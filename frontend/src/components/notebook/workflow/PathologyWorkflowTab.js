@@ -76,6 +76,104 @@ const DEFAULT_PATHOLOGY_WORKFLOW_PAGES = [
   { id: "default-13", order: 13, title: "Disposal and Archiving" },
 ];
 
+const PATHOLOGY_WORKFLOW_STAGE_MAP = {
+  histopathology_biopsy_tissue: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+  peripheral_smear_bone_marrow_morphology: [1, 2, 7, 8, 9, 10, 11, 12, 13],
+  fnac: [1, 2, 7, 8, 9, 10, 11, 12, 13],
+  cytology_liquid_based_pap_smear: [1, 2, 5, 7, 8, 9, 10, 11, 12, 13],
+};
+
+const CANONICAL_TITLES_BY_ORDER = {
+  1: "Sample Creation and Metadata Capture",
+  2: "Sample Quality Control",
+  3: "Gross Examination",
+  4: "Cassette Setup",
+  5: "Sample Processing",
+  6: "Block Creation",
+  7: "Slide Preparation",
+  8: "Slide Staining",
+  9: "Microscopy and Diagnosis",
+  10: "Individual Patient Report Preview and Print",
+  11: "Storage and Inventory Management",
+  12: "Reporting and Performance Monitoring",
+  13: "Disposal and Archiving",
+};
+
+const CANONICAL_ORDER_BY_TITLE = {
+  "sample creation and full metadata capture": 1,
+  "sample creation and metadata capture": 1,
+  "sample creation metadata capture": 1,
+  "sample quality control": 2,
+  "gross examination": 3,
+  "cassette setup": 4,
+  "sample processing": 5,
+  "block creation": 6,
+  "slide preparation": 7,
+  "slide staining": 8,
+  "microscopy and diagnosis": 9,
+  "microscopy diagnosis": 9,
+  "individual patient report preview and print": 10,
+  "storage and inventory management": 11,
+  "reporting and performance monitoring": 12,
+  "disposal and archiving": 13,
+};
+
+const normalizeWorkflowType = (workflowType) => {
+  const normalized = String(workflowType || "")
+    .trim()
+    .toLowerCase();
+  if (!normalized) {
+    return "histopathology_biopsy_tissue";
+  }
+  if (PATHOLOGY_WORKFLOW_STAGE_MAP[normalized]) {
+    return normalized;
+  }
+  switch (normalized) {
+    case "histopathology":
+    case "biopsy":
+    case "histopathology/biopsy":
+    case "histopathology_biopsy":
+      return "histopathology_biopsy_tissue";
+    case "peripheral_smear":
+    case "bone_marrow":
+    case "peripheral_smear_bone_marrow":
+      return "peripheral_smear_bone_marrow_morphology";
+    case "cytology":
+    case "liquid_based_pap_smear":
+    case "pap_smear":
+      return "cytology_liquid_based_pap_smear";
+    default:
+      return "histopathology_biopsy_tissue";
+  }
+};
+
+const normalizeStageTitle = (title) =>
+  String(title || "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const canonicalStageOrder = (page) => {
+  const byTitle = CANONICAL_ORDER_BY_TITLE[normalizeStageTitle(page?.title)];
+  if (byTitle) {
+    return byTitle;
+  }
+  const rawOrder = page?.pageOrder ?? page?.order;
+  return rawOrder ?? null;
+};
+
+const canonicalTitleForPage = (page) =>
+  CANONICAL_TITLES_BY_ORDER[canonicalStageOrder(page)] || page?.title;
+
+const isStageEnabledForPage = (workflowType, page) => {
+  const enabledStages =
+    PATHOLOGY_WORKFLOW_STAGE_MAP[normalizeWorkflowType(workflowType)] ||
+    PATHOLOGY_WORKFLOW_STAGE_MAP.histopathology_biopsy_tissue;
+  const stageOrder = canonicalStageOrder(page);
+  return stageOrder == null || enabledStages.includes(stageOrder);
+};
+
 /**
  * PathologyWorkflowTab - Container component for Pathology Laboratory workflow pages.
  * Displays the Pathology-specific workflow with progress indicators and navigation.
@@ -100,41 +198,38 @@ function PathologyWorkflowTab({ notebookId, entryId: propEntryId }) {
   const [samples, setSamples] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
+  const workflowType = useMemo(
+    () =>
+      normalizeWorkflowType(
+        notebook?.workflowType || entry?.notebook?.workflowType,
+      ),
+    [notebook?.workflowType, entry?.notebook?.workflowType],
+  );
+
   // Use actual pages if available, otherwise use default Pathology workflow pages.
   const effectivePages = useMemo(() => {
-    const canonicalTitleByOrder = {
-      1: "Sample Creation and Metadata Capture",
-      2: "Sample Quality Control",
-      3: "Gross Examination",
-      4: "Cassette Setup",
-      5: "Sample Processing",
-      6: "Block Creation",
-      7: "Slide Preparation",
-      8: "Slide Staining",
-      9: "Microscopy and Diagnosis",
-      10: "Individual Patient Report Preview and Print",
-      11: "Storage and Inventory Management",
-      12: "Reporting and Performance Monitoring",
-      13: "Disposal and Archiving",
-    };
+    const sourcePages =
+      pages && pages.length > 0 ? [...pages] : DEFAULT_PATHOLOGY_WORKFLOW_PAGES;
 
-    const normalizeTitles = (sourcePages) =>
-      sourcePages.map((page) => {
-        const pageOrder = page.pageOrder ?? page.order;
-        const canonicalTitle = canonicalTitleByOrder[pageOrder];
-        return canonicalTitle ? { ...page, title: canonicalTitle } : page;
-      });
+    return sourcePages
+      .map((page) => {
+        const stageOrder = canonicalStageOrder(page);
+        return {
+          ...page,
+          order: stageOrder ?? page.order ?? page.pageOrder,
+          pageOrder: stageOrder ?? page.pageOrder ?? page.order,
+          title: canonicalTitleForPage(page),
+        };
+      })
+      .filter((page) => isStageEnabledForPage(workflowType, page))
+      .sort((a, b) => (a.pageOrder ?? a.order ?? 0) - (b.pageOrder ?? b.order ?? 0));
+  }, [pages, workflowType]);
 
-    if (pages && pages.length > 0) {
-      const sortedPages = [...pages].sort((a, b) => {
-        const orderA = a.pageOrder ?? a.order ?? 0;
-        const orderB = b.pageOrder ?? b.order ?? 0;
-        return orderA - orderB;
-      });
-      return normalizeTitles(sortedPages);
+  useEffect(() => {
+    if (activePage >= effectivePages.length) {
+      setActivePage(0);
     }
-    return normalizeTitles(DEFAULT_PATHOLOGY_WORKFLOW_PAGES);
-  }, [pages]);
+  }, [activePage, effectivePages.length]);
 
   useEffect(() => {
     componentMounted.current = true;
@@ -313,7 +408,7 @@ function PathologyWorkflowTab({ notebookId, entryId: propEntryId }) {
 
   // Render Pathology page-specific content based on page order
   const renderPageContent = (page, pageIndex) => {
-    const pageOrder = page.order ?? 1;
+    const pageOrder = canonicalStageOrder(page) ?? page.order ?? 1;
     const progress = getProgressForPage(page.id);
     const previousPage = pageIndex > 0 ? effectivePages[pageIndex - 1] : null;
 

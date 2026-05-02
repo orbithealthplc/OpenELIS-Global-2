@@ -313,24 +313,41 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
             addGrossContent(document, sd, valueFont);
         }
 
-        // 7. Pathologist signature block
+        // 7. Verification / signature block
         document.add(Chunk.NEWLINE);
         Map<String, Object> lastSampleData = sampleDataList.get(sampleDataList.size() - 1);
+        boolean verifiedByPathologist = Boolean.parseBoolean(getString(lastSampleData, "diag_verifiedByPathologist"));
+        String verifyingPathologistName = getString(lastSampleData, "diag_verifyingPathologistName");
         String pathologistName = getString(lastSampleData, "diag_diagnosingPathologist");
         String credentials = getString(lastSampleData, "diag_pathologistCredentials");
-        String displayName = pathologistName;
-        if (!credentials.isEmpty()) {
+        String pathologistSignature = getString(lastSampleData, "diag_pathologistSignature");
+        String verificationDate = getString(lastSampleData, "diag_verificationDate");
+        String pathologistDate = getString(lastSampleData, "diag_pathologistDate");
+
+        String signerName = verifiedByPathologist && !verifyingPathologistName.isEmpty() ? verifyingPathologistName
+                : pathologistName;
+        String displayName = signerName;
+        if (!signerName.isEmpty() && !credentials.isEmpty()) {
             displayName += ", " + credentials;
+        } else if (displayName.isEmpty()) {
+            displayName = "Not recorded";
         }
 
         Paragraph sigBlock = new Paragraph();
         sigBlock.setSpacingBefore(20);
-        sigBlock.add(new Chunk("Pathologist Name: ", signLabelFont));
+        sigBlock.add(new Chunk(verifiedByPathologist ? "Verified by: " : "Pathologist Name: ", signLabelFont));
         sigBlock.add(new Chunk(displayName, signValueFont));
         sigBlock.add(Chunk.NEWLINE);
-        sigBlock.add(Chunk.NEWLINE);
-        sigBlock.add(new Chunk("Signature: ", signLabelFont));
-        sigBlock.add(new Chunk("________________", signValueFont));
+        if (!pathologistSignature.isEmpty()) {
+            sigBlock.add(new Chunk("Electronic Signature: ", signLabelFont));
+            sigBlock.add(new Chunk(pathologistSignature, signValueFont));
+            sigBlock.add(Chunk.NEWLINE);
+        }
+        String signedDate = !pathologistDate.isEmpty() ? pathologistDate : verificationDate;
+        if (!signedDate.isEmpty()) {
+            sigBlock.add(new Chunk(verifiedByPathologist ? "Verified Date: " : "Report Date: ", signLabelFont));
+            sigBlock.add(new Chunk(signedDate, signValueFont));
+        }
         document.add(sigBlock);
 
         // 8. Footer
@@ -341,8 +358,6 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
         Paragraph footer = new Paragraph();
         footer.setSpacingBefore(4);
         footer.add(new Chunk("Generated: " + LocalDateTime.now().toString(), smallFont));
-        footer.add(Chunk.NEWLINE);
-        footer.add(new Chunk("This is a computer-generated document.", smallFont));
         document.add(footer);
 
         document.close();
