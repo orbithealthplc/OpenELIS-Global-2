@@ -10,9 +10,6 @@ import {
   TableSelectAll,
   TableSelectRow,
   TableContainer,
-  TableToolbar,
-  TableToolbarContent,
-  TableToolbarSearch,
   Button,
   Form,
   TextInput,
@@ -25,6 +22,7 @@ import {
   Tag,
   Loading,
   Modal,
+  Checkbox,
 } from "@carbon/react";
 import { Add, Search, SendAlt, TrashCan } from "@carbon/icons-react";
 import { FormattedMessage, useIntl } from "react-intl";
@@ -33,6 +31,21 @@ import {
   getFromOpenElisServer,
   postToOpenElisServerJsonResponse,
 } from "../../../utils/Utils";
+
+function formatDateForApi(d) {
+  if (!d) return null;
+  if (typeof d === "string") return d.split("T")[0];
+  try {
+    const x = new Date(d);
+    if (Number.isNaN(x.getTime())) return null;
+    const year = x.getFullYear();
+    const month = String(x.getMonth() + 1).padStart(2, "0");
+    const day = String(x.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  } catch {
+    return null;
+  }
+}
 
 /**
  * RequestSubmissionTab - Create new sample retrieval requests
@@ -53,6 +66,11 @@ function RequestSubmissionTab({ onRequestCreated }) {
   const [ethicsApprovalRef, setEthicsApprovalRef] = useState("");
   const [requiredByDate, setRequiredByDate] = useState(null);
   const [projectId, setProjectId] = useState("");
+  const [requesterLabUnit, setRequesterLabUnit] = useState("");
+  const [requesterContactInfo, setRequesterContactInfo] = useState("");
+  const [intendedUseDescription, setIntendedUseDescription] = useState("");
+  const [samplesWillBeDestroyed, setSamplesWillBeDestroyed] = useState(false);
+  const [estimatedReturnDate, setEstimatedReturnDate] = useState(null);
 
   // Selected samples state
   const [selectedSamples, setSelectedSamples] = useState([]);
@@ -110,7 +128,12 @@ function RequestSubmissionTab({ onRequestCreated }) {
     const samplesToAdd = searchResults.filter((s) =>
       searchSelectedRows.includes(s.id.toString()),
     );
-    setSelectedSamples((prev) => [...prev, ...samplesToAdd]);
+    const withManifestDefaults = samplesToAdd.map((s) => ({
+      ...s,
+      quantityRequested: "1",
+      unitOfMeasure: "",
+    }));
+    setSelectedSamples((prev) => [...prev, ...withManifestDefaults]);
     setSearchSelectedRows([]);
     setSearchResults([]);
     setSearchQuery("");
@@ -121,6 +144,12 @@ function RequestSubmissionTab({ onRequestCreated }) {
   // Remove sample from selection
   const handleRemoveSample = useCallback((sampleId) => {
     setSelectedSamples((prev) => prev.filter((s) => s.id !== sampleId));
+  }, []);
+
+  const updateSelectedLine = useCallback((bioSampleId, field, value) => {
+    setSelectedSamples((prev) =>
+      prev.map((s) => (s.id === bioSampleId ? { ...s, [field]: value } : s)),
+    );
   }, []);
 
   // Submit the request
@@ -151,15 +180,35 @@ function RequestSubmissionTab({ onRequestCreated }) {
       setSubmitting(true);
       setSubmitError(null);
 
+      const sampleLines = selectedSamples.map((s) => {
+        const raw = String(s.quantityRequested ?? "")
+          .trim()
+          .replace(",", ".");
+        const q = parseFloat(raw);
+        return {
+          bioSampleId: s.id,
+          quantityRequested: Number.isFinite(q) ? q : null,
+          unitOfMeasure: (s.unitOfMeasure || "").trim() || null,
+        };
+      });
+
       const requestBody = {
         requestPurpose,
         bioSampleIds: selectedSamples.map((s) => s.id),
+        sampleLines,
         projectId: projectId || null,
         ethicsApprovalRef: ethicsApprovalRef || null,
         destinationType,
         destinationDetails: destinationDetails || null,
         priorityLevel,
-        requiredByDate: requiredByDate || null,
+        requiredByDate: formatDateForApi(requiredByDate),
+        requesterLabUnit: requesterLabUnit.trim() || null,
+        requesterContactInfo: requesterContactInfo.trim() || null,
+        intendedUseDescription: intendedUseDescription.trim() || null,
+        samplesWillBeDestroyed,
+        estimatedReturnDate: !samplesWillBeDestroyed
+          ? formatDateForApi(estimatedReturnDate)
+          : null,
       };
 
       postToOpenElisServerJsonResponse(
@@ -193,6 +242,11 @@ function RequestSubmissionTab({ onRequestCreated }) {
                 setEthicsApprovalRef("");
                 setRequiredByDate(null);
                 setProjectId("");
+                setRequesterLabUnit("");
+                setRequesterContactInfo("");
+                setIntendedUseDescription("");
+                setSamplesWillBeDestroyed(false);
+                setEstimatedReturnDate(null);
                 setSelectedSamples([]);
 
                 if (onRequestCreated) {
@@ -213,42 +267,15 @@ function RequestSubmissionTab({ onRequestCreated }) {
       destinationDetails,
       priorityLevel,
       requiredByDate,
+      requesterLabUnit,
+      requesterContactInfo,
+      intendedUseDescription,
+      samplesWillBeDestroyed,
+      estimatedReturnDate,
       intl,
       onRequestCreated,
     ],
   );
-
-  // Selected samples table headers
-  const selectedHeaders = [
-    {
-      key: "sampleNumber",
-      header: intl.formatMessage({
-        id: "biorepository.sample.number",
-        defaultMessage: "Sample Number",
-      }),
-    },
-    {
-      key: "sampleType",
-      header: intl.formatMessage({
-        id: "biorepository.sample.type",
-        defaultMessage: "Sample Type",
-      }),
-    },
-    {
-      key: "storageLocation",
-      header: intl.formatMessage({
-        id: "biorepository.sample.storageLocation",
-        defaultMessage: "Storage Location",
-      }),
-    },
-    {
-      key: "actions",
-      header: intl.formatMessage({
-        id: "label.actions",
-        defaultMessage: "Actions",
-      }),
-    },
-  ];
 
   // Search results table headers
   const searchHeaders = [
@@ -345,73 +372,112 @@ function RequestSubmissionTab({ onRequestCreated }) {
           </Button>
 
           {selectedSamples.length > 0 ? (
-            <DataTable
-              rows={selectedSamples.map((s) => ({
-                id: (s.id || s.sampleItemId).toString(),
-                sampleNumber:
-                  s.barcode ||
-                  s.sampleNumber ||
-                  `BIO-${s.id || s.sampleItemId}`,
-                sampleType:
-                  s.sampleType?.description || s.sampleTypeName || "N/A",
-                storageLocation:
-                  s.storageLocationName || s.storageLocation || "N/A",
-              }))}
-              headers={selectedHeaders}
-              size="sm"
-            >
-              {({
-                rows,
-                headers,
-                getTableProps,
-                getHeaderProps,
-                getRowProps,
-              }) => (
-                <TableContainer>
-                  <Table {...getTableProps()}>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader
-                            {...getHeaderProps({ header })}
-                            key={header.key}
-                          >
-                            {header.header}
-                          </TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row) => (
-                        <TableRow {...getRowProps({ row })} key={row.id}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>
-                              {cell.info.header === "actions" ? (
-                                <Button
-                                  kind="ghost"
-                                  size="sm"
-                                  renderIcon={TrashCan}
-                                  iconDescription={intl.formatMessage({
-                                    id: "label.remove",
-                                    defaultMessage: "Remove",
-                                  })}
-                                  hasIconOnly
-                                  onClick={() =>
-                                    handleRemoveSample(parseInt(row.id))
-                                  }
-                                />
-                              ) : (
-                                cell.value
-                              )}
-                            </TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </DataTable>
+            <TableContainer>
+              <Table size="sm">
+                <TableHead>
+                  <TableRow>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "biorepository.sample.number",
+                        defaultMessage: "Identifier",
+                      })}
+                    </TableHeader>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "biorepository.sample.type",
+                        defaultMessage: "Sample Type",
+                      })}
+                    </TableHeader>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "biorepository.retrieval.quantityRequested",
+                        defaultMessage: "Qty requested",
+                      })}
+                    </TableHeader>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "biorepository.retrieval.unitOfMeasure",
+                        defaultMessage: "Unit",
+                      })}
+                    </TableHeader>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "biorepository.sample.storageLocation",
+                        defaultMessage: "Storage Location",
+                      })}
+                    </TableHeader>
+                    <TableHeader>
+                      {intl.formatMessage({
+                        id: "label.actions",
+                        defaultMessage: "Actions",
+                      })}
+                    </TableHeader>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {selectedSamples.map((s) => (
+                    <TableRow key={s.id}>
+                      <TableCell>
+                        {s.barcode ||
+                          s.sampleNumber ||
+                          `BIO-${s.id || s.sampleItemId}`}
+                      </TableCell>
+                      <TableCell>
+                        {s.sampleType?.description || s.sampleTypeName || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <TextInput
+                          id={`qty-${s.id}`}
+                          labelText=""
+                          hideLabel
+                          size="sm"
+                          value={String(s.quantityRequested ?? "")}
+                          onChange={(ev) =>
+                            updateSelectedLine(
+                              s.id,
+                              "quantityRequested",
+                              ev.target.value,
+                            )
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <TextInput
+                          id={`uom-${s.id}`}
+                          labelText=""
+                          hideLabel
+                          size="sm"
+                          value={String(s.unitOfMeasure ?? "")}
+                          onChange={(ev) =>
+                            updateSelectedLine(
+                              s.id,
+                              "unitOfMeasure",
+                              ev.target.value,
+                            )
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        {s.storageLocationName || s.storageLocation || "N/A"}
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          kind="ghost"
+                          size="sm"
+                          renderIcon={TrashCan}
+                          iconDescription={intl.formatMessage({
+                            id: "label.remove",
+                            defaultMessage: "Remove",
+                          })}
+                          hasIconOnly
+                          onClick={() => handleRemoveSample(s.id)}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
           ) : (
             <p style={{ color: "#525252", fontStyle: "italic" }}>
               <FormattedMessage
@@ -587,6 +653,84 @@ function RequestSubmissionTab({ onRequestCreated }) {
                 placeholder="YYYY-MM-DD"
               />
             </DatePicker>
+          </div>
+        </div>
+
+        {/* AHRI withdrawal / requester details */}
+        <div style={{ marginBottom: "2rem" }}>
+          <h4 style={{ marginBottom: "1rem" }}>
+            <FormattedMessage
+              id="biorepository.retrieval.withdrawalDetails"
+              defaultMessage="Requester & Withdrawal Details"
+            />
+          </h4>
+          <div
+            style={{
+              display: "grid",
+              gap: "1rem",
+              gridTemplateColumns: "1fr 1fr",
+            }}
+          >
+            <TextInput
+              id="requesterLabUnit"
+              labelText={intl.formatMessage({
+                id: "biorepository.retrieval.requesterLabUnit",
+                defaultMessage: "Requester laboratory unit / department",
+              })}
+              value={requesterLabUnit}
+              onChange={(e) => setRequesterLabUnit(e.target.value)}
+              style={{ gridColumn: "1 / -1" }}
+            />
+            <TextInput
+              id="requesterContactInfo"
+              labelText={intl.formatMessage({
+                id: "biorepository.retrieval.requesterContactInfo",
+                defaultMessage: "Requester contact (phone / email)",
+              })}
+              value={requesterContactInfo}
+              onChange={(e) => setRequesterContactInfo(e.target.value)}
+              style={{ gridColumn: "1 / -1" }}
+            />
+            <TextArea
+              id="intendedUseDescription"
+              labelText={intl.formatMessage({
+                id: "biorepository.retrieval.intendedUse",
+                defaultMessage: "Intended use of material",
+              })}
+              value={intendedUseDescription}
+              onChange={(e) => setIntendedUseDescription(e.target.value)}
+              style={{ gridColumn: "1 / -1" }}
+            />
+            <Checkbox
+              id="samplesWillBeDestroyed"
+              labelText={intl.formatMessage({
+                id: "biorepository.retrieval.samplesWillBeDestroyed",
+                defaultMessage:
+                  "Samples will be destroyed (no return expected)",
+              })}
+              checked={samplesWillBeDestroyed}
+              onChange={(_, { checked }) =>
+                setSamplesWillBeDestroyed(!!checked)
+              }
+              style={{ gridColumn: "1 / -1" }}
+            />
+            {!samplesWillBeDestroyed && (
+              <DatePicker
+                datePickerType="single"
+                dateFormat="Y-m-d"
+                value={estimatedReturnDate}
+                onChange={(dates) => setEstimatedReturnDate(dates[0] || null)}
+              >
+                <DatePickerInput
+                  id="estimatedReturnDate"
+                  labelText={intl.formatMessage({
+                    id: "biorepository.retrieval.estimatedReturnDate",
+                    defaultMessage: "Estimated return date",
+                  })}
+                  placeholder="YYYY-MM-DD"
+                />
+              </DatePicker>
+            )}
           </div>
         </div>
 

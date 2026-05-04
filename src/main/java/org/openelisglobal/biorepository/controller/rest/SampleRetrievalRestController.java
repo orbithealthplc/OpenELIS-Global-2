@@ -82,35 +82,8 @@ public class SampleRetrievalRestController extends BaseRestController {
                     request.getBioSampleIds(), request.getProjectId(), request.getEthicsApprovalRef(), destType,
                     request.getDestinationDetails(), priority, request.getRequiredByDate(), sysUserId);
 
-            // Set AHRI BR-F-02 form fields and notebook link
-            boolean updated = false;
-            if (request.getNotebookEntryId() != null) {
-                NotebookEntry entry = notebookEntryService.get(request.getNotebookEntryId());
-                if (entry != null) {
-                    retrieval.setNotebookEntry(entry);
-                    updated = true;
-                }
-            }
-            if (request.getRequesterLabUnit() != null) {
-                retrieval.setRequesterLabUnit(request.getRequesterLabUnit());
-                updated = true;
-            }
-            if (request.getRequesterContactInfo() != null) {
-                retrieval.setRequesterContactInfo(request.getRequesterContactInfo());
-                updated = true;
-            }
-            if (request.getIntendedUseDescription() != null) {
-                retrieval.setIntendedUseDescription(request.getIntendedUseDescription());
-                updated = true;
-            }
-            if (request.getSamplesWillBeDestroyed() != null) {
-                retrieval.setSamplesWillBeDestroyed(request.getSamplesWillBeDestroyed());
-                updated = true;
-            }
-            if (request.getEstimatedReturnDate() != null) {
-                retrieval.setEstimatedReturnDate(request.getEstimatedReturnDate());
-                updated = true;
-            }
+            // Set AHRI BR-F-02 form fields, per-line qty/UOM, notebook link — single persist when dirty
+            boolean updated = applyRetrievalHeaderAndLineFields(retrieval, request, sysUserId);
             if (updated) {
                 retrieval.setSysUserId(sysUserId);
                 retrievalService.update(retrieval);
@@ -127,6 +100,71 @@ public class SampleRetrievalRestController extends BaseRestController {
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Failed to create retrieval request: " + e.getMessage()));
         }
+    }
+
+    /**
+     * Applies optional header fields and manifest line quantities to a newly created request; returns true if any
+     * field changed.
+     */
+    private boolean applyRetrievalHeaderAndLineFields(SampleRetrievalRequest retrieval, RetrievalRequestCreate request,
+            String sysUserId) {
+        boolean dirty = false;
+        if (request.getNotebookEntryId() != null) {
+            NotebookEntry entry = notebookEntryService.get(request.getNotebookEntryId());
+            if (entry != null) {
+                retrieval.setNotebookEntry(entry);
+                dirty = true;
+            }
+        }
+        if (request.getRequesterLabUnit() != null) {
+            retrieval.setRequesterLabUnit(trimToMaxLength(request.getRequesterLabUnit().trim(), 100));
+            dirty = true;
+        }
+        if (request.getRequesterContactInfo() != null) {
+            retrieval.setRequesterContactInfo(trimToMaxLength(request.getRequesterContactInfo().trim(), 255));
+            dirty = true;
+        }
+        if (request.getIntendedUseDescription() != null) {
+            retrieval.setIntendedUseDescription(request.getIntendedUseDescription().trim());
+            dirty = true;
+        }
+        if (request.getSamplesWillBeDestroyed() != null) {
+            retrieval.setSamplesWillBeDestroyed(request.getSamplesWillBeDestroyed());
+            dirty = true;
+        }
+        if (request.getEstimatedReturnDate() != null) {
+            retrieval.setEstimatedReturnDate(request.getEstimatedReturnDate());
+            dirty = true;
+        }
+        if (request.getSampleLines() != null && !request.getSampleLines().isEmpty()) {
+            for (RetrievalSampleLine line : request.getSampleLines()) {
+                if (line == null || line.getBioSampleId() == null) {
+                    continue;
+                }
+                for (SampleRetrievalItem item : retrieval.getItems()) {
+                    if (item.getBioSample() != null && line.getBioSampleId().equals(item.getBioSample().getId())) {
+                        if (line.getQuantityRequested() != null) {
+                            item.setQuantityRequested(line.getQuantityRequested());
+                            dirty = true;
+                        }
+                        if (line.getUnitOfMeasure() != null && !line.getUnitOfMeasure().isBlank()) {
+                            item.setUnitOfMeasure(trimToMaxLength(line.getUnitOfMeasure().trim(), 20));
+                            dirty = true;
+                        }
+                        item.setSysUserId(sysUserId);
+                        break;
+                    }
+                }
+            }
+        }
+        return dirty;
+    }
+
+    private static String trimToMaxLength(String s, int max) {
+        if (s == null || s.length() <= max) {
+            return s;
+        }
+        return s.substring(0, max);
     }
 
     /**
@@ -886,6 +924,7 @@ public class SampleRetrievalRestController extends BaseRestController {
         private String intendedUseDescription;
         private Boolean samplesWillBeDestroyed;
         private LocalDate estimatedReturnDate;
+        private List<RetrievalSampleLine> sampleLines;
 
         public String getRequestPurpose() {
             return requestPurpose;
@@ -997,6 +1036,44 @@ public class SampleRetrievalRestController extends BaseRestController {
 
         public void setEstimatedReturnDate(LocalDate estimatedReturnDate) {
             this.estimatedReturnDate = estimatedReturnDate;
+        }
+
+        public List<RetrievalSampleLine> getSampleLines() {
+            return sampleLines;
+        }
+
+        public void setSampleLines(List<RetrievalSampleLine> sampleLines) {
+            this.sampleLines = sampleLines;
+        }
+    }
+
+    public static class RetrievalSampleLine {
+        private Integer bioSampleId;
+        private BigDecimal quantityRequested;
+        private String unitOfMeasure;
+
+        public Integer getBioSampleId() {
+            return bioSampleId;
+        }
+
+        public void setBioSampleId(Integer bioSampleId) {
+            this.bioSampleId = bioSampleId;
+        }
+
+        public BigDecimal getQuantityRequested() {
+            return quantityRequested;
+        }
+
+        public void setQuantityRequested(BigDecimal quantityRequested) {
+            this.quantityRequested = quantityRequested;
+        }
+
+        public String getUnitOfMeasure() {
+            return unitOfMeasure;
+        }
+
+        public void setUnitOfMeasure(String unitOfMeasure) {
+            this.unitOfMeasure = unitOfMeasure;
         }
     }
 
