@@ -131,9 +131,10 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         BioSample updatedBioSample = bioSampleService.get(bioSampleId);
         assertEquals(WorkflowStatus.IN_USE, updatedBioSample.getWorkflowStatus());
 
-        // Step 5: Return item
-        item = retrievalService.returnItem(itemId, "Good condition", "Analysis complete", false,
-                approver.getId().toString());
+        retrievalService.releaseItem(itemId, approver.getId().toString());
+
+        // Step 5: Return item (intact path; notes optional)
+        item = retrievalService.returnItem(itemId, "Intact", "Analysis complete", false, approver.getId().toString());
         assertEquals(ItemStatus.RETURNED, item.getStatus());
 
         // Verify BioSample status is pending physical re-storage
@@ -152,6 +153,12 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
                 logs.stream().anyMatch(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_RECEIVED));
         assertFalse("RETURN_STORED should not be emitted before physical storage",
                 logs.stream().anyMatch(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_STORED));
+        ChainOfCustodyLog returnReceived = logs.stream()
+                .filter(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_RECEIVED)
+                .reduce((a, b) -> b)
+                .orElse(null);
+        assertNotNull(returnReceived);
+        assertTrue(returnReceived.getNotes() != null && returnReceived.getNotes().contains("Return condition:"));
     }
 
     // ========== CREATE REQUEST TESTS ==========
@@ -233,18 +240,59 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         SampleRetrievalRequest request = createApprovedRequest(bioSample);
         Integer itemId = request.getItems().get(0).getId();
 
-        // Retrieve
         retrievalService.retrieveItem(itemId, "Good", null, null, approver.getId().toString());
+        retrievalService.releaseItem(itemId, approver.getId().toString());
 
-        // Return as consumed
-        SampleRetrievalItem item = retrievalService.returnItem(itemId, "Fully used", "Sample exhausted", true,
+        SampleRetrievalItem item = retrievalService.returnItem(itemId, "Consumed", "Sample exhausted", true,
                 approver.getId().toString());
 
         assertEquals(ItemStatus.CONSUMED, item.getStatus());
 
-        // BioSample should be DISPOSED
         BioSample updatedBioSample = bioSampleService.get(bioSample.getId());
         assertEquals(WorkflowStatus.DISPOSED, updatedBioSample.getWorkflowStatus());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testReturnItem_DeviatedWithoutNotes_Throws() {
+        BioSample bioSample = createStoredBioSample("DEVNON-" + System.currentTimeMillis());
+        SampleRetrievalRequest request = createApprovedRequest(bioSample);
+        Integer itemId = request.getItems().get(0).getId();
+        retrievalService.retrieveItem(itemId, "Good", null, null, approver.getId().toString());
+        retrievalService.releaseItem(itemId, approver.getId().toString());
+        retrievalService.returnItem(itemId, "Deviated - Damaged", "", false, approver.getId().toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testReturnItem_ConsumedWithoutNotes_Throws() {
+        BioSample bioSample = createStoredBioSample("CONNON-" + System.currentTimeMillis());
+        SampleRetrievalRequest request = createApprovedRequest(bioSample);
+        Integer itemId = request.getItems().get(0).getId();
+        retrievalService.retrieveItem(itemId, "Good", null, null, approver.getId().toString());
+        retrievalService.releaseItem(itemId, approver.getId().toString());
+        retrievalService.returnItem(itemId, "Consumed", null, true, approver.getId().toString());
+    }
+
+    @Test
+    public void testReturnItem_DeviatedWithNotes_CustodyLogIncludesConditionAndNotes() {
+        BioSample bioSample = createStoredBioSample("DEVOK-" + System.currentTimeMillis());
+        SampleRetrievalRequest request = createApprovedRequest(bioSample);
+        Integer itemId = request.getItems().get(0).getId();
+        retrievalService.retrieveItem(itemId, "Good", null, null, approver.getId().toString());
+        retrievalService.releaseItem(itemId, approver.getId().toString());
+        retrievalService.returnItem(itemId, "Deviated - Damaged", "Cracked tube", false, approver.getId().toString());
+
+        List<ChainOfCustodyLog> logs = custodyService
+                .getBySampleItemId(Integer.valueOf(bioSample.getSampleItem().getId()));
+        ChainOfCustodyLog returnReceived = logs.stream()
+                .filter(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_RECEIVED)
+                .reduce((a, b) -> b)
+                .orElse(null);
+        assertNotNull(returnReceived);
+        assertNotNull(returnReceived.getNotes());
+        assertTrue(returnReceived.getNotes().contains("Return condition:"));
+        assertTrue(returnReceived.getNotes().contains("Deviated - Damaged"));
+        assertTrue(returnReceived.getNotes().contains("Notes:"));
+        assertTrue(returnReceived.getNotes().contains("Cracked tube"));
     }
 
     @Test

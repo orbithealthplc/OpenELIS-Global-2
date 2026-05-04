@@ -342,6 +342,48 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
         return item;
     }
 
+    /**
+     * Validates return documentation for deviation and consumption paths.
+     *
+     * @param consumedOrDisposed true when the item is treated as consumed (API flag and/or condition {@code Consumed})
+     */
+    public static void validateReturnDocumentation(String returnedCondition, String returnNotes,
+            boolean consumedOrDisposed) {
+        if (returnedCondition == null || returnedCondition.isBlank()) {
+            throw new IllegalArgumentException("Returned condition is required.");
+        }
+        String cond = returnedCondition.trim();
+        String trimmedNotes = returnNotes != null ? returnNotes.trim() : "";
+        if (consumedOrDisposed && trimmedNotes.isEmpty()) {
+            throw new IllegalArgumentException("Return notes are required when the sample is consumed.");
+        }
+        if (cond.startsWith("Deviated") && trimmedNotes.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Return notes are required when the return condition indicates a deviation.");
+        }
+    }
+
+    /**
+     * Builds custody-log text so lifecycle/history shows both condition and free-text notes.
+     */
+    public static String buildReturnCustodyLogNotes(String returnedCondition, String returnNotes, boolean fullyConsumed) {
+        StringBuilder sb = new StringBuilder();
+        if (returnedCondition != null && !returnedCondition.isBlank()) {
+            sb.append("Return condition: ").append(returnedCondition.trim());
+        }
+        String n = returnNotes != null ? returnNotes.trim() : "";
+        if (!n.isEmpty()) {
+            if (sb.length() > 0) {
+                sb.append(" | ");
+            }
+            sb.append("Notes: ").append(n);
+        }
+        if (sb.length() == 0 && fullyConsumed) {
+            return "Consumed (no additional notes)";
+        }
+        return sb.toString();
+    }
+
     @Override
     @Transactional
     public SampleRetrievalItem returnItem(Integer retrievalItemId, String returnedCondition, String returnNotes,
@@ -353,12 +395,16 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             throw new IllegalStateException("Item is not checked out: " + item.getStatus());
         }
 
+        String condTrim = returnedCondition != null ? returnedCondition.trim() : "";
+        boolean treatAsConsumed = fullyConsumed || "Consumed".equals(condTrim);
+        validateReturnDocumentation(returnedCondition, returnNotes, treatAsConsumed);
+
         SystemUser returner = systemUserService.get(sysUserId);
         if (returner == null) {
             throw new IllegalArgumentException("User not found: " + sysUserId);
         }
 
-        if (fullyConsumed) {
+        if (treatAsConsumed) {
             item.setStatus(ItemStatus.CONSUMED);
         } else {
             item.setStatus(ItemStatus.RETURNED);
@@ -375,7 +421,7 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
         String workflowStatusBefore = bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null;
         String storageCoords = getStorageCoordinates(bioSample);
 
-        if (fullyConsumed) {
+        if (treatAsConsumed) {
             bioSample.setWorkflowStatus(WorkflowStatus.DISPOSED);
         } else {
             bioSample.setWorkflowStatus(WorkflowStatus.PENDING_STORAGE);
@@ -383,10 +429,11 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
         bioSample.setSysUserId(sysUserId);
         bioSampleService.update(bioSample);
 
-        CustodyAction action = fullyConsumed ? CustodyAction.DISPOSED : CustodyAction.RETURN_RECEIVED;
+        CustodyAction action = treatAsConsumed ? CustodyAction.DISPOSED : CustodyAction.RETURN_RECEIVED;
+        String custodyLogNotes = buildReturnCustodyLogNotes(returnedCondition, returnNotes, treatAsConsumed);
         chainOfCustodyService.logCustodyAction(bioSample.getSampleItem(), action,
                 findOriginalTransferRequest(bioSample), request, storageCoords, returner, null, storageCoords, null,
-                returnNotes, sysUserId, "SampleRetrievalItem", item.getId(), workflowStatusBefore,
+                custodyLogNotes, sysUserId, "SampleRetrievalItem", item.getId(), workflowStatusBefore,
                 bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null);
 
         updateRequestStatusAfterItemChange(request, sysUserId);

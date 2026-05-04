@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import {
   DataTable,
   Table,
@@ -16,12 +16,10 @@ import {
   TableSelectRow,
   Button,
   Modal,
-  TextInput,
   TextArea,
   Select,
   SelectItem,
   NumberInput,
-  Checkbox,
   Tag,
   InlineNotification,
   Loading,
@@ -81,9 +79,18 @@ function ActiveRetrievalsTab({ onActionComplete }) {
   const [temperatureAtRetrieval, setTemperatureAtRetrieval] = useState("");
 
   // Return form state
-  const [returnedCondition, setReturnedCondition] = useState("Good");
+  const [returnedCondition, setReturnedCondition] = useState("Intact");
   const [returnNotes, setReturnNotes] = useState("");
-  const [fullyConsumed, setFullyConsumed] = useState(false);
+
+  const returnFormValid = useMemo(() => {
+    const consumed = returnedCondition === "Consumed";
+    const deviated =
+      returnedCondition && returnedCondition.startsWith("Deviated");
+    if (consumed || deviated) {
+      return !!(returnNotes && returnNotes.trim().length > 0);
+    }
+    return true;
+  }, [returnedCondition, returnNotes]);
 
   // Load active data
   const loadData = useCallback(() => {
@@ -188,13 +195,29 @@ function ActiveRetrievalsTab({ onActionComplete }) {
   const handleReturn = useCallback(() => {
     if (!selectedItem) return;
 
+    const consumed = returnedCondition === "Consumed";
+    const notesTrim = (returnNotes || "").trim();
+    const needsNotes =
+      consumed ||
+      (returnedCondition && returnedCondition.startsWith("Deviated"));
+    if (needsNotes && !notesTrim) {
+      setError(
+        intl.formatMessage({
+          id: "biorepository.retrieval.error.returnNotesRequired",
+          defaultMessage:
+            "Return notes are required for deviated returns and when marking as consumed.",
+        }),
+      );
+      return;
+    }
+
     setActionLoading(true);
     postToOpenElisServerJsonResponse(
       `/rest/biorepository/retrieval/items/${selectedItem.id}/return`,
       JSON.stringify({
-        returnedCondition,
+        returnedCondition: consumed ? "Consumed" : returnedCondition,
         returnNotes: returnNotes || null,
-        fullyConsumed,
+        fullyConsumed: consumed,
       }),
       (data) => {
         setActionLoading(false);
@@ -213,9 +236,9 @@ function ActiveRetrievalsTab({ onActionComplete }) {
     selectedItem,
     returnedCondition,
     returnNotes,
-    fullyConsumed,
     loadData,
     onActionComplete,
+    intl,
   ]);
 
   const resetRetrieveForm = () => {
@@ -225,9 +248,8 @@ function ActiveRetrievalsTab({ onActionComplete }) {
   };
 
   const resetReturnForm = () => {
-    setReturnedCondition("Good");
+    setReturnedCondition("Intact");
     setReturnNotes("");
-    setFullyConsumed(false);
   };
 
   const openLifecycle = useCallback((item) => {
@@ -236,7 +258,9 @@ function ActiveRetrievalsTab({ onActionComplete }) {
       sampleItemId: item.sampleItemId,
       bioSampleId: item.bioSampleId,
       sampleLabel:
-        item.sampleNumber || item.bioSampleExternalId || (item.sampleItemId ? `Item-${item.sampleItemId}` : ""),
+        item.sampleNumber ||
+        item.bioSampleExternalId ||
+        (item.sampleItemId ? `Item-${item.sampleItemId}` : ""),
     });
     setLifecycleModalOpen(true);
   }, []);
@@ -614,7 +638,9 @@ function ActiveRetrievalsTab({ onActionComplete }) {
                                   {cell.value}
                                 </Tag>
                               ) : cell.info.header === "actions" ? (
-                                <div style={{ display: "flex", gap: "0.25rem" }}>
+                                <div
+                                  style={{ display: "flex", gap: "0.25rem" }}
+                                >
                                   <Button
                                     kind="ghost"
                                     size="sm"
@@ -632,7 +658,9 @@ function ActiveRetrievalsTab({ onActionComplete }) {
                                     kind="ghost"
                                     size="sm"
                                     data-testid="view-lifecycle-button"
-                                    onClick={() => openLifecycle(rawData.items?.[0])}
+                                    onClick={() =>
+                                      openLifecycle(rawData.items?.[0])
+                                    }
                                   >
                                     <FormattedMessage
                                       id="biorepository.lifecycle.view"
@@ -988,7 +1016,7 @@ function ActiveRetrievalsTab({ onActionComplete }) {
           resetReturnForm();
         }}
         onRequestSubmit={handleReturn}
-        primaryButtonDisabled={actionLoading}
+        primaryButtonDisabled={actionLoading || !returnFormValid}
       >
         {selectedItem && (
           <div style={{ display: "grid", gap: "1rem" }}>
@@ -1014,32 +1042,29 @@ function ActiveRetrievalsTab({ onActionComplete }) {
               value={returnedCondition}
               onChange={(e) => setReturnedCondition(e.target.value)}
             >
-              <SelectItem value="Good" text="Good" />
-              <SelectItem value="Reduced Volume" text="Reduced Volume" />
-              <SelectItem value="Thawed" text="Thawed" />
-              <SelectItem value="Damaged" text="Damaged" />
-              <SelectItem value="Other" text="Other" />
+              <SelectItem value="Intact" text="Intact" />
+              <SelectItem
+                value="Deviated - Reduced Volume"
+                text="Deviated - Reduced Volume"
+              />
+              <SelectItem value="Deviated - Thawed" text="Deviated - Thawed" />
+              <SelectItem
+                value="Deviated - Damaged"
+                text="Deviated - Damaged"
+              />
+              <SelectItem value="Deviated - Other" text="Deviated - Other" />
+              <SelectItem value="Consumed" text="Consumed" />
             </Select>
 
             <TextArea
               id="returnNotes"
               labelText={intl.formatMessage({
                 id: "biorepository.retrieval.returnNotes",
-                defaultMessage: "Return Notes (Optional)",
+                defaultMessage:
+                  "Return notes (required if deviated or consumed)",
               })}
               value={returnNotes}
               onChange={(e) => setReturnNotes(e.target.value)}
-            />
-
-            <Checkbox
-              id="fullyConsumed"
-              labelText={intl.formatMessage({
-                id: "biorepository.retrieval.fullyConsumed",
-                defaultMessage:
-                  "Sample was fully consumed (will not be returned to storage)",
-              })}
-              checked={fullyConsumed}
-              onChange={(_, { checked }) => setFullyConsumed(checked)}
             />
           </div>
         )}
