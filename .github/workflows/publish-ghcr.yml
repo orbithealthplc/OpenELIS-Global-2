@@ -22,6 +22,11 @@ on:
         required: false
         type: boolean
         default: false
+      include_day_tag:
+        description: "Also publish a day version tag (vYYYY.MM.DD)"
+        required: false
+        type: boolean
+        default: false
 
 env:
   REGISTRY: ghcr.io
@@ -168,6 +173,10 @@ jobs:
 
           if [[ "${{ inputs.include_latest_tag }}" == "true" ]]; then
             tags+=("${image}:latest")
+          fi
+
+          if [[ "${{ inputs.include_day_tag }}" == "true" ]]; then
+            tags+=("${image}:v$(date -u +%Y.%m.%d)")
           fi
 
           {
