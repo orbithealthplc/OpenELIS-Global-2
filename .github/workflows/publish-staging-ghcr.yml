@@ -5,6 +5,10 @@ on:
     branches: [demo/ethiopia-main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   publish-staging:
     uses: ./.github/workflows/publish-ghcr.yml
@@ -12,3 +16,4 @@ jobs:
       tag: staging
       include_sha_tag: true
       include_latest_tag: false
+      include_day_tag: true
