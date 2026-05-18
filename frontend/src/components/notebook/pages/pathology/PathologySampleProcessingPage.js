@@ -65,6 +65,7 @@ import "../../workflow/NotebookWorkflow.css";
  */
 function PathologySampleProcessingPage({
   entryId,
+  notebookId,
   pageData,
   onProgressUpdate,
 }) {
@@ -181,62 +182,71 @@ function PathologySampleProcessingPage({
 
     setLoading(true);
     setError(null);
+    const isSyntheticPageId = String(pageData.id).startsWith("default-");
 
-    // Pull samples that are ready after cassettes (same feed used by blocks),
+    // Pull samples from the workflow-specific previous stage,
     // then overlay this page's status/data so processing progression is visible.
     getFromOpenElisServer(
-      `/rest/notebook/pathology/workflow/samples-ready?entryId=${entryId}&currentStep=blocks`,
+      `/rest/notebook/pathology/workflow/samples-ready?entryId=${entryId}&notebookId=${notebookId}&currentStep=processing`,
       (workflowResponse) => {
         if (componentMounted.current) {
+          const applyResponses = (pageResponse = []) => {
+            if (!componentMounted.current) return;
+
+            const pageSampleMap = {};
+            if (pageResponse && Array.isArray(pageResponse)) {
+              pageResponse.forEach((ps) => {
+                const sampleId = String(ps.sampleItemId || ps.id);
+                pageSampleMap[sampleId] = ps;
+              });
+            }
+
+            if (workflowResponse && Array.isArray(workflowResponse)) {
+              const transformedSamples = workflowResponse.map((sample) => {
+                const sampleId = String(sample.id || sample.sampleItemId);
+                const pageSample =
+                  pageSampleMap[sampleId] ||
+                  pageSampleMap[sampleId.split("_")[0]];
+
+                return {
+                  id: sampleId,
+                  externalId: sample.externalId,
+                  accessionNumber: sample.accessionNumber,
+                  sampleType:
+                    sample.sampleType || sample.typeOfSample?.description,
+                  specimenCategory: sample.specimenCategory || "histopathology",
+                  collectionDate: sample.collectionDate,
+                  status:
+                    pageSample?.pageStatus || pageSample?.status || "PENDING",
+                  patientName: sample.patientName,
+                  hasChildren: sample.hasChildren || false,
+                  childAliquotCount: sample.childAliquotCount || 0,
+                  isAliquot: sample.isAliquot || false,
+                  nestingLevel: sample.nestingLevel || 0,
+                  parentSampleItemId: sample.parentSampleId
+                    ? String(sample.parentSampleId)
+                    : sample.parentSampleItemId
+                      ? String(sample.parentSampleItemId)
+                      : null,
+                  parentExternalId: sample.parentExternalId,
+                };
+              });
+              setSamples(transformedSamples);
+            } else {
+              setSamples([]);
+            }
+
+            setLoading(false);
+          };
+
+          if (isSyntheticPageId) {
+            applyResponses([]);
+            return;
+          }
+
           getFromOpenElisServer(
             `/rest/notebook/page/${pageData.id}/samples`,
-            (pageResponse) => {
-              if (!componentMounted.current) return;
-
-              const pageSampleMap = {};
-              if (pageResponse && Array.isArray(pageResponse)) {
-                pageResponse.forEach((ps) => {
-                  const sampleId = String(ps.sampleItemId || ps.id);
-                  pageSampleMap[sampleId] = ps;
-                });
-              }
-
-              if (workflowResponse && Array.isArray(workflowResponse)) {
-                const transformedSamples = workflowResponse.map((sample) => {
-                  const sampleId = String(sample.id || sample.sampleItemId);
-                  const pageSample =
-                    pageSampleMap[sampleId] || pageSampleMap[sampleId.split("_")[0]];
-
-                  return {
-                    id: sampleId,
-                    externalId: sample.externalId,
-                    accessionNumber: sample.accessionNumber,
-                    sampleType:
-                      sample.sampleType || sample.typeOfSample?.description,
-                    specimenCategory: sample.specimenCategory || "histopathology",
-                    collectionDate: sample.collectionDate,
-                    status:
-                      pageSample?.pageStatus || pageSample?.status || "PENDING",
-                    patientName: sample.patientName,
-                    hasChildren: sample.hasChildren || false,
-                    childAliquotCount: sample.childAliquotCount || 0,
-                    isAliquot: sample.isAliquot || false,
-                    nestingLevel: sample.nestingLevel || 0,
-                    parentSampleItemId: sample.parentSampleId
-                      ? String(sample.parentSampleId)
-                      : sample.parentSampleItemId
-                        ? String(sample.parentSampleItemId)
-                        : null,
-                    parentExternalId: sample.parentExternalId,
-                  };
-                });
-                setSamples(transformedSamples);
-              } else {
-                setSamples([]);
-              }
-
-              setLoading(false);
-            },
+            applyResponses,
           );
         }
       },
@@ -292,7 +302,10 @@ function PathologySampleProcessingPage({
       return;
     }
 
-    if (processingData.fluidProcessing && !processingData.fluidProcessingMethod) {
+    if (
+      processingData.fluidProcessing &&
+      !processingData.fluidProcessingMethod
+    ) {
       setError(
         intl.formatMessage({
           id: "pathology.processing.error.fluidMethodRequired",
