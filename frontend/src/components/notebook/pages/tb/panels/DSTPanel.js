@@ -35,6 +35,8 @@ import {
   SignatureMeaning,
   useESign,
 } from "../../../../esignature";
+import PermissionGate from "../../../../security/PermissionGate";
+import { Permissions } from "../../../../../constants/roles";
 
 /**
  * DSTPanel - Drug Susceptibility Testing results panel.
@@ -665,19 +667,24 @@ function DSTPanel({ pageData, onProgressUpdate, cultureSamples = [] }) {
 
       {/* Action Buttons */}
       <div className="page-actions-bar">
-        <Button
-          kind="primary"
-          size="sm"
-          renderIcon={Add}
-          onClick={handleOpenResultModal}
-          disabled={selectedSampleIds.length === 0}
+        <PermissionGate
+          roles={Permissions.PROCESS_SAMPLES}
+          disabledTooltip="You need Laboratory Technician or Lab Manager role"
         >
-          <FormattedMessage
-            id="notebook.page.tb.dst.addResult"
-            defaultMessage="Enter DST Result ({count})"
-            values={{ count: selectedSampleIds.length }}
-          />
-        </Button>
+          <Button
+            kind="primary"
+            size="sm"
+            renderIcon={Add}
+            onClick={handleOpenResultModal}
+            disabled={selectedSampleIds.length === 0}
+          >
+            <FormattedMessage
+              id="notebook.page.tb.dst.addResult"
+              defaultMessage="Enter DST Result ({count})"
+              values={{ count: selectedSampleIds.length }}
+            />
+          </Button>
+        </PermissionGate>
 
         <Button
           kind="ghost"

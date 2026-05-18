@@ -56,6 +56,8 @@ import {
   SignatureMeaning,
   useESign,
 } from "../../../esignature";
+import PermissionGate from "../../../security/PermissionGate";
+import { Permissions } from "../../../../constants/roles";
 
 /**
  * MNTDReportingREDCapPage - Page 10 of the MNTD workflow.
@@ -1291,17 +1293,22 @@ function MNTDReportingREDCapPage({
           <TabPanel>
             {/* Action Buttons */}
             <div className="page-actions-bar">
-              <Button
-                kind="primary"
-                size="sm"
-                renderIcon={Report}
-                onClick={handleOpenReportModal}
+              <PermissionGate
+                roles={Permissions.GENERATE_REPORTS}
+                disabledTooltip="You need Reports or Lab Manager role"
               >
-                <FormattedMessage
-                  id="notebook.mntd.reporting.generateReport"
-                  defaultMessage="Generate Report"
-                />
-              </Button>
+                <Button
+                  kind="primary"
+                  size="sm"
+                  renderIcon={Report}
+                  onClick={handleOpenReportModal}
+                >
+                  <FormattedMessage
+                    id="notebook.mntd.reporting.generateReport"
+                    defaultMessage="Generate Report"
+                  />
+                </Button>
+              </PermissionGate>
 
               <Button
                 kind="secondary"

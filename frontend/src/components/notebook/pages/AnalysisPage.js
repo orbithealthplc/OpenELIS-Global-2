@@ -64,6 +64,8 @@ import {
   postToOpenElisServerJsonResponse,
 } from "../../utils/Utils";
 import SampleGrid from "../workflow/SampleGrid";
+import PermissionGate from "../../security/PermissionGate";
+import { Permissions } from "../../../constants/roles";
 
 /**
  * AnalysisPage - Page 6: Main Analysis Execution
@@ -2320,7 +2322,11 @@ function AnalysisPage({ entryId, pageData, progress, onProgressUpdate }) {
                   }}
                   style={{ marginBottom: "1rem" }}
                 />
-                <Button
+                                <PermissionGate
+                  roles={Permissions.REVIEW_RESULTS}
+                  disabledTooltip="You need Researcher or Lab Manager role to review results"
+                >
+<Button
                   kind="primary"
                   onClick={() => setImportStep(2)}
                   disabled={!selectedAssayRunId}
@@ -2330,6 +2336,7 @@ function AnalysisPage({ entryId, pageData, progress, onProgressUpdate }) {
                     defaultMessage="Continue to File Upload"
                   />
                 </Button>
+                </PermissionGate>
               </>
             )}
           </div>

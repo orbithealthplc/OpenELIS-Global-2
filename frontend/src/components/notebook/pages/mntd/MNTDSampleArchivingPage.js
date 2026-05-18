@@ -55,6 +55,8 @@ import {
   SignatureMeaning,
   useESign,
 } from "../../../esignature";
+import PermissionGate from "../../../security/PermissionGate";
+import { Permissions } from "../../../../constants/roles";
 
 /**
  * MNTDSampleArchivingPage - Page 9 of the MNTD workflow.
@@ -883,19 +885,24 @@ function MNTDSampleArchivingPage({
           size="sm"
         />
 
-        <Button
-          kind="primary"
-          size="sm"
-          renderIcon={Archive}
-          onClick={handleOpenArchiveModal}
-          disabled={selectedSampleIds.length === 0}
+        <PermissionGate
+          roles={Permissions.MANAGE_QA}
+          disabledTooltip="You need Lab Manager or EQA Personnel role"
         >
-          <FormattedMessage
-            id="notebook.mntd.archiving.archiveSelected"
-            defaultMessage="Archive Selected ({count})"
-            values={{ count: selectedSampleIds.length }}
-          />
-        </Button>
+          <Button
+            kind="primary"
+            size="sm"
+            renderIcon={Archive}
+            onClick={handleOpenArchiveModal}
+            disabled={selectedSampleIds.length === 0}
+          >
+            <FormattedMessage
+              id="notebook.mntd.archiving.archiveSelected"
+              defaultMessage="Archive Selected ({count})"
+              values={{ count: selectedSampleIds.length }}
+            />
+          </Button>
+        </PermissionGate>
 
         <Button
           kind="ghost"

@@ -57,6 +57,8 @@ import { NotificationContext } from "../../layout/Layout";
 import { NotificationKinds } from "../../common/CustomNotification";
 import { ESignatureButton, SignatureMeaning } from "../../esignature";
 import "../workflow/NotebookWorkflow.css";
+import PermissionGate from "../../security/PermissionGate";
+import { Permissions } from "../../../constants/roles";
 
 /**
  * ValidationReportingPage - Validation, Reporting & Performance Monitoring
@@ -652,7 +654,11 @@ function ValidationReportingPage({
                 justifyContent: "flex-end",
               }}
             >
-              <ESignatureButton
+                            <PermissionGate
+                roles={Permissions.REVIEW_RESULTS}
+                disabledTooltip="You need Researcher or Lab Manager role to review results"
+              >
+<Button
                 kind="primary"
                 size="md"
                 renderIcon={Checkmark}
@@ -681,7 +687,8 @@ function ValidationReportingPage({
                     defaultMessage="Mark Verification Complete"
                   />
                 )}
-              </ESignatureButton>
+              </Button>
+              </PermissionGate>
             </div>
 
             {/* Loading */}

@@ -36,6 +36,8 @@ import {
   SignatureMeaning,
   useESign,
 } from "../../../esignature";
+import PermissionGate from "../../../security/PermissionGate";
+import { Permissions } from "../../../../constants/roles";
 
 /**
  * ImmunologyDataAnalysisPage - Page 10: Data Analysis & Export
@@ -542,24 +544,29 @@ function ImmunologyDataAnalysisPage({
                 />
               </p>
               <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-                <Button
-                  kind="primary"
-                  renderIcon={DocumentExport}
-                  onClick={() => handleExport("excel", "processed")}
-                  disabled={exporting || !notebookId}
+                <PermissionGate
+                  roles={Permissions.REVIEW_RESULTS}
+                  disabledTooltip="You need Researcher or Lab Manager role to review results"
                 >
-                  {exporting ? (
-                    <FormattedMessage
-                      id="notebook.immunology.analysis.exporting"
-                      defaultMessage="Exporting..."
-                    />
-                  ) : (
-                    <FormattedMessage
-                      id="notebook.immunology.analysis.exportExcel"
-                      defaultMessage="Export to Excel"
-                    />
-                  )}
-                </Button>
+                  <Button
+                    kind="primary"
+                    renderIcon={DocumentExport}
+                    onClick={() => handleExport("excel", "processed")}
+                    disabled={exporting || !notebookId}
+                  >
+                    {exporting ? (
+                      <FormattedMessage
+                        id="notebook.immunology.analysis.exporting"
+                        defaultMessage="Exporting..."
+                      />
+                    ) : (
+                      <FormattedMessage
+                        id="notebook.immunology.analysis.exportExcel"
+                        defaultMessage="Export to Excel"
+                      />
+                    )}
+                  </Button>
+                </PermissionGate>
 
                 <Button
                   kind="secondary"

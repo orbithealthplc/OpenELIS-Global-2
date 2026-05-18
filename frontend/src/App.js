@@ -50,6 +50,7 @@ import AuditTrailReportIndex from "./components/reports/auditTrailReport/Index.j
 import ReferredOutTests from "./components/resultPage/resultsReferredOut/ReferredOutTests.js";
 import ChangePassword from "./components/ChangePassword.js";
 import { Roles } from "./components/utils/Utils";
+import { Permissions } from "./constants/roles";
 import {
   ROUTE_ROLES_EQUIPMENT_USAGE,
   ROUTE_ROLES_INVENTORY,
@@ -492,13 +493,11 @@ export default function App() {
                   path="/inventory"
                   exact
                   component={() => <InventoryManagement />}
-                  allowedRoles={ROUTE_ROLES_INVENTORY}
                 />
                 <SecureRoute
                   path="/equipment-usage"
                   exact
                   component={() => <EquipmentUsageManagement />}
-                  allowedRoles={ROUTE_ROLES_EQUIPMENT_USAGE}
                 />
                 <SecureRoute
                   path="/SampleManagement"

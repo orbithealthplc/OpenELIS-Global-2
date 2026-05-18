@@ -76,11 +76,6 @@ import {
 import SampleGrid from "../../workflow/SampleGrid";
 import config from "../../../../config.json";
 import "../../workflow/NotebookWorkflow.css";
-import {
-  ESignatureModal,
-  SignatureMeaning,
-  useESign,
-} from "../../../esignature";
 import PermissionGate from "../../../security/PermissionGate";
 import { Permissions } from "../../../../constants/roles";
 
@@ -3829,7 +3824,11 @@ function BacteriologyAssayTestExecutionPage({
 
               {/* Action Buttons */}
               <div className="page-actions-bar">
-                <Button
+                                <PermissionGate
+                  roles={Permissions.PROCESS_SAMPLES}
+                  disabledTooltip="You need Laboratory Technician or Lab Manager role to process samples"
+                >
+<Button
                   kind="primary"
                   size="sm"
                   renderIcon={Microscope}
@@ -3842,6 +3841,7 @@ function BacteriologyAssayTestExecutionPage({
                     values={{ count: selectedIds.length }}
                   />
                 </Button>
+                </PermissionGate>
 
                 <PermissionGate
                   roles={Permissions.VALIDATE_RESULTS}

@@ -51,6 +51,8 @@ import LinkOrderModal from "../workflow/LinkOrderModal";
 import BulkLinkOrderModal from "../workflow/BulkLinkOrderModal";
 import BiorepoSampleImportPage from "./common/BiorepoSampleImportPage";
 import "../workflow/NotebookWorkflow.css";
+import PermissionGate from "../../security/PermissionGate";
+import { Permissions } from "../../../constants/roles";";
 
 /**
  * SampleCollectionPage - Page 2 of the MedLab workflow.
@@ -711,6 +713,22 @@ function SampleCollectionPage({
                 defaultMessage="Bulk import samples from a CSV manifest file. Samples will be created with pre-labeled identifiers and can be linked to orders afterward."
               />
             </p>
+                        <PermissionGate
+              roles={Permissions.REGISTER_SAMPLES}
+              disabledTooltip="You need Sample Collector or Reception role"
+            >
+<Button
+              kind="primary"
+              size="md"
+              renderIcon={Upload}
+              onClick={() => setImportModalOpen(true)}
+            >
+              <FormattedMessage
+                id="medlab.page.sampleCollection.importManifest"
+                defaultMessage="Import from Manifest"
+              />
+            </Button>
+            </PermissionGate>
             <div style={{ display: "flex", gap: "0.5rem" }}>
               <Button
                 kind="secondary"

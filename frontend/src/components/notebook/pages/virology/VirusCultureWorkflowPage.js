@@ -58,6 +58,8 @@ import {
   SignatureMeaning,
   useESign,
 } from "../../../esignature";
+import PermissionGate from "../../../security/PermissionGate";
+import { Permissions } from "../../../../constants/roles";
 
 /**
  * Stage 2: Virus Culture Growth Workflow Page
@@ -2166,16 +2168,21 @@ const VirusCultureWorkflowPage = ({
               : "—",
             actions:
               step.status === "PENDING" ? (
-                <Button
-                  kind="primary"
-                  size="sm"
-                  renderIcon={Play}
-                  onClick={() =>
-                    handleStartStep(selectedBatch.id, step.stepName)
-                  }
+                <PermissionGate
+                  roles={Permissions.PROCESS_SAMPLES}
+                  disabledTooltip="You need Laboratory Technician or Lab Manager role"
                 >
-                  Start
-                </Button>
+                  <Button
+                    kind="primary"
+                    size="sm"
+                    renderIcon={Play}
+                    onClick={() =>
+                      handleStartStep(selectedBatch.id, step.stepName)
+                    }
+                  >
+                    Start
+                  </Button>
+                </PermissionGate>
               ) : step.status === "IN_PROGRESS" ? (
                 <Button
                   kind="secondary"

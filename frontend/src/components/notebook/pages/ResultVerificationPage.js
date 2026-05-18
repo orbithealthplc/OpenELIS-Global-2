@@ -36,6 +36,8 @@ import {
   useESign,
 } from "../../esignature";
 import "../workflow/NotebookWorkflow.css";
+import PermissionGate from "../../security/PermissionGate";
+import { Permissions } from "../../../constants/roles";";
 
 /**
  * ResultVerificationPage - Page 5 of the MedLab workflow.
@@ -478,7 +480,11 @@ function ResultVerificationPage({
                                               gap: "0.5rem",
                                             }}
                                           >
-                                            <ESignatureButton
+                                                                                        <PermissionGate
+                                              roles={Permissions.PROCESS_SAMPLES}
+                                              disabledTooltip="You need Laboratory Technician or Lab Manager role"
+                                            >
+<Button
                                               kind="primary"
                                               size="sm"
                                               renderIcon={Checkmark}
@@ -514,7 +520,8 @@ function ResultVerificationPage({
                                                 id="medlab.verification.approve"
                                                 defaultMessage="Approve"
                                               />
-                                            </ESignatureButton>
+                                            </Button>
+                                            </PermissionGate>
                                             <Button
                                               kind="danger"
                                               size="sm"
