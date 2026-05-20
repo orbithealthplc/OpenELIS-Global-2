@@ -21,7 +21,7 @@ services:
         platform: linux/amd64
         ports:
             - "15432:5432"
-        restart: always
+        restart: unless-stopped
         env_file:
             - ./volume/database/database.env
         environment:
@@ -40,7 +40,7 @@ services:
             
     oe.openelis.org:
         container_name: openelisglobal-webapp 
-        image: itechuw/openelis-global-2:develop   
+        image: openelis-global-2:1.0.0   
         platform: linux/amd64 
         depends_on:
             - db.openelis.org
@@ -48,7 +48,7 @@ services:
         ports:
             - "8080:8080"
             - "8443:8443"
-        restart: always
+        restart: unless-stopped
         networks:
           default:
               ipv4_address: 172.20.1.121
@@ -65,7 +65,8 @@ services:
             - ./volume/analyzer/analyzer-test-map.csv:/var/lib/openelis-global/analyzer/analyzer-test-map.csv
             - ./volume/properties/SystemConfiguration.properties:/var/lib/openelis-global/properties/SystemConfiguration.properties
             - ./volume/odoo/odoo-test-product-mapping.csv:/var/lib/openelis-global/odoo/odoo-test-product-mapping.csv
-            - ./configuration:/var/lib/openelis-global/configuration
+            - ./volume/configuration:/var/lib/openelis-global/configuration
+            - ./volume/menu/menu_config.json:/var/lib/openelis-global/menu/menu_config.json
             #Runing OpenELIS with the locally compiled war file
             #- ./target/OpenELIS-Global.war:/usr/local/tomcat/webapps/OpenELIS-Global.war
         secrets:
@@ -83,7 +84,7 @@ services:
             - "8444:8443"
         networks:
             - default
-        restart: always
+        restart: unless-stopped
         environment:
           TZ: Africa/Nairobi
           
@@ -102,14 +103,15 @@ services:
             -  key_trust-store-volume:/etc/openelis-global
         
     frontend.openelis.org:
-        image: itechuw/openelis-global-2-frontend:develop
+        image: openelis-global-2-frontend:1.0.0
         container_name: openelisglobal-front-end
         platform: linux/amd64
         networks:
             - default
-        environment:
-            - CHOKIDAR_USEPOLLING=true
-        tty: true
+        ports:
+            - 3000:80
+        restarts: unless-stopped
+        tty: false
 
     proxy:
         image: itechuw/openelis-global-2-proxy:develop
@@ -131,6 +133,8 @@ services:
 secrets:
   common.properties:
     file:  ./volume/properties/common.properties     
+  datasource.password:
+    file: ./volume/properties/datasource.password
 
 networks:
   default:
