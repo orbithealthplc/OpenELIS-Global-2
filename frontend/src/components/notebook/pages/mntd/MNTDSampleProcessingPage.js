@@ -22,7 +22,6 @@ import {
   RadioButton,
   Checkbox,
   Dropdown,
-  MultiSelect,
 } from "@carbon/react";
 import {
   Chemistry,
@@ -43,6 +42,7 @@ import ReagentUsageSelector, {
   getInvalidReagentUsageItems,
   syncReagentUsageQuantities,
 } from "../../workflow/ReagentUsageSelector";
+import NotebookDepartmentEquipmentMultiSelect from "../../workflow/NotebookDepartmentEquipmentMultiSelect";
 import { NotificationContext } from "../../../layout/Layout";
 import { NotificationKinds } from "../../../common/CustomNotification";
 import "../../workflow/NotebookWorkflow.css";
@@ -95,11 +95,6 @@ function MNTDSampleProcessingPage({
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  // Reagents from inventory and instruments from notebook
-  const [reagents, setReagents] = useState([]);
-  const [instruments, setInstruments] = useState([]);
-  const [loadingReagents, setLoadingReagents] = useState(false);
-
   // Bulk apply modal state
   const [bulkApplyModalOpen, setBulkApplyModalOpen] = useState(false);
   const [bulkApplyValues, setBulkApplyValues] = useState({
@@ -107,6 +102,7 @@ function MNTDSampleProcessingPage({
     technicianName: "",
     processingDate: new Date().toISOString().slice(0, 10),
     selectedReagents: [],
+    selectedReagentItems: [],
     reagentQuantities: {},
     selectedInstruments: [],
     batchNumber: "",
@@ -151,28 +147,10 @@ function MNTDSampleProcessingPage({
     [addNotification, intl, setNotificationVisible],
   );
 
-  // Set instruments from notebook when prop changes
-  useEffect(() => {
-    if (notebookInstruments && Array.isArray(notebookInstruments)) {
-      setInstruments(
-        notebookInstruments.map((i) => ({
-          id: String(i.id),
-          label: i.value || i.name,
-          name: i.value || i.name,
-          serialNumber: i.serialNumber || "N/A",
-          ...i,
-        })),
-      );
-    } else {
-      setInstruments([]);
-    }
-  }, [notebookInstruments]);
-
   // Load samples and reference data on mount
   useEffect(() => {
     componentMounted.current = true;
     loadPageSamples();
-    loadReagents();
     loadSampleTypes();
 
     return () => {
@@ -226,57 +204,6 @@ function MNTDSampleProcessingPage({
     );
   }, [pageData?.id]);
 
-  const loadReagents = useCallback(() => {
-    setLoadingReagents(true);
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setReagents(
-              response.map((r) => ({
-                id: r.id,
-                label: `${r.name} (Lot: ${r.lotNumber || "N/A"})`,
-                name: r.name,
-                lotNumber: r.lotNumber,
-                ...r,
-              })),
-            );
-          } else {
-            // Mock data if no reagents available
-            setReagents([
-              {
-                id: "1",
-                label: "DNA Extraction Kit (Lot: EK-2024-001)",
-                name: "DNA Extraction Kit",
-                lotNumber: "EK-2024-001",
-              },
-              {
-                id: "2",
-                label: "RNA Preservation Buffer (Lot: RPB-2024-002)",
-                name: "RNA Preservation Buffer",
-                lotNumber: "RPB-2024-002",
-              },
-              {
-                id: "3",
-                label: "PCR Master Mix (Lot: PM-2024-003)",
-                name: "PCR Master Mix",
-                lotNumber: "PM-2024-003",
-              },
-              {
-                id: "4",
-                label: "Malaria RDT Kit (Lot: MRK-2024-004)",
-                name: "Malaria RDT Kit",
-                lotNumber: "MRK-2024-004",
-              },
-            ]);
-          }
-          setLoadingReagents(false);
-        }
-      },
-    );
-  }, []);
-
   const loadSampleTypes = useCallback(() => {
     getFromOpenElisServer(
       "/rest/displayList/SAMPLE_TYPE_ACTIVE",
@@ -307,10 +234,8 @@ function MNTDSampleProcessingPage({
       return;
     }
 
-    const selectedReagentItems = reagents.filter((reagent) =>
-      bulkApplyValues.selectedReagents.includes(reagent.id),
-    );
-    if (reagents.length > 0 && selectedReagentItems.length === 0) {
+    const selectedReagentItems = bulkApplyValues.selectedReagentItems || [];
+    if (selectedReagentItems.length === 0) {
       notifyError("Select at least one reagent before applying processing.");
       return;
     }
@@ -370,7 +295,6 @@ function MNTDSampleProcessingPage({
     selectedSampleIds,
     pageData?.id,
     bulkApplyValues,
-    reagents,
     loadPageSamples,
     onProgressUpdate,
   ]);
@@ -535,7 +459,9 @@ function MNTDSampleProcessingPage({
   const triggerEsigForSave = useCallback(
     (callback, reopenModal) => {
       pendingAction.current = { callback, reopenModal };
-      openAuthoredSignatureModal();
+      setBulkApplyModalOpen(false);
+      setAddSampleModalOpen(false);
+      window.setTimeout(openAuthoredSignatureModal, 0);
     },
     [openAuthoredSignatureModal],
   );
@@ -569,6 +495,7 @@ function MNTDSampleProcessingPage({
       technicianName: "",
       processingDate: new Date().toISOString().slice(0, 10),
       selectedReagents: [],
+      selectedReagentItems: [],
       reagentQuantities: {},
       selectedInstruments: [],
       batchNumber: "",
@@ -880,11 +807,10 @@ function MNTDSampleProcessingPage({
 
           <Column lg={8} md={4} sm={4}>
             <ReagentUsageSelector
-              reagents={reagents}
+              notebookId={notebookId}
               selectedIds={bulkApplyValues.selectedReagents}
               reagentQuantities={bulkApplyValues.reagentQuantities}
               sampleCount={selectedSampleIds.length}
-              disabled={loadingReagents}
               titleText={intl.formatMessage({
                 id: "notebook.mntd.reagents",
                 defaultMessage: "Reagents",
@@ -894,6 +820,7 @@ function MNTDSampleProcessingPage({
                 setBulkApplyValues((prev) => ({
                   ...prev,
                   selectedReagents: selectedItems.map((item) => item.id),
+                  selectedReagentItems: selectedItems,
                   reagentQuantities: syncReagentUsageQuantities(
                     selectedItems,
                     prev.reagentQuantities,
@@ -913,25 +840,21 @@ function MNTDSampleProcessingPage({
           </Column>
 
           <Column lg={8} md={4} sm={4}>
-            <MultiSelect
-              id="selectedInstruments"
+            <NotebookDepartmentEquipmentMultiSelect
+              notebookId={notebookId}
+              templateInstruments={notebookInstruments}
+              selectedIds={bulkApplyValues.selectedInstruments}
               titleText={intl.formatMessage({
                 id: "notebook.mntd.instruments",
                 defaultMessage: "Instruments",
               })}
               label="Select instruments..."
-              items={instruments}
-              itemToString={(item) => (item ? item.label : "")}
-              selectedItems={instruments.filter((i) =>
-                bulkApplyValues.selectedInstruments.includes(i.id),
-              )}
-              onChange={({ selectedItems }) =>
+              onSelectionChange={(selectedItems) =>
                 setBulkApplyValues((prev) => ({
                   ...prev,
                   selectedInstruments: selectedItems.map((i) => i.id),
                 }))
               }
-              disabled={instruments.length === 0}
             />
           </Column>
 

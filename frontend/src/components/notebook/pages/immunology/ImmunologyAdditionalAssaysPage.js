@@ -21,7 +21,6 @@ import {
   Tag,
   Checkbox,
   TextInput,
-  MultiSelect,
   DatePicker,
   DatePickerInput,
   TimePicker,
@@ -50,6 +49,7 @@ import ReagentUsageSelector, {
   getInvalidReagentUsageItems,
   syncReagentUsageQuantities,
 } from "../../workflow/ReagentUsageSelector";
+import NotebookDepartmentEquipmentMultiSelect from "../../workflow/NotebookDepartmentEquipmentMultiSelect";
 import { NotificationContext } from "../../../layout/Layout";
 import { NotificationKinds } from "../../../common/CustomNotification";
 import "../../workflow/NotebookWorkflow.css";
@@ -93,6 +93,7 @@ function ImmunologyAdditionalAssaysPage({
   pageData,
   progress,
   onProgressUpdate,
+  notebookId,
   templateInstruments,
 }) {
   const intl = useIntl();
@@ -111,12 +112,6 @@ function ImmunologyAdditionalAssaysPage({
   const [bulkApplyModalOpen, setBulkApplyModalOpen] = useState(false);
   const [isBulkApplying, setIsBulkApplying] = useState(false);
 
-  // Reagents and Instruments from inventory
-  const [reagents, setReagents] = useState([]);
-  const [instruments, setInstruments] = useState([]);
-  const [loadingReagents, setLoadingReagents] = useState(false);
-  const [loadingInstruments, setLoadingInstruments] = useState(false);
-
   // Assay form values
   const [assayValues, setAssayValues] = useState({
     // Test Type Selection
@@ -133,6 +128,7 @@ function ImmunologyAdditionalAssaysPage({
 
     // Reagent & Instrument Selection (from inventory)
     selectedReagents: [],
+    selectedReagentItems: [],
     reagentQuantities: {},
     selectedEquipment: [],
 
@@ -246,71 +242,9 @@ function ImmunologyAdditionalAssaysPage({
     [addNotification, intl, setNotificationVisible],
   );
 
-  // Load reagents from inventory
-  const loadReagents = useCallback(() => {
-    setLoadingReagents(true);
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setReagents(
-              response.map((r) => ({
-                id: r.id,
-                label: `${r.name} (Lot: ${r.lotNumber || "N/A"})`,
-                name: r.name,
-                lotNumber: r.lotNumber,
-                ...r,
-              })),
-            );
-          }
-          setLoadingReagents(false);
-        }
-      },
-    );
-  }, []);
-
-  // Load instruments from template or inventory
-  const loadInstruments = useCallback(() => {
-    if (templateInstruments && templateInstruments.length > 0) {
-      setInstruments(
-        templateInstruments.map((analyzer) => ({
-          id: analyzer.id,
-          label: analyzer.value,
-          name: analyzer.value,
-        })),
-      );
-      setLoadingInstruments(false);
-      return;
-    }
-
-    setLoadingInstruments(true);
-    getFromOpenElisServer(
-      "/rest/inventory/instruments?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setInstruments(
-              response.map((i) => ({
-                id: i.id,
-                label: `${i.name} (${i.serialNumber || "N/A"})`,
-                name: i.name,
-                serialNumber: i.serialNumber,
-                ...i,
-              })),
-            );
-          }
-          setLoadingInstruments(false);
-        }
-      },
-    );
-  }, [templateInstruments]);
-
   useEffect(() => {
     componentMounted.current = true;
     loadPageSamples();
-    loadReagents();
-    loadInstruments();
     return () => {
       componentMounted.current = false;
     };
@@ -376,6 +310,7 @@ function ImmunologyAdditionalAssaysPage({
       operatorName: "",
       operatorInitials: "",
       selectedReagents: [],
+      selectedReagentItems: [],
       reagentQuantities: {},
       selectedEquipment: [],
       assayStartTime: "",
@@ -479,10 +414,8 @@ function ImmunologyAdditionalAssaysPage({
       return;
     }
 
-    const selectedReagentItems = reagents.filter((reagent) =>
-      assayValues.selectedReagents.includes(reagent.id),
-    );
-    if (reagents.length > 0 && selectedReagentItems.length === 0) {
+    const selectedReagentItems = assayValues.selectedReagentItems || [];
+    if (selectedReagentItems.length === 0) {
       notifyError("Select at least one reagent before applying assay data.");
       return;
     }
@@ -1516,11 +1449,10 @@ function ImmunologyAdditionalAssaysPage({
               <Grid narrow>
                 <Column lg={8} md={4} sm={4}>
                   <ReagentUsageSelector
-                    reagents={reagents}
+                    notebookId={notebookId}
                     selectedIds={assayValues.selectedReagents}
                     reagentQuantities={assayValues.reagentQuantities}
                     sampleCount={selectedSampleIds.length}
-                    disabled={loadingReagents}
                     titleText={intl.formatMessage({
                       id: "notebook.immunology.reagents",
                       defaultMessage: "Reagents Used",
@@ -1535,6 +1467,7 @@ function ImmunologyAdditionalAssaysPage({
                         selectedReagents: selectedItems.map(
                           (reagent) => reagent.id,
                         ),
+                        selectedReagentItems: selectedItems,
                         reagentQuantities: syncReagentUsageQuantities(
                           selectedItems,
                           prev.reagentQuantities,
@@ -1553,8 +1486,10 @@ function ImmunologyAdditionalAssaysPage({
                   />
                 </Column>
                 <Column lg={8} md={4} sm={4}>
-                  <MultiSelect
-                    id="selectedEquipment"
+                  <NotebookDepartmentEquipmentMultiSelect
+                    notebookId={notebookId}
+                    templateInstruments={templateInstruments}
+                    selectedIds={assayValues.selectedEquipment}
                     titleText={intl.formatMessage({
                       id: "notebook.immunology.equipment",
                       defaultMessage: "Instruments / Equipment",
@@ -1563,18 +1498,12 @@ function ImmunologyAdditionalAssaysPage({
                       id: "notebook.immunology.equipment.placeholder",
                       defaultMessage: "Select instruments...",
                     })}
-                    items={instruments}
-                    itemToString={(item) => (item ? item.label : "")}
-                    selectedItems={instruments.filter((i) =>
-                      assayValues.selectedEquipment.includes(i.id),
-                    )}
-                    onChange={({ selectedItems }) =>
+                    onSelectionChange={(selectedItems) =>
                       setAssayValues((prev) => ({
                         ...prev,
                         selectedEquipment: selectedItems.map((i) => i.id),
                       }))
                     }
-                    disabled={loadingInstruments}
                   />
                 </Column>
               </Grid>

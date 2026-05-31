@@ -15,7 +15,6 @@ import {
   Modal,
   TextInput,
   TextArea,
-  ComboBox,
   DatePicker,
   DatePickerInput,
   TimePicker,
@@ -29,6 +28,7 @@ import {
   postToOpenElisServerJsonResponse,
 } from "../../../utils/Utils";
 import { NotificationContext } from "../../../layout/Layout";
+import NotebookDepartmentStockPicker from "../../workflow/NotebookDepartmentStockPicker";
 import { NotificationKinds } from "../../../common/CustomNotification";
 import SampleGrid from "../../workflow/SampleGrid";
 import "../../workflow/NotebookWorkflow.css";
@@ -62,6 +62,7 @@ function VirologyFeedingPage({
   pageData,
   progress,
   onProgressUpdate,
+  notebookId,
 }) {
   const intl = useIntl();
   const { addNotification, setNotificationVisible } =
@@ -75,9 +76,6 @@ function VirologyFeedingPage({
   const [modalOpen, setModalOpen] = useState(false);
   const [historyModalOpen, setHistoryModalOpen] = useState(false);
   const [selectedSampleHistory, setSelectedSampleHistory] = useState(null);
-
-  // Inventory data
-  const [availableReagents, setAvailableReagents] = useState([]);
 
   // Form data (for modal form)
   const [feedingDate, setFeedingDate] = useState("");
@@ -101,7 +99,6 @@ function VirologyFeedingPage({
   useEffect(() => {
     componentMounted.current = true;
     loadPageSamples();
-    loadInventory();
 
     return () => {
       componentMounted.current = false;
@@ -163,26 +160,6 @@ function VirologyFeedingPage({
     );
   }, [pageData?.id]);
 
-  const loadInventory = useCallback(() => {
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
-      (response) => {
-        if (componentMounted.current && response && Array.isArray(response)) {
-          // All inventory items for reagents
-          const reagents = response.map((item) => ({
-            ...item,
-            id: item.itemId,
-            text: item.name,
-            category: item.category,
-            lotNumber: item.lotNumber,
-            expirationDate: item.expirationDate,
-          }));
-          setAvailableReagents(reagents);
-        }
-      },
-    );
-  }, []);
-
   const handleAddReagent = () => {
     setReagentList([
       ...reagentList,
@@ -207,14 +184,13 @@ function VirologyFeedingPage({
       reagentList.map((r) => {
         if (r.id === id) {
           if (field === "reagent") {
-            // When selecting reagent, auto-fill lot and expiry if available
             return {
               ...r,
-              reagentId: value.id,
-              reagentName: value.text,
-              category: value.category || "",
-              lotNumber: value.lotNumber || "",
-              expiryDate: value.expirationDate || "",
+              reagentId: value?.itemId ?? value?.id,
+              reagentName: value?.name ?? value?.label ?? "",
+              category: value?.category || "",
+              lotNumber: value?.lotNumber || "",
+              expiryDate: value?.expirationDate || "",
             };
           }
           return { ...r, [field]: value };
@@ -1048,7 +1024,8 @@ function VirologyFeedingPage({
                     >
                       <Grid narrow>
                         <Column lg={5} md={4} sm={4}>
-                          <ComboBox
+                          <NotebookDepartmentStockPicker
+                            notebookId={notebookId}
                             id={`reagent-${reagent.id}`}
                             titleText={
                               <span>
@@ -1060,23 +1037,24 @@ function VirologyFeedingPage({
                               </span>
                             }
                             placeholder="Select reagent from inventory..."
-                            items={availableReagents}
-                            itemToString={(item) => (item ? item.text : "")}
                             selectedItem={
-                              availableReagents.find(
-                                (r) => r.text === reagent.reagentName,
-                              ) || null
+                              reagent.reagentId
+                                ? {
+                                    id: reagent.reagentId,
+                                    label: reagent.reagentName,
+                                    name: reagent.reagentName,
+                                    lotNumber: reagent.lotNumber,
+                                  }
+                                : null
                             }
-                            onChange={({ selectedItem }) =>
+                            disabled={loading}
+                            onChange={(selectedItem) =>
                               handleReagentChange(
                                 reagent.id,
                                 "reagent",
                                 selectedItem,
                               )
                             }
-                            size="sm"
-                            invalid={!reagent.reagentName}
-                            invalidText="Required"
                           />
                         </Column>
                         <Column lg={3} md={3} sm={4}>

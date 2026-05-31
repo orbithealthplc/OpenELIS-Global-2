@@ -129,10 +129,6 @@ function MNTDTestExecutionPage({
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Reagents from inventory (for kit lot number selection)
-  const [reagents, setReagents] = useState([]);
-  const [loadingReagents, setLoadingReagents] = useState(false);
-
   const notifyError = useCallback(
     (message) => {
       addNotification({
@@ -154,7 +150,8 @@ function MNTDTestExecutionPage({
     runCompleted: "YES",
     runIssues: "",
     runId: "",
-    selectedKits: [], // Array of selected kit IDs for multiselect
+    selectedKits: [],
+    selectedKitItems: [],
     kitQuantities: {},
     operator: "",
     executionDate: new Date().toISOString().split("T")[0],
@@ -289,32 +286,6 @@ function MNTDTestExecutionPage({
     );
   }, [pageData?.id]);
 
-  // Load reagents from inventory (used for kit lot number selection)
-  const loadReagents = useCallback(() => {
-    setLoadingReagents(true);
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setReagents(
-              response.map((r) => ({
-                id: r.id,
-                label: `${r.name} (Lot: ${r.lotNumber || "N/A"})`,
-                name: r.name,
-                lotNumber: r.lotNumber,
-                ...r,
-              })),
-            );
-          } else {
-            setReagents([]);
-          }
-          setLoadingReagents(false);
-        }
-      },
-    );
-  }, []);
-
   // Check if page has a real database ID
   const hasRealPageId =
     pageData?.id && !String(pageData.id).startsWith("default-");
@@ -359,16 +330,15 @@ function MNTDTestExecutionPage({
       runIssues: "",
       runId: "",
       selectedKits: [],
+      selectedKitItems: [],
       kitQuantities: {},
       operator: "",
       executionDate: new Date().toISOString().split("T")[0],
       executionTime: "",
       notes: "",
     });
-    // Load reagents from inventory
-    loadReagents();
     setShowExecutionModal(true);
-  }, [selectedIds, intl, loadReagents]);
+  }, [selectedIds, intl]);
 
   // Handle saving execution confirmation data
   const handleSaveExecutionData = useCallback(() => {
@@ -379,11 +349,8 @@ function MNTDTestExecutionPage({
 
     const numericIds = selectedIds.map((id) => parseInt(id, 10));
 
-    // Get selected kit objects from reagents list based on selected IDs
-    const selectedKitObjects = reagents.filter((r) =>
-      executionData.selectedKits.includes(r.id),
-    );
-    if (reagents.length > 0 && selectedKitObjects.length === 0) {
+    const selectedKitObjects = executionData.selectedKitItems || [];
+    if (selectedKitObjects.length === 0) {
       notifyError("Select at least one kit before saving execution data.");
       return;
     }
@@ -459,6 +426,7 @@ function MNTDTestExecutionPage({
                   runIssues: "",
                   runId: "",
                   selectedKits: [],
+                  selectedKitItems: [],
                   kitQuantities: {},
                   operator: "",
                   executionDate: new Date().toISOString().split("T")[0],
@@ -485,7 +453,7 @@ function MNTDTestExecutionPage({
     loadPageSamples,
     onProgressUpdate,
     intl,
-    reagents,
+    notifyError,
   ]);
 
   // Handle file upload
@@ -890,7 +858,11 @@ function MNTDTestExecutionPage({
   const triggerEsigForSave = useCallback(
     (callback, reopenModal) => {
       pendingAction.current = { callback, reopenModal };
-      openAuthoredSignatureModal();
+      setShowExecutionModal(false);
+      setShowDataUploadModal(false);
+      setShowBulkValueModal(false);
+      setShowPostTestQCModal(false);
+      window.setTimeout(openAuthoredSignatureModal, 0);
     },
     [openAuthoredSignatureModal],
   );
@@ -1385,49 +1357,40 @@ function MNTDTestExecutionPage({
                 />
               </Column>
               <Column lg={8} md={4} sm={4}>
-                {loadingReagents ? (
-                  <InlineLoading
-                    description={intl.formatMessage({
-                      id: "notebook.mntd.testexecution.loadingReagents",
-                      defaultMessage: "Loading reagents...",
-                    })}
-                  />
-                ) : (
-                  <ReagentUsageSelector
-                    reagents={reagents}
-                    selectedIds={executionData.selectedKits}
-                    reagentQuantities={executionData.kitQuantities}
-                    sampleCount={selectedIds.length}
-                    disabled={loadingReagents}
-                    titleText={intl.formatMessage({
-                      id: "notebook.mntd.testexecution.kitLot",
-                      defaultMessage: "Kit Lot Number",
-                    })}
-                    label={intl.formatMessage({
-                      id: "notebook.mntd.testexecution.selectKits",
-                      defaultMessage: "Select kits...",
-                    })}
-                    onSelectionChange={(selectedItems) =>
-                      setExecutionData((prev) => ({
-                        ...prev,
-                        selectedKits: selectedItems.map((item) => item.id),
-                        kitQuantities: syncReagentUsageQuantities(
-                          selectedItems,
-                          prev.kitQuantities,
-                        ),
-                      }))
-                    }
-                    onQuantityChange={(reagentId, value) =>
-                      setExecutionData((prev) => ({
-                        ...prev,
-                        kitQuantities: {
-                          ...prev.kitQuantities,
-                          [reagentId]: value,
-                        },
-                      }))
-                    }
-                  />
-                )}
+                <ReagentUsageSelector
+                  notebookId={notebookId}
+                  selectedIds={executionData.selectedKits}
+                  reagentQuantities={executionData.kitQuantities}
+                  sampleCount={selectedIds.length}
+                  titleText={intl.formatMessage({
+                    id: "notebook.mntd.testexecution.kitLot",
+                    defaultMessage: "Kit Lot Number",
+                  })}
+                  label={intl.formatMessage({
+                    id: "notebook.mntd.testexecution.selectKits",
+                    defaultMessage: "Select kits...",
+                  })}
+                  onSelectionChange={(selectedItems) =>
+                    setExecutionData((prev) => ({
+                      ...prev,
+                      selectedKits: selectedItems.map((item) => item.id),
+                      selectedKitItems: selectedItems,
+                      kitQuantities: syncReagentUsageQuantities(
+                        selectedItems,
+                        prev.kitQuantities,
+                      ),
+                    }))
+                  }
+                  onQuantityChange={(reagentId, value) =>
+                    setExecutionData((prev) => ({
+                      ...prev,
+                      kitQuantities: {
+                        ...prev.kitQuantities,
+                        [reagentId]: value,
+                      },
+                    }))
+                  }
+                />
               </Column>
               <Column lg={8} md={4} sm={4}>
                 <TextInput

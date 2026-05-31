@@ -12,6 +12,7 @@ import { getFromOpenElisServer } from "../../utils/Utils";
 import config from "../../../config.json";
 import { NotificationContext } from "../../layout/Layout";
 import PageNavigation from "./PageNavigation";
+import { usePageAccessControl } from "../../../hooks/usePageAccessControl";
 import {
   BiorepositoryIntakePage,
   BiorepositoryStorageAssignmentPage,
@@ -68,22 +69,27 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
   const [entryId, setEntryId] = useState(propEntryId);
   const [pages, setPages] = useState([]);
   const [pageProgress, setPageProgress] = useState({});
-  const [activePage, setActivePage] = useState(0);
   const [samples, setSamples] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isCreatingEntry, setIsCreatingEntry] = useState(!propEntryId);
 
-  // Use actual pages if available, otherwise use default Biorepository workflow pages
-  // Sort by pageOrder or order to ensure correct display sequence
-  const effectivePages = useMemo(() => {
-    if (pages && pages.length > 0) {
-      return [...pages].sort((a, b) => {
-        const orderA = a.pageOrder ?? a.order ?? 0;
-        const orderB = b.pageOrder ?? b.order ?? 0;
-        return orderA - orderB;
-      });
+  const sortedPages = useMemo(() => {
+    if (!pages || pages.length === 0) {
+      return [];
     }
-    return DEFAULT_BIOREPOSITORY_WORKFLOW_PAGES;
+    return [...pages].sort((a, b) => {
+      const orderA = a.pageOrder ?? a.order ?? 0;
+      const orderB = b.pageOrder ?? b.order ?? 0;
+      return orderA - orderB;
+    });
   }, [pages]);
+
+  const { effectivePages, activePage, handlePageChange } = usePageAccessControl(
+    sortedPages,
+    DEFAULT_BIOREPOSITORY_WORKFLOW_PAGES,
+    0,
+    { isCreating: isCreatingEntry, workflowType: "biorepository" },
+  );
 
   useEffect(() => {
     componentMounted.current = true;
@@ -163,6 +169,7 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
                 const existingEntry = entriesResponse[0];
                 setEntry(existingEntry);
                 setEntryId(existingEntry.id);
+                setIsCreatingEntry(false);
 
                 getFromOpenElisServer(
                   `/rest/notebook-entry/${existingEntry.id}/samples`,
@@ -176,6 +183,7 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
                   },
                 );
               } else {
+                setIsCreatingEntry(true);
                 createEntryForNotebook(nbId);
               }
             }
@@ -220,6 +228,7 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
             setEntry(data);
             setEntryId(data.id);
             setSamples([]);
+            setIsCreatingEntry(false);
           } else if (data && data.error) {
             console.error("Entry creation error:", data.error);
           }
@@ -233,10 +242,6 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
           setLoading(false);
         }
       });
-  };
-
-  const handlePageChange = (pageIndex) => {
-    setActivePage(pageIndex);
   };
 
   const getProgressForPage = (pageId) => {
@@ -456,7 +461,9 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
 
         <Column lg={12} md={6} sm={4}>
           <div className="workflow-page-content">
-            {effectivePages.length > 0 && effectivePages[activePage] && (
+            {effectivePages.length > 0 &&
+              effectivePages[activePage] &&
+              effectivePages[activePage].hasAccess && (
               <div className="page-panel">
                 <div className="page-header">
                   <h3>{effectivePages[activePage].title}</h3>
@@ -488,6 +495,25 @@ function BiorepositoryWorkflowTab({ notebookId, entryId: propEntryId }) {
                 </div>
               </div>
             )}
+            {effectivePages.length > 0 &&
+              effectivePages[activePage] &&
+              !effectivePages[activePage].hasAccess && (
+                <div className="page-panel access-denied">
+                  <h3>{effectivePages[activePage].title}</h3>
+                  <p>
+                    <FormattedMessage
+                      id="notebook.page.restricted"
+                      defaultMessage="Restricted"
+                    />
+                  </p>
+                  <p>
+                    <FormattedMessage
+                      id="notebook.page.accessDenied"
+                      defaultMessage="You don't have the required role to access this page"
+                    />
+                  </p>
+                </div>
+              )}
           </div>
         </Column>
       </Grid>

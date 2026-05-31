@@ -22,7 +22,7 @@ import {
   Tile,
 } from "@carbon/react";
 import { Add, Checkmark, Launch } from "@carbon/react/icons";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { useParams } from "react-router-dom";
 import { Permissions } from "../../constants/roles";
@@ -41,19 +41,11 @@ import {
   toBase64,
 } from "../utils/Utils";
 import NotebookAuditLogViewer from "./NotebookAuditLogViewer";
-import BacteriologyWorkflowTab from "./workflow/BacteriologyWorkflowTab";
-import BioanalyticalWorkflowTab from "./workflow/BioanalyticalWorkflowTab";
-import BioequivalenceWorkflowTab from "./workflow/BioequivalenceWorkflowTab";
-import BiorepositoryWorkflowTab from "./workflow/BiorepositoryWorkflowTab";
-import GBDWorkflowTab from "./workflow/GBDWorkflowTab";
-import MedLabWorkflowTab from "./workflow/MedLabWorkflowTab";
-import MNTDWorkflowTab from "./workflow/MNTDWorkflowTab";
-import NotebookWorkflowTab from "./workflow/NotebookWorkflowTab";
-import PathologyWorkflowTab from "./workflow/PathologyWorkflowTab";
-import PharmaceuticalWorkflowTab from "./workflow/PharmaceuticalWorkflowTab";
-import TBWorkflowTab from "./workflow/TBWorkflowTab";
-import TraditionalMedicineWorkflowTab from "./workflow/TraditionalMedicineWorkflowTab";
-import VirologyLabWorkflowTab from "./workflow/VirologyLabWorkflowTab";
+import { resolveWorkflowTabComponent } from "./workflow/workflowRouting";
+import {
+  buildLinkedEquipmentInstrumentsUrl,
+  mapLinkedEquipmentOptions,
+} from "./notebookLinkedEquipment";
 
 const PATHOLOGY_WORKFLOW_TYPES = [
   {
@@ -71,20 +63,27 @@ const PATHOLOGY_WORKFLOW_TYPES = [
   },
 ];
 
-const isPathologyDepartment = (notebook) => {
-  const title = String(notebook?.title || "").toLowerCase();
-  return title.includes("pathology");
-};
+const normalizeWorkflowTypeKey = (notebook) =>
+  String(notebook?.workflowType || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
 
 const isPathologyNotebook = (notebook) => {
-  const workflowType = String(notebook?.workflowType || "").toLowerCase();
+  const workflowType = normalizeWorkflowTypeKey(notebook);
   return (
-    isPathologyDepartment(notebook) &&
-    (workflowType.includes("pathology") ||
-      PATHOLOGY_WORKFLOW_TYPES.some((type) => type.id === workflowType) ||
-      workflowType === "")
+    workflowType === "pathology" ||
+    PATHOLOGY_WORKFLOW_TYPES.some((type) => type.id === workflowType)
   );
 };
+
+const isMedLabNotebook = (notebook) => {
+  const workflowType = normalizeWorkflowTypeKey(notebook);
+  return workflowType === "medlab" || workflowType === "medical_laboratory";
+};
+
+const isBiorepositoryNotebook = (notebook) =>
+  normalizeWorkflowTypeKey(notebook) === "biorepository";
 
 const sanitizeNotebookPageForSubmit = (page) => {
   const rawId = page?.id;
@@ -199,34 +198,6 @@ const NoteBookInstanceEntryForm = () => {
   const [questionnaires, setQuestionnaires] = useState([]);
   const [projectTags, setProjectTags] = useState([]); // Template tags (for display only)
   const [projectFiles, setProjectFiles] = useState([]); // Template files (for display only)
-
-  const isBiorepositoryNotebook = (notebook) => {
-    const workflowType = notebook?.workflowType;
-    if (
-      typeof workflowType === "string" &&
-      workflowType.toLowerCase() === "biorepository"
-    ) {
-      return true;
-    }
-
-    const typeName = notebook?.typeName;
-    if (
-      typeof typeName === "string" &&
-      typeName.toLowerCase().includes("biorepository")
-    ) {
-      return true;
-    }
-
-    const title = notebook?.title;
-    if (
-      typeof title === "string" &&
-      title.toLowerCase().includes("biorepository")
-    ) {
-      return true;
-    }
-
-    return false;
-  };
 
   const handleSubmit = () => {
     if (isSubmitting) {
@@ -442,36 +413,69 @@ const NoteBookInstanceEntryForm = () => {
     setNewComment("");
   };
 
+  const applyInstrumentList = useCallback((response) => {
+    const departmentInstruments = mapLinkedEquipmentOptions(response);
+    if (departmentInstruments.length === 0) {
+      setAnalyzerList([]);
+      setNoteBookData((previous) => ({
+        ...previous,
+        analyzers: [],
+      }));
+      return;
+    }
+    const allowedInstrumentIds = new Set(
+      departmentInstruments.map((instrument) => String(instrument.id)),
+    );
+    setAnalyzerList(departmentInstruments);
+    setNoteBookData((previous) => ({
+      ...previous,
+      analyzers: (previous.analyzers || []).filter((instrument) =>
+        allowedInstrumentIds.has(String(instrument.id)),
+      ),
+    }));
+  }, []);
+
+  const loadDepartmentInstruments = useCallback(
+    (departmentIds) => {
+      const ids = (departmentIds || []).filter(Boolean);
+      if (ids.length === 0) {
+        applyInstrumentList([]);
+        return;
+      }
+      getFromOpenElisServer(
+        buildLinkedEquipmentInstrumentsUrl(ids),
+        applyInstrumentList,
+      );
+    },
+    [applyInstrumentList],
+  );
+
+  const loadNotebookInstruments = useCallback(
+    (notebookId) => {
+      if (!notebookId) {
+        applyInstrumentList([]);
+        return;
+      }
+      getFromOpenElisServer(
+        `/rest/notebook/${notebookId}/departments`,
+        (departments) => {
+          if (!Array.isArray(departments)) {
+            applyInstrumentList([]);
+            return;
+          }
+          loadDepartmentInstruments(
+            departments.map((department) => department.id),
+          );
+        },
+      );
+    },
+    [applyInstrumentList, loadDepartmentInstruments],
+  );
+
   useEffect(() => {
     componentMounted.current = true;
     getFromOpenElisServer("/rest/displayList/NOTEBOOK_STATUS", setStatuses);
     getFromOpenElisServer("/rest/displayList/NOTEBOOK_EXPT_TYPE", setTypes);
-    getFromOpenElisServer(
-      "/rest/inventory/instruments?status=active",
-      (response) => {
-        if (response && Array.isArray(response) && response.length > 0) {
-          // Transform inventory instruments to IdValuePair format for FilterableMultiSelect
-          setAnalyzerList(
-            response.map((instrument) => ({
-              id: instrument.id,
-              value: instrument.name,
-            })),
-          );
-        } else {
-          // Mock data if no instruments available in inventory
-          setAnalyzerList([
-            { id: "1", value: "Analytical Balance" },
-            { id: "2", value: "HPLC System" },
-            { id: "3", value: "UV-Vis Spectrophotometer" },
-            { id: "4", value: "Dissolution Apparatus" },
-            { id: "5", value: "Centrifuge" },
-            { id: "6", value: "Karl Fischer Titrator" },
-            { id: "7", value: "GC-MS System" },
-            { id: "8", value: "pH Meter" },
-          ]);
-        }
-      },
-    );
     getFromOpenElisServer("/rest/displayList/ALL_TESTS", setAllTests);
     getFromOpenElisServer("/rest/users", setTechnicianUsers);
     getFromOpenElisServer("/rest/panels", setAllPanels);
@@ -584,9 +588,10 @@ const NoteBookInstanceEntryForm = () => {
             userSessionDetails.firstName + " " + userSessionDetails.lastName,
           workflowType:
             data.workflowType ||
-            (isPathologyDepartment(data) ? "histopathology_biopsy_tissue" : ""),
+            (isPathologyNotebook(data) ? "histopathology_biopsy_tissue" : ""),
         };
         setNoteBookData(instanceData);
+        loadNotebookInstruments(data.id);
         setLoading(false);
       }
     }
@@ -656,7 +661,6 @@ const NoteBookInstanceEntryForm = () => {
                 title: templateData.title,
                 type: templateData.type,
                 typeName: templateData.typeName || data.typeName,
-                workflowType: templateData.workflowType || data.workflowType,
                 objective: templateData.objective,
                 protocol: templateData.protocol,
                 content: templateData.content,
@@ -679,11 +683,12 @@ const NoteBookInstanceEntryForm = () => {
                 workflowType:
                   data.workflowType ||
                   templateData.workflowType ||
-                  (isPathologyDepartment(templateData)
+                  (isPathologyNotebook(templateData)
                     ? "histopathology_biopsy_tissue"
                     : ""),
               };
               setNoteBookData(mergedData);
+              loadNotebookInstruments(templateData.id || data.templateId);
             },
           );
         } else {
@@ -706,10 +711,11 @@ const NoteBookInstanceEntryForm = () => {
             ...data,
             workflowType:
               data.workflowType ||
-              (isPathologyNotebook(data)
+              (isPathologyNotebook(data) && !data.workflowType
                 ? "histopathology_biopsy_tissue"
                 : data.workflowType),
           });
+          loadNotebookInstruments(data.id);
         }
 
         // Load comments from backend (with proper id and author)
@@ -1300,108 +1306,15 @@ const NoteBookInstanceEntryForm = () => {
             */}
             {noteBookData?.isTemplate !== true &&
               noteBookData?.id &&
-              noteBookData?.title
-                ?.toLowerCase()
-                .includes("malaria and neglected tropical disease") && (
-                <MNTDWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title?.toLowerCase().includes("pharmaceutical") && (
-                <PharmaceuticalWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              (noteBookData?.title?.toLowerCase().includes("traditional") ||
-                noteBookData?.title
-                  ?.toLowerCase()
-                  .includes("modern medicine")) && (
-                <TraditionalMedicineWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title?.toLowerCase().includes("tuberculosis") &&
-              !noteBookData?.title
-                ?.toLowerCase()
-                .includes("malaria and neglected tropical disease") && (
-                <TBWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title?.toLowerCase().includes("bacteriology") && (
-                <BacteriologyWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              isPathologyNotebook(noteBookData) && (
-                <PathologyWorkflowTab
-                  notebookId={noteBookData.id}
-                  draftWorkflowType={noteBookData.workflowType}
-                />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title?.toLowerCase().includes("bioanalytical") && (
-                <BioanalyticalWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title?.toLowerCase().includes("bioequivalence") && (
-                <BioequivalenceWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title
-                ?.toLowerCase()
-                .includes("medical laboratory") && (
-                <MedLabWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              isBiorepositoryNotebook(noteBookData) && (
-                <BiorepositoryWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              noteBookData?.title
-                ?.toLowerCase()
-                .includes("genomics & bioinformatics laboratory") && (
-                <GBDWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              (noteBookData?.title?.toLowerCase().includes("virologylab") ||
-                noteBookData?.title
-                  ?.toLowerCase()
-                  .includes("virology laboratory")) && (
-                <VirologyLabWorkflowTab notebookId={noteBookData.id} />
-              )}
-            {noteBookData?.isTemplate !== true &&
-              noteBookData?.id &&
-              !noteBookData?.title?.toLowerCase().includes("tuberculosis") &&
-              !noteBookData?.title
-                ?.toLowerCase()
-                .includes("malaria and neglected tropical disease") &&
-              !noteBookData?.title?.toLowerCase().includes("pharmaceutical") &&
-              !noteBookData?.title?.toLowerCase().includes("bacteriology") &&
-              !isPathologyNotebook(noteBookData) &&
-              !noteBookData?.title?.toLowerCase().includes("bioanalytical") &&
-              !noteBookData?.title?.toLowerCase().includes("bioequivalence") &&
-              !noteBookData?.title?.toLowerCase().includes("pharmaceutical") &&
-              !noteBookData?.title?.toLowerCase().includes("traditional") &&
-              !noteBookData?.title
-                ?.toLowerCase()
-                .includes("medical laboratory") &&
-              !isBiorepositoryNotebook(noteBookData) &&
-              !noteBookData?.title
-                ?.toLowerCase()
-                .includes("genomics & bioinformatics laboratory") &&
-              !noteBookData?.title?.toLowerCase().includes("virologylab") &&
-              !noteBookData?.title
-                ?.toLowerCase()
-                .includes("virology laboratory") && (
-                <NotebookWorkflowTab notebookId={noteBookData.id} />
-              )}
+              (() => {
+                const WorkflowTab = resolveWorkflowTabComponent(noteBookData);
+                return (
+                  <WorkflowTab
+                    notebookId={noteBookData.id}
+                    draftWorkflowType={noteBookData.workflowType}
+                  />
+                );
+              })()}
             {/* Use accordion view for templates or when no ID is available */}
             {(noteBookData?.isTemplate === true || !noteBookData?.id) && (
               <Grid fullWidth={true} className="gridBoundary">
@@ -1432,23 +1345,9 @@ const NoteBookInstanceEntryForm = () => {
                         const basePages = [...noteBookData.pages].sort(
                           (a, b) => (a.order || 0) - (b.order || 0),
                         );
-                        const pageTitles = basePages.map((page) =>
-                          String(page.title || "").toLowerCase(),
+                        const isPathologyTemplate = isPathologyNotebook(
+                          noteBookData,
                         );
-                        const looksLikePathologyByPages = [
-                          "gross examination",
-                          "cassette setup",
-                          "block creation",
-                          "slide preparation",
-                        ].every((expectedTitle) =>
-                          pageTitles.some((title) =>
-                            title.includes(expectedTitle),
-                          ),
-                        );
-                        const isPathologyTemplate =
-                          String(noteBookData?.title || "")
-                            .toLowerCase()
-                            .includes("pathology") || looksLikePathologyByPages;
                         const hasProcessingStage = basePages.some((page) =>
                           String(page.title || "")
                             .toLowerCase()

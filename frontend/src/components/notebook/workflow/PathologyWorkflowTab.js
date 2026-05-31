@@ -12,6 +12,8 @@ import { getFromOpenElisServer } from "../../utils/Utils";
 import config from "../../../config.json";
 import { NotificationContext } from "../../layout/Layout";
 import PageNavigation from "./PageNavigation";
+import { usePageAccessControl } from "../../../hooks/usePageAccessControl";
+import { normalizeWorkflowType } from "../../../constants/ahriWorkflowRegistry";
 import {
   PathologySampleCreationPage,
   PathologyQualityControlPage,
@@ -164,6 +166,7 @@ function PathologyWorkflowTab({
   const preservedStageOrderRef = useRef(1);
   const prevWorkflowTypeForRemapRef = useRef(null);
   const prevNotebookIdForResetRef = useRef(notebookId);
+  const [pendingEditIntent, setPendingEditIntent] = useState(null);
   const intl = useIntl();
   const { notificationVisible, setNotificationVisible } =
     useContext(NotificationContext);
@@ -174,7 +177,7 @@ function PathologyWorkflowTab({
   const [entryId, setEntryId] = useState(propEntryId);
   const [pages, setPages] = useState([]);
   const [pageProgress, setPageProgress] = useState({});
-  const [activePage, setActivePage] = useState(0);
+  const [isCreatingEntry, setIsCreatingEntry] = useState(!propEntryId);
   const [samples, setSamples] = useState([]);
   const [errorMessage, setErrorMessage] = useState(null);
 
@@ -224,8 +227,7 @@ function PathologyWorkflowTab({
     entry?.workflowType,
   ]);
 
-  // Use actual pages if available, otherwise use default Pathology workflow pages.
-  const effectivePages = useMemo(() => {
+  const pathologyStagePages = useMemo(() => {
     const enabledStages =
       PATHOLOGY_WORKFLOW_STAGE_MAP[workflowType] ||
       PATHOLOGY_WORKFLOW_STAGE_MAP.histopathology_biopsy_tissue;
@@ -239,11 +241,28 @@ function PathologyWorkflowTab({
           ...page,
           title: getCanonicalPathologyStageTitle(page),
           workflowStageOrder,
+          order: workflowStageOrder,
+          pageOrder: workflowStageOrder,
         };
       })
       .filter((page) => enabledStages.has(page.workflowStageOrder))
       .sort((a, b) => a.workflowStageOrder - b.workflowStageOrder);
   }, [pages, workflowType]);
+
+  const registryWorkflowType = useMemo(
+    () => normalizeWorkflowType(workflowType) || "pathology",
+    [workflowType],
+  );
+
+  const {
+    effectivePages,
+    activePage,
+    setActivePage,
+    handlePageChange: navigateAccessiblePage,
+  } = usePageAccessControl(pathologyStagePages, DEFAULT_PATHOLOGY_WORKFLOW_PAGES, 0, {
+    isCreating: isCreatingEntry,
+    workflowType: registryWorkflowType,
+  });
 
   /** Comma-separated real DB page IDs (excludes default-* placeholders) for progress API. */
   const pathologyRealPageIdsKey = useMemo(
@@ -336,12 +355,13 @@ function PathologyWorkflowTab({
     if (prevWorkflowTypeForRemapRef.current !== workflowType) {
       const orderToKeep = preservedStageOrderRef.current;
       prevWorkflowTypeForRemapRef.current = workflowType;
+      setPendingEditIntent(null);
       const idx = effectivePages.findIndex(
         (p) => p.workflowStageOrder === orderToKeep,
       );
       setActivePage(idx >= 0 ? idx : 0);
     }
-  }, [workflowType, effectivePages]);
+  }, [workflowType, effectivePages, setActivePage]);
 
   useEffect(() => {
     componentMounted.current = true;
@@ -421,6 +441,7 @@ function PathologyWorkflowTab({
                 const existingEntry = entriesResponse[0];
                 setEntry(existingEntry);
                 setEntryId(existingEntry.id);
+                setIsCreatingEntry(false);
 
                 getFromOpenElisServer(
                   `/rest/notebook-entry/${existingEntry.id}/samples`,
@@ -478,6 +499,7 @@ function PathologyWorkflowTab({
             setEntry(data);
             setEntryId(data.id);
             setSamples([]);
+            setIsCreatingEntry(false);
           } else if (data && data.error) {
             console.error("Entry creation error:", data.error);
           }
@@ -498,11 +520,18 @@ function PathologyWorkflowTab({
     if (p?.workflowStageOrder != null) {
       preservedStageOrderRef.current = p.workflowStageOrder;
     }
-    setActivePage(pageIndex);
+    navigateAccessiblePage(pageIndex);
   };
 
   const navigateToWorkflowStage = useCallback(
-    (stageOrder) => {
+    (stageOrder, options = {}) => {
+      if (options?.openEdit && options?.patientKey) {
+        setPendingEditIntent({
+          patientKey: options.patientKey,
+          sampleIds: options.sampleIds || [],
+          openEdit: true,
+        });
+      }
       const targetIndex = effectivePages.findIndex(
         (page) => page.workflowStageOrder === stageOrder,
       );
@@ -511,8 +540,12 @@ function PathologyWorkflowTab({
         setActivePage(targetIndex);
       }
     },
-    [effectivePages],
+    [effectivePages, setActivePage],
   );
+
+  const handleEditIntentConsumed = useCallback(() => {
+    setPendingEditIntent(null);
+  }, []);
 
   const getProgressForPage = (pageId) => {
     const progress = pageProgress[pageId];
@@ -653,6 +686,8 @@ function PathologyWorkflowTab({
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
             notebookId={notebook?.id}
+            pendingEditIntent={pendingEditIntent}
+            onEditIntentConsumed={handleEditIntentConsumed}
           />
         );
       case 10:
@@ -804,7 +839,9 @@ function PathologyWorkflowTab({
 
         <Column lg={12} md={6} sm={4}>
           <div className="workflow-page-content">
-            {effectivePages.length > 0 && effectivePages[activePage] && (
+            {effectivePages.length > 0 &&
+              effectivePages[activePage] &&
+              effectivePages[activePage].hasAccess && (
               <div className="page-panel">
                 <div className="page-header">
                   <h3>{effectivePages[activePage].title}</h3>
@@ -836,6 +873,25 @@ function PathologyWorkflowTab({
                 </div>
               </div>
             )}
+            {effectivePages.length > 0 &&
+              effectivePages[activePage] &&
+              !effectivePages[activePage].hasAccess && (
+                <div className="page-panel access-denied">
+                  <h3>{effectivePages[activePage].title}</h3>
+                  <p>
+                    <FormattedMessage
+                      id="notebook.page.restricted"
+                      defaultMessage="Restricted"
+                    />
+                  </p>
+                  <p>
+                    <FormattedMessage
+                      id="notebook.page.accessDenied"
+                      defaultMessage="You don't have the required role to access this page"
+                    />
+                  </p>
+                </div>
+              )}
           </div>
         </Column>
       </Grid>

@@ -8,6 +8,8 @@ import UserSessionDetailsContext from "../../UserSessionDetailsContext";
 import CartridgeUsageAPI from "./EquipmentUsageService";
 import ChooseEquipmentModal from "./modals/ChooseEquipment";
 import "./EquipmentUsage.css";
+import PermissionGate from "../security/PermissionGate";
+import { equipmentMutationRoles } from "../../security/rbacActions";
 
 /**
  * EquipmentUsageLog Component
@@ -369,7 +371,10 @@ const EquipmentUsageLog = ({ onSubmitSuccess }) => {
             ) : (
               <div className="equipmentSelectionSection">
                 <h3>
-                  <FormattedMessage id="equipment.usage.selectedEquipment" />
+                  <FormattedMessage
+                    id="equipment.usage.selectedEquipment"
+                    defaultMessage="Selected equipment"
+                  />
                 </h3>
                 {selectedEquipment ? (
                   <div className="equipmentListSection">
@@ -416,7 +421,10 @@ const EquipmentUsageLog = ({ onSubmitSuccess }) => {
                 <div className="detailsRow">
                   <div className="detailField">
                     <label>
-                      <FormattedMessage id="equipment.name" />
+                      <FormattedMessage
+                        id="equipment.name"
+                        defaultMessage="Equipment name"
+                      />
                     </label>
                     <input
                       type="text"
@@ -427,7 +435,10 @@ const EquipmentUsageLog = ({ onSubmitSuccess }) => {
                   </div>
                   <div className="detailField">
                     <label>
-                      <FormattedMessage id="equipment.serialNumber" />
+                      <FormattedMessage
+                        id="equipment.serialNumber"
+                        defaultMessage="Serial number"
+                      />
                     </label>
                     <input
                       type="text"
@@ -438,7 +449,10 @@ const EquipmentUsageLog = ({ onSubmitSuccess }) => {
                   </div>
                   <div className="detailField">
                     <label>
-                      <FormattedMessage id="equipment.department" />
+                      <FormattedMessage
+                        id="equipment.department"
+                        defaultMessage="Department"
+                      />
                     </label>
                     <input
                       type="text"
@@ -699,21 +713,30 @@ const EquipmentUsageLog = ({ onSubmitSuccess }) => {
 
             {/* Action Buttons */}
             <div className="equipmentUsageActionsBottom">
-              <Button
-                kind="primary"
-                size="sm"
-                onClick={handleSubmit}
-                disabled={!selectedEquipment || isSubmitting}
+              <PermissionGate
+                roles={equipmentMutationRoles}
+                requireActiveDepartment
+                disabledTooltip="You do not have permission to record equipment usage"
               >
-                {isSubmitting ? (
-                  <FormattedMessage
-                    id="common.submitting"
-                    defaultMessage="Submitting..."
-                  />
-                ) : (
-                  <FormattedMessage id="equipment.usage.submit" />
-                )}
-              </Button>
+                <Button
+                  kind="primary"
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={!selectedEquipment || isSubmitting}
+                >
+                  {isSubmitting ? (
+                    <FormattedMessage
+                      id="common.submitting"
+                      defaultMessage="Submitting..."
+                    />
+                  ) : (
+                    <FormattedMessage
+                      id="equipment.usage.submit"
+                      defaultMessage="Submit"
+                    />
+                  )}
+                </Button>
+              </PermissionGate>
             </div>
           </div>
         </Column>

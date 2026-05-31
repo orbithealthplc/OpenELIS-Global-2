@@ -37,9 +37,9 @@ function PageNavigation({ pages, activePage, onPageChange, pageProgress }) {
           : Array.from(page.allowedRoles)
         : [];
 
-      // No roles defined = no restriction = allow everyone
+      // Fail closed when roles are unknown (registry + backend are source of truth)
       if (pageRoles.length === 0) {
-        return true;
+        return false;
       }
 
       // Check if user has any of the page's required roles
@@ -113,6 +113,16 @@ function PageNavigation({ pages, activePage, onPageChange, pageProgress }) {
   const getStatusTag = (status, percentage) => {
     // Use percentage-based coloring for all states
     const tagType = getPercentageTagType(percentage);
+    if (percentage === 100) {
+      return (
+        <Tag type={tagType}>
+          <FormattedMessage
+            id="notebook.page.completed"
+            defaultMessage="Completed"
+          />
+        </Tag>
+      );
+    }
     return <Tag type={tagType}>{percentage}%</Tag>;
   };
 

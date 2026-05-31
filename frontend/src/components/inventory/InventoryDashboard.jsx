@@ -36,6 +36,8 @@ import { FormattedMessage, useIntl } from "react-intl";
 import { NotificationContext } from "../layout/Layout";
 import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
 import { InventoryItemAPI, InventoryLotAPI } from "./InventoryService";
+import UserSessionDetailsContext from "../../UserSessionDetailsContext";
+import { hasUnrestrictedDepartmentAccess } from "../../security/departmentAccess";
 import LotEntryModal from "./LotEntryModal";
 import RecordUsageModal from "./RecordUsageModal";
 import LotAdjustmentModal from "./LotAdjustmentModal";
@@ -45,8 +47,14 @@ import LotDetailsPanel from "./LotDetailsPanel";
 import AuditLogViewer from "./AuditLogViewer";
 import "./InventoryList.css";
 
+const DEPARTMENT_HEADER = {
+  key: "department",
+  header: "Department (lab unit)",
+};
+
 const InventoryDashboard = () => {
   const intl = useIntl();
+  const { userSessionDetails } = useContext(UserSessionDetailsContext);
   const { notificationVisible, setNotificationVisible, addNotification } =
     useContext(NotificationContext);
 
@@ -77,8 +85,10 @@ const InventoryDashboard = () => {
   });
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [typeFilter, setTypeFilter] = useState("CARTRIDGE");
+  const [typeFilter, setTypeFilter] = useState("EQUIPMENT");
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [departmentFilter, setDepartmentFilter] = useState("ALL");
+  const [assignableDepartments, setAssignableDepartments] = useState([]);
 
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -110,7 +120,9 @@ const InventoryDashboard = () => {
   const itemTypes = [
     { id: "ALL", text: intl.formatMessage({ id: "inventory.filter.all" }) },
     { id: "REAGENT", text: "Reagent" },
-    { id: "CARTRIDGE", text: "Equipment" },
+    { id: "EQUIPMENT", text: "Equipment" },
+    { id: "CARTRIDGE", text: "Analyzer cartridge" },
+    { id: "CONSUMABLE", text: "Consumable" },
     { id: "RDT", text: "RDT" },
     { id: "ENZYME", text: "Enzyme" },
     { id: "ANTIBIOTICS", text: "Antibiotics" },
@@ -123,12 +135,32 @@ const InventoryDashboard = () => {
     { id: "EXPIRED", text: "Expired" },
   ];
 
-  // Equipment-specific headers (for CARTRIDGE type)
+  const unrestrictedDepartmentAccess = useCallback(
+    () => hasUnrestrictedDepartmentAccess(userSessionDetails),
+    [userSessionDetails],
+  );
+
+  const resolveDepartmentDisplay = useCallback(
+    (item) => {
+      if (!item?.departmentTestSectionId) {
+        return "Unassigned";
+      }
+      const match = assignableDepartments.find(
+        (department) =>
+          String(department.id) === String(item.departmentTestSectionId),
+      );
+      return match?.text || String(item.departmentTestSectionId);
+    },
+    [assignableDepartments],
+  );
+
+  // Equipment-specific headers (for EQUIPMENT type)
   const equipmentHeaders = [
     {
       key: "name",
       header: "Equipment Name",
     },
+    DEPARTMENT_HEADER,
     {
       key: "manufacturer",
       header: "Manufacturer",
@@ -205,6 +237,10 @@ const InventoryDashboard = () => {
       group: "reagentIdentifier",
     },
     {
+      ...DEPARTMENT_HEADER,
+      group: "reagentIdentifier",
+    },
+    {
       key: "concentration",
       header: "Concentration",
       group: "reagentQuantity",
@@ -275,7 +311,13 @@ const InventoryDashboard = () => {
   const reagentColumnGroups = {
     reagentIdentifier: {
       label: "Reagent Identifier",
-      columns: ["name", "catalogNumber", "manufacturer", "category"],
+      columns: [
+        "name",
+        "catalogNumber",
+        "manufacturer",
+        "category",
+        "department",
+      ],
     },
     reagentQuantity: {
       label: "Reagent Quantity",
@@ -305,6 +347,7 @@ const InventoryDashboard = () => {
       key: "name",
       header: intl.formatMessage({ id: "catalog.item.name" }),
     },
+    DEPARTMENT_HEADER,
     {
       key: "projectName",
       header: "Project",
@@ -345,7 +388,7 @@ const InventoryDashboard = () => {
 
   // Select headers based on current type filter
   const headers = useMemo(() => {
-    if (typeFilter === "CARTRIDGE") {
+    if (typeFilter === "EQUIPMENT") {
       return equipmentHeaders;
     } else if (typeFilter === "REAGENT") {
       return reagentHeaders;
@@ -402,6 +445,17 @@ const InventoryDashboard = () => {
   useEffect(() => {
     fetchUnits();
     fetchProjects();
+    InventoryItemAPI.getAssignableDepartments()
+      .then((rows) => {
+        const options = Array.isArray(rows)
+          ? rows.map((row) => ({
+              id: String(row.id),
+              text: row.value,
+            }))
+          : [];
+        setAssignableDepartments(options);
+      })
+      .catch(() => setAssignableDepartments([]));
   }, []);
 
   useEffect(() => {
@@ -418,13 +472,13 @@ const InventoryDashboard = () => {
 
   useEffect(() => {
     fetchLots();
-  }, [typeFilter, statusFilter, page, pageSize]);
+  }, [typeFilter, statusFilter, departmentFilter, page, pageSize]);
 
   useEffect(() => {
     if (page !== 1) {
       setPage(1);
     }
-  }, [typeFilter, statusFilter]);
+  }, [typeFilter, statusFilter, departmentFilter]);
 
   const fetchUnits = async () => {
     try {
@@ -467,6 +521,10 @@ const InventoryDashboard = () => {
         itemType: typeFilter !== "ALL" ? typeFilter : undefined,
         status: statusFilter !== "ALL" ? statusFilter : undefined,
         search: searchTerm || undefined,
+        departmentId:
+          unrestrictedDepartmentAccess() && departmentFilter !== "ALL"
+            ? departmentFilter
+            : undefined,
       });
 
       const validLots = Array.isArray(response.lots) ? response.lots : [];
@@ -597,9 +655,12 @@ const InventoryDashboard = () => {
       }
     }
 
+    const departmentDisplay = resolveDepartmentDisplay(item);
+
     const baseData = {
       id: String(lot.id),
       name: item?.name || "Unknown",
+      department: departmentDisplay,
       manufacturer: item?.manufacturer || "N/A",
       catalogNumber: item?.catalogNumber || "N/A",
       category: item?.category || "N/A",
@@ -611,8 +672,7 @@ const InventoryDashboard = () => {
       stockStatus: stockStatus,
     };
 
-    // Equipment-specific row data (for CARTRIDGE items)
-    if (item?.itemType === "CARTRIDGE") {
+    if (item?.itemType === "EQUIPMENT") {
       return {
         ...baseData,
         // Map new equipment-specific fields
@@ -854,6 +914,29 @@ const InventoryDashboard = () => {
                       }
                       size="md"
                     />
+
+                    {unrestrictedDepartmentAccess() && (
+                      <Dropdown
+                        id="department-filter"
+                        titleText=""
+                        label="Department (lab unit)"
+                        items={[
+                          { id: "ALL", text: "All departments" },
+                          ...assignableDepartments,
+                        ]}
+                        itemToString={(item) => (item ? item.text : "")}
+                        selectedItem={[
+                          { id: "ALL", text: "All departments" },
+                          ...assignableDepartments,
+                        ].find(
+                          (department) => department.id === departmentFilter,
+                        )}
+                        onChange={({ selectedItem }) =>
+                          setDepartmentFilter(selectedItem?.id || "ALL")
+                        }
+                        size="md"
+                      />
+                    )}
                   </div>
 
                   <div className="action-buttons-group">
@@ -941,6 +1024,20 @@ const InventoryDashboard = () => {
                           <TableRow key={row.id} {...getRowProps({ row })}>
                             <TableSelectRow {...getSelectionProps({ row })} />
                             {row.cells.map((cell) => {
+                              if (cell.info.header === "department") {
+                                const isUnassigned =
+                                  cell.value === "Unassigned";
+                                return (
+                                  <TableCell key={cell.id}>
+                                    {isUnassigned ? (
+                                      <Tag type="red">Unassigned</Tag>
+                                    ) : (
+                                      cell.value
+                                    )}
+                                  </TableCell>
+                                );
+                              }
+
                               if (cell.info.header === "stockStatus") {
                                 const status = cell.value;
                                 return (

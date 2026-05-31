@@ -26,10 +26,11 @@ function Login(props) {
     useContext(NotificationContext);
   const { configurationProperties } = useContext(ConfigurationContext);
 
-  const { userSessionDetails, refresh } = useContext(UserSessionDetailsContext);
+  const { userSessionDetails } = useContext(UserSessionDetailsContext);
   const [submitting, setSubmitting] = useState(false);
   const [samlRedirectInitiated, setSamlRedirectInitiated] = useState(false);
   const firstInput = createRef();
+  const showFormLogin = configurationProperties?.useFormLogin !== "false";
 
   // Auto-redirect to SAML if configured to bypass login page
   useEffect(() => {
@@ -55,12 +56,6 @@ function Login(props) {
 
   useEffect(() => {
     firstInput?.current?.focus();
-
-    const interval = setInterval(() => {
-      checkLogin();
-    }, 1000 * 3);
-
-    return () => clearInterval(interval); // clear your interval to prevent memory leaks.
   }, []);
 
   useEffect(() => {
@@ -68,10 +63,6 @@ function Login(props) {
       window.location.href = "/";
     }
   }, [userSessionDetails]);
-
-  const checkLogin = () => {
-    refresh();
-  };
 
   const loginMessage = () => {
     return (
@@ -110,22 +101,61 @@ function Login(props) {
     })
       .then(async (response) => {
         setSubmitting(false);
-        // get json response here
-        let data = await response.json();
+        let responseData = null;
+
+        // Some backend/proxy setups return redirects/HTML instead of JSON.
+        // Keep the login flow resilient by only parsing JSON when possible.
+        try {
+          responseData = await response.json();
+        } catch (jsonError) {
+          responseData = null;
+        }
+
         if (response.status === 200) {
           window.location.href = "/";
-        } else {
+          return;
+        }
+
+        // Legacy behavior: backend may return 302 for login POST.
+        // Verify current session before deciding it is an error.
+        if (response.status === 302 || response.redirected || !responseData) {
+          const sessionResponse = await fetch(config.serverBaseUrl + "/session", {
+            credentials: "include",
+          });
+
+          if (sessionResponse.status === 200) {
+            const sessionData = await sessionResponse.json();
+            if (sessionData.authenticated) {
+              window.location.href = "/";
+              return;
+            }
+          }
+        }
+
+        if (responseData?.error) {
           addNotification({
             title: props.intl.formatMessage({
               id: "notification.title",
             }),
             message: props.intl.formatMessage({
-              id: data.error,
+              id: responseData.error,
             }),
             kind: NotificationKinds.error,
           });
           setNotificationVisible(true);
+          return;
         }
+
+        addNotification({
+          title: props.intl.formatMessage({
+            id: "notification.title",
+          }),
+          message: props.intl.formatMessage({
+            id: "error.invalidcredentials",
+          }),
+          kind: NotificationKinds.error,
+        });
+        setNotificationVisible(true);
       })
       .catch((error) => {
         setSubmitting(false);
@@ -219,11 +249,10 @@ function Login(props) {
               ) : (
                 <Formik
                   initialValues={{
-                    username: "",
+                    loginName: "",
                     password: "",
                   }}
                   onSubmit={(values) => {
-                    doLogin(values);
                     fetch(config.serverBaseUrl + "/LoginPage", {
                       //includes the browser sessionId in the Header for Authentication on the backend server
                       credentials: "include",
@@ -238,18 +267,21 @@ function Login(props) {
                       });
                   }}
                 >
-                  {({ isValid, handleChange, handleSubmit }) => (
-                    <Form onSubmit={handleSubmit} onChange={handleChange}>
+                  {({ isValid, values, handleChange, handleSubmit }) => (
+                    <Form onSubmit={handleSubmit}>
                       <Stack gap={5}>
                         <FormLabel>
                           <Heading>
                             <FormattedMessage id="login.title" />
                           </Heading>
                         </FormLabel>
-                        {configurationProperties?.useFormLogin == "true" && (
+                        {showFormLogin && (
                           <>
                             <TextInput
                               id="loginName"
+                              name="loginName"
+                              value={values.loginName}
+                              onChange={handleChange}
                               invalidText={props.intl.formatMessage({
                                 id: "login.msg.username.missing",
                               })}
@@ -265,6 +297,9 @@ function Login(props) {
                             />
                             <TextInput.PasswordInput
                               id="password"
+                              name="password"
+                              value={values.password}
+                              onChange={handleChange}
                               invalidText={props.intl.formatMessage({
                                 id: "login.msg.password.missing",
                               })}

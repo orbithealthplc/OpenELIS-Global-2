@@ -73,6 +73,7 @@ import {
   getFromOpenElisServer,
   postToOpenElisServer,
 } from "../../../utils/Utils";
+import { loadNotebookScopedInventory } from "../../utils/notebookInventoryScope";
 import SampleGrid from "../../workflow/SampleGrid";
 import config from "../../../../config.json";
 import "../../workflow/NotebookWorkflow.css";
@@ -638,10 +639,6 @@ function BacteriologyAssayTestExecutionPage({
   // Active tab state (0-4 for sections A-E)
   const [activeTab, setActiveTab] = useState(0);
 
-  // Reagents from inventory
-  const [reagents, setReagents] = useState([]);
-  const [loadingReagents, setLoadingReagents] = useState(false);
-
   // Enzymes from inventory
   const [enzymes, setEnzymes] = useState([]);
   const [loadingEnzymes, setLoadingEnzymes] = useState(false);
@@ -917,7 +914,6 @@ function BacteriologyAssayTestExecutionPage({
   useEffect(() => {
     componentMounted.current = true;
     loadPageSamples();
-    loadReagents();
     loadEnzymes();
     loadAntibiotics();
 
@@ -1024,59 +1020,36 @@ function BacteriologyAssayTestExecutionPage({
     );
   }, [pageData?.id]);
 
-  // Load reagents from inventory
-  const loadReagents = useCallback(() => {
-    setLoadingReagents(true);
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
+  const loadEnzymes = useCallback(() => {
+    setLoadingEnzymes(true);
+    loadNotebookScopedInventory(
+      notebookId,
+      "/rest/inventory/items/type/ENZYME",
       (response) => {
         if (componentMounted.current) {
           if (response && Array.isArray(response)) {
-            setReagents(
-              response.map((r) => ({
-                id: r.id,
-                label: `${r.name} (Lot: ${r.lotNumber || "N/A"})`,
-                name: r.name,
-                lotNumber: r.lotNumber,
-                expiryDate: r.expiryDate,
-                ...r,
-              })),
-            );
+            const enzymeOptions = response.map((enzyme) => ({
+              id: enzyme.id,
+              text: enzyme.name,
+              name: enzyme.name,
+              catalogNumber: enzyme.catalogNumber,
+              manufacturer: enzyme.manufacturer,
+              ...enzyme,
+            }));
+            setEnzymes(enzymeOptions);
           } else {
-            setReagents([]);
+            setEnzymes([]);
           }
-          setLoadingReagents(false);
+          setLoadingEnzymes(false);
         }
       },
     );
-  }, []);
-
-  const loadEnzymes = useCallback(() => {
-    setLoadingEnzymes(true);
-    getFromOpenElisServer("/rest/inventory/items/type/ENZYME", (response) => {
-      if (componentMounted.current) {
-        if (response && Array.isArray(response)) {
-          const enzymeOptions = response.map((enzyme) => ({
-            id: enzyme.id,
-            text: enzyme.name,
-            name: enzyme.name,
-            catalogNumber: enzyme.catalogNumber,
-            manufacturer: enzyme.manufacturer,
-            ...enzyme,
-          }));
-          setEnzymes(enzymeOptions);
-        } else {
-          // Handle error or empty response - use hardcoded list as fallback
-          setEnzymes(PCR_ENZYMES);
-        }
-        setLoadingEnzymes(false);
-      }
-    });
-  }, []);
+  }, [notebookId]);
 
   const loadAntibiotics = useCallback(() => {
     setLoadingAntibiotics(true);
-    getFromOpenElisServer(
+    loadNotebookScopedInventory(
+      notebookId,
       "/rest/inventory/items/type/ANTIBIOTICS",
       (response) => {
         if (componentMounted.current) {
@@ -1098,7 +1071,7 @@ function BacteriologyAssayTestExecutionPage({
         }
       },
     );
-  }, []);
+  }, [notebookId]);
 
   // Check if page has a real database ID
   const hasRealPageId =
@@ -7205,12 +7178,9 @@ function BacteriologyAssayTestExecutionPage({
                     defaultMessage: "Enzyme/Master Mix",
                   })}
                   label="Select enzyme"
-                  items={enzymes.length > 0 ? enzymes : PCR_ENZYMES}
+                  items={enzymes}
                   itemToString={(item) => (item ? item.text : "")}
-                  selectedItem={(enzymes.length > 0
-                    ? enzymes
-                    : PCR_ENZYMES
-                  ).find((e) => e.id === pcrData.enzyme)}
+                  selectedItem={enzymes.find((e) => e.id === pcrData.enzyme)}
                   onChange={({ selectedItem }) =>
                     setPcrData({
                       ...pcrData,

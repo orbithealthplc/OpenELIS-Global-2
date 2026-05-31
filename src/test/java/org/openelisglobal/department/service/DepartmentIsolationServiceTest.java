@@ -81,17 +81,11 @@ public class DepartmentIsolationServiceTest {
     }
 
     @Test
-    public void canAccessInventoryItemWhenProjectNotebookIsVisibleToDepartment() {
+    public void deniesInventoryItemWhenOnlyProjectNameIsSetWithoutDepartmentColumn() {
         InventoryItem item = new InventoryItem();
         item.setProjectName("Pathology Project");
 
-        NoteBook notebook = new NoteBook();
-        notebook.setId(10);
-        when(noteBookService.getAllMatching("title", "Pathology Project")).thenReturn(List.of(notebook));
-        when(noteBookService.getNoteBookDepartments(10)).thenReturn(
-                List.of(buildDepartment("7", LAB_UNIT)).stream().collect(java.util.stream.Collectors.toSet()));
-
-        assertTrue(service.canAccessInventoryItem(item, request));
+        assertFalse(service.canAccessInventoryItem(item, request));
     }
 
     @Test
@@ -197,6 +191,24 @@ public class DepartmentIsolationServiceTest {
     }
 
     @Test
+    public void assignableInventoryProjectsExcludesTemplatesOutsideUserDepartment() {
+        NoteBook parent = new NoteBook();
+        parent.setId(20);
+        parent.setTitle("Biorepository Laboratory");
+        parent.setIsTemplate(true);
+
+        when(noteBookService.getAllParentTemplates()).thenReturn(List.of(parent));
+        when(noteBookService.getChildInstances(20)).thenReturn(List.of());
+        when(noteBookService.getNoteBookDepartments(20)).thenReturn(
+                List.of(buildDepartment("9", "Biorepository")).stream().collect(java.util.stream.Collectors.toSet()));
+        when(notebookSecurityService.canViewTemplate(20, USER_ID, LAB_UNIT)).thenReturn(true);
+
+        List<Map<String, String>> projects = service.getAssignableInventoryProjects(request, LAB_UNIT_ID);
+
+        assertTrue(projects.isEmpty());
+    }
+
+    @Test
     public void assignableInventoryProjectsPreferChildInstancesWithinDepartment() {
         NoteBook parent = new NoteBook();
         parent.setId(10);
@@ -280,6 +292,57 @@ public class DepartmentIsolationServiceTest {
     }
 
     @Test
+    public void systemAdminAloneDoesNotHaveUnrestrictedDepartmentAccess() {
+        when(userRoleService.userInRole(USER_ID, org.openelisglobal.common.constants.Constants.ROLE_SYSTEM_ADMIN))
+                .thenReturn(true);
+
+        assertFalse(service.hasUnrestrictedDepartmentAccess(request));
+    }
+
+    @Test
+    public void activeLoginLabUnitMatchesStoredIdNameAndLocalizedName() {
+        TestSection pathology = buildDepartment("7", LAB_UNIT);
+        when(testSectionService.getTestSectionById("7")).thenReturn(pathology);
+        when(testSectionService.getTestSectionById("Pathology Laboratory")).thenReturn(null);
+        when(testSectionService.get("Pathology Laboratory")).thenReturn(null);
+        when(testSectionService.getTestSectionByName("Pathology Laboratory")).thenReturn(null);
+        when(testSectionService.getAllActiveTestSections()).thenReturn(List.of(pathology));
+
+        assertTrue(service.activeLoginLabUnitMatches(request, "7"));
+        assertTrue(service.activeLoginLabUnitMatches(request, LAB_UNIT));
+        assertTrue(service.activeLoginLabUnitMatches(request, "Pathology Laboratory"));
+        assertFalse(service.activeLoginLabUnitMatches(request, "AllLabUnits"));
+        assertFalse(service.activeLoginLabUnitMatches(request, "Biorepository"));
+    }
+
+    @Test
+    public void assignableLabDepartmentsForAdminUsesActiveTestSections() {
+        when(notebookSecurityService.hasGlobalAdminRole(USER_ID)).thenReturn(true);
+        TestSection bacteriology = buildDepartment("168", "Bacteriology");
+        TestSection immunology = buildDepartment("59", "Immunology");
+        TestSection allLabUnits = buildDepartment("0", "All Lab Units");
+        when(testSectionService.getAllActiveTestSections()).thenReturn(List.of(bacteriology, allLabUnits, immunology));
+
+        List<Map<String, String>> rows = service.getAssignableLabDepartments(request);
+
+        assertEquals(2, rows.size());
+        assertTrue(rows.stream().anyMatch(row -> "168".equals(row.get("id"))));
+        assertTrue(rows.stream().anyMatch(row -> "59".equals(row.get("id"))));
+        assertFalse(rows.stream().anyMatch(row -> "All Lab Units".equals(row.get("value"))));
+    }
+
+    @Test
+    public void assignableLabDepartmentsForRestrictedUserUsesSelectableSections() {
+        TestSection pathology = buildDepartment("7", LAB_UNIT);
+        when(testSectionService.getTestSectionById("7")).thenReturn(pathology);
+
+        List<Map<String, String>> rows = service.getAssignableLabDepartments(request);
+
+        assertEquals(1, rows.size());
+        assertEquals("7", rows.get(0).get("id"));
+    }
+
+    @Test
     public void deniesInventoryItemWhenNotebookDepartmentDoesNotMatchUserDepartment() {
         InventoryItem item = new InventoryItem();
         item.setProjectName("Biorepository Project");
@@ -343,6 +406,12 @@ public class DepartmentIsolationServiceTest {
         TestSection section = new TestSection();
         section.setId(id);
         section.setTestSectionName(name);
+        org.openelisglobal.localization.valueholder.Localization localization = new org.openelisglobal.localization.valueholder.Localization();
+        localization.setEnglish(name);
+        if ("Pathology".equals(name)) {
+            localization.setEnglish("Pathology Laboratory");
+        }
+        section.setLocalization(localization);
         return section;
     }
 }

@@ -25,7 +25,6 @@ import {
   Tag,
   Select,
   SelectItem,
-  MultiSelect,
 } from "@carbon/react";
 import {
   Add,
@@ -48,6 +47,7 @@ import ReagentUsageSelector, {
   getInvalidReagentUsageItems,
   syncReagentUsageQuantities,
 } from "../../workflow/ReagentUsageSelector";
+import NotebookDepartmentEquipmentMultiSelect from "../../workflow/NotebookDepartmentEquipmentMultiSelect";
 import { NotificationContext } from "../../../layout/Layout";
 import { NotificationKinds } from "../../../common/CustomNotification";
 import "../../workflow/NotebookWorkflow.css";
@@ -97,6 +97,7 @@ function PharmaceuticalProcessingPage({
     technicianName: "",
     processingDate: new Date().toISOString().slice(0, 10),
     selectedReagents: [],
+    selectedReagentItems: [],
     reagentQuantities: {},
     selectedInstruments: [],
     batchNumber: "",
@@ -110,11 +111,6 @@ function PharmaceuticalProcessingPage({
   const [parentChildren, setParentChildren] = useState([]);
   const [loadingChildren, setLoadingChildren] = useState(false);
 
-  // Reagents and instruments from inventory
-  const [reagents, setReagents] = useState([]);
-  const [instruments, setInstruments] = useState([]);
-  const [loadingReagents, setLoadingReagents] = useState(false);
-  const [loadingInstruments, setLoadingInstruments] = useState(false);
   const [sampleTypes, setSampleTypes] = useState([]);
 
   // Processing method options (pharma-specific)
@@ -150,7 +146,6 @@ function PharmaceuticalProcessingPage({
   useEffect(() => {
     componentMounted.current = true;
     loadPageSamples();
-    loadReagents();
     loadSampleTypes();
 
     return () => {
@@ -208,139 +203,6 @@ function PharmaceuticalProcessingPage({
     );
   }, [pageData?.id]);
 
-  const loadReagents = useCallback(() => {
-    setLoadingReagents(true);
-    getFromOpenElisServer(
-      "/rest/inventory/reagents?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setReagents(
-              response.map((r) => ({
-                id: r.id,
-                label: `${r.name} (Lot: ${r.lotNumber || "N/A"})`,
-                name: r.name,
-                lotNumber: r.lotNumber,
-                ...r,
-              })),
-            );
-          } else {
-            // Mock data for pharma reagents
-            setReagents([
-              {
-                id: "1",
-                label: "HPLC Grade Methanol (Lot: MeOH-2024-01)",
-                name: "HPLC Grade Methanol",
-                lotNumber: "MeOH-2024-01",
-              },
-              {
-                id: "2",
-                label: "HPLC Grade Acetonitrile (Lot: ACN-2024-02)",
-                name: "HPLC Grade Acetonitrile",
-                lotNumber: "ACN-2024-02",
-              },
-              {
-                id: "3",
-                label: "Phosphate Buffer pH 7.4 (Lot: PB74-2024-03)",
-                name: "Phosphate Buffer pH 7.4",
-                lotNumber: "PB74-2024-03",
-              },
-              {
-                id: "4",
-                label: "Mobile Phase A (Lot: MPA-2024-04)",
-                name: "Mobile Phase A",
-                lotNumber: "MPA-2024-04",
-              },
-              {
-                id: "5",
-                label: "Mobile Phase B (Lot: MPB-2024-05)",
-                name: "Mobile Phase B",
-                lotNumber: "MPB-2024-05",
-              },
-            ]);
-          }
-          setLoadingReagents(false);
-        }
-      },
-    );
-  }, []);
-
-  const loadInstruments = useCallback(() => {
-    // If template has configured instruments, use those exclusively
-    if (templateInstruments && templateInstruments.length > 0) {
-      setInstruments(
-        templateInstruments.map((analyzer) => ({
-          id: analyzer.id,
-          label: analyzer.value,
-          name: analyzer.value,
-        })),
-      );
-      setLoadingInstruments(false);
-      return;
-    }
-
-    // Fallback: load from inventory if no template instruments configured
-    setLoadingInstruments(true);
-    getFromOpenElisServer(
-      "/rest/inventory/instruments?status=active",
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            setInstruments(
-              response.map((i) => ({
-                id: i.id,
-                label: `${i.name} (${i.serialNumber || "N/A"})`,
-                name: i.name,
-                serialNumber: i.serialNumber,
-                ...i,
-              })),
-            );
-          } else {
-            // Mock data for pharma instruments (development fallback)
-            setInstruments([
-              {
-                id: "1",
-                label: "Analytical Balance (SN: AB-001)",
-                name: "Analytical Balance",
-                serialNumber: "AB-001",
-              },
-              {
-                id: "2",
-                label: "HPLC System (SN: HPLC-002)",
-                name: "HPLC System",
-                serialNumber: "HPLC-002",
-              },
-              {
-                id: "3",
-                label: "UV-Vis Spectrophotometer (SN: UV-003)",
-                name: "UV-Vis Spectrophotometer",
-                serialNumber: "UV-003",
-              },
-              {
-                id: "4",
-                label: "Dissolution Apparatus (SN: DA-004)",
-                name: "Dissolution Apparatus",
-                serialNumber: "DA-004",
-              },
-              {
-                id: "5",
-                label: "Centrifuge (SN: CF-005)",
-                name: "Centrifuge",
-                serialNumber: "CF-005",
-              },
-            ]);
-          }
-          setLoadingInstruments(false);
-        }
-      },
-    );
-  }, [templateInstruments]);
-
-  // Load instruments on mount and when template instruments change
-  useEffect(() => {
-    loadInstruments();
-  }, [loadInstruments]);
-
   const loadSampleTypes = useCallback(() => {
     getFromOpenElisServer(
       "/rest/displayList/SAMPLE_TYPE_ACTIVE",
@@ -362,6 +224,7 @@ function PharmaceuticalProcessingPage({
       technicianName: "",
       processingDate: new Date().toISOString().slice(0, 10),
       selectedReagents: [],
+      selectedReagentItems: [],
       reagentQuantities: {},
       selectedInstruments: [],
       batchNumber: "",
@@ -403,10 +266,8 @@ function PharmaceuticalProcessingPage({
       return;
     }
 
-    const selectedReagentItems = reagents.filter((reagent) =>
-      bulkPrepareValues.selectedReagents.includes(reagent.id),
-    );
-    if (reagents.length > 0 && selectedReagentItems.length === 0) {
+    const selectedReagentItems = bulkPrepareValues.selectedReagentItems || [];
+    if (selectedReagentItems.length === 0) {
       notifyError("Select at least one reagent before preparing samples.");
       return;
     }
@@ -1071,11 +932,10 @@ function PharmaceuticalProcessingPage({
 
           <Column lg={8} md={4} sm={4}>
             <ReagentUsageSelector
-              reagents={reagents}
+              notebookId={notebookId}
               selectedIds={bulkPrepareValues.selectedReagents}
               reagentQuantities={bulkPrepareValues.reagentQuantities}
               sampleCount={selectedParentIds.length}
-              disabled={loadingReagents}
               titleText={intl.formatMessage({
                 id: "notebook.pharma.reagents",
                 defaultMessage: "Reagents",
@@ -1085,6 +945,7 @@ function PharmaceuticalProcessingPage({
                 setBulkPrepareValues((prev) => ({
                   ...prev,
                   selectedReagents: selectedItems.map((item) => item.id),
+                  selectedReagentItems: selectedItems,
                   reagentQuantities: syncReagentUsageQuantities(
                     selectedItems,
                     prev.reagentQuantities,
@@ -1104,25 +965,21 @@ function PharmaceuticalProcessingPage({
           </Column>
 
           <Column lg={8} md={4} sm={4}>
-            <MultiSelect
-              id="selectedInstruments"
+            <NotebookDepartmentEquipmentMultiSelect
+              notebookId={notebookId}
+              templateInstruments={templateInstruments}
+              selectedIds={bulkPrepareValues.selectedInstruments}
               titleText={intl.formatMessage({
                 id: "notebook.pharma.instruments",
                 defaultMessage: "Instruments",
               })}
               label="Select instruments..."
-              items={instruments}
-              itemToString={(item) => (item ? item.label : "")}
-              selectedItems={instruments.filter((i) =>
-                bulkPrepareValues.selectedInstruments.includes(i.id),
-              )}
-              onChange={({ selectedItems }) =>
+              onSelectionChange={(selectedItems) =>
                 setBulkPrepareValues((prev) => ({
                   ...prev,
                   selectedInstruments: selectedItems.map((i) => i.id),
                 }))
               }
-              disabled={loadingInstruments}
             />
           </Column>
 

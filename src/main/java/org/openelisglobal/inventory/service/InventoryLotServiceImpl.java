@@ -3,6 +3,7 @@ package org.openelisglobal.inventory.service;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.openelisglobal.common.service.AuditableBaseObjectServiceImpl;
 import org.openelisglobal.inventory.dao.InventoryLotDAO;
@@ -19,11 +20,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<InventoryLot, Long>
         implements InventoryLotService {
 
+    public static final String EQUIPMENT_LOT_RECEIVE_MESSAGE =
+            "Equipment is managed from the equipment catalog/asset workflow, not inventory lot receiving.";
+
     @Autowired
     private InventoryLotDAO inventoryLotDAO;
 
     @Autowired
     private InventoryTransactionService transactionService;
+
+    @Autowired
+    private InventoryItemService inventoryItemService;
 
     public InventoryLotServiceImpl() {
         super(InventoryLot.class);
@@ -38,6 +45,8 @@ public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<Inve
     @Override
     @Transactional
     public Long insert(InventoryLot lot) {
+        rejectEquipmentLotReceiving(lot);
+
         // Ensure UUID is set before insert
         if (lot.getFhirUuid() == null) {
             lot.setFhirUuid(UUID.randomUUID());
@@ -45,6 +54,22 @@ public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<Inve
 
         // Audit logging is automatic via auditTrailLog = true in constructor
         return super.insert(lot);
+    }
+
+    private void rejectEquipmentLotReceiving(InventoryLot lot) {
+        if (lot == null || lot.getInventoryItem() == null) {
+            return;
+        }
+        InventoryItem item = lot.getInventoryItem();
+        if (item.getItemType() == null && item.getId() != null) {
+            InventoryItem loaded = inventoryItemService.get(item.getId());
+            if (loaded != null) {
+                item = loaded;
+            }
+        }
+        if (!InventoryBehavior.isLotReceivable(item)) {
+            throw new IllegalArgumentException(EQUIPMENT_LOT_RECEIVE_MESSAGE);
+        }
     }
 
     @Override
@@ -380,7 +405,7 @@ public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<Inve
     @Override
     @Transactional(readOnly = true)
     public List<InventoryLot> getPagedLots(int limit, int offset, String sortBy, String sortOrder, String itemType,
-            LotStatus status, String searchTerm) {
+            LotStatus status, String searchTerm, Set<Integer> departmentIds) {
         // Validate and constrain limit to prevent performance issues
         if (limit > 1000) {
             limit = 1000;
@@ -394,12 +419,13 @@ public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<Inve
             offset = 0;
         }
 
-        return inventoryLotDAO.getPagedLots(limit, offset, sortBy, sortOrder, itemType, status, searchTerm);
+        return inventoryLotDAO.getPagedLots(limit, offset, sortBy, sortOrder, itemType, status, searchTerm,
+                departmentIds);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Long getPagedLotsCount(String itemType, LotStatus status, String searchTerm) {
-        return inventoryLotDAO.getPagedLotsCount(itemType, status, searchTerm);
+    public Long getPagedLotsCount(String itemType, LotStatus status, String searchTerm, Set<Integer> departmentIds) {
+        return inventoryLotDAO.getPagedLotsCount(itemType, status, searchTerm, departmentIds);
     }
 }
