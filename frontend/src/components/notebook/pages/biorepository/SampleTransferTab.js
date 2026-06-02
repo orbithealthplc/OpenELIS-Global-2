@@ -38,12 +38,20 @@ import {
 import BiorepositoryLifecycleModal from "./BiorepositoryLifecycleModal";
 import { formatTransferSourceLab } from "./biorepositoryTransferHelpers";
 
+export const buildAcceptErrorMessage = (acceptErrors = []) => {
+  if (!Array.isArray(acceptErrors) || acceptErrors.length === 0) {
+    return null;
+  }
+  const uniqueMessages = [...new Set(acceptErrors.filter(Boolean))];
+  return uniqueMessages.length > 0 ? uniqueMessages.join(" | ") : null;
+};
+
 /**
  * SampleTransferTab - Sample Transfer Queue management
  * Displays pending transfer requests from origin labs for biorepository review.
  * Supports inline editing of BSL/Ethics and bulk accept/reject operations.
  */
-function SampleTransferTab({ notebookId, onTransferAccepted }) {
+function SampleTransferTab({ notebookId, entryId, onTransferAccepted }) {
   const intl = useIntl();
 
   // Notification context
@@ -94,6 +102,7 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
     { id: "BSL_3", text: "BSL-3" },
     { id: "BSL_4", text: "BSL-4" },
   ];
+  const resolvedNotebookId = notebookId || entryId;
 
   const statusFilters = [
     {
@@ -308,55 +317,6 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
     setLifecycleModalOpen(true);
   }, []);
 
-  const addAcceptedSamplesToStoragePage = useCallback(
-    async (acceptedItems) => {
-      if (!notebookId || !acceptedItems || acceptedItems.length === 0) {
-        return { linkedCount: 0, skipped: acceptedItems?.length || 0 };
-      }
-
-      const sampleIds = acceptedItems
-        .map((item) => Number(item.sampleItemId))
-        .filter((sampleId) => Number.isInteger(sampleId));
-
-      if (sampleIds.length === 0) {
-        return { linkedCount: 0, skipped: acceptedItems.length };
-      }
-
-      const notebookResponse = await new Promise((resolve) => {
-        getFromOpenElisServer(`/rest/notebook/view/${notebookId}`, resolve);
-      });
-
-      const storageAssignmentPage = notebookResponse?.pages?.find(
-        (page) => (page.pageOrder || page.order) === 2,
-      );
-
-      if (!storageAssignmentPage?.id) {
-        throw new Error("Could not find Biorepository Storage Assignment page");
-      }
-
-      const addResponse = await new Promise((resolve) => {
-        postToOpenElisServerJsonResponse(
-          `/rest/notebook/bulk/page/${storageAssignmentPage.id}/samples/add`,
-          JSON.stringify({ sampleIds }),
-          resolve,
-        );
-      });
-
-      if (addResponse?.error || addResponse?.success === false) {
-        throw new Error(
-          addResponse?.error ||
-            "Failed to move accepted samples to Storage Assignment",
-        );
-      }
-
-      return {
-        linkedCount: addResponse?.addedCount || 0,
-        skipped: Math.max(sampleIds.length - (addResponse?.addedCount || 0), 0),
-      };
-    },
-    [notebookId],
-  );
-
   /**
    * Open reject modal for selected items
    */
@@ -496,12 +456,14 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
 
     let successCount = 0;
     let errorCount = 0;
+    const acceptErrors = [];
     let storageLinkedCount = 0;
     let storageLinkError = null;
 
     const metadata = {
       biosafetyLevel: acceptBsl,
       ethicsApprovalRef: acceptEthics.trim() || null,
+      notebookId: resolvedNotebookId ? Number(resolvedNotebookId) : null,
     };
 
     // Process accepts with Promise wrapper for async/await support
@@ -523,25 +485,23 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
 
     // Wait for all accepts to complete
     const results = await Promise.all(acceptPromises);
-    const acceptedItems = [];
 
     // Count successes and errors
     for (const result of results) {
       if (result.success) {
         successCount++;
-        acceptedItems.push(result.item);
+        if (result.response?.storagePageLinked) {
+          storageLinkedCount++;
+        } else {
+          storageLinkError =
+            result.response?.storagePageError ||
+            "Accepted sample was not moved to Storage Assignment.";
+        }
       } else {
         errorCount++;
-      }
-    }
-
-    if (acceptedItems.length > 0) {
-      try {
-        const storageLinkResult =
-          await addAcceptedSamplesToStoragePage(acceptedItems);
-        storageLinkedCount = storageLinkResult.linkedCount;
-      } catch (error) {
-        storageLinkError = error.message;
+        if (result.response?.error) {
+          acceptErrors.push(result.response.error);
+        }
       }
     }
 
@@ -559,6 +519,7 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
           },
           { errorCount },
         ),
+        message: buildAcceptErrorMessage(acceptErrors),
       });
     }
 
@@ -595,8 +556,8 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
     intl,
     loadTransferData,
     notify,
-    addAcceptedSamplesToStoragePage,
     onTransferAccepted,
+    resolvedNotebookId,
   ]);
 
   // Prepare table rows
@@ -1108,6 +1069,7 @@ function SampleTransferTab({ notebookId, onTransferAccepted }) {
 
 SampleTransferTab.propTypes = {
   notebookId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  entryId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   onTransferAccepted: PropTypes.func,
 };
 
