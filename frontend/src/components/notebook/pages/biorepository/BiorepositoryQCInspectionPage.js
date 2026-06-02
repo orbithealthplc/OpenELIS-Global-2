@@ -128,6 +128,18 @@ const CORRECTION_ACTIONS = [
 
 const ALL_OPTION = "__ALL__";
 
+export const normalizeLastQCInspection = (inspection) => {
+  if (!inspection || typeof inspection !== "object") {
+    return null;
+  }
+  const inspectionDate = inspection.inspectionDate || inspection.lastQCDate || null;
+  return {
+    ...inspection,
+    inspectionDate,
+    lastQCDate: inspection.lastQCDate || inspectionDate,
+  };
+};
+
 const buildStorageOverviewQuery = (filters, includeInspected, notebookId, options = {}) => {
   const params = new URLSearchParams();
   ["freezer", "shelf", "rack", "box"].forEach((key) => {
@@ -285,7 +297,7 @@ function BiorepositoryQCInspectionPage({
             storageLocation: sample.storageLocation, // Full location object
             biosafetyLevel: sample.biosafetyLevel || "-",
             workflowStatus: sample.workflowStatus,
-            lastQCInspection: sample.lastQCInspection, // Most recent inspection record
+            lastQCInspection: normalizeLastQCInspection(sample.lastQCInspection), // Most recent inspection record
           }));
           setSamples(transformedSamples);
         } else {
@@ -1194,6 +1206,26 @@ function BiorepositoryQCInspectionPage({
           setBulkApplyModalOpen(false);
           resetBulkApplyValues();
           setSelectedForBulkApply([]); // Clear captured selection
+          if (Array.isArray(response.inspections) && response.inspections.length > 0) {
+            const inspectionByBioSampleId = new Map(
+              response.inspections.map((inspection) => [
+                String(inspection.bioSampleId),
+                normalizeLastQCInspection(inspection),
+              ]),
+            );
+            setSamples((prev) =>
+              prev.map((sample) => {
+                const updatedInspection = inspectionByBioSampleId.get(String(sample.id));
+                if (!updatedInspection) {
+                  return sample;
+                }
+                return {
+                  ...sample,
+                  lastQCInspection: updatedInspection,
+                };
+              }),
+            );
+          }
           loadStoredSamples();
           loadStorageOverview(storageFilters, includeInspectedSamples);
           if (roundInfo?.qcBatchId) {
@@ -1257,8 +1289,11 @@ function BiorepositoryQCInspectionPage({
   );
 
   // Get QC result tag
-  const getQCTag = (qcResult, qcStatus) => {
+  const getQCTag = (qcResult, qcStatus, lifecycleOutcome) => {
     if (!qcResult) return <Tag type="gray">Pending</Tag>;
+    if (lifecycleOutcome === "FAILED_CORRECTED") {
+      return <Tag type="teal">FIXED (review)</Tag>;
+    }
     if (qcStatus === "MISSING") return <Tag type="purple">Missing</Tag>;
     if (qcResult === "VERIFIED") return <Tag type="green">PASS</Tag>;
     if (qcResult === "DISCREPANCY_FOUND") return <Tag type="red">FAIL</Tag>;
@@ -1270,7 +1305,7 @@ function BiorepositoryQCInspectionPage({
       return "";
     }
     if (inspection.lifecycleOutcome === "FAILED_CORRECTED") {
-      return "Correction logged";
+      return "Fixed (pending review)";
     }
     if (
       inspection.lifecycleOutcome === "FAILED_MARKED_MISSING" ||
@@ -2031,16 +2066,22 @@ function BiorepositoryQCInspectionPage({
                                         alignItems: "center",
                                       }}
                                     >
-                                      {getQCTag(qc.qcResult, qc.qcStatus)}
+                                      {getQCTag(
+                                        qc.qcResult,
+                                        qc.qcStatus,
+                                        qc.lifecycleOutcome,
+                                      )}
                                       <span
                                         style={{
                                           fontSize: "0.75rem",
                                           color: "#525252",
                                         }}
                                       >
-                                        {new Date(
-                                          qc.inspectionDate,
-                                        ).toLocaleDateString()}
+                                        {qc.inspectionDate
+                                          ? new Date(
+                                              qc.inspectionDate,
+                                            ).toLocaleDateString()
+                                          : "—"}
                                       </span>
                                     </div>
                                     {qc.qcResult === "DISCREPANCY_FOUND" && (

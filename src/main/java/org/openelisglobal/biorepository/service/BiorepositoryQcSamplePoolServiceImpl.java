@@ -552,12 +552,67 @@ public class BiorepositoryQcSamplePoolServiceImpl implements BiorepositoryQcSamp
         Map<String, Object> mapped = new HashMap<>();
         mapped.put("id", inspection.getId());
         mapped.put("lastQCDate", inspection.getInspectionDate());
-        String qcStatus = BiorepositoryQCInspection.QCResult.VERIFIED.equals(inspection.getQcResult()) ? "VALID"
-                : "INVALID";
+        mapped.put("inspectionDate", inspection.getInspectionDate());
+        mapped.put("qcResult", inspection.getQcResult() != null ? inspection.getQcResult().name() : null);
+        mapped.put("correctionActionType", inspection.getCorrectionActionType());
+        String qcStatus = deriveQcStatusSummary(inspection);
         mapped.put("qcStatus", qcStatus);
+        mapped.put("lifecycleOutcome", deriveLifecycleOutcomeSummary(inspection));
         mapped.put("sampleFlag", "VALID".equals(qcStatus) ? "QC_VALID" : "QC_FAILED");
         mapped.put("qcFailed", !"VALID".equals(qcStatus));
         return mapped;
+    }
+
+    private String deriveQcStatusSummary(BiorepositoryQCInspection inspection) {
+        if (inspection == null || inspection.getQcResult() == null) {
+            return "UNKNOWN";
+        }
+        if (BiorepositoryQCInspection.QCResult.VERIFIED.equals(inspection.getQcResult())) {
+            return "VALID";
+        }
+        if (BiorepositoryQCInspection.QCResult.DISCREPANCY_FOUND.equals(inspection.getQcResult())) {
+            if (isMissingDiscrepancySummary(inspection)
+                    && "MARK_MISSING".equalsIgnoreCase(trimToNull(inspection.getCorrectionActionType()))) {
+                return "MISSING";
+            }
+            return "QC_FAILED";
+        }
+        return "UNKNOWN";
+    }
+
+    private String deriveLifecycleOutcomeSummary(BiorepositoryQCInspection inspection) {
+        if (inspection == null || inspection.getQcResult() == null) {
+            return "UNKNOWN";
+        }
+        if (BiorepositoryQCInspection.QCResult.VERIFIED.equals(inspection.getQcResult())) {
+            return "PASSED";
+        }
+        if (BiorepositoryQCInspection.QCResult.DISCREPANCY_FOUND.equals(inspection.getQcResult())) {
+            if ("MISSING".equals(deriveQcStatusSummary(inspection))) {
+                return "FAILED_MARKED_MISSING";
+            }
+            if (trimToNull(inspection.getCorrectionActionType()) != null) {
+                return "FAILED_CORRECTED";
+            }
+            return "FAILED_PENDING_CORRECTION";
+        }
+        return "UNKNOWN";
+    }
+
+    private boolean isMissingDiscrepancySummary(BiorepositoryQCInspection inspection) {
+        if (inspection == null || inspection.getDiscrepancyType() == null) {
+            return false;
+        }
+        return BiorepositoryQCInspection.DiscrepancyType.SAMPLE_MISSING.equals(inspection.getDiscrepancyType())
+                || BiorepositoryQCInspection.DiscrepancyType.MISSING_SAMPLE.equals(inspection.getDiscrepancyType());
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 
     private Integer parseSampleItemId(String sampleItemIdStr) {

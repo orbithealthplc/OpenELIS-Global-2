@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openelisglobal.biorepository.valueholder.BioSample;
+import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
 import org.openelisglobal.common.services.IStatusService;
 import org.openelisglobal.common.services.StatusService.SampleStatus;
@@ -145,6 +146,39 @@ public class BiorepositoryQcSamplePoolServiceTest {
         assertEquals(1, samples.size());
         assertEquals("11", String.valueOf(samples.get(0).get("sampleItemId")));
         assertNotNull(samples.get(0).get("bioSampleId"));
+    }
+
+    @Test
+    public void listSamplesForQcTable_mapsMostRecentInspectionForImmediateDisplay() {
+        Map<String, Object> row = assignmentRow("12",
+                "Biorepository Laboratory > Freezer-A > Shelf-1 > Rack-1 > Box-1", DEPT_ID, "active");
+        when(sampleStorageService.getAllSamplesWithAssignments()).thenReturn(List.of(row));
+
+        BioSample existing = new BioSample();
+        existing.setId(503);
+        existing.setWorkflowStatus(WorkflowStatus.STORED);
+        SampleItem sampleItem = new SampleItem();
+        sampleItem.setId("12");
+        existing.setSampleItem(sampleItem);
+        when(bioSampleService.getBySampleItemIds(List.of(12))).thenReturn(List.of(existing));
+
+        BiorepositoryQCInspection inspection = new BiorepositoryQCInspection();
+        inspection.setId(9001);
+        inspection.setBioSample(existing);
+        inspection.setQcResult(BiorepositoryQCInspection.QCResult.DISCREPANCY_FOUND);
+        inspection.setCorrectionActionType("UPDATE_LOCATION");
+        inspection.setInspectionDate(new java.sql.Timestamp(System.currentTimeMillis()));
+        when(qcInspectionService.getMostRecentByBioSampleIds(List.of(503))).thenReturn(Map.of(503, inspection));
+        when(qcInspectionService.getBioSampleIdsWithAnyInspection(List.of(503))).thenReturn(Set.of(503));
+
+        List<Map<String, Object>> samples = poolService.listSamplesForQcTable(NOTEBOOK_ID);
+        assertEquals(1, samples.size());
+        @SuppressWarnings("unchecked")
+        Map<String, Object> lastQCInspection = (Map<String, Object>) samples.get(0).get("lastQCInspection");
+        assertNotNull(lastQCInspection);
+        assertEquals("DISCREPANCY_FOUND", String.valueOf(lastQCInspection.get("qcResult")));
+        assertEquals("FAILED_CORRECTED", String.valueOf(lastQCInspection.get("lifecycleOutcome")));
+        assertNotNull(lastQCInspection.get("inspectionDate"));
     }
 
     private static Map<String, Object> assignmentRow(String id, String location, int departmentId, String status) {
