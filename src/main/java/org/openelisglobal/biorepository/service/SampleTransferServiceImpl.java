@@ -272,6 +272,7 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
         item.setBioSample(createdBioSample);
 
         updateRequestStatus(request, sysUserId);
+        request.setSysUserId(sysUserId);
         update(request);
 
         chainOfCustodyService.logCustodyAction(item.getSampleItem(), CustodyAction.TRANSFER_RECEIVED, request, null,
@@ -302,6 +303,7 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
         item.setRejectionReason(rejectionReason);
 
         updateRequestStatus(request, sysUserId);
+        request.setSysUserId(sysUserId);
         update(request);
 
         chainOfCustodyService.logCustodyAction(item.getSampleItem(), CustodyAction.TRANSFER_REJECTED, request, null,
@@ -342,6 +344,7 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
         }
 
         updateRequestStatus(request, sysUserId);
+        request.setSysUserId(sysUserId);
         return update(request);
     }
 
@@ -371,6 +374,7 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
 
         updateRequestStatus(request, sysUserId);
         request.setRejectionReason(rejectionReason);
+        request.setSysUserId(sysUserId);
         return update(request);
     }
 
@@ -388,6 +392,7 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
 
         request.setStatus(TransferStatus.CANCELLED);
         request.setProcessedTimestamp(new Timestamp(System.currentTimeMillis()));
+        request.setSysUserId(sysUserId);
 
         SystemUser cancellingUser = systemUserService.get(sysUserId);
         for (SampleTransferItem item : request.getItems()) {
@@ -488,7 +493,8 @@ public class SampleTransferServiceImpl extends AuditableBaseObjectServiceImpl<Sa
             if (item.getUnitOfMeasure() != null && !item.getUnitOfMeasure().trim().isEmpty()) {
                 sampleItem.setUnitOfMeasureName(item.getUnitOfMeasure().trim());
             }
-            sampleItem.setSysUserId(bioSample.getSysUserId());
+            sampleItem.setSysUserId(
+                    bioSample != null && hasText(bioSample.getSysUserId()) ? bioSample.getSysUserId() : "1");
             sampleItemService.update(sampleItem);
         }
     }
