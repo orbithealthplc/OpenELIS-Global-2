@@ -23,6 +23,7 @@ import { FormattedMessage, useIntl } from "react-intl";
 import "../pathology/PathologyDashboard.css";
 import PageBreadCrumb from "../common/PageBreadCrumb";
 import { usePermissions } from "../../hooks/usePermissions";
+import { Permissions } from "../../constants/roles";
 import CustomDatePicker from "../common/CustomDatePicker";
 import {
   Document,
@@ -42,9 +43,11 @@ import "./NoteBook.css";
 function NoteBookDashBoard() {
   const componentMounted = useRef(false);
 
-  const { notificationVisible } = useContext(NotificationContext);
+  const { notificationVisible, addNotification, setNotificationVisible } =
+    useContext(NotificationContext);
   const { userSessionDetails } = useContext(UserSessionDetailsContext);
-  const { hasRoleForCurrentLabUnit } = usePermissions();
+  const { hasRoleForCurrentLabUnit, hasAnyRole } = usePermissions();
+  const canEditTemplate = hasAnyRole(Permissions.CREATE_OR_EDIT_NOTEBOOK);
 
   const [statuses, setStatuses] = useState([]);
   const [noteBookEntries, setNoteBookEntries] = useState([]);
@@ -70,6 +73,19 @@ function NoteBookDashBoard() {
   });
   const [loading, setLoading] = useState(true);
   const intl = useIntl();
+
+  useEffect(() => {
+    const notice = sessionStorage.getItem("notebookDashboardNotice");
+    if (notice) {
+      sessionStorage.removeItem("notebookDashboardNotice");
+      setNotificationVisible(true);
+      addNotification({
+        kind: "info",
+        title: intl.formatMessage({ id: "notification.title" }),
+        message: notice,
+      });
+    }
+  }, [addNotification, intl, setNotificationVisible]);
 
   const setStatusList = (statusList) => {
     if (componentMounted.current) {
@@ -155,7 +171,10 @@ function NoteBookDashBoard() {
   };
 
   const openNoteBookInstanceEntryForm = () => {
-    window.location.href = "/NoteBookInstanceEntryForm/" + selectedNoteBook.id;
+    if (!selectedNoteBook?.id || isParentTemplate) {
+      return;
+    }
+    window.location.href = `/NoteBookInstanceEditForm/${selectedNoteBook.id}?mode=edit&tab=workflow`;
   };
 
   const openNoteBookInstanceView = (id) => {
@@ -236,28 +255,35 @@ function NoteBookDashBoard() {
     }
   };
 
-  // Store the refresh function from NotebookTreeView
+  // Store the refresh function and expandParent from NotebookTreeView
   const refreshTreeRef = useRef(null);
+  const expandParentRef = useRef(null);
 
   const handleTreeRefresh = (refreshFn) => {
     refreshTreeRef.current = refreshFn;
   };
 
+  const handleExpandParentReady = (expandFn) => {
+    expandParentRef.current = expandFn;
+  };
+
   // Handler for successful instance creation
   const handleInstanceCreated = (newInstance) => {
-    // Refresh the tree view
     if (refreshTreeRef.current) {
       refreshTreeRef.current();
     }
-    // Stay on dashboard: select the new instance so user can create/select entry from the tree/list.
     if (newInstance && newInstance.id) {
-      // The refresh is async; select after a short delay so the node exists.
+      const parentId =
+        newInstance.parentNotebookId ?? selectedNoteBook?.id ?? null;
       setTimeout(() => {
+        if (parentId && expandParentRef.current) {
+          expandParentRef.current(parentId);
+        }
         handleTreeSelect(newInstance.id, false, {
           id: newInstance.id,
           title: newInstance.title,
           isChildInstance: true,
-          parentNotebookId: newInstance.parentNotebookId,
+          parentNotebookId: parentId,
         });
       }, 300);
     }
@@ -326,6 +352,8 @@ function NoteBookDashBoard() {
                 onSelectNotebook={handleTreeSelect}
                 selectedId={selectedNoteBook?.id}
                 onRefresh={handleTreeRefresh}
+                onExpandParentReady={handleExpandParentReady}
+                canEditTemplate={canEditTemplate}
               />
             </Column>
           </Grid>

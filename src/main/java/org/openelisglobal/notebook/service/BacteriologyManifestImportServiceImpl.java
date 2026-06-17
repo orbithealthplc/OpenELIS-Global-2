@@ -150,26 +150,20 @@ public class BacteriologyManifestImportServiceImpl implements BacteriologyManife
                 String sampleOrigin = getValueAtIndex(values, sampleOriginIdx);
                 String sourceLocation = getValueAtIndex(values, sourceLocationIdx);
 
-                // Validate required fields
+                // Validate required fields — barcode/Sample ID only for go-live imports
                 if (barcode == null || barcode.isBlank()) {
                     errors.add(new ParseError(rowNumber, "barcode", "Barcode is required"));
                     continue;
                 }
 
-                if (sampleType == null || sampleType.isBlank()) {
-                    errors.add(new ParseError(rowNumber, "sampleType", "Sample type is required"));
-                    continue;
-                }
-
-                if (sampleOrigin == null || sampleOrigin.isBlank()) {
-                    errors.add(new ParseError(rowNumber, "sampleOrigin", "Sample origin is required"));
-                    continue;
-                }
+                String normalizedSampleType = sampleType != null ? sampleType.trim() : "";
+                String normalizedSampleOrigin = sampleOrigin != null ? sampleOrigin.trim() : "";
+                String normalizedSourceLocation = sourceLocation != null ? sourceLocation.trim() : "";
 
                 rows.add(new BacteriologyManifestRow(rowNumber, projectName, studyId, participantId, barcode.trim(),
-                        collectionSite, sampleType.trim(), collectionDateTime, sampleReceivedDate, sampleArrivalTime,
+                        collectionSite, normalizedSampleType, collectionDateTime, sampleReceivedDate, sampleArrivalTime,
                         receivedBy, storageContainerType, storageTemperature, consentStatus, crfStatus,
-                        sampleOrigin.trim(), sourceLocation));
+                        normalizedSampleOrigin, normalizedSourceLocation));
             }
 
         } catch (IOException e) {
@@ -185,6 +179,10 @@ public class BacteriologyManifestImportServiceImpl implements BacteriologyManife
         List<ParseError> errors = new ArrayList<>();
 
         for (BacteriologyManifestRow row : manifest.rows()) {
+            if (row.sampleType() == null || row.sampleType().isBlank()) {
+                continue;
+            }
+
             TypeOfSample searchType = new TypeOfSample();
             searchType.setDescription(row.sampleType());
 
@@ -217,13 +215,11 @@ public class BacteriologyManifestImportServiceImpl implements BacteriologyManife
         int sequenceNumber = 1;
 
         for (BacteriologyManifestRow row : manifest.rows()) {
-            // Look up sample type
-            TypeOfSample searchType = new TypeOfSample();
-            searchType.setDescription(row.sampleType());
-            TypeOfSample sampleType = typeOfSampleService.getTypeOfSampleByDescriptionAndDomain(searchType, true);
+            TypeOfSample sampleType = resolveBacteriologySampleType(row.sampleType());
 
             if (sampleType == null) {
-                errors.add(new ParseError(row.rowNumber(), "sampleType", "Unknown sample type: " + row.sampleType()));
+                errors.add(new ParseError(row.rowNumber(), "sampleType",
+                        "No default bacteriology sample type configured for barcode-only import"));
                 continue;
             }
 
@@ -322,6 +318,44 @@ public class BacteriologyManifestImportServiceImpl implements BacteriologyManife
         result.sort((a, b) -> a.get("description").compareToIgnoreCase(b.get("description")));
 
         return result;
+    }
+
+    /**
+     * Resolve sample type for manifest import. When the CSV row omits sample type
+     * (barcode-only go-live imports), default to "Other animal specimen" if
+     * configured, otherwise the first active bacteriology type in the database.
+     */
+    private TypeOfSample resolveBacteriologySampleType(String sampleTypeDescription) {
+        if (sampleTypeDescription != null && !sampleTypeDescription.isBlank()) {
+            TypeOfSample searchType = new TypeOfSample();
+            searchType.setDescription(sampleTypeDescription.trim());
+            TypeOfSample found = typeOfSampleService.getTypeOfSampleByDescriptionAndDomain(searchType, true);
+            if (found != null) {
+                return found;
+            }
+            return null;
+        }
+
+        TypeOfSample preferredDefault = lookupSampleTypeByDescription("Other animal specimen");
+        if (preferredDefault != null) {
+            return preferredDefault;
+        }
+
+        List<Map<String, String>> validTypes = getValidBacteriologySampleTypes();
+        if (!validTypes.isEmpty()) {
+            return lookupSampleTypeByDescription(validTypes.get(0).get("description"));
+        }
+
+        return null;
+    }
+
+    private TypeOfSample lookupSampleTypeByDescription(String description) {
+        if (description == null || description.isBlank()) {
+            return null;
+        }
+        TypeOfSample searchType = new TypeOfSample();
+        searchType.setDescription(description);
+        return typeOfSampleService.getTypeOfSampleByDescriptionAndDomain(searchType, true);
     }
 
     /**

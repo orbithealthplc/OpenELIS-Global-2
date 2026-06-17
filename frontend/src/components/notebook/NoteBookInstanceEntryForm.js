@@ -43,9 +43,7 @@ import {
 } from "../utils/Utils";
 import NotebookAuditLogViewer from "./NotebookAuditLogViewer";
 import { resolveWorkflowTabComponent } from "./workflow/workflowRouting";
-import {
-  buildLinkedEquipmentInstrumentsUrl,
-} from "./notebookLinkedEquipment";
+import { buildLinkedEquipmentInstrumentsUrl } from "./notebookLinkedEquipment";
 import {
   loadNotebookEquipmentOptions,
   mergeInventoryOptionsWithLinkedSelections,
@@ -421,26 +419,30 @@ const NoteBookInstanceEntryForm = () => {
     setNewComment("");
   };
 
-  const applyInstrumentList = useCallback((response) => {
-    const departmentInstruments = mergeInventoryOptionsWithLinkedSelections(
-      response,
-      noteBookData.analyzers || [],
-      intl.formatMessage({
-        id: "notebook.equipment.picker.missingSelection",
-        defaultMessage: "Linked instrument is not currently available in department inventory.",
-      }),
-    );
-    setAnalyzerList(departmentInstruments);
-    setNoteBookData((previous) => ({
-      ...previous,
-      analyzers: (previous.analyzers || []).map((instrument) => {
-        const resolvedMatch = departmentInstruments.find(
-          (option) => String(option.id) === String(instrument.id),
-        );
-        return resolvedMatch || instrument;
-      }),
-    }));
-  }, [intl, noteBookData.analyzers]);
+  const applyInstrumentList = useCallback(
+    (response) => {
+      const departmentInstruments = mergeInventoryOptionsWithLinkedSelections(
+        response,
+        noteBookData.analyzers || [],
+        intl.formatMessage({
+          id: "notebook.equipment.picker.missingSelection",
+          defaultMessage:
+            "Linked instrument is not currently available in department inventory.",
+        }),
+      );
+      setAnalyzerList(departmentInstruments);
+      setNoteBookData((previous) => ({
+        ...previous,
+        analyzers: (previous.analyzers || []).map((instrument) => {
+          const resolvedMatch = departmentInstruments.find(
+            (option) => String(option.id) === String(instrument.id),
+          );
+          return resolvedMatch || instrument;
+        }),
+      }));
+    },
+    [intl, noteBookData.analyzers],
+  );
 
   const loadNotebookInstruments = useCallback(
     (notebookId) => {
@@ -520,40 +522,6 @@ const NoteBookInstanceEntryForm = () => {
       window.location.href = `/NoteBookInstanceEditForm/${projectId}?mode=edit${tabQuery}`;
     };
 
-    const bootstrapProjectFromTemplate = (templateId, templateData) => {
-      const childCount = templateData?.entriesCount ?? 0;
-      const suggestedTitle = `${templateData?.title || "Project"} - Lab ${childCount + 1}`;
-      postToOpenElisServerJsonResponse(
-        `/rest/notebook/${templateId}/instances`,
-        JSON.stringify({ title: suggestedTitle }),
-        (response) => {
-          if (!componentMounted.current) {
-            return;
-          }
-          if (response?.id) {
-            redirectToPersistedProject(response.id, null);
-            return;
-          }
-          setLoading(false);
-          showAlertMessage(
-            response?.error || intl.formatMessage({ id: "error.save.msg" }),
-            NotificationKinds.error,
-          );
-        },
-        (errorResponse) => {
-          if (!componentMounted.current) {
-            return;
-          }
-          setLoading(false);
-          showAlertMessage(
-            errorResponse?.error ||
-              intl.formatMessage({ id: "error.save.msg" }),
-            NotificationKinds.error,
-          );
-        },
-      );
-    };
-
     setLoading(true);
     getFromOpenElisServer(`/rest/notebook/view/${notebookid}`, (data) => {
       if (!componentMounted.current) {
@@ -565,16 +533,16 @@ const NoteBookInstanceEntryForm = () => {
       }
 
       if (data.isTemplate === true) {
-        const allowedRoles = data.allowedRoles
-          ? Array.isArray(data.allowedRoles)
-            ? data.allowedRoles
-            : Array.from(data.allowedRoles)
-          : [];
-        if (!checkAuthorization(allowedRoles)) {
-          setLoading(false);
-          return;
-        }
-        bootstrapProjectFromTemplate(notebookid, data);
+        setLoading(false);
+        sessionStorage.setItem(
+          "notebookDashboardNotice",
+          intl.formatMessage({
+            id: "notebook.instance.createViaModal",
+            defaultMessage:
+              "Use Create Instance on the dashboard to start a new lab project.",
+          }),
+        );
+        window.location.href = "/NoteBookDashboard";
         return;
       }
 
@@ -1437,9 +1405,8 @@ const NoteBookInstanceEntryForm = () => {
                         const basePages = [...noteBookData.pages].sort(
                           (a, b) => (a.order || 0) - (b.order || 0),
                         );
-                        const isPathologyTemplate = isPathologyNotebook(
-                          noteBookData,
-                        );
+                        const isPathologyTemplate =
+                          isPathologyNotebook(noteBookData);
                         const hasProcessingStage = basePages.some((page) =>
                           String(page.title || "")
                             .toLowerCase()

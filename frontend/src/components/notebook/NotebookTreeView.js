@@ -14,9 +14,17 @@ import { Loading } from "@carbon/react";
  *
  * @param {Function} onSelectNotebook - Callback when a notebook is selected. Receives (notebookId, isParentTemplate, notebookData)
  * @param {Number} selectedId - Currently selected notebook ID
- * @param {Function} onRefresh - Optional callback to trigger refresh
+ * @param {Function} onRefresh - Optional callback to register refresh function
+ * @param {Function} onExpandParentReady - Optional callback to register expandParent(parentId)
+ * @param {boolean} canEditTemplate - Show parent template edit (admin only)
  */
-const NotebookTreeView = ({ onSelectNotebook, selectedId, onRefresh }) => {
+const NotebookTreeView = ({
+  onSelectNotebook,
+  selectedId,
+  onRefresh,
+  onExpandParentReady,
+  canEditTemplate = false,
+}) => {
   const [hierarchy, setHierarchy] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expandedNodes, setExpandedNodes] = useState([]);
@@ -40,12 +48,25 @@ const NotebookTreeView = ({ onSelectNotebook, selectedId, onRefresh }) => {
     loadHierarchy();
   }, [loadHierarchy]);
 
-  // Expose refresh function
+  const expandParent = useCallback((parentId) => {
+    const nodeId = `parent-${parentId}`;
+    setExpandedNodes((prev) =>
+      prev.includes(nodeId) ? prev : [...prev, nodeId],
+    );
+  }, []);
+
+  // Expose refresh and expand helpers to parent
   useEffect(() => {
     if (onRefresh) {
       onRefresh(loadHierarchy);
     }
   }, [onRefresh, loadHierarchy]);
+
+  useEffect(() => {
+    if (onExpandParentReady) {
+      onExpandParentReady(expandParent);
+    }
+  }, [onExpandParentReady, expandParent]);
 
   const handleSelect = (event, node) => {
     if (node && node.id) {
@@ -112,9 +133,15 @@ const NotebookTreeView = ({ onSelectNotebook, selectedId, onRefresh }) => {
     );
   };
 
-  const handleEdit = (e, notebookId) => {
+  const handleEdit = (e, notebookId, isChildInstance) => {
     e.stopPropagation();
-    window.location.href = `/NoteBookEntryForm/${notebookId}`;
+    if (isChildInstance) {
+      window.location.href = `/NoteBookInstanceEditForm/${notebookId}?mode=edit`;
+      return;
+    }
+    if (canEditTemplate) {
+      window.location.href = `/NoteBookEntryForm/${notebookId}`;
+    }
   };
 
   if (loading) {
@@ -157,18 +184,20 @@ const NotebookTreeView = ({ onSelectNotebook, selectedId, onRefresh }) => {
             value={`parent-${parent.id}`}
             label={
               <span className="tree-node-label">
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  hasIconOnly
-                  renderIcon={Edit}
-                  iconDescription={intl.formatMessage({
-                    id: "notebook.icon.edit",
-                    defaultMessage: "Edit",
-                  })}
-                  onClick={(e) => handleEdit(e, parent.id)}
-                  className="tree-node-edit-btn"
-                />
+                {canEditTemplate && (
+                  <Button
+                    kind="ghost"
+                    size="sm"
+                    hasIconOnly
+                    renderIcon={Edit}
+                    iconDescription={intl.formatMessage({
+                      id: "notebook.icon.edit",
+                      defaultMessage: "Edit",
+                    })}
+                    onClick={(e) => handleEdit(e, parent.id, false)}
+                    className="tree-node-edit-btn"
+                  />
+                )}
                 <Template size={16} className="tree-node-icon parent-icon" />
                 <span className="tree-node-title">{parent.title}</span>
                 <span className="tree-node-count">
@@ -228,7 +257,7 @@ const NotebookTreeView = ({ onSelectNotebook, selectedId, onRefresh }) => {
                             id: "notebook.icon.edit",
                             defaultMessage: "Edit",
                           })}
-                          onClick={(e) => handleEdit(e, child.id)}
+                          onClick={(e) => handleEdit(e, child.id, true)}
                           className="tree-node-edit-btn"
                         />
                         <Document

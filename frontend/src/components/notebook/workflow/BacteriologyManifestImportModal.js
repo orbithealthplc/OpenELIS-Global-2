@@ -42,14 +42,14 @@ const EXPECTED_DATA_POINTS = {
       label: "Project Name",
       description: "Name of the research project or study",
       example: "Antimicrobial Resistance Study 2024",
-      required: true,
+      required: false,
     },
     {
       key: "studyId",
       label: "Study ID",
       description: "Unique identifier for the study",
       example: "STUDY-001",
-      required: true,
+      required: false,
     },
   ],
   sampleIdentity: [
@@ -62,8 +62,8 @@ const EXPECTED_DATA_POINTS = {
     },
     {
       key: "barcode",
-      label: "Barcode",
-      description: "Sample barcode identifier",
+      label: "Sample ID / Barcode",
+      description: "Sample barcode identifier (required)",
       example: "BACT-2024-001",
       required: true,
     },
@@ -74,21 +74,21 @@ const EXPECTED_DATA_POINTS = {
       label: "Collection Site",
       description: "Where the sample was collected",
       example: "Main Hospital Lab",
-      required: true,
+      required: false,
     },
     {
       key: "sampleType",
       label: "Sample Type",
       description: "Type of sample (validated against Bacteriology lab types)",
       example: "Blood, Urine, Stool, Wastewater, Dairy Products, Animal Stool",
-      required: true,
+      required: false,
     },
     {
       key: "collectionDateTime",
       label: "Collection Date & Time",
       description: "When the sample was collected",
       example: "2024-06-15 09:30",
-      required: true,
+      required: false,
     },
   ],
   receptionMetadata: [
@@ -97,21 +97,21 @@ const EXPECTED_DATA_POINTS = {
       label: "Sample Received Date",
       description: "Date when sample was received at the lab",
       example: "2024-06-15",
-      required: true,
+      required: false,
     },
     {
       key: "sampleArrivalTime",
       label: "Sample Arrival Time",
       description: "Time when sample arrived at the lab",
       example: "10:00",
-      required: true,
+      required: false,
     },
     {
       key: "receivedBy",
       label: "Received By",
       description: "Name/initials of person who received the sample",
       example: "John Doe",
-      required: true,
+      required: false,
     },
   ],
   storageConditions: [
@@ -120,14 +120,14 @@ const EXPECTED_DATA_POINTS = {
       label: "Storage Container Type",
       description: "Type of container used for storage",
       example: "Vacutainer Tube, Sterile Cup, Sample Bottle",
-      required: true,
+      required: false,
     },
     {
       key: "storageTemperatureOnArrival",
       label: "Storage Temperature on Arrival",
       description: "Temperature of sample when received (in Celsius)",
       example: "4, -20, Room Temperature",
-      required: true,
+      required: false,
     },
   ],
   complianceStatus: [
@@ -152,14 +152,14 @@ const EXPECTED_DATA_POINTS = {
       label: "Sample Origin",
       description: "Source category of the sample",
       example: "Human, Animal, Environmental, Food/Beverage",
-      required: true,
+      required: false,
     },
     {
       key: "sourceLocationFacility",
       label: "Source Location/Facility",
       description: "Specific location or facility of sample origin",
       example: "Central Hospital, Municipal Water Treatment, Local Farm",
-      required: true,
+      required: false,
     },
   ],
 };
@@ -413,12 +413,7 @@ function BacteriologyManifestImportModal({
 
   // Check if required fields are mapped
   const isRequiredMappingComplete = useCallback(() => {
-    return (
-      columnMapping.barcodeColumn &&
-      columnMapping.sampleTypeColumn &&
-      columnMapping.sampleOriginColumn &&
-      columnMapping.sourceLocationFacilityColumn
-    );
+    return Boolean(columnMapping.barcodeColumn);
   }, [columnMapping]);
 
   // Preview import
@@ -795,7 +790,7 @@ function BacteriologyManifestImportModal({
               <p className="step-description">
                 <FormattedMessage
                   id="notebook.bacteriology.manifest.step2.description"
-                  defaultMessage="Map the CSV columns to the required fields. Columns have been auto-detected where possible."
+                  defaultMessage="Map the Sample ID / Barcode column (required). Other fields are optional."
                 />
               </p>
             </div>
@@ -814,64 +809,22 @@ function BacteriologyManifestImportModal({
                 <Tag type="red" size="sm">
                   Required
                 </Tag>
-                Required Fields
+                <FormattedMessage
+                  id="notebook.bacteriology.manifest.requiredFields"
+                  defaultMessage="Required Field"
+                />
               </h6>
               <Grid fullWidth>
                 <Column lg={8} md={4} sm={4}>
                   <Select
                     id="barcodeColumn"
-                    labelText="Barcode *"
+                    labelText={intl.formatMessage({
+                      id: "notebook.bacteriology.manifest.barcodeColumn",
+                      defaultMessage: "Sample ID / Barcode *",
+                    })}
                     value={columnMapping.barcodeColumn}
                     onChange={(e) =>
                       handleMappingChange("barcodeColumn", e.target.value)
-                    }
-                  >
-                    <SelectItem value="" text="Select column..." />
-                    {csvHeaders.map((header) => (
-                      <SelectItem key={header} value={header} text={header} />
-                    ))}
-                  </Select>
-                </Column>
-                <Column lg={8} md={4} sm={4}>
-                  <Select
-                    id="sampleTypeColumn"
-                    labelText="Sample Type *"
-                    value={columnMapping.sampleTypeColumn}
-                    onChange={(e) =>
-                      handleMappingChange("sampleTypeColumn", e.target.value)
-                    }
-                  >
-                    <SelectItem value="" text="Select column..." />
-                    {csvHeaders.map((header) => (
-                      <SelectItem key={header} value={header} text={header} />
-                    ))}
-                  </Select>
-                </Column>
-                <Column lg={8} md={4} sm={4}>
-                  <Select
-                    id="sampleOriginColumn"
-                    labelText="Sample Origin *"
-                    value={columnMapping.sampleOriginColumn}
-                    onChange={(e) =>
-                      handleMappingChange("sampleOriginColumn", e.target.value)
-                    }
-                  >
-                    <SelectItem value="" text="Select column..." />
-                    {csvHeaders.map((header) => (
-                      <SelectItem key={header} value={header} text={header} />
-                    ))}
-                  </Select>
-                </Column>
-                <Column lg={8} md={4} sm={4}>
-                  <Select
-                    id="sourceLocationFacilityColumn"
-                    labelText="Source Location/Facility *"
-                    value={columnMapping.sourceLocationFacilityColumn}
-                    onChange={(e) =>
-                      handleMappingChange(
-                        "sourceLocationFacilityColumn",
-                        e.target.value,
-                      )
                     }
                   >
                     <SelectItem value="" text="Select column..." />
@@ -885,8 +838,64 @@ function BacteriologyManifestImportModal({
 
             {/* Optional Fields Mapping */}
             <Accordion>
-              <AccordionItem title="Optional Fields (Click to expand)">
+              <AccordionItem
+                title={intl.formatMessage({
+                  id: "notebook.bacteriology.manifest.optionalFields",
+                  defaultMessage: "Optional Fields (Click to expand)",
+                })}
+              >
                 <Grid fullWidth>
+                  <Column lg={8} md={4} sm={4}>
+                    <Select
+                      id="sampleTypeColumn"
+                      labelText="Sample Type"
+                      value={columnMapping.sampleTypeColumn}
+                      onChange={(e) =>
+                        handleMappingChange("sampleTypeColumn", e.target.value)
+                      }
+                    >
+                      <SelectItem value="" text="Select column..." />
+                      {csvHeaders.map((header) => (
+                        <SelectItem key={header} value={header} text={header} />
+                      ))}
+                    </Select>
+                  </Column>
+                  <Column lg={8} md={4} sm={4}>
+                    <Select
+                      id="sampleOriginColumn"
+                      labelText="Sample Origin"
+                      value={columnMapping.sampleOriginColumn}
+                      onChange={(e) =>
+                        handleMappingChange(
+                          "sampleOriginColumn",
+                          e.target.value,
+                        )
+                      }
+                    >
+                      <SelectItem value="" text="Select column..." />
+                      {csvHeaders.map((header) => (
+                        <SelectItem key={header} value={header} text={header} />
+                      ))}
+                    </Select>
+                  </Column>
+                  <Column lg={8} md={4} sm={4}>
+                    <Select
+                      id="sourceLocationFacilityColumn"
+                      labelText="Source Location/Facility"
+                      value={columnMapping.sourceLocationFacilityColumn}
+                      onChange={(e) =>
+                        handleMappingChange(
+                          "sourceLocationFacilityColumn",
+                          e.target.value,
+                        )
+                      }
+                    >
+                      <SelectItem value="" text="Select column..." />
+                      {csvHeaders.map((header) => (
+                        <SelectItem key={header} value={header} text={header} />
+                      ))}
+                    </Select>
+                  </Column>
                   <Column lg={8} md={4} sm={4}>
                     <Select
                       id="projectNameColumn"
@@ -1101,7 +1110,7 @@ function BacteriologyManifestImportModal({
                 title={intl.formatMessage({
                   id: "notebook.bacteriology.manifest.mappingIncomplete",
                   defaultMessage:
-                    "Please map all required fields before proceeding.",
+                    "Please map the Sample ID / Barcode column before proceeding.",
                 })}
                 lowContrast
                 hideCloseButton
