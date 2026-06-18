@@ -25,19 +25,26 @@ import {
   Tag,
   Button,
   Modal,
+  Pagination,
 } from "@carbon/react";
-import { Checkmark, Renew, Barcode, ArrowRight } from "@carbon/icons-react";
+import {
+  Checkmark,
+  Renew,
+  Barcode,
+  ArrowRight,
+  View,
+} from "@carbon/icons-react";
 import { FormattedMessage, useIntl } from "react-intl";
 import PropTypes from "prop-types";
-import {
-  getFromOpenElisServer,
-} from "../../../utils/Utils";
+import config from "../../../../config.json";
+import { getFromOpenElisServer } from "../../../utils/Utils";
 import ShipmentReceptionForm from "./ShipmentReceptionForm";
 import ShipmentListTable from "./ShipmentListTable";
 import SampleIntakeForm from "./SampleIntakeForm";
 import SampleDuplicationSection from "./SampleDuplicationSection";
 import DocumentationVerificationModal from "./DocumentationVerificationModal";
 import ManifestUploadModal from "./ManifestUploadModal";
+import BioSampleDetailModal from "./BioSampleDetailModal";
 import SampleTransferTab from "./SampleTransferTab";
 import RetentionPolicySection from "./RetentionPolicySection";
 import {
@@ -46,7 +53,7 @@ import {
   advanceSamplesToStorageBatched,
 } from "./biorepositoryStorageHelpers";
 
-const INVENTORY_SAMPLE_FETCH_LIMIT = 5000;
+const INVENTORY_PAGE_SIZE = 50;
 const SHIPMENT_SAMPLE_FETCH_LIMIT = 5000;
 
 /**
@@ -83,6 +90,11 @@ function BiorepositoryIntakePage({
   const [registeredSamples, setRegisteredSamples] = useState([]);
   const [allBioSamples, setAllBioSamples] = useState([]);
   const [loadingSamples, setLoadingSamples] = useState(false);
+  const [inventoryPage, setInventoryPage] = useState(1);
+  const [inventoryPageSize, setInventoryPageSize] =
+    useState(INVENTORY_PAGE_SIZE);
+  const [inventoryTotal, setInventoryTotal] = useState(0);
+  const [detailSample, setDetailSample] = useState(null);
   const [verificationModalOpen, setVerificationModalOpen] = useState(false);
   const [manifestModalOpen, setManifestModalOpen] = useState(false);
   const [shipmentListRefreshKey, setShipmentListRefreshKey] = useState(0);
@@ -244,23 +256,43 @@ function BiorepositoryIntakePage({
 
   // Load all biorepository samples (for inventory tab) - runs on mount
   // Filter by workflowStatus=REGISTERED to show only samples at Intake stage
-  const loadAllBioSamples = useCallback(() => {
-    setLoadingSamples(true);
-    getFromOpenElisServer(
-      `/rest/biorepository/sample?limit=${INVENTORY_SAMPLE_FETCH_LIMIT}&workflowStatus=REGISTERED`,
-      (data) => {
-        setLoadingSamples(false);
-        if (data && Array.isArray(data)) {
-          setAllBioSamples(data);
-        }
-      },
-    );
-  }, []);
+  const loadAllBioSamples = useCallback(
+    (page = inventoryPage, pageSize = inventoryPageSize) => {
+      setLoadingSamples(true);
+      const offset = (page - 1) * pageSize;
+      fetch(
+        `${config.serverBaseUrl}/rest/biorepository/sample?limit=${pageSize}&offset=${offset}&workflowStatus=REGISTERED`,
+        {
+          credentials: "include",
+          method: "GET",
+        },
+      )
+        .then((response) => {
+          const totalHeader = response.headers.get("X-Total-Count");
+          if (totalHeader) {
+            const parsedTotal = parseInt(totalHeader, 10);
+            if (!Number.isNaN(parsedTotal)) {
+              setInventoryTotal(parsedTotal);
+            }
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setLoadingSamples(false);
+          if (data && Array.isArray(data)) {
+            setAllBioSamples(data);
+          }
+        })
+        .catch(() => {
+          setLoadingSamples(false);
+        });
+    },
+    [inventoryPage, inventoryPageSize],
+  );
 
-  // Load all samples on mount
   useEffect(() => {
-    loadAllBioSamples();
-  }, [loadAllBioSamples]);
+    loadAllBioSamples(inventoryPage, inventoryPageSize);
+  }, [inventoryPage, inventoryPageSize, loadAllBioSamples]);
 
   // Restore active shipment from session storage
   useEffect(() => {
@@ -298,8 +330,8 @@ function BiorepositoryIntakePage({
   // Refresh inventory after bulk import
   const handleBulkImportCompleteWithRefresh = useCallback(() => {
     handleBulkImportComplete();
-    // Refresh all samples list
-    loadAllBioSamples();
+    setInventoryPage(1);
+    loadAllBioSamples(1, inventoryPageSize);
 
     // Refresh shipment-specific registration count if this intake page is linked to a shipment
     if (currentShipment?.id) {
@@ -318,7 +350,12 @@ function BiorepositoryIntakePage({
         },
       );
     }
-  }, [currentShipment?.id, handleBulkImportComplete, loadAllBioSamples]);
+  }, [
+    currentShipment?.id,
+    handleBulkImportComplete,
+    loadAllBioSamples,
+    inventoryPageSize,
+  ]);
 
   // Advance selected samples to Storage Assignment page
   const handleAdvanceToStorage = useCallback(
@@ -397,8 +434,7 @@ function BiorepositoryIntakePage({
             }),
             subtitle: intl.formatMessage({
               id: "biorepository.inventory.advance.noStoragePage.message",
-              defaultMessage:
-                "Storage Assignment page not found in notebook.",
+              defaultMessage: "Storage Assignment page not found in notebook.",
             }),
           });
           return;
@@ -473,7 +509,8 @@ function BiorepositoryIntakePage({
           subtitle += ` ${intl.formatMessage(
             {
               id: "biorepository.inventory.advance.alreadyOnPage",
-              defaultMessage: "{count} were already on the Storage Assignment page.",
+              defaultMessage:
+                "{count} were already on the Storage Assignment page.",
             },
             { count: alreadyOnPage },
           )}`;
@@ -521,13 +558,7 @@ function BiorepositoryIntakePage({
         setAdvancingToStorage(false);
       }
     },
-    [
-      allBioSamples,
-      notebookId,
-      intl,
-      loadAllBioSamples,
-      onProgressUpdate,
-    ],
+    [allBioSamples, notebookId, intl, loadAllBioSamples, onProgressUpdate],
   );
 
   const getDocStatusLabel = (status) => {
@@ -818,7 +849,9 @@ function BiorepositoryIntakePage({
                   <SampleTransferTab
                     notebookId={notebookId}
                     entryId={entryId}
-                    onTransferAccepted={loadAllBioSamples}
+                    onTransferAccepted={() =>
+                      loadAllBioSamples(inventoryPage, inventoryPageSize)
+                    }
                   />
                 </div>
               </TabPanel>
@@ -844,7 +877,9 @@ function BiorepositoryIntakePage({
                       kind="ghost"
                       size="sm"
                       renderIcon={Renew}
-                      onClick={loadAllBioSamples}
+                      onClick={() =>
+                        loadAllBioSamples(inventoryPage, inventoryPageSize)
+                      }
                       disabled={loadingSamples}
                     >
                       <FormattedMessage
@@ -871,7 +906,7 @@ function BiorepositoryIntakePage({
                         defaultMessage="Loading samples..."
                       />
                     </p>
-                  ) : allBioSamples.length === 0 ? (
+                  ) : inventoryTotal === 0 ? (
                     <InlineNotification
                       kind="info"
                       title={intl.formatMessage({
@@ -896,7 +931,7 @@ function BiorepositoryIntakePage({
                             defaultMessage:
                               "{count} sample(s) in biorepository",
                           },
-                          { count: allBioSamples.length },
+                          { count: inventoryTotal },
                         )}
                         lowContrast
                         hideCloseButton
@@ -918,6 +953,7 @@ function BiorepositoryIntakePage({
                         rows={allBioSamples.map((sample) => ({
                           id: sample.id.toString(),
                           barcode: sample.barcode || "-",
+                          accessionNumber: sample.accessionNumber || "-",
                           sampleType: sample.sampleType?.description || "-",
                           originLab: sample.originLab || "-",
                           receiptDate: sample.receiptDate
@@ -934,7 +970,10 @@ function BiorepositoryIntakePage({
                               )
                             : "-",
                           biosafetyLevel: sample.biosafetyLevel || "-",
-                          status: sample.workflowStatus || sample.status || "REGISTERED",
+                          status:
+                            sample.workflowStatus ||
+                            sample.status ||
+                            "REGISTERED",
                           documentationStatus:
                             sample.documentationStatus || "PENDING",
                           actions: "",
@@ -944,7 +983,14 @@ function BiorepositoryIntakePage({
                             key: "barcode",
                             header: intl.formatMessage({
                               id: "biorepository.sample.field.barcode",
-                              defaultMessage: "Barcode",
+                              defaultMessage: "Barcode / Sample ID",
+                            }),
+                          },
+                          {
+                            key: "accessionNumber",
+                            header: intl.formatMessage({
+                              id: "biorepository.sample.field.accessionNumber",
+                              defaultMessage: "Accession Number",
                             }),
                           },
                           {
@@ -1194,6 +1240,22 @@ function BiorepositoryIntakePage({
                                                   kind="ghost"
                                                   size="sm"
                                                   hasIconOnly
+                                                  renderIcon={View}
+                                                  iconDescription={intl.formatMessage(
+                                                    {
+                                                      id: "biorepository.inventory.viewDetails",
+                                                      defaultMessage:
+                                                        "View sample details",
+                                                    },
+                                                  )}
+                                                  onClick={() =>
+                                                    setDetailSample(sample)
+                                                  }
+                                                />
+                                                <Button
+                                                  kind="ghost"
+                                                  size="sm"
+                                                  hasIconOnly
                                                   renderIcon={Barcode}
                                                   iconDescription={intl.formatMessage(
                                                     {
@@ -1237,6 +1299,18 @@ function BiorepositoryIntakePage({
                           );
                         }}
                       </DataTable>
+                      <Pagination
+                        page={inventoryPage}
+                        pageSize={inventoryPageSize}
+                        pageSizes={[25, 50, 100, 250]}
+                        totalItems={inventoryTotal}
+                        onChange={({ page, pageSize }) => {
+                          setInventoryPage(page);
+                          setInventoryPageSize(pageSize);
+                        }}
+                        size="md"
+                        style={{ marginTop: "1rem" }}
+                      />
                     </>
                   )}
                 </div>
@@ -1261,6 +1335,12 @@ function BiorepositoryIntakePage({
         shipmentId={currentShipment?.id}
         notebookId={notebookId}
         onImportComplete={handleBulkImportCompleteWithRefresh}
+      />
+
+      <BioSampleDetailModal
+        open={detailSample != null}
+        sample={detailSample}
+        onClose={() => setDetailSample(null)}
       />
 
       {/* Barcode Display Modal */}

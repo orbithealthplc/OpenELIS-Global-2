@@ -574,7 +574,7 @@ public class BioSampleRestControllerManifestImportTest extends BaseWebContextSen
     }
 
     @Test
-    public void testRegisterBulk_PartialFailure_ReturnsRowErrorsAndKeepsSuccesses() throws Exception {
+    public void testRegisterBulk_DuplicateBarcodeInDatabase_ImportsWithSameBarcode() throws Exception {
         ManifestImportRequest request = new ManifestImportRequest();
         List<SampleRegistrationDTO> samples = new ArrayList<>();
 
@@ -582,14 +582,126 @@ public class BioSampleRestControllerManifestImportTest extends BaseWebContextSen
         createExistingSampleItem(duplicateBarcode);
 
         samples.add(createValidSampleDTO("PARTIAL-VALID-" + System.currentTimeMillis()));
-        samples.add(createValidSampleDTO(duplicateBarcode));
+        SampleRegistrationDTO duplicateDto = createValidSampleDTO(duplicateBarcode);
+        duplicateDto.setSno(2);
+        samples.add(duplicateDto);
         request.setSamples(samples);
 
-        MvcResult result = mockMvc
-                .perform(post("/rest/biorepository/sample/register-bulk").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", userSessionData)
-                        .content(objectMapper.writeValueAsString(request)))
+        MvcResult result = mockMvc.perform(post("/rest/biorepository/sample/register-bulk")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", userSessionData)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
+
+        assertTrue("Response should succeed", response.get("success").asBoolean());
+        assertEquals("Should register both samples", 2, response.get("registeredCount").asInt());
+        assertEquals("Duplicate row should keep original barcode", duplicateBarcode,
+                response.get("samples").get(1).get("barcode").asText());
+    }
+
+    @Test
+    public void testRegisterBulk_DuplicateBarcodesInManifest_KeepsOriginalBarcode() throws Exception {
+        ManifestImportRequest request = new ManifestImportRequest();
+        List<SampleRegistrationDTO> samples = new ArrayList<>();
+
+        String duplicateBarcode = "APPROVED-DUP-" + System.currentTimeMillis();
+        SampleRegistrationDTO first = createValidSampleDTO(duplicateBarcode);
+        first.setSno(1);
+        SampleRegistrationDTO second = createValidSampleDTO(duplicateBarcode);
+        second.setSno(2);
+        samples.add(first);
+        samples.add(second);
+        request.setSamples(samples);
+
+        MvcResult result = mockMvc.perform(post("/rest/biorepository/sample/register-bulk")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", userSessionData)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
+
+        assertTrue("Registration should succeed", response.get("success").asBoolean());
+        assertEquals("Should register both samples", 2, response.get("registeredCount").asInt());
+        assertEquals("First sample keeps barcode", duplicateBarcode,
+                response.get("samples").get(0).get("barcode").asText());
+        assertEquals("Second sample keeps same barcode", duplicateBarcode,
+                response.get("samples").get(1).get("barcode").asText());
+    }
+
+    @Test
+    public void testRegisterBulk_PersistsManifestSno() throws Exception {
+        ManifestImportRequest request = new ManifestImportRequest();
+        SampleRegistrationDTO sample = createValidSampleDTO("SNO-TEST-" + System.currentTimeMillis());
+        sample.setSno(42);
+        request.setSamples(List.of(sample));
+
+        MvcResult result = mockMvc.perform(post("/rest/biorepository/sample/register-bulk")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", userSessionData)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
+        assertTrue(response.get("success").asBoolean());
+
+        int bioSampleId = response.get("samples").get(0).get("id").asInt();
+        assertEquals(Integer.valueOf(42), bioSampleService.get(bioSampleId).getManifestSno());
+    }
+
+    @Test
+    public void testListSamples_OrdersByManifestSno() throws Exception {
+        ManifestImportRequest request = new ManifestImportRequest();
+        List<SampleRegistrationDTO> samples = new ArrayList<>();
+        long timestamp = System.currentTimeMillis();
+
+        SampleRegistrationDTO third = createValidSampleDTO("SNO-ORDER-3-" + timestamp);
+        third.setSno(30);
+        SampleRegistrationDTO first = createValidSampleDTO("SNO-ORDER-1-" + timestamp);
+        first.setSno(10);
+        SampleRegistrationDTO second = createValidSampleDTO("SNO-ORDER-2-" + timestamp);
+        second.setSno(20);
+        samples.add(third);
+        samples.add(first);
+        samples.add(second);
+        request.setSamples(samples);
+
+        mockMvc.perform(post("/rest/biorepository/sample/register-bulk").contentType(MediaType.APPLICATION_JSON)
+                .sessionAttr("userSessionData", userSessionData).content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
+
+        MvcResult listResult = mockMvc
+                .perform(get("/rest/biorepository/sample").param("workflowStatus", "REGISTERED").param("limit", "100")
+                        .param("offset", "0").sessionAttr("userSessionData", userSessionData))
                 .andExpect(status().isOk()).andReturn();
+
+        JsonNode listed = objectMapper.readTree(listResult.getResponse().getContentAsString());
+        assertTrue(listed.isArray());
+        assertTrue(listed.size() >= 3);
+
+        List<Integer> orderedSnos = new ArrayList<>();
+        for (JsonNode row : listed) {
+            String barcode = row.path("barcode").asText("");
+            if (barcode.startsWith("SNO-ORDER-") && row.hasNonNull("manifestSno")) {
+                orderedSnos.add(row.get("manifestSno").asInt());
+            }
+        }
+        assertEquals("Should find all imported rows", 3, orderedSnos.size());
+        assertEquals(Integer.valueOf(10), orderedSnos.get(0));
+        assertEquals(Integer.valueOf(20), orderedSnos.get(1));
+        assertEquals(Integer.valueOf(30), orderedSnos.get(2));
+    }
+
+    @Test
+    public void testRegisterBulk_PartialFailure_ReturnsRowErrorsAndKeepsSuccesses() throws Exception {
+        ManifestImportRequest request = new ManifestImportRequest();
+        List<SampleRegistrationDTO> samples = new ArrayList<>();
+
+        samples.add(createValidSampleDTO("PARTIAL-VALID-" + System.currentTimeMillis()));
+        SampleRegistrationDTO invalid = createValidSampleDTO("PARTIAL-INVALID-" + System.currentTimeMillis());
+        invalid.setSampleType("   ");
+        samples.add(invalid);
+        request.setSamples(samples);
+
+        MvcResult result = mockMvc.perform(post("/rest/biorepository/sample/register-bulk")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", userSessionData)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk()).andReturn();
 
         JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
 
@@ -597,37 +709,6 @@ public class BioSampleRestControllerManifestImportTest extends BaseWebContextSen
         assertEquals("Should register exactly one sample", 1, response.get("registeredCount").asInt());
         assertEquals("Should report one failed sample", 1, response.get("failedCount").asInt());
         assertEquals("Should include one row error", 1, response.get("rowErrors").size());
-        assertTrue("Row error should mention duplicate was not approved",
-                response.get("rowErrors").get(0).asText().toLowerCase().contains("not approved"));
-    }
-
-    @Test
-    public void testRegisterBulk_ApprovedManifestDuplicate_AssignsSuffix() throws Exception {
-        ManifestImportRequest request = new ManifestImportRequest();
-        List<SampleRegistrationDTO> samples = new ArrayList<>();
-
-        String duplicateBarcode = "APPROVED-DUP-" + System.currentTimeMillis();
-        samples.add(createValidSampleDTO(duplicateBarcode));
-        samples.add(createValidSampleDTO(duplicateBarcode));
-
-        ManifestImportRequest.DuplicateResolution duplicateResolution = new ManifestImportRequest.DuplicateResolution();
-        duplicateResolution.setMode("SUFFIX");
-        duplicateResolution.setAllowedRowIndexes(List.of(1));
-        request.setSamples(samples);
-        request.setDuplicateResolution(duplicateResolution);
-
-        MvcResult result = mockMvc
-                .perform(post("/rest/biorepository/sample/register-bulk").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", userSessionData)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk()).andReturn();
-
-        JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
-
-        assertTrue("Registration should succeed", response.get("success").asBoolean());
-        assertEquals("Should register both samples", 2, response.get("registeredCount").asInt());
-        assertTrue("Second sample should use suffixed barcode",
-                response.get("samples").get(1).get("barcode").asText().endsWith("-R2"));
     }
 
     @Test

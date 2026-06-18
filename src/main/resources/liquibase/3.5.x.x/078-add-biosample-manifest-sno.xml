@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!--
+        Store Excel manifest serial number (S.No) for natural sort order in
+        biorepository reception lists. Not displayed in UI; used for ORDER BY.
+    -->
+
+    <changeSet id="078-add-biosample-manifest-sno-column" author="openelis">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="bio_sample" schemaName="clinlims" columnName="manifest_sno"/>
+            </not>
+        </preConditions>
+        <comment>Add manifest_sno column to bio_sample for Excel row ordering</comment>
+        <addColumn tableName="bio_sample" schemaName="clinlims">
+            <column name="manifest_sno" type="INTEGER">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="bio_sample" schemaName="clinlims" columnName="manifest_sno"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

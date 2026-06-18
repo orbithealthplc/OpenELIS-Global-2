@@ -193,7 +193,8 @@ public class BioSample extends BaseObject<Integer> {
 
     /**
      * Owning department ({@code test_section.id}) for department isolation. Project
-     * metadata may help with labels and filters, but this field is the data boundary.
+     * metadata may help with labels and filters, but this field is the data
+     * boundary.
      */
     @Column(name = "department_test_section_id")
     private Integer departmentTestSectionId;
@@ -271,6 +272,13 @@ public class BioSample extends BaseObject<Integer> {
      */
     @Column(name = "arrival_condition_notes", columnDefinition = "TEXT")
     private String arrivalConditionNotes;
+
+    /**
+     * Excel manifest serial number (S.No). Used for natural sort order; not shown
+     * in list UI.
+     */
+    @Column(name = "manifest_sno")
+    private Integer manifestSno;
 
     @Column(name = "sys_user_id", nullable = false, length = 36)
     private String sysUserId;
@@ -449,6 +457,14 @@ public class BioSample extends BaseObject<Integer> {
 
     public void setArrivalConditionNotes(String arrivalConditionNotes) {
         this.arrivalConditionNotes = arrivalConditionNotes;
+    }
+
+    public Integer getManifestSno() {
+        return manifestSno;
+    }
+
+    public void setManifestSno(Integer manifestSno) {
+        this.manifestSno = manifestSno;
     }
 
     // ========================================

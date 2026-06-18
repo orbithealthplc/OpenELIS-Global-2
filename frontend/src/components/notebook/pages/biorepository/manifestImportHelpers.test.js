@@ -58,27 +58,20 @@ describe("manifestImportHelpers", () => {
         "Sample_ID",
         "Transfer_Date",
       ],
-      [
-        "02/09/2026",
-        "Bacteriology",
-        "HIEPV",
-        "DNA",
-        "H-0001",
-        "11.02.2026",
-      ],
+      ["02/09/2026", "Bacteriology", "HIEPV", "DNA", "H-0001", "11.02.2026"],
     ];
 
     const converted = convertLegacyWorksheetRows(rows, "HIEPVBacteriology");
     expect(converted).toHaveLength(1);
-    expect(converted[0][5]).toBe("2026-02-09");
-    expect(converted[0][9]).toBe("2026-02-11");
-    expect(isSupportedDateValue(converted[0][5], true)).toBe(true);
+    expect(converted[0][6]).toBe("2026-02-09");
+    expect(converted[0][10]).toBe("2026-02-11");
+    expect(isSupportedDateValue(converted[0][6], true)).toBe(true);
   });
 
-  test("resolveUniqueBarcodePreview assigns suffix for duplicates", () => {
+  test("resolveUniqueBarcodePreview keeps original barcode for duplicates", () => {
     const reserved = new Set(["PAT-001"]);
     expect(resolveUniqueBarcodePreview("PAT-001", reserved, new Set())).toBe(
-      "PAT-001-R2",
+      "PAT-001",
     );
   });
 
@@ -130,14 +123,14 @@ describe("manifestImportHelpers", () => {
     expect(hardErrors).toEqual(["Origin lab is required"]);
   });
 
-  test("computeDuplicateImportPreviews suggests suffixed ids", () => {
+  test("computeDuplicateImportPreviews keeps original barcode", () => {
     const rows = [
       { _rowNumber: 1, barcode: "BIO-001", _isDuplicate: false },
       { _rowNumber: 2, barcode: "BIO-001", _isDuplicate: true },
     ];
 
     const previews = computeDuplicateImportPreviews(rows, { 2: true });
-    expect(previews[2]).toBe("BIO-001-R2");
+    expect(previews[2]).toBe("BIO-001");
   });
 
   test("buildSingleEntrySpecialHandling composes custody and volume notes", () => {

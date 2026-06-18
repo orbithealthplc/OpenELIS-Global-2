@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.openelisglobal.biorepository.dao.BioSampleRetrievalSearchCriteria;
 import org.openelisglobal.biorepository.controller.rest.dto.BioSampleLifecycleEventDTO;
 import org.openelisglobal.biorepository.controller.rest.dto.BioSampleListDTO;
 import org.openelisglobal.biorepository.controller.rest.dto.BulkRegistrationResponse;
@@ -28,16 +27,16 @@ import org.openelisglobal.biorepository.controller.rest.dto.DuplicateIssue;
 import org.openelisglobal.biorepository.controller.rest.dto.ManifestImportRequest;
 import org.openelisglobal.biorepository.controller.rest.dto.ManifestValidationResponse;
 import org.openelisglobal.biorepository.controller.rest.dto.SampleRegistrationDTO;
-import org.openelisglobal.biorepository.service.ManifestDuplicateResolver;
+import org.openelisglobal.biorepository.dao.BioSampleRetrievalSearchCriteria;
 import org.openelisglobal.biorepository.service.BioSampleFulfillmentSearchService;
 import org.openelisglobal.biorepository.service.BioSampleLifecycleService;
 import org.openelisglobal.biorepository.service.BioSampleService;
+import org.openelisglobal.biorepository.service.BiorepositoryApprovedSampleTypeService;
 import org.openelisglobal.biorepository.service.FulfillmentSearchInput;
 import org.openelisglobal.biorepository.service.FulfillmentSearchOutcome;
-import org.openelisglobal.biorepository.util.Brf02SamplePathFormatter;
-import org.openelisglobal.biorepository.service.BiorepositoryApprovedSampleTypeService;
 import org.openelisglobal.biorepository.service.RetentionPolicyService;
 import org.openelisglobal.biorepository.service.ShipmentService;
+import org.openelisglobal.biorepository.util.Brf02SamplePathFormatter;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.biorepository.valueholder.BioSample.BiosafetyLevel;
 import org.openelisglobal.biorepository.valueholder.BiorepositoryApprovedSampleType;
@@ -47,17 +46,17 @@ import org.openelisglobal.biorepository.valueholder.Shipment;
 import org.openelisglobal.common.rest.BaseRestController;
 import org.openelisglobal.common.services.DisplayListService;
 import org.openelisglobal.department.service.DepartmentIsolationService;
-import org.openelisglobal.rbac.RbacAction;
-import org.openelisglobal.rbac.RbacPermissionService;
 import org.openelisglobal.localization.service.LocalizationService;
 import org.openelisglobal.localization.valueholder.Localization;
+import org.openelisglobal.rbac.RbacAction;
+import org.openelisglobal.rbac.RbacPermissionService;
 import org.openelisglobal.sample.dao.SampleDAO;
 import org.openelisglobal.sample.service.SampleService;
 import org.openelisglobal.sample.util.AccessionNumberHandler;
 import org.openelisglobal.sample.valueholder.Sample;
 import org.openelisglobal.sampleitem.service.SampleItemService;
-import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.sampleitem.valueholder.SampleItem;
+import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.typeofsample.service.TypeOfSampleService;
 import org.openelisglobal.typeofsample.valueholder.TypeOfSample;
 import org.slf4j.Logger;
@@ -67,7 +66,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -253,8 +251,7 @@ public class BioSampleRestController extends BaseRestController {
 
         SampleItem sampleItem = sampleStorageService.resolveSampleItemByIdentifier(barcode.trim());
         if (sampleItem == null) {
-            return ResponseEntity.status(404)
-                    .body(Map.of("error", "No sample found with identifier: " + barcode));
+            return ResponseEntity.status(404).body(Map.of("error", "No sample found with identifier: " + barcode));
         }
 
         if (!departmentIsolationService.canAccessSampleItem(sampleItem, request)) {
@@ -282,7 +279,7 @@ public class BioSampleRestController extends BaseRestController {
             dto.setAccessionNumber(sampleItem.getSample().getAccessionNumber());
             dto.setSampleId(Integer.valueOf(sampleItem.getSample().getId()));
         }
-        populateQuantityFields(dto, sampleItem);
+        populateQuantityFields(dto, sampleItem, false);
 
         // Add BioSample-specific fields if extension exists
         if (bioSample != null) {
@@ -670,9 +667,12 @@ public class BioSampleRestController extends BaseRestController {
     public ResponseEntity<List<BioSampleListDTO>> listSamples(@RequestParam(required = false) Integer shipmentId,
             @RequestParam(required = false) String sampleItemIds,
             @RequestParam(required = false, defaultValue = "100") Integer limit,
+            @RequestParam(required = false, defaultValue = "0") Integer offset,
             @RequestParam(required = false) String workflowStatus, HttpServletRequest request) {
 
         List<BioSample> bioSamples;
+        long totalCount = 0;
+
         if (sampleItemIds != null && !sampleItemIds.trim().isEmpty()) {
             // Filter by sample item IDs
             List<Integer> ids = new ArrayList<>();
@@ -684,49 +684,51 @@ public class BioSampleRestController extends BaseRestController {
                 }
             }
             bioSamples = bioSampleService.getBySampleItemIds(ids);
+            totalCount = bioSamples.size();
         } else if (shipmentId != null) {
-            // Use eager-loading method to prevent LazyInitializationException
             bioSamples = bioSampleService.getByShipmentIdWithRelationships(shipmentId);
-        } else {
-            // Use eager-loading method with limit
-            bioSamples = bioSampleService.getAllWithRelationships(limit);
-        }
-
-        // Filter by workflow status if specified
-        if (workflowStatus != null && !workflowStatus.trim().isEmpty()) {
+            totalCount = bioSamples.size();
+        } else if (workflowStatus != null && !workflowStatus.trim().isEmpty()) {
             BioSample.WorkflowStatus filterStatus = BioSample.WorkflowStatus.fromString(workflowStatus);
             if (filterStatus != null) {
-                bioSamples = bioSamples.stream().filter(bs -> filterStatus.equals(bs.getWorkflowStatus())
-                        || (bs.getWorkflowStatus() == null && filterStatus == BioSample.WorkflowStatus.REGISTERED))
-                        .collect(java.util.stream.Collectors.toList());
+                int safeLimit = limit != null && limit > 0 ? limit : 100;
+                int safeOffset = offset != null && offset >= 0 ? offset : 0;
+                bioSamples = bioSampleService.getByWorkflowStatusWithRelationshipsPaginated(filterStatus, safeOffset,
+                        safeLimit);
+                totalCount = bioSampleService.countByWorkflowStatus(filterStatus);
+            } else {
+                bioSamples = bioSampleService.getAllWithRelationships(limit);
+                totalCount = bioSamples.size();
             }
+        } else {
+            bioSamples = bioSampleService.getAllWithRelationships(limit);
+            totalCount = bioSamples.size();
         }
 
         bioSamples = filterAccessibleBioSamples(bioSamples, request);
 
         List<BioSampleListDTO> result = new ArrayList<>();
         for (BioSample bioSample : bioSamples) {
-            result.add(convertToListDTO(bioSample));
+            result.add(convertToListDTO(bioSample, true));
         }
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok().header("X-Total-Count", String.valueOf(totalCount)).body(result);
     }
 
     /**
      * Discovery search for biorepository-held samples available for retrieval.
      * AND-combines partial filters; at least one filter or browse=true required.
      *
-     * GET /rest/biorepository/sample/search?sampleType=Plasma&status=STORED
-     * GET /rest/biorepository/sample/search?browse=true&status=STORED
+     * GET /rest/biorepository/sample/search?sampleType=Plasma&status=STORED GET
+     * /rest/biorepository/sample/search?browse=true&status=STORED
      */
     @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<BioSampleListDTO>> searchSamples(@RequestParam(required = false) String barcode,
-            @RequestParam(required = false) String identity,
-            @RequestParam(required = false) String originLab, @RequestParam(required = false) String projectId,
-            @RequestParam(required = false) String accessionNumber, @RequestParam(required = false) String sampleType,
+            @RequestParam(required = false) String identity, @RequestParam(required = false) String originLab,
+            @RequestParam(required = false) String projectId, @RequestParam(required = false) String accessionNumber,
+            @RequestParam(required = false) String sampleType,
             @RequestParam(required = false) String collectionDateFrom,
-            @RequestParam(required = false) String collectionDateTo,
-            @RequestParam(required = false) String context,
+            @RequestParam(required = false) String collectionDateTo, @RequestParam(required = false) String context,
             @RequestParam(required = false, defaultValue = "false") Boolean browse,
             @RequestParam(required = false) String status,
             @RequestParam(required = false, defaultValue = "50") Integer limit, HttpServletRequest request) {
@@ -741,8 +743,8 @@ public class BioSampleRestController extends BaseRestController {
         boolean hasCollectionDateFrom = collectionDateFrom != null && !collectionDateFrom.trim().isEmpty();
         boolean hasCollectionDateTo = collectionDateTo != null && !collectionDateTo.trim().isEmpty();
 
-        boolean hasAnyFilter = hasBarcode || hasIdentity || hasOriginLab || hasProjectId || hasAccessionNumber || hasSampleType
-                || hasCollectionDateFrom || hasCollectionDateTo;
+        boolean hasAnyFilter = hasBarcode || hasIdentity || hasOriginLab || hasProjectId || hasAccessionNumber
+                || hasSampleType || hasCollectionDateFrom || hasCollectionDateTo;
 
         if (!hasBrowse && !hasAnyFilter) {
             return ResponseEntity.ok(new ArrayList<>());
@@ -759,10 +761,7 @@ public class BioSampleRestController extends BaseRestController {
         Set<String> matchingTypeIds = null;
         if (hasSampleType) {
             matchingTypeIds = resolveSampleTypeIdsForSearch(sampleType.trim());
-            if (matchingTypeIds.isEmpty()
-                    && !hasIdentity
-                    && !hasAccessionNumber
-                    && !hasBarcode) {
+            if (matchingTypeIds.isEmpty() && !hasIdentity && !hasAccessionNumber && !hasBarcode) {
                 return ResponseEntity.ok(new ArrayList<>());
             }
         }
@@ -891,18 +890,15 @@ public class BioSampleRestController extends BaseRestController {
             dto.setMatchReason(matchReason);
             dto.setMatchScore(score);
             dto.setExactIdentityMatch(exactIdentityMatch);
-            dto.setFallbackUsed(Boolean.valueOf(fulfillmentContext
-                    && searchMetadata.hasExactIdentityInput
-                    && !exactIdentityMatch
-                    && !searchMetadata.exactIdentityMatchesFound
-                    && searchMetadata.fallbackUsed));
+            dto.setFallbackUsed(
+                    Boolean.valueOf(fulfillmentContext && searchMetadata.hasExactIdentityInput && !exactIdentityMatch
+                            && !searchMetadata.exactIdentityMatchesFound && searchMetadata.fallbackUsed));
         });
 
         Comparator<BioSampleListDTO> comparator = Comparator
                 .comparingInt((BioSampleListDTO dto) -> dto.getMatchScore() != null ? dto.getMatchScore() : 0)
                 .reversed()
-                .thenComparing(BioSampleListDTO::getCollectionDate,
-                        Comparator.nullsLast(Comparator.reverseOrder()))
+                .thenComparing(BioSampleListDTO::getCollectionDate, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(BioSampleListDTO::getId, Comparator.nullsLast(Comparator.reverseOrder()));
 
         results.sort(comparator);
@@ -911,8 +907,7 @@ public class BioSampleRestController extends BaseRestController {
     private int fulfillmentMatchScore(BioSampleListDTO dto, String barcodeTerm, String accessionTerm,
             String sampleTypeTerm, String originLabTerm, String projectIdTerm, boolean fulfillmentContext) {
         int score = 0;
-        if (barcodeTerm != null && dto.getBarcode() != null
-                && dto.getBarcode().equalsIgnoreCase(barcodeTerm)) {
+        if (barcodeTerm != null && dto.getBarcode() != null && dto.getBarcode().equalsIgnoreCase(barcodeTerm)) {
             score += 200;
         } else if (barcodeTerm != null && dto.getBarcode() != null
                 && dto.getBarcode().toLowerCase(Locale.ROOT).contains(barcodeTerm)) {
@@ -927,7 +922,8 @@ public class BioSampleRestController extends BaseRestController {
         }
 
         if (fulfillmentContext) {
-            if (matchesTerm(dto.getSampleType() != null ? dto.getSampleType().getDescription() : null, sampleTypeTerm)) {
+            if (matchesTerm(dto.getSampleType() != null ? dto.getSampleType().getDescription() : null,
+                    sampleTypeTerm)) {
                 score += 40;
             }
             if (matchesTerm(dto.getOriginLab(), originLabTerm)) {
@@ -952,8 +948,7 @@ public class BioSampleRestController extends BaseRestController {
                 && dto.getAccessionNumber().equalsIgnoreCase(accessionTerm)) {
             return "EXACT_ACCESSION";
         }
-        if (barcodeTerm != null && dto.getBarcode() != null
-                && dto.getBarcode().equalsIgnoreCase(barcodeTerm)) {
+        if (barcodeTerm != null && dto.getBarcode() != null && dto.getBarcode().equalsIgnoreCase(barcodeTerm)) {
             return "EXACT_BARCODE";
         }
         if (!fulfillmentContext) {
@@ -1035,7 +1030,7 @@ public class BioSampleRestController extends BaseRestController {
             dto.setCollectionDate(sampleItem.getCollectionDate());
         }
 
-        populateQuantityFields(dto, sampleItem);
+        populateQuantityFields(dto, sampleItem, false);
 
         // Add BioSample-specific fields if extension exists
         if (bioSample != null) {
@@ -1150,7 +1145,7 @@ public class BioSampleRestController extends BaseRestController {
             dto.setCollectionDate(sampleItem.getCollectionDate());
         }
 
-        populateQuantityFields(dto, sampleItem);
+        populateQuantityFields(dto, sampleItem, false);
 
         if (bioSample.getRetentionPolicyId() != null) {
             RetentionPolicy policy = retentionPolicyService.get(bioSample.getRetentionPolicyId());
@@ -1172,8 +1167,13 @@ public class BioSampleRestController extends BaseRestController {
      * Convert BioSample to enriched DTO by fetching related data.
      */
     private BioSampleListDTO convertToListDTO(BioSample bioSample) {
+        return convertToListDTO(bioSample, false);
+    }
+
+    private BioSampleListDTO convertToListDTO(BioSample bioSample, boolean lightweight) {
         BioSampleListDTO dto = new BioSampleListDTO();
         dto.setId(bioSample.getId());
+        dto.setManifestSno(bioSample.getManifestSno());
         dto.setBiosafetyLevel(bioSample.getBiosafetyLevel() != null ? bioSample.getBiosafetyLevel().name() : null);
         dto.setOriginLab(bioSample.getOriginLab());
         dto.setProjectId(bioSample.getProjectId());
@@ -1184,6 +1184,8 @@ public class BioSampleRestController extends BaseRestController {
         dto.setArrivalCondition(bioSample.getArrivalCondition());
         dto.setRequiredTempMin(bioSample.getRequiredTempMin());
         dto.setRequiredTempMax(bioSample.getRequiredTempMax());
+        dto.setConsentId(bioSample.getConsentId());
+        dto.setSpecialHandling(bioSample.getSpecialHandling());
 
         // Get shipment ID if linked
         if (bioSample.getShipment() != null) {
@@ -1200,6 +1202,7 @@ public class BioSampleRestController extends BaseRestController {
         SampleItem sampleItem = bioSample.getSampleItem();
         if (sampleItem != null) {
             dto.setBarcode(sampleItem.getExternalId());
+            dto.setExternalId(sampleItem.getExternalId());
             dto.setSampleItemId(Integer.valueOf(sampleItem.getId()));
             dto.setCollectionDate(sampleItem.getCollectionDate());
 
@@ -1221,15 +1224,14 @@ public class BioSampleRestController extends BaseRestController {
                 dto.setStatus("REGISTERED");
             }
 
-            populateQuantityFields(dto, sampleItem);
+            populateQuantityFields(dto, sampleItem, lightweight);
         }
 
         // Set retention policy fields
         dto.setRetentionPolicyId(bioSample.getRetentionPolicyId());
         dto.setRetentionExpiryDate(bioSample.getRetentionExpiryDate());
 
-        // Fetch policy name if retention policy ID is set
-        if (bioSample.getRetentionPolicyId() != null) {
+        if (!lightweight && bioSample.getRetentionPolicyId() != null) {
             RetentionPolicy policy = retentionPolicyService.get(bioSample.getRetentionPolicyId());
             if (policy != null) {
                 dto.setRetentionPolicyName(policy.getPolicyName());
@@ -1243,12 +1245,15 @@ public class BioSampleRestController extends BaseRestController {
         return dto;
     }
 
-    private void populateQuantityFields(BioSampleListDTO dto, SampleItem sampleItem) {
+    private void populateQuantityFields(BioSampleListDTO dto, SampleItem sampleItem, boolean lightweight) {
         if (sampleItem == null || dto == null) {
             return;
         }
         if (sampleItem.getQuantity() != null) {
             dto.setQuantity(sampleItem.getQuantity());
+        }
+        if (lightweight) {
+            return;
         }
         BigDecimal remaining = sampleItem.getEffectiveRemainingQuantity();
         if (remaining != null && remaining.compareTo(BigDecimal.ZERO) > 0) {
@@ -1625,8 +1630,7 @@ public class BioSampleRestController extends BaseRestController {
                     rowResult.addDuplicateWarning(DuplicateIssue.IN_MANIFEST,
                             "Duplicate sample ID in manifest: " + barcode);
                 } else if (duplicateInDatabase) {
-                    rowResult.addDuplicateWarning(DuplicateIssue.IN_DATABASE,
-                            "Sample ID already exists: " + barcode);
+                    rowResult.addDuplicateWarning(DuplicateIssue.IN_DATABASE, "Sample ID already exists: " + barcode);
                     seenBarcodes.add(barcode);
                 } else {
                     seenBarcodes.add(barcode);
@@ -1726,9 +1730,9 @@ public class BioSampleRestController extends BaseRestController {
                 return ResponseEntity.status(403).body(errorResponse);
             }
             Object body = departmentResult.errorResponse.getBody();
-            errorResponse.setError(body instanceof Map<?, ?> map && map.get("error") != null
-                    ? String.valueOf(map.get("error"))
-                    : "Select a department first.");
+            errorResponse.setError(
+                    body instanceof Map<?, ?> map && map.get("error") != null ? String.valueOf(map.get("error"))
+                            : "Select a department first.");
             return ResponseEntity.status(departmentResult.errorResponse.getStatusCode()).body(errorResponse);
         }
         if (!rbacPermissionService.hasPermission(httpRequest, RbacAction.REGISTER_SAMPLES)) {
@@ -1748,77 +1752,53 @@ public class BioSampleRestController extends BaseRestController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        TransactionTemplate rowTransaction = new TransactionTemplate(transactionManager);
-        rowTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        TransactionTemplate batchTransaction = new TransactionTemplate(transactionManager);
+        Map<String, TypeOfSample> sampleTypeLookup = buildManifestSampleTypeLookup();
+        AccessionNumberHandler accessionNumberHandler = new AccessionNumberHandler(sampleService, sampleDAO,
+                entityManager, BioSampleRestController.class);
+        List<String> reservedAccessions = accessionNumberHandler.reserveAccessionNumbers(samples.size(),
+                AccessionNumberHandler.DEFAULT_MAX_ATTEMPTS);
 
-        Set<Integer> allowedDuplicateIndexes = new HashSet<>();
-        ManifestImportRequest.DuplicateResolution duplicateResolution = request.getDuplicateResolution();
-        if (duplicateResolution != null && duplicateResolution.getAllowedRowIndexes() != null) {
-            allowedDuplicateIndexes.addAll(duplicateResolution.getAllowedRowIndexes());
-        }
-
-        List<String> manifestBarcodes = new ArrayList<>();
-        for (SampleRegistrationDTO sample : samples) {
-            String barcode = firstNonBlank(sample.getBarcode(), sample.getExternalId());
-            if (barcode != null && !barcode.trim().isEmpty()) {
-                manifestBarcodes.add(barcode.trim());
-            }
-        }
-        Set<String> existingBarcodes = bioSampleService.findExistingBarcodes(manifestBarcodes);
-        Set<String> seenInBatch = new HashSet<>();
-
-        for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
-            SampleRegistrationDTO dto = samples.get(rowIndex);
-            try {
-                String barcode = firstNonBlank(dto.getBarcode(), dto.getExternalId());
-                if (barcode != null && !barcode.isBlank()) {
-                    String normalizedBarcode = barcode.trim();
-                    boolean duplicateInManifest = seenInBatch.contains(normalizedBarcode);
-                    boolean duplicateInDatabase = existingBarcodes.contains(normalizedBarcode);
-                    boolean isDuplicate = duplicateInManifest || duplicateInDatabase;
-
-                    if (isDuplicate) {
-                        if (!allowedDuplicateIndexes.contains(rowIndex)) {
-                            response.addRowError(
-                                    "Duplicate Sample ID skipped (not approved): " + normalizedBarcode);
-                            continue;
-                        }
-                        String resolvedBarcode = ManifestDuplicateResolver.resolveUniqueBarcode(normalizedBarcode,
-                                seenInBatch, existingBarcodes);
-                        dto.setBarcode(resolvedBarcode);
-                        dto.setSpecialHandling(ManifestDuplicateResolver.appendOriginalSampleIdNote(
-                                dto.getSpecialHandling(), normalizedBarcode));
-                        seenInBatch.add(resolvedBarcode);
-                    } else {
-                        seenInBatch.add(normalizedBarcode);
+        batchTransaction.execute(status -> {
+            for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
+                SampleRegistrationDTO dto = samples.get(rowIndex);
+                Object savepoint = status.createSavepoint();
+                try {
+                    if (dto.getProjectId() != null && !dto.getProjectId().isBlank() && !departmentIsolationService
+                            .isInventoryProjectConsistent(departmentResult.departmentId, dto.getProjectId())) {
+                        String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
+                        String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
+                                : "Sample '" + sampleRef + "'";
+                        response.addRowError(prefix + ": Selected project belongs to a different department.");
+                        status.releaseSavepoint(savepoint);
+                        continue;
                     }
-                }
 
-                if (dto.getProjectId() != null && !dto.getProjectId().isBlank()
-                        && !departmentIsolationService.isInventoryProjectConsistent(departmentResult.departmentId,
-                                dto.getProjectId())) {
+                    String reservedAccession = rowIndex < reservedAccessions.size() ? reservedAccessions.get(rowIndex)
+                            : null;
+                    BulkRegistrationResponse.RegisteredSample registered = registerSingleSample(dto,
+                            request.getShipmentId(), sysUserId, departmentResult.departmentId, sampleTypeLookup,
+                            accessionNumberHandler, reservedAccession);
+
+                    if (registered != null) {
+                        response.addSample(registered);
+                    } else {
+                        response.addRowError("Sample registration returned no result");
+                    }
+                    status.releaseSavepoint(savepoint);
+                } catch (Exception e) {
+                    status.rollbackToSavepoint(savepoint);
                     String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
                     String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
                             : "Sample '" + sampleRef + "'";
-                    response.addRowError(prefix + ": Selected project belongs to a different department.");
-                    continue;
+                    String detailedError = getRootCauseMessage(e);
+                    logger.error("Bulk manifest import failed for {}", prefix, e);
+                    response.addRowError(prefix + ": " + detailedError);
                 }
-                BulkRegistrationResponse.RegisteredSample registered = rowTransaction.execute(status -> registerSingleSample(
-                        dto, request.getShipmentId(), sysUserId, departmentResult.departmentId));
-
-                if (registered != null) {
-                    response.addSample(registered);
-                } else {
-                    response.addRowError("Sample registration returned no result");
-                }
-            } catch (Exception e) {
-                String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
-                String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample" : "Sample '" + sampleRef + "'";
-                String detailedError = getRootCauseMessage(e);
-                logger.error("Bulk manifest import failed for {}", prefix, e);
-                response.addRowError(prefix + ": " + detailedError);
             }
-        }
+            entityManager.flush();
+            return null;
+        });
 
         if (response.getRegisteredCount() == 0) {
             response.setSuccess(false);
@@ -1836,27 +1816,43 @@ public class BioSampleRestController extends BaseRestController {
      */
     private BulkRegistrationResponse.RegisteredSample registerSingleSample(SampleRegistrationDTO dto,
             Integer shipmentId, String sysUserId, Integer departmentTestSectionId) {
+        return registerSingleSample(dto, shipmentId, sysUserId, departmentTestSectionId, null, null, null);
+    }
+
+    private BulkRegistrationResponse.RegisteredSample registerSingleSample(SampleRegistrationDTO dto,
+            Integer shipmentId, String sysUserId, Integer departmentTestSectionId,
+            Map<String, TypeOfSample> sampleTypeLookup, AccessionNumberHandler accessionNumberHandler,
+            String reservedAccessionNumber) {
         String barcode = firstNonBlank(dto.getBarcode(), dto.getExternalId());
         if (barcode == null || barcode.isBlank()) {
             barcode = generateBarcode().getBody().get("barcode");
         }
 
-        // Find or create sample type by name or ID for biorepository intake.
-        TypeOfSample sampleType = resolveManifestSampleType(dto.getSampleTypeId(), sysUserId, true);
+        TypeOfSample sampleType;
+        if (sampleTypeLookup != null) {
+            sampleType = resolveManifestSampleTypeFromLookup(sampleTypeLookup, dto.getSampleTypeId(), sysUserId, true);
+        } else {
+            sampleType = resolveManifestSampleType(dto.getSampleTypeId(), sysUserId, true);
+        }
         if (sampleType == null) {
             throw new IllegalArgumentException("Invalid sample type: " + dto.getSampleTypeId());
         }
 
-        // Create Sample (accession-level record)
         Timestamp receiptTimestamp = dto.getReceiptDate() != null && !dto.getReceiptDate().trim().isEmpty()
                 ? parseDate(dto.getReceiptDate().trim())
                 : null;
         if (receiptTimestamp == null) {
             receiptTimestamp = new Timestamp(System.currentTimeMillis());
         }
-        Sample savedSample = createSampleWithGeneratedAccession(receiptTimestamp, sysUserId);
 
-        // Create SampleItem (aliquot-level record)
+        Sample savedSample;
+        if (accessionNumberHandler != null && reservedAccessionNumber != null && !reservedAccessionNumber.isBlank()) {
+            savedSample = createSampleWithReservedAccession(receiptTimestamp, sysUserId, accessionNumberHandler,
+                    reservedAccessionNumber);
+        } else {
+            savedSample = createSampleWithGeneratedAccession(receiptTimestamp, sysUserId);
+        }
+
         SampleItem sampleItem = new SampleItem();
         sampleItem.setSample(savedSample);
         sampleItem.setExternalId(barcode);
@@ -1872,7 +1868,6 @@ public class BioSampleRestController extends BaseRestController {
         sampleItem.setSysUserId(sysUserId);
         SampleItem savedSampleItem = sampleItemService.save(sampleItem);
 
-        // Create BioSample extension
         BioSample bioSample = new BioSample();
         bioSample.setBiosafetyLevel(dto.getBiosafetyLevel() != null ? BiosafetyLevel.valueOf(dto.getBiosafetyLevel())
                 : BiosafetyLevel.BSL_1);
@@ -1887,6 +1882,7 @@ public class BioSampleRestController extends BaseRestController {
         bioSample.setOriginLab(dto.getOriginLab());
         bioSample.setProjectId(dto.getProjectId());
         bioSample.setDepartmentTestSectionId(departmentTestSectionId);
+        bioSample.setManifestSno(dto.getSno());
         if (dto.getRequiredTempMin() != null) {
             bioSample.setRequiredTempMin(dto.getRequiredTempMin());
         }
@@ -1902,17 +1898,46 @@ public class BioSampleRestController extends BaseRestController {
         bioSample.setSysUserId(sysUserId);
         BioSample savedBioSample = bioSampleService.createForSampleItem(savedSampleItem, bioSample);
 
-        // Force SQL execution in this row transaction so DB constraint failures surface
-        // with a specific cause.
-        entityManager.flush();
-
-        // Build response
         BulkRegistrationResponse.RegisteredSample registered = new BulkRegistrationResponse.RegisteredSample();
         registered.setId(savedBioSample.getId());
         registered.setBarcode(barcode);
         registered.setSampleItemId(Integer.valueOf(savedSampleItem.getId()));
         registered.setSampleId(Integer.valueOf(savedSample.getId()));
         return registered;
+    }
+
+    private Sample createSampleWithReservedAccession(Timestamp receiptTimestamp, String sysUserId,
+            AccessionNumberHandler accessionNumberHandler, String accessionNumber) {
+        Sample sample = new Sample();
+        sample.setReceivedTimestamp(receiptTimestamp);
+        sample.setEnteredDate(new java.sql.Date(receiptTimestamp.getTime()));
+        sample.setDomain("H");
+        sample.setSysUserId(sysUserId);
+        String sampleId = accessionNumberHandler.insertSampleWithAccessionNumber(sample, accessionNumber);
+        return sampleService.get(sampleId);
+    }
+
+    private TypeOfSample resolveManifestSampleTypeFromLookup(Map<String, TypeOfSample> lookup, String nameOrId,
+            String sysUserId, boolean createIfMissing) {
+        TypeOfSample existingType = findSampleTypeInLookup(lookup, nameOrId);
+        if (existingType != null) {
+            ensureBiorepositoryApprovedSampleType(existingType, sysUserId);
+            return existingType;
+        }
+
+        if (!createIfMissing || !isManifestSampleTypeAutoCreatable(nameOrId)) {
+            return null;
+        }
+
+        TypeOfSample created = createManifestSampleType(nameOrId, sysUserId);
+        if (created != null && created.getId() != null) {
+            lookup.putIfAbsent(created.getId(), created);
+            String description = normalizeSampleTypeLabel(created.getDescription());
+            if (!description.isBlank()) {
+                lookup.putIfAbsent(description.toLowerCase(Locale.ROOT), created);
+            }
+        }
+        return created;
     }
 
     private String getRootCauseMessage(Throwable throwable) {
@@ -2269,8 +2294,7 @@ public class BioSampleRestController extends BaseRestController {
                 return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
             }
             if (!rbacPermissionService.hasPermission(httpRequest, RbacAction.UPDATE_SAMPLES)) {
-                return ResponseEntity.status(403)
-                        .body(Map.of("error", "Insufficient permission to update samples"));
+                return ResponseEntity.status(403).body(Map.of("error", "Insufficient permission to update samples"));
             }
             Map<String, Object> result = bioSampleService.disposeBioSample(request.getSampleItemId(),
                     request.getReason(), request.getMethod(), request.getNotes(), sysUserId);
@@ -2371,12 +2395,12 @@ public class BioSampleRestController extends BaseRestController {
                 explicitDepartmentId);
         if (departmentId == null) {
             if (departmentIsolationService.hasUnrestrictedDepartmentAccess(request)) {
-                return RegistrationDepartmentResult.error(
-                        ResponseEntity.badRequest().body(Map.of("error", "Select a department (departmentTestSectionId).")));
+                return RegistrationDepartmentResult.error(ResponseEntity.badRequest()
+                        .body(Map.of("error", "Select a department (departmentTestSectionId).")));
             }
             if (departmentIsolationService.getRestrictedUserTestSectionIds(request).isEmpty()) {
-                return RegistrationDepartmentResult.error(
-                        ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Select a department first.")));
+                return RegistrationDepartmentResult.error(ResponseEntity.status(HttpStatus.FORBIDDEN)
+                        .body(Map.of("error", "Select a department first.")));
             }
             return RegistrationDepartmentResult
                     .error(ResponseEntity.badRequest().body(Map.of("error", "Select a department first.")));
@@ -2387,8 +2411,8 @@ public class BioSampleRestController extends BaseRestController {
         }
         if (projectRef != null && !projectRef.isBlank()
                 && !departmentIsolationService.isInventoryProjectConsistent(departmentId, projectRef)) {
-            return RegistrationDepartmentResult.error(ResponseEntity.badRequest().body(Map.of("error",
-                    "Selected linked notebook / project belongs to a different department.")));
+            return RegistrationDepartmentResult.error(ResponseEntity.badRequest()
+                    .body(Map.of("error", "Selected linked notebook / project belongs to a different department.")));
         }
         return RegistrationDepartmentResult.ok(departmentId);
     }

@@ -3,6 +3,7 @@
  */
 
 export const MANIFEST_FIELDS = [
+  "sno",
   "barcode",
   "externalId",
   "sampleType",
@@ -23,6 +24,14 @@ export const MANIFEST_FIELDS = [
 ];
 
 export const HEADER_ALIASES = {
+  sno: "sno",
+  sn: "sno",
+  serialno: "sno",
+  serialnumber: "sno",
+  serial: "sno",
+  rowno: "sno",
+  rownumber: "sno",
+  no: "sno",
   barcode: "barcode",
   sampleid: "barcode",
   samplebarcode: "barcode",
@@ -159,7 +168,10 @@ export const normalizeCellValue = (value) => {
     return "";
   }
   const normalizedDate = normalizeDateValue(trimmed, true);
-  if (normalizedDate !== trimmed && isSupportedDateValue(normalizedDate, true)) {
+  if (
+    normalizedDate !== trimmed &&
+    isSupportedDateValue(normalizedDate, true)
+  ) {
     return normalizedDate;
   }
   return trimmed;
@@ -238,8 +250,14 @@ export const mergeMappedRowValues = (rawHeaders, values) => {
     row._storageNotes = storageParts.join(" | ");
   }
 
-  if (row.storageTemperaturePreset && !row.requiredTempMin && !row.requiredTempMax) {
-    const presetRange = resolveStorageTemperaturePreset(row.storageTemperaturePreset);
+  if (
+    row.storageTemperaturePreset &&
+    !row.requiredTempMin &&
+    !row.requiredTempMax
+  ) {
+    const presetRange = resolveStorageTemperaturePreset(
+      row.storageTemperaturePreset,
+    );
     if (presetRange) {
       row.requiredTempMin = presetRange.min;
       row.requiredTempMax = presetRange.max;
@@ -335,36 +353,7 @@ export const inferLegacyBiosafetyLevel = (sampleType, sheetName) => {
 };
 
 export const normalizeLegacyDuplicateBarcodes = (rows) => {
-  const seen = new Map();
-
-  return rows.map((row) => {
-    const normalizedRow = Array.isArray(row) ? [...row] : row;
-    const barcode = normalizeCellValue(normalizedRow[0]);
-
-    if (!barcode) {
-      return normalizedRow;
-    }
-
-    const seenCount = seen.get(barcode) || 0;
-    seen.set(barcode, seenCount + 1);
-
-    if (seenCount === 0) {
-      normalizedRow[1] = normalizeCellValue(normalizedRow[1]) || barcode;
-      return normalizedRow;
-    }
-
-    const duplicateIndex = seenCount + 1;
-    normalizedRow[0] = `${barcode}-R${duplicateIndex}`;
-    normalizedRow[1] = normalizeCellValue(normalizedRow[1]) || barcode;
-
-    const duplicateNote = `Original Sample ID: ${barcode}`;
-    const existingSpecialHandling = normalizeCellValue(normalizedRow[16]);
-    normalizedRow[16] = existingSpecialHandling
-      ? `${existingSpecialHandling} | ${duplicateNote}`
-      : duplicateNote;
-
-    return normalizedRow;
-  });
+  return rows.map((row) => (Array.isArray(row) ? [...row] : row));
 };
 
 export const convertLegacyWorksheetRows = (rows, sheetName) => {
@@ -417,8 +406,10 @@ export const convertLegacyWorksheetRows = (rows, sheetName) => {
       true,
     );
     const collectionDate = normalizeDateValue(row.collectionDate, false);
+    const manifestSno = parseManifestSno(row.sno, i);
 
     convertedRows.push([
+      manifestSno,
       barcode,
       row.externalId,
       sampleType,
@@ -471,27 +462,22 @@ export const parseDuplicateSampleId = (message) => {
 export const buildSuffixedBarcode = (baseBarcode, replicaIndex) =>
   `${baseBarcode}-R${replicaIndex}`;
 
+export const parseManifestSno = (value, fallbackRowIndex) => {
+  const normalized = normalizeCellValue(value);
+  if (normalized) {
+    const parsed = parseInt(String(normalized).replace(/[^\d-]/g, ""), 10);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      return parsed;
+    }
+  }
+  return fallbackRowIndex;
+};
+
 export const resolveUniqueBarcodePreview = (
   baseBarcode,
   reservedInBatch = new Set(),
   existingInDb = new Set(),
-) => {
-  const normalized = normalizeCellValue(baseBarcode);
-  if (!normalized) {
-    return normalized;
-  }
-  if (!reservedInBatch.has(normalized) && !existingInDb.has(normalized)) {
-    return normalized;
-  }
-
-  let replicaIndex = 2;
-  let candidate = buildSuffixedBarcode(normalized, replicaIndex);
-  while (reservedInBatch.has(candidate) || existingInDb.has(candidate)) {
-    replicaIndex += 1;
-    candidate = buildSuffixedBarcode(normalized, replicaIndex);
-  }
-  return candidate;
-};
+) => normalizeCellValue(baseBarcode);
 
 export const getDuplicateIssueType = (duplicateIssue, messages = []) => {
   if (duplicateIssue && duplicateIssue !== DUPLICATE_ISSUE.NONE) {
@@ -501,7 +487,9 @@ export const getDuplicateIssueType = (duplicateIssue, messages = []) => {
     return DUPLICATE_ISSUE.NONE;
   }
   const manifestMessage = messages.find((message) =>
-    String(message).toLowerCase().startsWith("duplicate sample id in manifest:"),
+    String(message)
+      .toLowerCase()
+      .startsWith("duplicate sample id in manifest:"),
   );
   if (manifestMessage) {
     return DUPLICATE_ISSUE.IN_MANIFEST;

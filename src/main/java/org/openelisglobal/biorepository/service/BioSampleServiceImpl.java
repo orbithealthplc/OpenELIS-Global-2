@@ -139,8 +139,9 @@ public class BioSampleServiceImpl extends AuditableBaseObjectServiceImpl<BioSamp
             return null;
         }
         String locationPath = location.get("location") != null ? String.valueOf(location.get("location")) : "";
-        String hierarchicalPath =
-                location.get("hierarchicalPath") != null ? String.valueOf(location.get("hierarchicalPath")) : "";
+        String hierarchicalPath = location.get("hierarchicalPath") != null
+                ? String.valueOf(location.get("hierarchicalPath"))
+                : "";
         if (locationPath.isBlank() && hierarchicalPath.isBlank()) {
             return null;
         }
@@ -205,6 +206,19 @@ public class BioSampleServiceImpl extends AuditableBaseObjectServiceImpl<BioSamp
     @Transactional(readOnly = true)
     public List<BioSample> getByWorkflowStatusWithRelationships(WorkflowStatus workflowStatus) {
         return baseObjectDAO.getByWorkflowStatusWithRelationships(workflowStatus);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<BioSample> getByWorkflowStatusWithRelationshipsPaginated(WorkflowStatus workflowStatus, int offset,
+            int limit) {
+        return baseObjectDAO.getByWorkflowStatusWithRelationshipsPaginated(workflowStatus, offset, limit);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long countByWorkflowStatus(WorkflowStatus workflowStatus) {
+        return baseObjectDAO.countByWorkflowStatus(workflowStatus);
     }
 
     @Override

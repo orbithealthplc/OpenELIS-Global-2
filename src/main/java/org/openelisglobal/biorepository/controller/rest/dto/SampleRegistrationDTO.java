@@ -29,6 +29,7 @@ public class SampleRegistrationDTO {
     private String specialHandling; // Special handling instructions
     private String collectionDate; // Original collection date
     private Integer shipmentId; // Associated shipment
+    private Integer sno; // Excel manifest serial number (S.No)
 
     // Getters and setters
     public String getOriginLab() {
@@ -187,5 +188,13 @@ public class SampleRegistrationDTO {
 
     public void setShipmentId(Integer shipmentId) {
         this.shipmentId = shipmentId;
+    }
+
+    public Integer getSno() {
+        return sno;
+    }
+
+    public void setSno(Integer sno) {
+        this.sno = sno;
     }
 }
