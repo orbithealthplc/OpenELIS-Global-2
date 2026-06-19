@@ -1,0 +1,85 @@
+name: Deploy release to on-prem
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "GHCR release tag (e.g. v2026.06.18.05)"
+        required: true
+        type: string
+      target:
+        description: "Deploy target"
+        required: true
+        type: choice
+        options:
+          - test
+          - prod
+
+jobs:
+  deploy-test:
+    if: ${{ github.repository == 'orbithealthplc/OpenELIS-Global-2' && inputs.target == 'test' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deploy to test server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ONPREM_STAGING_HOST }}
+          username: ${{ secrets.ONPREM_STAGING_USER }}
+          key: ${{ secrets.ONPREM_STAGING_SSH_KEY }}
+          port: ${{ secrets.ONPREM_STAGING_PORT }}
+          script: |
+            set -euo pipefail
+            RELEASE="${{ inputs.release }}"
+            APP_DIR="${{ secrets.ONPREM_STAGING_APP_DIR }}"
+            if [ -z "${APP_DIR}" ]; then APP_DIR="/opt/OpenELIS-Docker"; fi
+            cd "${APP_DIR}"
+
+            sudo cp docker-compose.yml "docker-compose.yml.bak-${RELEASE}"
+            sudo sed -i "s#v2026\\.[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]#${RELEASE}#g" docker-compose.yml
+            grep -E 'ghcr.io/orbithealthplc/openelis-global-2' docker-compose.yml || true
+
+            echo "${{ secrets.GHCR_READ_TOKEN }}" | sudo docker login ghcr.io -u "${{ secrets.GHCR_READ_USER }}" --password-stdin
+            sudo docker compose pull
+            sudo docker compose up -d
+            sudo docker compose ps
+
+            IMAGE=$(sudo docker inspect openelisglobal-webapp --format '{{.Config.Image}}')
+            echo "Webapp image: ${IMAGE}"
+            echo "${IMAGE}" | grep -q "${RELEASE}"
+
+  deploy-prod:
+    if: ${{ github.repository == 'orbithealthplc/OpenELIS-Global-2' && inputs.target == 'prod' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Deploy to production server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.ONPREM_PROD_HOST }}
+          username: ${{ secrets.ONPREM_PROD_USER }}
+          key: ${{ secrets.ONPREM_PROD_SSH_KEY }}
+          port: ${{ secrets.ONPREM_PROD_PORT }}
+          script: |
+            set -euo pipefail
+            RELEASE="${{ inputs.release }}"
+            APP_DIR="${{ secrets.ONPREM_PROD_APP_DIR }}"
+            if [ -z "${APP_DIR}" ]; then APP_DIR="/opt/OpenELIS-Docker"; fi
+            cd "${APP_DIR}"
+
+            sudo cp docker-compose.yml "docker-compose.yml.bak-${RELEASE}"
+            sudo sed -i "s#v2026\\.[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]#${RELEASE}#g" docker-compose.yml
+            grep -E 'ghcr.io/orbithealthplc/openelis-global-2' docker-compose.yml || true
+
+            echo "${{ secrets.GHCR_READ_TOKEN }}" | sudo docker login ghcr.io -u "${{ secrets.GHCR_READ_USER }}" --password-stdin
+            sudo docker compose pull
+            sudo docker compose up -d
+            sudo docker compose ps
+
+            IMAGE=$(sudo docker inspect openelisglobal-webapp --format '{{.Config.Image}}')
+            echo "Webapp image: ${IMAGE}"
+            echo "${IMAGE}" | grep -q "${RELEASE}"
