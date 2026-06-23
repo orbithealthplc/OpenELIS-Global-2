@@ -23,9 +23,42 @@ export const MANIFEST_FIELDS = [
   "specialHandling",
 ];
 
+/** Legacy convertLegacyWorksheetRows output omits sno; keep indices aligned. */
+export const LEGACY_MANIFEST_FIELDS = MANIFEST_FIELDS.filter(
+  (field) => field !== "sno",
+);
+
+/**
+ * True when the worksheet uses the full AHRI Excel template (Sr. no + storage columns).
+ * These sheets must use header-based parsing, not convertLegacyWorksheetRows.
+ */
+export const isFullAhriManifestSheet = (rows) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return false;
+  }
+
+  const rawHeaders = rows[0];
+  if (!Array.isArray(rawHeaders)) {
+    return false;
+  }
+
+  const mappedHeaders = rawHeaders.map(
+    (header) => HEADER_ALIASES[normalizeHeaderToken(header)] || null,
+  );
+
+  if (mappedHeaders.includes("sno")) {
+    return true;
+  }
+
+  return rawHeaders.some(
+    (header) => STORAGE_METADATA_ALIASES[normalizeHeaderToken(header)],
+  );
+};
+
 export const HEADER_ALIASES = {
   sno: "sno",
   sn: "sno",
+  srno: "sno",
   serialno: "sno",
   serialnumber: "sno",
   serial: "sno",
@@ -76,11 +109,14 @@ export const STORAGE_METADATA_ALIASES = {
   rackno: "Rack",
   boxno: "Box",
   location: "Location",
+  coordinate: "Coordinate",
   qcstatus: "QC Status",
   deviationorincident: "Deviation",
   transferredby: "Transferred By",
   transferreason: "Transfer Reason",
   transferbatchnumber: "Transfer Batch",
+  receivedby: "Received by",
+  approvalsign: "Approval/Sign",
 };
 
 export const FIRST_WINS_MANIFEST_FIELDS = new Set([
@@ -353,7 +389,36 @@ export const inferLegacyBiosafetyLevel = (sampleType, sheetName) => {
 };
 
 export const normalizeLegacyDuplicateBarcodes = (rows) => {
-  return rows.map((row) => (Array.isArray(row) ? [...row] : row));
+  const seen = new Map();
+
+  return rows.map((row) => {
+    const normalizedRow = Array.isArray(row) ? [...row] : row;
+    const barcode = normalizeCellValue(normalizedRow[0]);
+
+    if (!barcode) {
+      return normalizedRow;
+    }
+
+    const seenCount = seen.get(barcode) || 0;
+    seen.set(barcode, seenCount + 1);
+
+    if (seenCount === 0) {
+      normalizedRow[1] = normalizeCellValue(normalizedRow[1]) || barcode;
+      return normalizedRow;
+    }
+
+    const duplicateIndex = seenCount + 1;
+    normalizedRow[0] = `${barcode}-R${duplicateIndex}`;
+    normalizedRow[1] = normalizeCellValue(normalizedRow[1]) || barcode;
+
+    const duplicateNote = `Original Sample ID: ${barcode}`;
+    const existingSpecialHandling = normalizeCellValue(normalizedRow[16]);
+    normalizedRow[16] = existingSpecialHandling
+      ? `${existingSpecialHandling} | ${duplicateNote}`
+      : duplicateNote;
+
+    return normalizedRow;
+  });
 };
 
 export const convertLegacyWorksheetRows = (rows, sheetName) => {
@@ -386,7 +451,6 @@ export const convertLegacyWorksheetRows = (rows, sheetName) => {
   for (let i = 1; i < normalizedRows.length; i++) {
     const values = normalizedRows[i];
     const row = mergeMappedRowValues(rawHeaders, values);
-
     const sampleType = firstNonEmptyValue(
       row.biorepositorySampleType,
       row.sampleType,
@@ -406,10 +470,8 @@ export const convertLegacyWorksheetRows = (rows, sheetName) => {
       true,
     );
     const collectionDate = normalizeDateValue(row.collectionDate, false);
-    const manifestSno = parseManifestSno(row.sno, i);
 
     convertedRows.push([
-      manifestSno,
       barcode,
       row.externalId,
       sampleType,
@@ -462,22 +524,27 @@ export const parseDuplicateSampleId = (message) => {
 export const buildSuffixedBarcode = (baseBarcode, replicaIndex) =>
   `${baseBarcode}-R${replicaIndex}`;
 
-export const parseManifestSno = (value, fallbackRowIndex) => {
-  const normalized = normalizeCellValue(value);
-  if (normalized) {
-    const parsed = parseInt(String(normalized).replace(/[^\d-]/g, ""), 10);
-    if (Number.isFinite(parsed) && parsed > 0) {
-      return parsed;
-    }
-  }
-  return fallbackRowIndex;
-};
-
 export const resolveUniqueBarcodePreview = (
   baseBarcode,
   reservedInBatch = new Set(),
   existingInDb = new Set(),
-) => normalizeCellValue(baseBarcode);
+) => {
+  const normalized = normalizeCellValue(baseBarcode);
+  if (!normalized) {
+    return normalized;
+  }
+  if (!reservedInBatch.has(normalized) && !existingInDb.has(normalized)) {
+    return normalized;
+  }
+
+  let replicaIndex = 2;
+  let candidate = buildSuffixedBarcode(normalized, replicaIndex);
+  while (reservedInBatch.has(candidate) || existingInDb.has(candidate)) {
+    replicaIndex += 1;
+    candidate = buildSuffixedBarcode(normalized, replicaIndex);
+  }
+  return candidate;
+};
 
 export const getDuplicateIssueType = (duplicateIssue, messages = []) => {
   if (duplicateIssue && duplicateIssue !== DUPLICATE_ISSUE.NONE) {

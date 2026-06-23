@@ -43,6 +43,8 @@ import {
 } from "./manifestImportErrorMessages";
 import {
   MANIFEST_FIELDS,
+  LEGACY_MANIFEST_FIELDS,
+  isFullAhriManifestSheet,
   convertLegacyWorksheetRows,
   firstNonEmptyValue,
   formatCurrentReceiptDate,
@@ -64,12 +66,14 @@ import {
   reconcileCrossBatchManifestDuplicates,
   computeDuplicateImportPreviews,
   parseDuplicateSampleId,
-  parseManifestSno,
 } from "./manifestImportHelpers";
+import {
+  buildImportPreviewColumns,
+  normalizeManifestSno,
+} from "./biorepositoryExcelColumns";
 
 const REQUIRED_FIELDS = [
   "barcode",
-  "externalId",
   "sampleType",
   "originLab",
   "receiptDate",
@@ -252,38 +256,31 @@ function ManifestUploadModal({
   }, [expectedHeaders]);
 
   const extractWorkbookRows = useCallback((workbook) => {
-    const sheetNames = workbook.SheetNames.filter(
-      (name) => name.trim().toLowerCase() !== "key",
-    );
-
-    let legacyRows = [];
-
-    for (const sheetName of sheetNames) {
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,
-        defval: "",
-        raw: false,
-        dateNF: "yyyy-mm-dd hh:mm:ss",
-      });
-
-      const convertedLegacyRows = convertLegacyWorksheetRows(rows, sheetName);
-      if (convertedLegacyRows.length > 0) {
-        legacyRows = legacyRows.concat(convertedLegacyRows);
-      }
-    }
-
-    if (legacyRows.length > 0) {
-      return [MANIFEST_FIELDS, ...normalizeLegacyDuplicateBarcodes(legacyRows)];
-    }
-
-    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    return XLSX.utils.sheet_to_json(firstSheet, {
+    const firstSheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[firstSheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, {
       header: 1,
       defval: "",
       raw: false,
       dateNF: "yyyy-mm-dd hh:mm:ss",
     });
+
+    if (isFullAhriManifestSheet(rows)) {
+      return rows;
+    }
+
+    const convertedLegacyRows = convertLegacyWorksheetRows(
+      rows,
+      firstSheetName,
+    );
+    if (convertedLegacyRows.length > 0) {
+      return [
+        LEGACY_MANIFEST_FIELDS,
+        ...normalizeLegacyDuplicateBarcodes(convertedLegacyRows),
+      ];
+    }
+
+    return rows;
   }, []);
 
   const parseManifestRows = useCallback(
@@ -368,9 +365,9 @@ function ManifestUploadModal({
       for (let i = 1; i < normalizedRows.length; i++) {
         const values = normalizedRows[i];
         const row = mergeMappedRowValues(rawHeaders, values);
-
         row.barcode = row.barcode || "";
-        row.externalId = row.externalId || "";
+        row.externalId = row.externalId || row.barcode || "";
+        row.sno = normalizeManifestSno(row.sno);
 
         row.receiptDate = normalizeDateValue(
           firstNonEmptyValue(
@@ -400,10 +397,9 @@ function ManifestUploadModal({
           row.biosafetyLevel = inferLegacyBiosafetyLevel(row.sampleType, "");
         }
 
-        row.sno = parseManifestSno(row.sno, i);
-
         requiredFields.forEach((field) => {
-          const value = field === "barcode" ? row.barcode : row[field];
+          const value =
+            field === "barcode" ? row.barcode || row.externalId : row[field];
           if (!value) {
             errors.push({
               row: i + 1,
@@ -577,14 +573,18 @@ function ManifestUploadModal({
    */
   const transformToBackendFormat = useCallback((data) => {
     return data.map((row) => {
-      const barcode = row.barcode || "";
+      const barcode = row.barcode || row.externalId || "";
       const sample = {
         barcode,
-        externalId: row.externalId || "",
+        externalId: row.externalId || row.barcode || "",
         sampleType: row.sampleType,
         originLab: row.originLab,
         receiptDate: row.receiptDate,
       };
+
+      if (row.sno != null) {
+        sample.sno = row.sno;
+      }
 
       if (row.projectId) {
         sample.projectId = row.projectId;
@@ -618,14 +618,13 @@ function ManifestUploadModal({
       }
       if (row.specialHandling) {
         sample.specialHandling = row.specialHandling;
+      } else if (row._storageNotes) {
+        sample.specialHandling = row._storageNotes;
       }
       if (row.biosafetyLevel) {
         sample.biosafetyLevel = row.biosafetyLevel;
       } else {
         sample.biosafetyLevel = "BSL_1";
-      }
-      if (row.sno != null && row.sno !== "") {
-        sample.sno = Number(row.sno);
       }
       return sample;
     });
@@ -1206,44 +1205,7 @@ function ManifestUploadModal({
     importStatus === "preview" && duplicateRows.length > 0;
 
   const tableHeaders = useMemo(() => {
-    const headers = [
-      { key: "row", header: "#" },
-      {
-        key: "barcode",
-        header: intl.formatMessage({
-          id: "biorepository.manifest.column.barcode",
-          defaultMessage: "Sample ID",
-        }),
-      },
-      {
-        key: "sampleType",
-        header: intl.formatMessage({
-          id: "biorepository.manifest.column.sampleType",
-          defaultMessage: "Sample Type",
-        }),
-      },
-      {
-        key: "originLab",
-        header: intl.formatMessage({
-          id: "biorepository.manifest.column.originLab",
-          defaultMessage: "Origin Lab",
-        }),
-      },
-      {
-        key: "receiptDate",
-        header: intl.formatMessage({
-          id: "biorepository.manifest.column.receiptDate",
-          defaultMessage: "Receipt Date",
-        }),
-      },
-      {
-        key: "biosafetyLevel",
-        header: intl.formatMessage({
-          id: "biorepository.manifest.column.bsl",
-          defaultMessage: "BSL",
-        }),
-      },
-    ];
+    const headers = buildImportPreviewColumns(intl);
 
     if (showDuplicateColumns) {
       headers.push({
@@ -1297,11 +1259,12 @@ function ManifestUploadModal({
     const tableRow = {
       id: String(row._rowNumber),
       row: row._rowNumber,
-      barcode: row.barcode || row.externalId || "-",
-      sampleType: row.sampleType || "-",
+      manifestSno: row.sno != null ? String(row.sno) : "-",
       originLab: row.originLab || "-",
-      receiptDate: row.receiptDate || "-",
-      biosafetyLevel: row.biosafetyLevel || "BSL_1",
+      projectId: row.projectId || "-",
+      sampleType: row.sampleType || "-",
+      barcode: row.barcode || "-",
+      externalId: row.externalId || "-",
       status,
       _isDuplicate: row._isDuplicate,
     };
