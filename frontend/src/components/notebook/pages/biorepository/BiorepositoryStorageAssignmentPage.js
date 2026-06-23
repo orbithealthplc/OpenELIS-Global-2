@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Grid,
   Column,
@@ -41,6 +47,12 @@ import {
   PAGE_SAMPLES_BATCH_SIZE,
 } from "./biorepositoryStorageHelpers";
 import { formatBiorepositoryLocationLevel } from "./biorepositoryDisplayHelpers";
+import BioSampleDetailModal from "./BioSampleDetailModal";
+import {
+  buildReceptionTableColumns,
+  extractLabId,
+  sortBioSamplesByManifestSno,
+} from "./biorepositoryExcelColumns";
 import "../../workflow/NotebookWorkflow.css";
 
 /**
@@ -193,6 +205,8 @@ function BiorepositoryStorageAssignmentPage({
   const [confirmReassignModalOpen, setConfirmReassignModalOpen] =
     useState(false);
   const [samplesToReassign, setSamplesToReassign] = useState([]);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedDetailSample, setSelectedDetailSample] = useState(null);
 
   /**
    * Validate storage condition against sample temperature requirements.
@@ -317,27 +331,52 @@ function BiorepositoryStorageAssignmentPage({
             biosafetyLevel: bioSample.biosafetyLevel,
             requiredTempMin: bioSample.requiredTempMin,
             requiredTempMax: bioSample.requiredTempMax,
+            manifestSno: bioSample.manifestSno,
+            externalId: bioSample.externalId,
+            specialHandling: bioSample.specialHandling,
+            originLab: bioSample.originLab,
+            projectId: bioSample.projectId,
+            receiptDate: bioSample.receiptDate,
+            arrivalCondition: bioSample.arrivalCondition,
+            collectionDate: bioSample.collectionDate,
+            barcode: bioSample.barcode,
+            sampleType: bioSample.sampleType,
+            workflowStatus: bioSample.workflowStatus,
+            accessionNumber: bioSample.accessionNumber,
+            bioSampleRecord: bioSample,
           };
         }
       });
 
       setBioSampleData((prev) => ({ ...prev, ...bioSampleMap }));
       setSamples((prevSamples) =>
-        prevSamples.map((sample) => {
-          const bioData = bioSampleMap[sample.sampleItemId];
-          if (bioData) {
-            return {
-              ...sample,
-              retentionPolicyName:
-                bioData.retentionPolicyName || sample.retentionPolicyName,
-              retentionExpiryDate:
-                bioData.retentionExpiryDate || sample.retentionExpiryDate,
-              biosafetyLevel:
-                bioData.biosafetyLevel || sample.biosafetyLevel,
-            };
-          }
-          return sample;
-        }),
+        sortBioSamplesByManifestSno(
+          prevSamples.map((sample) => {
+            const bioData = bioSampleMap[sample.sampleItemId];
+            if (bioData) {
+              return {
+                ...sample,
+                retentionPolicyName:
+                  bioData.retentionPolicyName || sample.retentionPolicyName,
+                retentionExpiryDate:
+                  bioData.retentionExpiryDate || sample.retentionExpiryDate,
+                biosafetyLevel: bioData.biosafetyLevel || sample.biosafetyLevel,
+                manifestSno: bioData.manifestSno ?? sample.manifestSno,
+                externalId:
+                  bioData.externalId ||
+                  extractLabId(bioData) ||
+                  sample.externalId,
+                barcode: bioData.barcode || sample.barcode,
+                projectId: bioData.projectId || sample.projectId,
+                originLab: bioData.originLab || sample.originLab,
+                receiptDate: bioData.receiptDate || sample.receiptDate,
+                bioSampleRecord:
+                  bioData.bioSampleRecord || sample.bioSampleRecord,
+              };
+            }
+            return sample;
+          }),
+        ),
       );
     };
 
@@ -354,12 +393,15 @@ function BiorepositoryStorageAssignmentPage({
 
   const transformPageSample = useCallback((sample) => {
     const normalizedStatus = deriveStoragePageStatus(sample);
+    const labId =
+      sample.externalId || extractLabId(sample) || sample.accessionNumber || "";
     return {
       id: String(sample.id || sample.sampleItemId),
       sampleItemId: sample.sampleItemId,
+      manifestSno: sample.manifestSno ?? null,
+      barcode: sample.barcode || sample.externalId || "-",
       externalId:
-        sample.externalId ||
-        sample.accessionNumber ||
+        labId ||
         (sample.sampleItemId != null ? String(sample.sampleItemId) : "-"),
       accessionNumber:
         sample.accessionNumber ||
@@ -367,11 +409,16 @@ function BiorepositoryStorageAssignmentPage({
         (sample.sampleItemId != null ? String(sample.sampleItemId) : "-"),
       sampleType: sample.sampleType || sample.typeOfSample?.description || "-",
       collectionDate: sample.collectionDate,
+      receiptDate: sample.receiptDate
+        ? new Date(sample.receiptDate).toLocaleDateString()
+        : "-",
+      projectId: sample.projectId || sample.data?.projectId || "-",
+      originLab: sample.originLab || sample.data?.originLab || "-",
+      workflowStatus: sample.workflowStatus || normalizedStatus,
       status: normalizedStatus,
       pageStatus: normalizedStatus,
       biosafetyLevel: sample.data?.biosafetyLevel || sample.biosafetyLevel,
       projectName: sample.data?.projectName || sample.projectName,
-      originLab: sample.data?.originLab || sample.originLab,
       storageRoom: sample.data?.storageRoom || sample.storageRoom,
       storageFreezer: sample.data?.storageFreezer || sample.storageFreezer,
       storageShelf: sample.data?.storageShelf || sample.storageShelf,
@@ -423,7 +470,9 @@ function BiorepositoryStorageAssignmentPage({
         throw new Error(loadErrorMessage);
       }
 
-      const totalCount = Number(firstBatch.totalCount ?? firstBatch.samples.length);
+      const totalCount = Number(
+        firstBatch.totalCount ?? firstBatch.samples.length,
+      );
       const firstTransformed = firstBatch.samples.map(transformPageSample);
 
       if (!componentMounted.current) {
@@ -431,7 +480,7 @@ function BiorepositoryStorageAssignmentPage({
       }
 
       setTotalSampleCount(totalCount);
-      setSamples(firstTransformed);
+      setSamples(sortBioSamplesByManifestSno(firstTransformed));
       setLoadProgress({
         loaded: firstTransformed.length,
         total: totalCount,
@@ -480,7 +529,9 @@ function BiorepositoryStorageAssignmentPage({
         }
 
         offset += transformedBatch.length;
-        setSamples((prev) => [...prev, ...transformedBatch]);
+        setSamples((prev) =>
+          sortBioSamplesByManifestSno([...prev, ...transformedBatch]),
+        );
         setLoadProgress({ loaded: offset, total: totalCount });
 
         const batchIds = transformedBatch
@@ -503,12 +554,7 @@ function BiorepositoryStorageAssignmentPage({
         setLoadProgress(null);
       }
     }
-  }, [
-    pageData?.id,
-    fetchBioSampleRetentionData,
-    transformPageSample,
-    intl,
-  ]);
+  }, [pageData?.id, fetchBioSampleRetentionData, transformPageSample, intl]);
 
   // Load box occupancy from storage API
   const loadBoxOccupancy = useCallback((boxId) => {
@@ -951,11 +997,7 @@ function BiorepositoryStorageAssignmentPage({
 
     if (sample.status === "COMPLETED" && hasStorage) {
       return (
-        <Tag
-          type="green"
-          renderIcon={Checkmark}
-          title={storageLocation}
-        >
+        <Tag type="green" renderIcon={Checkmark} title={storageLocation}>
           {storageLocation} (
           <FormattedMessage
             id="notebook.status.sentToNext"
@@ -967,11 +1009,7 @@ function BiorepositoryStorageAssignmentPage({
     }
     if (hasStorage) {
       return (
-        <Tag
-          type="cyan"
-          renderIcon={Archive}
-          title={storageLocation}
-        >
+        <Tag type="cyan" renderIcon={Archive} title={storageLocation}>
           {storageLocation} (
           <FormattedMessage
             id="notebook.status.inProgress"
@@ -1020,6 +1058,58 @@ function BiorepositoryStorageAssignmentPage({
         return "gray";
     }
   };
+
+  const storageSampleColumns = useMemo(() => {
+    const baseColumns = buildReceptionTableColumns(intl).filter(
+      (column) => !["actions", "workflowStatus"].includes(column.key),
+    );
+    return [
+      ...baseColumns,
+      {
+        key: "storage",
+        header: intl.formatMessage({
+          id: "biorepository.column.storage",
+          defaultMessage: "Storage Location",
+        }),
+        render: (value, row) => (
+          <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+            {getStorageTag(row)}
+            {getConditionTag(row)}
+          </div>
+        ),
+      },
+      {
+        key: "assignedBy",
+        header: intl.formatMessage({
+          id: "biorepository.column.assignedBy",
+          defaultMessage: "Assigned By",
+        }),
+      },
+      {
+        key: "retentionPolicyName",
+        header: intl.formatMessage({
+          id: "biorepository.column.retentionPolicy",
+          defaultMessage: "Retention Policy",
+        }),
+        render: (value) => value || "-",
+      },
+      {
+        key: "retentionExpiryDate",
+        header: intl.formatMessage({
+          id: "biorepository.column.retentionExpiry",
+          defaultMessage: "Expiry Date",
+        }),
+        render: (value) => (value ? new Date(value).toLocaleDateString() : "-"),
+      },
+      {
+        key: "status",
+        header: intl.formatMessage({
+          id: "biorepository.column.status",
+          defaultMessage: "Status",
+        }),
+      },
+    ];
+  }, [intl]);
 
   // Check if page has real ID
   const hasRealPageId =
@@ -1160,87 +1250,15 @@ function BiorepositoryStorageAssignmentPage({
           samples={samples}
           selectedIds={selectedSampleIds}
           onSelectionChange={setSelectedSampleIds}
+          onSampleClick={(sample) => {
+            setSelectedDetailSample(sample.bioSampleRecord || sample);
+            setDetailModalOpen(true);
+          }}
           statusFilter={statusFilter}
           onStatusFilterChange={setStatusFilter}
           showSelection={true}
           loading={loading}
-          columns={[
-            {
-              key: "externalId",
-              header: intl.formatMessage({
-                id: "biorepository.column.externalId",
-                defaultMessage: "Barcode/ID",
-              }),
-            },
-            {
-              key: "sampleType",
-              header: intl.formatMessage({
-                id: "biorepository.column.sampleType",
-                defaultMessage: "Sample Type",
-              }),
-            },
-            {
-              key: "biosafetyLevel",
-              header: intl.formatMessage({
-                id: "biorepository.column.biosafetyLevel",
-                defaultMessage: "BSL",
-              }),
-              render: (value) =>
-                value ? (
-                  <Tag type={getBiosafetyBadgeType(value)} size="sm">
-                    {value}
-                  </Tag>
-                ) : (
-                  "-"
-                ),
-            },
-            {
-              key: "storage",
-              header: intl.formatMessage({
-                id: "biorepository.column.storage",
-                defaultMessage: "Storage Location",
-              }),
-              render: (value, row) => (
-                <div
-                  style={{ display: "flex", gap: "4px", alignItems: "center" }}
-                >
-                  {getStorageTag(row)}
-                  {getConditionTag(row)}
-                </div>
-              ),
-            },
-            {
-              key: "assignedBy",
-              header: intl.formatMessage({
-                id: "biorepository.column.assignedBy",
-                defaultMessage: "Assigned By",
-              }),
-            },
-            {
-              key: "retentionPolicyName",
-              header: intl.formatMessage({
-                id: "biorepository.column.retentionPolicy",
-                defaultMessage: "Retention Policy",
-              }),
-              render: (value) => value || "-",
-            },
-            {
-              key: "retentionExpiryDate",
-              header: intl.formatMessage({
-                id: "biorepository.column.retentionExpiry",
-                defaultMessage: "Expiry Date",
-              }),
-              render: (value) =>
-                value ? new Date(value).toLocaleDateString() : "-",
-            },
-            {
-              key: "status",
-              header: intl.formatMessage({
-                id: "biorepository.column.status",
-                defaultMessage: "Status",
-              }),
-            },
-          ]}
+          columns={storageSampleColumns}
         />
       </div>
 
@@ -1483,17 +1501,17 @@ function BiorepositoryStorageAssignmentPage({
                 </div>
 
                 <div id="storage-box-print-area">
-                <BoxLayoutViewer
-                  boxId={storageSelection.box.id}
-                  layout={getCombinedLayout()}
-                  rows={storageSelection.box.rows || 9}
-                  columns={storageSelection.box.columns || 9}
-                  positionSchemaHint={
-                    storageSelection.box.positionSchemaHint || "number-number"
-                  }
-                  showSampleIdInWell
-                  onWellClick={handleWellClick}
-                />
+                  <BoxLayoutViewer
+                    boxId={storageSelection.box.id}
+                    layout={getCombinedLayout()}
+                    rows={storageSelection.box.rows || 9}
+                    columns={storageSelection.box.columns || 9}
+                    positionSchemaHint={
+                      storageSelection.box.positionSchemaHint || "number-number"
+                    }
+                    showSampleIdInWell
+                    onWellClick={handleWellClick}
+                  />
                 </div>
 
                 <div
@@ -1590,6 +1608,15 @@ function BiorepositoryStorageAssignmentPage({
           </div>
         </div>
       </Modal>
+
+      <BioSampleDetailModal
+        open={detailModalOpen}
+        sample={selectedDetailSample}
+        onClose={() => {
+          setDetailModalOpen(false);
+          setSelectedDetailSample(null);
+        }}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
  */
 
 export const MANIFEST_FIELDS = [
+  "sno",
   "barcode",
   "externalId",
   "sampleType",
@@ -22,7 +23,48 @@ export const MANIFEST_FIELDS = [
   "specialHandling",
 ];
 
+/** Legacy convertLegacyWorksheetRows output omits sno; keep indices aligned. */
+export const LEGACY_MANIFEST_FIELDS = MANIFEST_FIELDS.filter(
+  (field) => field !== "sno",
+);
+
+/**
+ * True when the worksheet uses the full AHRI Excel template (Sr. no + storage columns).
+ * These sheets must use header-based parsing, not convertLegacyWorksheetRows.
+ */
+export const isFullAhriManifestSheet = (rows) => {
+  if (!Array.isArray(rows) || rows.length === 0) {
+    return false;
+  }
+
+  const rawHeaders = rows[0];
+  if (!Array.isArray(rawHeaders)) {
+    return false;
+  }
+
+  const mappedHeaders = rawHeaders.map(
+    (header) => HEADER_ALIASES[normalizeHeaderToken(header)] || null,
+  );
+
+  if (mappedHeaders.includes("sno")) {
+    return true;
+  }
+
+  return rawHeaders.some(
+    (header) => STORAGE_METADATA_ALIASES[normalizeHeaderToken(header)],
+  );
+};
+
 export const HEADER_ALIASES = {
+  sno: "sno",
+  sn: "sno",
+  srno: "sno",
+  serialno: "sno",
+  serialnumber: "sno",
+  serial: "sno",
+  rowno: "sno",
+  rownumber: "sno",
+  no: "sno",
   barcode: "barcode",
   sampleid: "barcode",
   samplebarcode: "barcode",
@@ -67,11 +109,14 @@ export const STORAGE_METADATA_ALIASES = {
   rackno: "Rack",
   boxno: "Box",
   location: "Location",
+  coordinate: "Coordinate",
   qcstatus: "QC Status",
   deviationorincident: "Deviation",
   transferredby: "Transferred By",
   transferreason: "Transfer Reason",
   transferbatchnumber: "Transfer Batch",
+  receivedby: "Received by",
+  approvalsign: "Approval/Sign",
 };
 
 export const FIRST_WINS_MANIFEST_FIELDS = new Set([
@@ -159,7 +204,10 @@ export const normalizeCellValue = (value) => {
     return "";
   }
   const normalizedDate = normalizeDateValue(trimmed, true);
-  if (normalizedDate !== trimmed && isSupportedDateValue(normalizedDate, true)) {
+  if (
+    normalizedDate !== trimmed &&
+    isSupportedDateValue(normalizedDate, true)
+  ) {
     return normalizedDate;
   }
   return trimmed;
@@ -238,8 +286,14 @@ export const mergeMappedRowValues = (rawHeaders, values) => {
     row._storageNotes = storageParts.join(" | ");
   }
 
-  if (row.storageTemperaturePreset && !row.requiredTempMin && !row.requiredTempMax) {
-    const presetRange = resolveStorageTemperaturePreset(row.storageTemperaturePreset);
+  if (
+    row.storageTemperaturePreset &&
+    !row.requiredTempMin &&
+    !row.requiredTempMax
+  ) {
+    const presetRange = resolveStorageTemperaturePreset(
+      row.storageTemperaturePreset,
+    );
     if (presetRange) {
       row.requiredTempMin = presetRange.min;
       row.requiredTempMax = presetRange.max;
@@ -397,7 +451,6 @@ export const convertLegacyWorksheetRows = (rows, sheetName) => {
   for (let i = 1; i < normalizedRows.length; i++) {
     const values = normalizedRows[i];
     const row = mergeMappedRowValues(rawHeaders, values);
-
     const sampleType = firstNonEmptyValue(
       row.biorepositorySampleType,
       row.sampleType,
@@ -501,7 +554,9 @@ export const getDuplicateIssueType = (duplicateIssue, messages = []) => {
     return DUPLICATE_ISSUE.NONE;
   }
   const manifestMessage = messages.find((message) =>
-    String(message).toLowerCase().startsWith("duplicate sample id in manifest:"),
+    String(message)
+      .toLowerCase()
+      .startsWith("duplicate sample id in manifest:"),
   );
   if (manifestMessage) {
     return DUPLICATE_ISSUE.IN_MANIFEST;

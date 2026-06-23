@@ -148,7 +148,22 @@ function SampleGrid({
     const result = [];
     const rootSamples = samples
       .filter((s) => !s.parentSampleItemId)
-      .sort((a, b) => (a.externalId || "").localeCompare(b.externalId || ""));
+      .sort((a, b) => {
+        if (gridId === "biorepository-storage") {
+          const leftSno = a.manifestSno;
+          const rightSno = b.manifestSno;
+          if (leftSno != null && rightSno != null && leftSno !== rightSno) {
+            return leftSno - rightSno;
+          }
+          if (leftSno != null && rightSno == null) {
+            return -1;
+          }
+          if (leftSno == null && rightSno != null) {
+            return 1;
+          }
+        }
+        return (a.externalId || "").localeCompare(b.externalId || "");
+      });
 
     rootSamples.forEach((root) => addWithDescendants(root, result));
 
