@@ -301,22 +301,6 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
     },
     {
       "stageOrder": 3,
-      "stageId": "isolate",
-      "pageKey": "isolate",
-      "stageTitle": "Isolate Creation",
-      "requiredActions": [
-        "VIEW",
-        "EDIT",
-        "COMPLETE"
-      ],
-      "allowedPersonas": [
-        "Laboratory Technician",
-        "Junior Researcher",
-        "Senior Researcher"
-      ]
-    },
-    {
-      "stageOrder": 4,
       "stageId": "temp_storage",
       "pageKey": "temp_storage",
       "stageTitle": "Temporary Storage Assignment",
@@ -331,7 +315,7 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 5,
+      "stageOrder": 4,
       "stageId": "processing_qc",
       "pageKey": "processing_qc",
       "stageTitle": "Processing & Quality Control",
@@ -346,10 +330,26 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 6,
+      "stageOrder": 5,
       "stageId": "test_execution",
       "pageKey": "test_execution",
       "stageTitle": "Assay/Test Execution",
+      "requiredActions": [
+        "VIEW",
+        "EDIT",
+        "COMPLETE"
+      ],
+      "allowedPersonas": [
+        "Laboratory Technician",
+        "Junior Researcher",
+        "Senior Researcher"
+      ]
+    },
+    {
+      "stageOrder": 6,
+      "stageId": "isolate",
+      "pageKey": "isolate",
+      "stageTitle": "Isolate Creation",
       "requiredActions": [
         "VIEW",
         "EDIT",

@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- ======================================================== -->
+    <!-- BACTERIOLOGY: MOVE ISOLATE CREATION TO PAGE 6            -->
+    <!-- New order:                                               -->
+    <!--   1 Sample Reception                                     -->
+    <!--   2 Laboratory Reception & Verification                  -->
+    <!--   3 Temporary Storage Assignment                         -->
+    <!--   4 Processing & Quality Control                         -->
+    <!--   5 Assay/Test Execution                                 -->
+    <!--   6 Isolate Creation                                     -->
+    <!--   7 Post-Analysis Storage                                -->
+    <!--   8 Sample Retrieval, Archival & Disposal                -->
+    <!--   9 Reporting & Data Export                              -->
+    <!-- ======================================================== -->
+
+    <changeSet id="079-reorder-bacteriology-isolate-creation-page" author="openelis-bacteriology">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT CASE WHEN COUNT(*) &gt; 0 THEN 1 ELSE 0 END
+                FROM clinlims.notebook_page
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 3
+            </sqlCheck>
+        </preConditions>
+        <comment>Move Bacteriology Isolate Creation from page 3 to page 6 (after Assay, before Post-Analysis Storage)</comment>
+
+        <!-- Step 1: park Isolate Creation temporarily -->
+        <sql>
+            UPDATE clinlims.notebook_page
+            SET page_order = 99
+            WHERE title = 'Isolate Creation'
+              AND page_order = 3
+              AND notebook_id IN (
+                SELECT DISTINCT notebook_id
+                FROM clinlims.notebook_page
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 3
+              );
+        </sql>
+
+        <!-- Step 2: shift pages 4-6 down to 3-5 -->
+        <sql>
+            UPDATE clinlims.notebook_page
+            SET page_order = 3
+            WHERE title IN ('Temporary Storage Assignment', 'Sample Storage Assignment')
+              AND page_order = 4
+              AND notebook_id IN (
+                SELECT DISTINCT notebook_id
+                FROM clinlims.notebook_page
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 99
+              );
+
+            UPDATE clinlims.notebook_page
+            SET page_order = 4
+            WHERE title = 'Processing &amp; Quality Control'
+              AND page_order = 5
+              AND notebook_id IN (
+                SELECT DISTINCT notebook_id
+                FROM clinlims.notebook_page
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 99
+              );
+
+            UPDATE clinlims.notebook_page
+            SET page_order = 5
+            WHERE title = 'Assay/Test Execution'
+              AND page_order = 6
+              AND notebook_id IN (
+                SELECT DISTINCT notebook_id
+                FROM clinlims.notebook_page
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 99
+              );
+        </sql>
+
+        <!-- Step 3: place Isolate Creation at page 6 -->
+        <sql>
+            UPDATE clinlims.notebook_page
+            SET page_order = 6
+            WHERE title = 'Isolate Creation'
+              AND page_order = 99;
+        </sql>
+
+        <rollback>
+            <sql>
+                UPDATE clinlims.notebook_page
+                SET page_order = 99
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 6;
+
+                UPDATE clinlims.notebook_page
+                SET page_order = 6
+                WHERE title = 'Assay/Test Execution'
+                  AND page_order = 5;
+
+                UPDATE clinlims.notebook_page
+                SET page_order = 5
+                WHERE title = 'Processing &amp; Quality Control'
+                  AND page_order = 4;
+
+                UPDATE clinlims.notebook_page
+                SET page_order = 4
+                WHERE title IN ('Temporary Storage Assignment', 'Sample Storage Assignment')
+                  AND page_order = 3;
+
+                UPDATE clinlims.notebook_page
+                SET page_order = 3
+                WHERE title = 'Isolate Creation'
+                  AND page_order = 99;
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="079-reorder-bacteriology-isolate-creation-workflow-template" author="openelis-bacteriology">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="workflow_page_template" schemaName="clinlims"/>
+            <sqlCheck expectedResult="1">
+                SELECT CASE WHEN COUNT(*) &gt; 0 THEN 1 ELSE 0 END
+                FROM clinlims.workflow_page_template
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Isolate Creation'
+                  AND display_order = 3
+            </sqlCheck>
+        </preConditions>
+        <comment>Reorder Bacteriology workflow_page_template display_order for Isolate Creation</comment>
+
+        <sql>
+            UPDATE clinlims.workflow_page_template
+            SET display_order = 99
+            WHERE workflow_category = 'BACTERIOLOGY'
+              AND name = 'Isolate Creation'
+              AND display_order = 3;
+
+            UPDATE clinlims.workflow_page_template
+            SET display_order = 3
+            WHERE workflow_category = 'BACTERIOLOGY'
+              AND name = 'Temporary Storage Assignment'
+              AND display_order = 4;
+
+            UPDATE clinlims.workflow_page_template
+            SET display_order = 4
+            WHERE workflow_category = 'BACTERIOLOGY'
+              AND name = 'Processing &amp; Quality Control'
+              AND display_order = 5;
+
+            UPDATE clinlims.workflow_page_template
+            SET display_order = 5
+            WHERE workflow_category = 'BACTERIOLOGY'
+              AND name = 'Assay/Test Execution'
+              AND display_order = 6;
+
+            UPDATE clinlims.workflow_page_template
+            SET display_order = 6
+            WHERE workflow_category = 'BACTERIOLOGY'
+              AND name = 'Isolate Creation'
+              AND display_order = 99;
+        </sql>
+
+        <rollback>
+            <sql>
+                UPDATE clinlims.workflow_page_template
+                SET display_order = 99
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Isolate Creation'
+                  AND display_order = 6;
+
+                UPDATE clinlims.workflow_page_template
+                SET display_order = 6
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Assay/Test Execution'
+                  AND display_order = 5;
+
+                UPDATE clinlims.workflow_page_template
+                SET display_order = 5
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Processing &amp; Quality Control'
+                  AND display_order = 4;
+
+                UPDATE clinlims.workflow_page_template
+                SET display_order = 4
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Temporary Storage Assignment'
+                  AND display_order = 3;
+
+                UPDATE clinlims.workflow_page_template
+                SET display_order = 3
+                WHERE workflow_category = 'BACTERIOLOGY'
+                  AND name = 'Isolate Creation'
+                  AND display_order = 99;
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

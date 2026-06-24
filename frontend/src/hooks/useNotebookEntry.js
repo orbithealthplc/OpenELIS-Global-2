@@ -33,18 +33,21 @@ export function useNotebookEntry(
   const [missingEntrySelection, setMissingEntrySelection] = useState(false);
 
   const loadEntryData = useCallback(
-    (eId) => {
+    (eId, options = {}) => {
+      const { silent = false } = options;
       let loadCount = 0;
       const checkDone = () => {
         loadCount++;
-        if (loadCount >= 2) {
+        if (!silent && loadCount >= 2) {
           setLoading(false);
         }
       };
 
       setMissingEntrySelection(false);
       setErrorMessage(null);
-      setLoading(true);
+      if (!silent) {
+        setLoading(true);
+      }
       setIsCreatingEntry(false);
 
       getFromOpenElisServer(`/rest/notebook-entry/${eId}`, (response) => {

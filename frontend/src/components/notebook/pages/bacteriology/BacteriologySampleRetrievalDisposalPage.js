@@ -50,7 +50,7 @@ import "../../workflow/NotebookWorkflow.css";
  * 3. Sample Disposal - with criteria, methods, and documentation
  * 4. Record Archival - documentation retention
  *
- * Samples are routed here from the Post-Analysis Storage page (Page 6).
+ * Samples are routed here from the Post-Analysis Storage page.
  *
  * @param {Object} props
  * @param {number} props.entryId - The notebook entry ID
@@ -65,6 +65,7 @@ function BacteriologySampleRetrievalDisposalPage({
   progress,
   onProgressUpdate,
   notebookId,
+  onNextPage,
 }) {
   const componentMounted = useRef(true);
   const intl = useIntl();
@@ -201,7 +202,7 @@ function BacteriologySampleRetrievalDisposalPage({
   const hasRealPageId =
     pageData?.id && !String(pageData.id).startsWith("default-");
 
-  // Load samples from Post-Analysis Storage page (page 6) and this page
+  // Load samples from Post-Analysis Storage page and this page
   // Also fetches routing data for storage location information
   const loadSamples = useCallback(() => {
     if (!hasRealPageId) {
@@ -380,7 +381,7 @@ function BacteriologySampleRetrievalDisposalPage({
       },
     );
 
-    // Fetch notebook pages to find Post-Analysis Storage page (order 6) and load routing data
+    // Fetch notebook pages to find Post-Analysis Storage page and load routing data
     if (notebookId) {
       // Load routing data for storage assignments
       getFromOpenElisServer(
@@ -399,7 +400,9 @@ function BacteriologySampleRetrievalDisposalPage({
         (nbResponse) => {
           if (nbResponse && nbResponse.pages) {
             const postAnalysisPage = nbResponse.pages.find(
-              (p) => (p.pageOrder || p.order) === 6,
+              (p) =>
+                p.title === "Post-Analysis Storage" ||
+                (p.pageOrder || p.order) === 7,
             );
             if (postAnalysisPage && postAnalysisPage.id) {
               getFromOpenElisServer(
@@ -2159,6 +2162,20 @@ function BacteriologySampleRetrievalDisposalPage({
           </div>
         </div>
       </Modal>
+
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

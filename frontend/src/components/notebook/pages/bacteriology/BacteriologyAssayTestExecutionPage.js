@@ -77,13 +77,17 @@ import { loadNotebookScopedInventory } from "../../utils/notebookInventoryScope"
 import SampleGrid from "../../workflow/SampleGrid";
 import config from "../../../../config.json";
 import "../../workflow/NotebookWorkflow.css";
-import {
-  ESignatureModal,
-  SignatureMeaning,
-  useESign,
-} from "../../../esignature";
 import PermissionGate from "../../../security/PermissionGate";
 import { Permissions } from "../../../../constants/roles";
+import BacteriologyAntibioticSelector from "./BacteriologyAntibioticSelector";
+import {
+  BACTERIOLOGY_ANTIBIOTIC_CATALOG,
+  BACTERIOLOGY_ENZYME_CATALOG,
+  buildAntibioticResultsFromSelection,
+  findAntibioticOption,
+  mergeAssayCatalogWithInventory,
+  normalizeAntibioticResults,
+} from "../../../../constants/bacteriologyAssayCatalog";
 
 /**
  * BacteriologyAssayTestExecutionPage - Page 5 of the Bacteriology workflow.
@@ -356,27 +360,6 @@ const INTERPRETATION_GUIDELINES = [
   { id: "OTHER", text: "Other" },
 ];
 
-// Antibiotic Panel Selection - per user specification
-// Panel depends on organism and clinical scenario
-// 2nd line if resistance detected or clinically indicated
-const ANTIBIOTIC_PANELS = [
-  {
-    id: "FIRST_LINE",
-    text: "1st Line Antibiotics",
-    description: "Standard panel for initial testing",
-  },
-  {
-    id: "SECOND_LINE",
-    text: "2nd Line Antibiotics",
-    description: "If resistance detected or clinically indicated",
-  },
-  {
-    id: "BOTH",
-    text: "Both Panels",
-    description: "Full 1st and 2nd line testing",
-  },
-];
-
 // Susceptibility Interpretation - S, I, R per CLSI/EUCAST guidelines
 const SUSCEPTIBILITY_INTERPRETATION = [
   { id: "S", text: "Susceptible (S)" },
@@ -621,12 +604,13 @@ function BacteriologyAssayTestExecutionPage({
   progress,
   onProgressUpdate,
   notebookId,
+  onNextPage,
 }) {
   const intl = useIntl();
   const componentMounted = useRef(false);
 
   // E-signature: pending action ref for shared AUTHORED/REJECTED hooks
-  const pendingAction = useRef(null);
+  // Signature is collected in final stage only.
 
   // State for samples
   const [samples, setSamples] = useState([]);
@@ -640,12 +624,20 @@ function BacteriologyAssayTestExecutionPage({
   const [activeTab, setActiveTab] = useState(0);
 
   // Enzymes from inventory
-  const [enzymes, setEnzymes] = useState([]);
+  const [enzymes, setEnzymes] = useState(BACTERIOLOGY_ENZYME_CATALOG);
   const [loadingEnzymes, setLoadingEnzymes] = useState(false);
 
-  // Antibiotics from inventory
-  const [antibiotics, setAntibiotics] = useState([]);
-  const [loadingAntibiotics, setLoadingAntibiotics] = useState(false);
+  // Supplemental antibiotics from notebook inventory (catalog is always available)
+  const [inventoryAntibiotics, setInventoryAntibiotics] = useState([]);
+
+  const antibioticOptions = useMemo(
+    () =>
+      mergeAssayCatalogWithInventory(
+        BACTERIOLOGY_ANTIBIOTIC_CATALOG,
+        inventoryAntibiotics,
+      ),
+    [inventoryAntibiotics],
+  );
 
   // ==========================================
   // SECTION A: Primary Culture & Microscopy State
@@ -761,13 +753,18 @@ function BacteriologyAssayTestExecutionPage({
   const [dstData, setDstData] = useState({
     method: "", // DISC_DIFFUSION, BROTH_MICRODILUTION, AST_STRIP, AUTOMATED_AST
     guidelinesUsed: "", // CLSI, EUCAST, OTHER
-    antibioticPanel: "", // FIRST_LINE, SECOND_LINE, BOTH
-    antibioticResults: [], // Array of {panelType, antibiotic, zoneDiameter, mic, interpretation}
+    antibioticResults: [], // Array of {antibiotic, zoneDiameter, mic, interpretation}
+    // DST QC (required by workflow)
+    qcResult: "", // PASS / FAIL
+    qcControlOrganism: "",
+    qcPerformedBy: "",
+    qcDate: new Date().toISOString().split("T")[0],
+    qcNotes: "",
     notes: "",
   });
 
   // Antibiotic results for different methods
-  // Each result: {panelType: "1ST_LINE"|"2ND_LINE", antibiotic: string, zoneDiameter?: string, mic?: string, interpretation: "S"|"I"|"R"}
+  // Each result: {antibiotic: string, zoneDiameter?: string, mic?: string, interpretation: "S"|"I"|"R"}
   const [antibioticResults, setAntibioticResults] = useState([]);
 
   // ==========================================
@@ -968,6 +965,14 @@ function BacteriologyAssayTestExecutionPage({
                 presumptiveId: data.presumptiveId,
                 dstCompleted: data.dstCompleted,
                 dstMethod: data.dstMethod,
+                dstGuidelinesUsed: data.dstGuidelinesUsed,
+                dstAntibioticResults: data.dstAntibioticResults,
+                dstNotes: data.dstNotes,
+                dstQcResult: data.dstQcResult,
+                dstQcControlOrganism: data.dstQcControlOrganism,
+                dstQcPerformedBy: data.dstQcPerformedBy,
+                dstQcDate: data.dstQcDate,
+                dstQcNotes: data.dstQcNotes,
                 automatedIdCompleted: data.automatedIdCompleted,
                 organismIdentified: data.organismIdentified,
                 molecularCompleted: data.molecularCompleted,
@@ -1036,9 +1041,14 @@ function BacteriologyAssayTestExecutionPage({
               manufacturer: enzyme.manufacturer,
               ...enzyme,
             }));
-            setEnzymes(enzymeOptions);
+            setEnzymes(
+              mergeAssayCatalogWithInventory(
+                BACTERIOLOGY_ENZYME_CATALOG,
+                enzymeOptions,
+              ),
+            );
           } else {
-            setEnzymes([]);
+            setEnzymes(BACTERIOLOGY_ENZYME_CATALOG);
           }
           setLoadingEnzymes(false);
         }
@@ -1047,27 +1057,25 @@ function BacteriologyAssayTestExecutionPage({
   }, [notebookId]);
 
   const loadAntibiotics = useCallback(() => {
-    setLoadingAntibiotics(true);
     loadNotebookScopedInventory(
       notebookId,
       "/rest/inventory/items/type/ANTIBIOTICS",
       (response) => {
         if (componentMounted.current) {
           if (response && Array.isArray(response)) {
-            const antibioticOptions = response.map((antibiotic) => ({
-              id: antibiotic.id,
-              text: antibiotic.name,
-              name: antibiotic.name,
-              catalogNumber: antibiotic.catalogNumber,
-              manufacturer: antibiotic.manufacturer,
-              ...antibiotic,
-            }));
-            setAntibiotics(antibioticOptions);
+            setInventoryAntibiotics(
+              response.map((antibiotic) => ({
+                id: antibiotic.id,
+                text: antibiotic.name,
+                name: antibiotic.name,
+                catalogNumber: antibiotic.catalogNumber,
+                manufacturer: antibiotic.manufacturer,
+                ...antibiotic,
+              })),
+            );
           } else {
-            // Handle error or empty response
-            setAntibiotics([]);
+            setInventoryAntibiotics([]);
           }
-          setLoadingAntibiotics(false);
         }
       },
     );
@@ -1394,6 +1402,13 @@ function BacteriologyAssayTestExecutionPage({
       );
       return;
     }
+    // Auto-fill isolate ID when a single isolate is selected
+    const defaultIsolateId =
+      selectedIds.length === 1
+        ? samples.find((s) => String(s.id) === String(selectedIds[0]))
+            ?.externalId || ""
+        : "";
+
     setColonyData({
       mediaType: "",
       colonyCount: "",
@@ -1404,11 +1419,11 @@ function BacteriologyAssayTestExecutionPage({
       odor: "",
       readingDate: new Date().toISOString().split("T")[0],
       readBy: "",
-      isolateId: "",
+      isolateId: defaultIsolateId,
       notes: "",
     });
     setColonyModalOpen(true);
-  }, [selectedIds, intl]);
+  }, [selectedIds, intl, samples]);
 
   const handleSaveColonyData = useCallback(() => {
     if (!hasRealPageId) {
@@ -1503,7 +1518,13 @@ function BacteriologyAssayTestExecutionPage({
           sample.mediaReactions &&
           sample.mediaReactions.length > 0
         ) {
-          existingReactions = [...sample.mediaReactions];
+          existingReactions = sample.mediaReactions.map((reaction) => ({
+            ...reaction,
+            dstAntibioticResults: normalizeAntibioticResults(
+              antibioticOptions,
+              reaction.dstAntibioticResults,
+            ),
+          }));
         }
       } else {
         // For multiple samples, start fresh
@@ -1514,7 +1535,7 @@ function BacteriologyAssayTestExecutionPage({
       setMediaReactions(existingReactions);
       setMediaReactionsModalOpen(true);
     },
-    [selectedIds, samples, intl],
+    [selectedIds, samples, intl, antibioticOptions],
   );
 
   const handleAddMediaReaction = useCallback(() => {
@@ -1539,8 +1560,12 @@ function BacteriologyAssayTestExecutionPage({
       dstCompleted: false,
       dstMethod: "",
       dstGuidelinesUsed: "",
-      dstAntibioticPanel: "",
       dstAntibioticResults: [],
+      dstQcResult: "",
+      dstQcControlOrganism: "",
+      dstQcPerformedBy: "",
+      dstQcDate: new Date().toISOString().split("T")[0],
+      dstQcNotes: "",
       dstNotes: "",
     };
     setMediaReactions([...mediaReactions, newReaction]);
@@ -1574,12 +1599,6 @@ function BacteriologyAssayTestExecutionPage({
 
     const reaction = mediaReactions[editingMediaReactionIndex];
     const newResult = {
-      panelType:
-        reaction.dstAntibioticPanel === "FIRST_LINE"
-          ? "1ST_LINE"
-          : reaction.dstAntibioticPanel === "SECOND_LINE"
-            ? "2ND_LINE"
-            : "1ST_LINE",
       antibiotic: "",
       antibioticId: "",
       zoneDiameter: "",
@@ -1635,6 +1654,29 @@ function BacteriologyAssayTestExecutionPage({
       setMediaReactions(updated);
     },
     [editingMediaReactionIndex, mediaReactions],
+  );
+
+  const handleMediaReactionAntibioticSelectionChange = useCallback(
+    (_selectedIds, selectedItems) => {
+      if (editingMediaReactionIndex === null) {
+        return;
+      }
+
+      setMediaReactions((previousReactions) => {
+        const updated = [...previousReactions];
+        const existingResults =
+          updated[editingMediaReactionIndex].dstAntibioticResults || [];
+        updated[editingMediaReactionIndex] = {
+          ...updated[editingMediaReactionIndex],
+          dstAntibioticResults: buildAntibioticResultsFromSelection(
+            selectedItems,
+            existingResults,
+          ),
+        };
+        return updated;
+      });
+    },
+    [editingMediaReactionIndex],
   );
 
   // Save DST for a specific media reaction
@@ -1738,50 +1780,78 @@ function BacteriologyAssayTestExecutionPage({
       );
       return;
     }
-    setDstData({
-      method: "",
-      guidelinesUsed: "",
-      antibioticPanel: "",
-      antibioticResults: [],
-      notes: "",
-    });
-    setAntibioticResults([]);
+
+    const primarySample = samples.find(
+      (s) => String(s.id) === String(selectedIds[0]),
+    );
+    const hasSavedDst =
+      primarySample?.dstCompleted ||
+      primarySample?.dstMethod ||
+      primarySample?.dstQcResult ||
+      primarySample?.dstQcControlOrganism ||
+      primarySample?.dstQcPerformedBy ||
+      primarySample?.dstQcNotes;
+
+    const defaultDate = new Date().toISOString().split("T")[0];
+
+    const normalizedAntibioticResults = normalizeAntibioticResults(
+      antibioticOptions,
+      primarySample?.dstAntibioticResults,
+    );
+
+    if (hasSavedDst && primarySample) {
+      setDstData({
+        method: primarySample.dstMethod || "",
+        guidelinesUsed: primarySample.dstGuidelinesUsed || "",
+        antibioticResults: normalizedAntibioticResults,
+        qcResult: primarySample.dstQcResult || "",
+        qcControlOrganism: primarySample.dstQcControlOrganism || "",
+        qcPerformedBy: primarySample.dstQcPerformedBy || "",
+        qcDate: primarySample.dstQcDate || defaultDate,
+        qcNotes: primarySample.dstQcNotes || "",
+        notes: primarySample.dstNotes || "",
+      });
+      setAntibioticResults(normalizedAntibioticResults);
+    } else {
+      setDstData({
+        method: "",
+        guidelinesUsed: "",
+        antibioticResults: [],
+        qcResult: "",
+        qcControlOrganism: "",
+        qcPerformedBy: "",
+        qcDate: defaultDate,
+        qcNotes: "",
+        notes: "",
+      });
+      setAntibioticResults([]);
+    }
+
     setDstModalOpen(true);
-  }, [selectedIds, intl]);
+  }, [selectedIds, intl, samples, antibioticOptions]);
 
-  // Add antibiotic result row - always includes zoneDiameter, mic, and interpretation
-  const handleAddAntibioticResult = useCallback(() => {
-    const newResult = {
-      panelType:
-        dstData.antibioticPanel === "FIRST_LINE"
-          ? "1ST_LINE"
-          : dstData.antibioticPanel === "SECOND_LINE"
-            ? "2ND_LINE"
-            : "1ST_LINE",
-      antibiotic: "",
-      zoneDiameter: "", // Zone of inhibition (mm) - for Disc Diffusion
-      mic: "", // Minimum Inhibitory Concentration (µg/mL) - always available
-      interpretation: "", // S/I/R interpretation
-    };
-
-    setAntibioticResults([...antibioticResults, newResult]);
-  }, [dstData.antibioticPanel, antibioticResults]);
-
-  const handleRemoveAntibioticResult = useCallback(
-    (index) => {
-      setAntibioticResults(antibioticResults.filter((_, i) => i !== index));
+  const handleDstAntibioticSelectionChange = useCallback(
+    (_selectedIds, selectedItems) => {
+      setAntibioticResults((previousResults) =>
+        buildAntibioticResultsFromSelection(selectedItems, previousResults),
+      );
     },
-    [antibioticResults],
+    [],
   );
 
-  const handleUpdateAntibioticResult = useCallback(
-    (index, field, value) => {
-      const updated = [...antibioticResults];
+  const handleRemoveAntibioticResult = useCallback((index) => {
+    setAntibioticResults((previousResults) =>
+      previousResults.filter((_, rowIndex) => rowIndex !== index),
+    );
+  }, []);
+
+  const handleUpdateAntibioticResult = useCallback((index, field, value) => {
+    setAntibioticResults((previousResults) => {
+      const updated = [...previousResults];
       updated[index] = { ...updated[index], [field]: value };
-      setAntibioticResults(updated);
-    },
-    [antibioticResults],
-  );
+      return updated;
+    });
+  }, []);
 
   const handleSaveDSTData = useCallback(() => {
     if (!hasRealPageId) {
@@ -1795,8 +1865,12 @@ function BacteriologyAssayTestExecutionPage({
       dstCompleted: true,
       dstMethod: dstData.method,
       dstGuidelinesUsed: dstData.guidelinesUsed,
-      dstAntibioticPanel: dstData.antibioticPanel,
       dstAntibioticResults: antibioticResults,
+      dstQcResult: dstData.qcResult,
+      dstQcControlOrganism: dstData.qcControlOrganism,
+      dstQcPerformedBy: dstData.qcPerformedBy,
+      dstQcDate: dstData.qcDate,
+      dstQcNotes: dstData.qcNotes,
       dstNotes: dstData.notes,
     };
 
@@ -2760,143 +2834,21 @@ function BacteriologyAssayTestExecutionPage({
   ]);
 
   // ==========================================
-  // E-Signature Integration (21 CFR Part 11)
+  // Signature (Requirement: signature only in final stage)
   // ==========================================
-
-  // Shared callback: executes whichever save action was pending after a successful signature.
-  const handleSignAndSave = useCallback(
-    // eslint-disable-next-line no-unused-vars
-    (signature) => {
-      if (pendingAction.current?.callback) {
-        pendingAction.current.callback();
-      }
-      pendingAction.current = null;
-    },
-    [],
-  );
-
-  // Shared callback: reopens the parent modal when the user cancels the signature flow.
-  const handleSignCancelled = useCallback(() => {
-    if (pendingAction.current?.reopenModal) {
-      pendingAction.current.reopenModal();
+  // This workflow stage does NOT collect signatures. Save actions run directly.
+  const triggerEsigForSave = useCallback((callback) => {
+    if (typeof callback === "function") {
+      callback();
     }
-    pendingAction.current = null;
   }, []);
-
-  // Callback for Mark Completed (VALIDATED_AND_RELEASED).
-  const handleSignAndMarkComplete = useCallback(
-    // eslint-disable-next-line no-unused-vars
-    (signature) => {
-      handleBulkMarkCompleted();
-    },
-    [handleBulkMarkCompleted],
-  );
-
-  // Hook 1: AUTHORED (shared across all 11 save handlers for normal data entry)
-  const {
-    openSignatureModal: openAuthoredSignatureModal,
-    signatureModalProps: authoredSignatureModalProps,
-  } = useESign({
-    meaning: SignatureMeaning.AUTHORED,
-    context: intl.formatMessage({
-      id: "notebook.bacteriology.esig.authoredContext",
-      defaultMessage: "Sign bacteriology test data as authored",
-    }),
-    recordType: "NOTEBOOK_PAGE_SAMPLE",
-    recordId: pageData?.id || 0,
-    onSuccess: handleSignAndSave,
-    onCancel: handleSignCancelled,
-  });
-
-  // Hook 2: REJECTED (for molecular QC failures and fully-contaminated media reactions)
-  const {
-    openSignatureModal: openRejectedSignatureModal,
-    signatureModalProps: rejectedSignatureModalProps,
-  } = useESign({
-    meaning: SignatureMeaning.REJECTED,
-    context: intl.formatMessage({
-      id: "notebook.bacteriology.esig.rejectedContext",
-      defaultMessage: "Sign rejection of bacteriology result",
-    }),
-    recordType: "NOTEBOOK_PAGE_SAMPLE",
-    recordId: pageData?.id || 0,
-    onSuccess: handleSignAndSave,
-    onCancel: handleSignCancelled,
-  });
-
-  // Hook 3: VALIDATED_AND_RELEASED (Mark Completed - advances samples to next page)
-  const {
-    openSignatureModal: openCompleteSignatureModal,
-    signatureModalProps: completeSignatureModalProps,
-  } = useESign({
-    meaning: SignatureMeaning.VALIDATED_AND_RELEASED,
-    context: intl.formatMessage(
-      {
-        id: "notebook.bacteriology.esig.completeContext",
-        defaultMessage: "Mark {count} sample(s) as completed",
-      },
-      { count: selectedIds.length },
-    ),
-    recordType: "NOTEBOOK_PAGE_SAMPLE",
-    recordId: pageData?.id || 0,
-    onSuccess: handleSignAndMarkComplete,
-    onCancel: () => {},
-  });
-
-  /**
-   * Helper that routes a save action through the appropriate e-sig flow.
-   * Stores the callback + modal reopener, then opens the correct signature modal.
-   *
-   * @param {Function} callback - The original save handler to run after signing.
-   * @param {Function} reopenModal - Reopens the parent modal if the user cancels.
-   * @param {string} meaning - SignatureMeaning.AUTHORED or SignatureMeaning.REJECTED.
-   */
-  // Close workflow modals before e-sig so Carbon focus trap does not block password input.
-  const closeAllWorkflowModals = useCallback(() => {
-    setMicroscopyModalOpen(false);
-    setCultureModalOpen(false);
-    setBiochemModalOpen(false);
-    setColonyModalOpen(false);
-    setMediaReactionsModalOpen(false);
-    setMediaReactionDstModalOpen(false);
-    setDstModalOpen(false);
-    setAutomatedIdModalOpen(false);
-    setExtractionModalOpen(false);
-    setPcrModalOpen(false);
-    setWgsModalOpen(false);
-    setMolecularQcModalOpen(false);
-  }, []);
-
-  const triggerEsigForSave = useCallback(
-    (callback, reopenModal, meaning = SignatureMeaning.AUTHORED) => {
-      pendingAction.current = { callback, reopenModal };
-      closeAllWorkflowModals();
-      const openModal =
-        meaning === SignatureMeaning.REJECTED
-          ? openRejectedSignatureModal
-          : openAuthoredSignatureModal;
-      window.setTimeout(openModal, 0);
-    },
-    [
-      closeAllWorkflowModals,
-      openAuthoredSignatureModal,
-      openRejectedSignatureModal,
-    ],
-  );
 
   /**
    * Media Reactions: if every reaction is CONTAMINATED, the whole batch is a
    * rejection decision -- sign as REJECTED. Otherwise sign as AUTHORED.
    */
   const triggerMediaReactionsEsig = useCallback(() => {
-    const allContaminated =
-      mediaReactions.length > 0 &&
-      mediaReactions.every((r) => r.growthResult === "CONTAMINATED");
-    triggerEsigForSave(
-      handleSaveMediaReactions,
-      () => setMediaReactionsModalOpen(true),
-      allContaminated ? SignatureMeaning.REJECTED : SignatureMeaning.AUTHORED,
-    );
+    triggerEsigForSave(handleSaveMediaReactions);
   }, [mediaReactions, handleSaveMediaReactions, triggerEsigForSave]);
 
   /**
@@ -2906,37 +2858,7 @@ function BacteriologyAssayTestExecutionPage({
    * meaning to apply.
    */
   const triggerMolecularQcEsig = useCallback(() => {
-    const hasReagentFailure = molecularQcData.reagentQcChecks.some(
-      (c) => c.qcStatus === "FAILED",
-    );
-    const hasEquipmentFailure = molecularQcData.equipmentQcChecks.some(
-      (c) => c.qcStatus === "FAILED" || c.qcStatus === "DUE",
-    );
-    const hasSampleFailure = molecularQcData.sampleQcChecks.some(
-      (c) => c.qcStatus === "FAILED",
-    );
-    const hasControlFailure =
-      molecularQcData.positiveControlResult === "FAILED" ||
-      molecularQcData.negativeControlResult === "FAILED";
-
-    let overallResult = molecularQcData.overallQcResult;
-    if (!overallResult) {
-      overallResult =
-        hasReagentFailure ||
-        hasEquipmentFailure ||
-        hasSampleFailure ||
-        hasControlFailure
-          ? "FAIL"
-          : "PASS";
-    }
-
-    triggerEsigForSave(
-      handleSaveMolecularQcData,
-      () => setMolecularQcModalOpen(true),
-      overallResult === "FAIL"
-        ? SignatureMeaning.REJECTED
-        : SignatureMeaning.AUTHORED,
-    );
+    triggerEsigForSave(handleSaveMolecularQcData);
   }, [molecularQcData, handleSaveMolecularQcData, triggerEsigForSave]);
 
   // ==========================================
@@ -3845,7 +3767,7 @@ function BacteriologyAssayTestExecutionPage({
                     kind="tertiary"
                     size="sm"
                     renderIcon={CheckmarkFilled}
-                    onClick={openCompleteSignatureModal}
+                    onClick={handleBulkMarkCompleted}
                     disabled={selectedIds.length === 0}
                   >
                     <FormattedMessage
@@ -3982,7 +3904,7 @@ function BacteriologyAssayTestExecutionPage({
                     kind="tertiary"
                     size="sm"
                     renderIcon={CheckmarkFilled}
-                    onClick={openCompleteSignatureModal}
+                    onClick={handleBulkMarkCompleted}
                     disabled={selectedIds.length === 0}
                   >
                     <FormattedMessage
@@ -4085,7 +4007,7 @@ function BacteriologyAssayTestExecutionPage({
                     kind="tertiary"
                     size="sm"
                     renderIcon={CheckmarkFilled}
-                    onClick={openCompleteSignatureModal}
+                    onClick={handleBulkMarkCompleted}
                     disabled={selectedIds.length === 0}
                   >
                     <FormattedMessage
@@ -4180,7 +4102,7 @@ function BacteriologyAssayTestExecutionPage({
                     kind="tertiary"
                     size="sm"
                     renderIcon={CheckmarkFilled}
-                    onClick={openCompleteSignatureModal}
+                    onClick={handleBulkMarkCompleted}
                     disabled={selectedIds.length === 0}
                   >
                     <FormattedMessage
@@ -4378,7 +4300,7 @@ function BacteriologyAssayTestExecutionPage({
                     kind="tertiary"
                     size="sm"
                     renderIcon={CheckmarkFilled}
-                    onClick={openCompleteSignatureModal}
+                    onClick={handleBulkMarkCompleted}
                     disabled={selectedIds.length === 0}
                   >
                     <FormattedMessage
@@ -4998,7 +4920,10 @@ function BacteriologyAssayTestExecutionPage({
                     isolateId: e.target.value,
                   })
                 }
-                placeholder="e.g., ISO-001"
+                placeholder={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.isolateId.placeholder",
+                  defaultMessage: "Isolate ID",
+                })}
               />
             </Column>
 
@@ -5813,7 +5738,7 @@ function BacteriologyAssayTestExecutionPage({
               <p style={{ color: "#525252", marginBottom: "1rem" }}>
                 <FormattedMessage
                   id="notebook.bacteriology.assay.modal.mediaReactionDstDescription"
-                  defaultMessage="Record DST results for {mediaType}. Add Zone Diameter and/or MIC values with R/S/I interpretation."
+                  defaultMessage="Record DST results for {mediaType}. Select antibiotics and enter zone and/or MIC values."
                   values={{
                     mediaType:
                       ISOLATION_MEDIA_TYPES.find(
@@ -5825,9 +5750,9 @@ function BacteriologyAssayTestExecutionPage({
                 />
               </p>
 
-              {/* DST Method and Guidelines */}
+              {/* DST Method */}
               <Grid fullWidth>
-                <Column lg={6} md={4} sm={4}>
+                <Column lg={8} md={4} sm={4}>
                   <Dropdown
                     id="media-dst-method"
                     titleText={intl.formatMessage({
@@ -5851,58 +5776,6 @@ function BacteriologyAssayTestExecutionPage({
                     }
                   />
                 </Column>
-
-                <Column lg={5} md={4} sm={4}>
-                  <Dropdown
-                    id="media-dst-guidelines"
-                    titleText={intl.formatMessage({
-                      id: "notebook.bacteriology.assay.guidelinesUsed",
-                      defaultMessage: "Interpretation Guidelines",
-                    })}
-                    label="Select guidelines"
-                    items={INTERPRETATION_GUIDELINES}
-                    itemToString={(item) => (item ? item.text : "")}
-                    selectedItem={INTERPRETATION_GUIDELINES.find(
-                      (g) =>
-                        g.id ===
-                        mediaReactions[editingMediaReactionIndex]
-                          .dstGuidelinesUsed,
-                    )}
-                    onChange={({ selectedItem }) =>
-                      handleUpdateMediaReaction(
-                        editingMediaReactionIndex,
-                        "dstGuidelinesUsed",
-                        selectedItem?.id || "",
-                      )
-                    }
-                  />
-                </Column>
-
-                <Column lg={5} md={4} sm={4}>
-                  <Dropdown
-                    id="media-dst-panel"
-                    titleText={intl.formatMessage({
-                      id: "notebook.bacteriology.assay.antibioticPanel",
-                      defaultMessage: "Antibiotic Panel",
-                    })}
-                    label="Select panel"
-                    items={ANTIBIOTIC_PANELS}
-                    itemToString={(item) => (item ? item.text : "")}
-                    selectedItem={ANTIBIOTIC_PANELS.find(
-                      (p) =>
-                        p.id ===
-                        mediaReactions[editingMediaReactionIndex]
-                          .dstAntibioticPanel,
-                    )}
-                    onChange={({ selectedItem }) =>
-                      handleUpdateMediaReaction(
-                        editingMediaReactionIndex,
-                        "dstAntibioticPanel",
-                        selectedItem?.id || "",
-                      )
-                    }
-                  />
-                </Column>
               </Grid>
 
               {/* Antibiotic Results Section */}
@@ -5914,134 +5787,65 @@ function BacteriologyAssayTestExecutionPage({
                   borderRadius: "4px",
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <h6>
-                    <FormattedMessage
-                      id="notebook.bacteriology.assay.antibioticResults"
-                      defaultMessage="Antibiotic Results"
-                    />
-                  </h6>
-                  <Button
-                    kind="ghost"
-                    size="sm"
-                    renderIcon={Add}
-                    onClick={handleAddMediaReactionAntibiotic}
-                  >
-                    <FormattedMessage
-                      id="notebook.bacteriology.assay.addAntibiotic"
-                      defaultMessage="Add Antibiotic"
-                    />
-                  </Button>
-                </div>
+                <BacteriologyAntibioticSelector
+                  id="media-dst-antibiotic-list"
+                  titleText={intl.formatMessage({
+                    id: "notebook.bacteriology.assay.antibioticResults",
+                    defaultMessage: "Antibiotic List",
+                  })}
+                  items={antibioticOptions}
+                  selectedIds={mediaReactions[
+                    editingMediaReactionIndex
+                  ].dstAntibioticResults.map((result) => result.antibioticId)}
+                  onSelectionChange={
+                    handleMediaReactionAntibioticSelectionChange
+                  }
+                />
 
-                {/* Column Headers */}
                 {mediaReactions[editingMediaReactionIndex].dstAntibioticResults
                   .length > 0 && (
-                  <Grid fullWidth style={{ marginBottom: "0.25rem" }}>
-                    <Column lg={2} md={1} sm={1}>
-                      <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
-                        Panel
-                      </span>
-                    </Column>
-                    <Column lg={4} md={2} sm={1}>
+                  <Grid fullWidth style={{ marginTop: "1rem" }}>
+                    <Column lg={6} md={3} sm={2}>
                       <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                         Antibiotic
                       </span>
                     </Column>
-                    <Column lg={2} md={1} sm={1}>
+                    <Column lg={3} md={2} sm={1}>
                       <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                         Zone (mm)
                       </span>
                     </Column>
-                    <Column lg={3} md={2} sm={1}>
+                    <Column lg={4} md={2} sm={1}>
                       <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                         MIC (µg/mL)
-                      </span>
-                    </Column>
-                    <Column lg={3} md={2} sm={1}>
-                      <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
-                        Interpretation
                       </span>
                     </Column>
                     <Column lg={2} md={1} sm={1}></Column>
                   </Grid>
                 )}
 
-                {/* Antibiotic Rows */}
                 {mediaReactions[
                   editingMediaReactionIndex
                 ].dstAntibioticResults.map((result, abIndex) => (
                   <Grid
                     fullWidth
-                    key={abIndex}
+                    key={result.antibioticId || abIndex}
                     style={{ marginBottom: "0.5rem", alignItems: "flex-end" }}
                   >
-                    <Column lg={2} md={1} sm={1}>
-                      <Dropdown
-                        id={`media-ab-panel-${abIndex}`}
-                        label="Select"
-                        items={[
-                          { id: "1ST_LINE", text: "1st Line" },
-                          { id: "2ND_LINE", text: "2nd Line" },
-                        ]}
-                        itemToString={(item) => (item ? item.text : "")}
-                        selectedItem={
-                          result.panelType === "1ST_LINE"
-                            ? { id: "1ST_LINE", text: "1st Line" }
-                            : { id: "2ND_LINE", text: "2nd Line" }
-                        }
-                        onChange={({ selectedItem }) =>
-                          handleUpdateMediaReactionAntibiotic(
-                            abIndex,
-                            "panelType",
-                            selectedItem?.id || "1ST_LINE",
-                          )
-                        }
-                        size="sm"
-                      />
+                    <Column lg={6} md={3} sm={2}>
+                      <p style={{ margin: "0.5rem 0", fontSize: "0.875rem" }}>
+                        {findAntibioticOption(antibioticOptions, result)
+                          ?.text ||
+                          result.antibiotic ||
+                          "—"}
+                      </p>
                     </Column>
 
-                    <Column lg={4} md={2} sm={1}>
-                      <Dropdown
-                        id={`media-ab-name-${abIndex}`}
-                        items={antibiotics}
-                        itemToString={(item) => (item ? item.text : "")}
-                        selectedItem={antibiotics.find(
-                          (a) =>
-                            a.id ===
-                            (result.antibioticId ||
-                              antibiotics.find(
-                                (ab) => ab.name === result.antibiotic,
-                              )?.id),
-                        )}
-                        onChange={({ selectedItem }) => {
-                          handleUpdateMediaReactionAntibiotic(
-                            abIndex,
-                            "antibiotic",
-                            selectedItem?.text || "",
-                          );
-                          handleUpdateMediaReactionAntibiotic(
-                            abIndex,
-                            "antibioticId",
-                            selectedItem?.id || "",
-                          );
-                        }}
-                        disabled={loadingAntibiotics}
-                        placeholder="Select antibiotic"
-                        size="sm"
-                      />
-                    </Column>
-
-                    <Column lg={2} md={1} sm={1}>
+                    <Column lg={3} md={2} sm={1}>
                       <TextInput
                         id={`media-ab-zone-${abIndex}`}
+                        labelText=" "
+                        hideLabel
                         value={result.zoneDiameter || ""}
                         onChange={(e) =>
                           handleUpdateMediaReactionAntibiotic(
@@ -6055,9 +5859,11 @@ function BacteriologyAssayTestExecutionPage({
                       />
                     </Column>
 
-                    <Column lg={3} md={2} sm={1}>
+                    <Column lg={4} md={2} sm={1}>
                       <TextInput
                         id={`media-ab-mic-${abIndex}`}
+                        labelText=" "
+                        hideLabel
                         value={result.mic || ""}
                         onChange={(e) =>
                           handleUpdateMediaReactionAntibiotic(
@@ -6067,26 +5873,6 @@ function BacteriologyAssayTestExecutionPage({
                           )
                         }
                         placeholder="µg/mL"
-                        size="sm"
-                      />
-                    </Column>
-
-                    <Column lg={3} md={2} sm={1}>
-                      <Dropdown
-                        id={`media-ab-interp-${abIndex}`}
-                        label="Select"
-                        items={SUSCEPTIBILITY_INTERPRETATION}
-                        itemToString={(item) => (item ? item.text : "")}
-                        selectedItem={SUSCEPTIBILITY_INTERPRETATION.find(
-                          (i) => i.id === result.interpretation,
-                        )}
-                        onChange={({ selectedItem }) =>
-                          handleUpdateMediaReactionAntibiotic(
-                            abIndex,
-                            "interpretation",
-                            selectedItem?.id || "",
-                          )
-                        }
                         size="sm"
                       />
                     </Column>
@@ -6113,15 +5899,113 @@ function BacteriologyAssayTestExecutionPage({
                       color: "#6f6f6f",
                       fontStyle: "italic",
                       textAlign: "center",
+                      marginTop: "1rem",
                     }}
                   >
                     <FormattedMessage
                       id="notebook.bacteriology.assay.noAntibioticsAdded"
-                      defaultMessage="No antibiotics added. Click 'Add Antibiotic' to record results."
+                      defaultMessage="Select one or more antibiotics from the list above."
                     />
                   </p>
                 )}
               </div>
+
+              {/* DST QC */}
+              <Grid fullWidth style={{ marginTop: "1rem" }}>
+                <Column lg={5} md={4} sm={4}>
+                  <Dropdown
+                    id="media-dst-qc-result"
+                    titleText={intl.formatMessage({
+                      id: "notebook.bacteriology.assay.dstQcResult",
+                      defaultMessage: "DST QC Result",
+                    })}
+                    label="Select QC result"
+                    items={[
+                      { id: "PASS", text: "QC Passed" },
+                      { id: "FAIL", text: "QC Failed" },
+                    ]}
+                    itemToString={(item) => (item ? item.text : "")}
+                    selectedItem={
+                      [
+                        { id: "PASS", text: "QC Passed" },
+                        { id: "FAIL", text: "QC Failed" },
+                      ].find(
+                        (item) =>
+                          item.id ===
+                          mediaReactions[editingMediaReactionIndex].dstQcResult,
+                      ) || null
+                    }
+                    onChange={({ selectedItem }) =>
+                      handleUpdateMediaReaction(
+                        editingMediaReactionIndex,
+                        "dstQcResult",
+                        selectedItem?.id || "",
+                      )
+                    }
+                  />
+                </Column>
+                <Column lg={5} md={4} sm={4}>
+                  <TextInput
+                    id="media-dst-qc-control"
+                    labelText={intl.formatMessage({
+                      id: "notebook.bacteriology.assay.dstQcControlOrganism",
+                      defaultMessage: "QC Control Organism",
+                    })}
+                    value={
+                      mediaReactions[editingMediaReactionIndex]
+                        .dstQcControlOrganism || ""
+                    }
+                    onChange={(e) =>
+                      handleUpdateMediaReaction(
+                        editingMediaReactionIndex,
+                        "dstQcControlOrganism",
+                        e.target.value,
+                      )
+                    }
+                  />
+                </Column>
+                <Column lg={5} md={4} sm={4}>
+                  <TextInput
+                    id="media-dst-qc-by"
+                    labelText={intl.formatMessage({
+                      id: "notebook.bacteriology.assay.dstQcPerformedBy",
+                      defaultMessage: "QC Performed By",
+                    })}
+                    value={
+                      mediaReactions[editingMediaReactionIndex]
+                        .dstQcPerformedBy || ""
+                    }
+                    onChange={(e) =>
+                      handleUpdateMediaReaction(
+                        editingMediaReactionIndex,
+                        "dstQcPerformedBy",
+                        e.target.value,
+                      )
+                    }
+                  />
+                </Column>
+                <Column lg={5} md={4} sm={4}>
+                  <TextInput
+                    id="media-dst-qc-date"
+                    type="date"
+                    labelText={intl.formatMessage({
+                      id: "notebook.bacteriology.assay.dstQcDate",
+                      defaultMessage: "QC Date",
+                    })}
+                    value={
+                      mediaReactions[editingMediaReactionIndex].dstQcDate ||
+                      new Date().toISOString().split("T")[0]
+                    }
+                    onChange={(e) =>
+                      handleUpdateMediaReaction(
+                        editingMediaReactionIndex,
+                        "dstQcDate",
+                        e.target.value,
+                      )
+                    }
+                  />
+                </Column>
+              </Grid>
 
               {/* DST Notes */}
               <Grid fullWidth style={{ marginTop: "1rem" }}>
@@ -6174,7 +6058,7 @@ function BacteriologyAssayTestExecutionPage({
 
           <Grid fullWidth>
             {/* DST Method Selection */}
-            <Column lg={8} md={4} sm={4}>
+            <Column lg={16} md={8} sm={4}>
               <Dropdown
                 id="dst-method"
                 titleText={intl.formatMessage({
@@ -6207,25 +6091,34 @@ function BacteriologyAssayTestExecutionPage({
                 </p>
               )}
             </Column>
+          </Grid>
 
-            {/* Interpretation Guidelines - CLSI/EUCAST */}
+          <Grid fullWidth style={{ marginTop: "1rem" }}>
+            {/* DST QC */}
             <Column lg={8} md={4} sm={4}>
               <Dropdown
-                id="dst-guidelines"
+                id="dst-qc-result"
                 titleText={intl.formatMessage({
-                  id: "notebook.bacteriology.assay.guidelinesUsed",
-                  defaultMessage: "Interpretation Guidelines",
+                  id: "notebook.bacteriology.assay.dstQcResult",
+                  defaultMessage: "DST QC Result",
                 })}
-                label="Select guidelines"
-                items={INTERPRETATION_GUIDELINES}
+                label="Select QC result"
+                items={[
+                  { id: "PASS", text: "QC Passed" },
+                  { id: "FAIL", text: "QC Failed" },
+                ]}
                 itemToString={(item) => (item ? item.text : "")}
-                selectedItem={INTERPRETATION_GUIDELINES.find(
-                  (g) => g.id === dstData.guidelinesUsed,
-                )}
+                selectedItem={
+                  dstData.qcResult === "PASS"
+                    ? { id: "PASS", text: "QC Passed" }
+                    : dstData.qcResult === "FAIL"
+                      ? { id: "FAIL", text: "QC Failed" }
+                      : null
+                }
                 onChange={({ selectedItem }) =>
                   setDstData({
                     ...dstData,
-                    guidelinesUsed: selectedItem?.id || "",
+                    qcResult: selectedItem?.id || "",
                   })
                 }
               />
@@ -6233,47 +6126,80 @@ function BacteriologyAssayTestExecutionPage({
           </Grid>
 
           <Grid fullWidth style={{ marginTop: "1rem" }}>
-            {/* Antibiotic Panel Selection */}
-            <Column lg={8} md={4} sm={4}>
-              <Dropdown
-                id="dst-panel"
-                titleText={intl.formatMessage({
-                  id: "notebook.bacteriology.assay.antibioticPanel",
-                  defaultMessage: "Antibiotic Panel",
+            <Column lg={6} md={4} sm={4}>
+              <TextInput
+                id="dst-qc-control-organism"
+                labelText={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.dstQcControlOrganism",
+                  defaultMessage: "QC Control Organism",
                 })}
-                label="Select panel"
-                items={ANTIBIOTIC_PANELS}
-                itemToString={(item) => (item ? item.text : "")}
-                selectedItem={ANTIBIOTIC_PANELS.find(
-                  (p) => p.id === dstData.antibioticPanel,
-                )}
-                onChange={({ selectedItem }) =>
+                value={dstData.qcControlOrganism}
+                onChange={(e) =>
                   setDstData({
                     ...dstData,
-                    antibioticPanel: selectedItem?.id || "",
+                    qcControlOrganism: e.target.value,
+                  })
+                }
+                placeholder={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.dstQcControlOrganism.placeholder",
+                  defaultMessage: "e.g., E. coli ATCC 25922",
+                })}
+              />
+            </Column>
+            <Column lg={5} md={4} sm={4}>
+              <TextInput
+                id="dst-qc-performed-by"
+                labelText={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.dstQcPerformedBy",
+                  defaultMessage: "QC Performed By",
+                })}
+                value={dstData.qcPerformedBy}
+                onChange={(e) =>
+                  setDstData({
+                    ...dstData,
+                    qcPerformedBy: e.target.value,
                   })
                 }
               />
-              {dstData.antibioticPanel && (
-                <p
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#6f6f6f",
-                    marginTop: "0.25rem",
-                  }}
-                >
-                  {
-                    ANTIBIOTIC_PANELS.find(
-                      (p) => p.id === dstData.antibioticPanel,
-                    )?.description
-                  }
-                </p>
-              )}
+            </Column>
+            <Column lg={5} md={4} sm={4}>
+              <TextInput
+                id="dst-qc-date"
+                labelText={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.dstQcDate",
+                  defaultMessage: "QC Date",
+                })}
+                type="date"
+                value={dstData.qcDate}
+                onChange={(e) =>
+                  setDstData({
+                    ...dstData,
+                    qcDate: e.target.value,
+                  })
+                }
+              />
+            </Column>
+            <Column lg={16} md={8} sm={4}>
+              <TextArea
+                id="dst-qc-notes"
+                labelText={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.dstQcNotes",
+                  defaultMessage: "QC Notes",
+                })}
+                value={dstData.qcNotes}
+                onChange={(e) =>
+                  setDstData({
+                    ...dstData,
+                    qcNotes: e.target.value,
+                  })
+                }
+                rows={2}
+              />
             </Column>
           </Grid>
 
-          {/* Antibiotic Results Section - shown when method and panel are selected */}
-          {dstData.method && dstData.antibioticPanel && (
+          {/* Antibiotic Results Section - shown when method is selected */}
+          {dstData.method && (
             <div
               style={{
                 marginTop: "1rem",
@@ -6282,157 +6208,59 @@ function BacteriologyAssayTestExecutionPage({
                 borderRadius: "4px",
               }}
             >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <h6>
-                  <FormattedMessage
-                    id="notebook.bacteriology.assay.antibioticResults"
-                    defaultMessage="Antibiotic Results"
-                  />
-                  <span
-                    style={{
-                      fontSize: "0.75rem",
-                      color: "#6f6f6f",
-                      marginLeft: "0.5rem",
-                    }}
-                  >
-                    (
-                    {dstData.method === "DISC_DIFFUSION" &&
-                      "Measure zone of inhibition - Interpret as S/I/R per guidelines"}
-                    {dstData.method === "BROTH_MICRODILUTION" &&
-                      "Determine MIC - Quantitative result"}
-                    {dstData.method === "AST_STRIP" &&
-                      "E-test gradient - MIC determination"}
-                    {dstData.method === "AUTOMATED_AST" &&
-                      "Automated AST system results"}
-                    )
-                  </span>
-                </h6>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  renderIcon={Add}
-                  onClick={handleAddAntibioticResult}
-                >
-                  <FormattedMessage
-                    id="notebook.bacteriology.assay.addAntibiotic"
-                    defaultMessage="Add Antibiotic"
-                  />
-                </Button>
-              </div>
+              <BacteriologyAntibioticSelector
+                id="dst-antibiotic-list"
+                titleText={intl.formatMessage({
+                  id: "notebook.bacteriology.assay.antibioticResults",
+                  defaultMessage: "Antibiotic List",
+                })}
+                items={antibioticOptions}
+                selectedIds={antibioticResults.map(
+                  (result) => result.antibioticId,
+                )}
+                onSelectionChange={handleDstAntibioticSelectionChange}
+              />
 
-              {/* Column Headers - Always show Zone, MIC, and Interpretation */}
               {antibioticResults.length > 0 && (
-                <Grid fullWidth style={{ marginBottom: "0.25rem" }}>
-                  <Column lg={2} md={1} sm={1}>
-                    <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
-                      Panel
-                    </span>
-                  </Column>
-                  <Column lg={4} md={2} sm={1}>
+                <Grid fullWidth style={{ marginTop: "1rem" }}>
+                  <Column lg={6} md={3} sm={2}>
                     <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                       Antibiotic
                     </span>
                   </Column>
-                  <Column lg={2} md={1} sm={1}>
+                  <Column lg={3} md={2} sm={1}>
                     <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                       Zone (mm)
                     </span>
                   </Column>
-                  <Column lg={3} md={2} sm={1}>
+                  <Column lg={4} md={2} sm={1}>
                     <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
                       MIC (µg/mL)
-                    </span>
-                  </Column>
-                  <Column lg={3} md={2} sm={1}>
-                    <span style={{ fontSize: "0.75rem", fontWeight: "600" }}>
-                      Interpretation
                     </span>
                   </Column>
                   <Column lg={2} md={1} sm={1}></Column>
                 </Grid>
               )}
 
-              {/* Antibiotic Result Rows - Always show Zone, MIC, and Interpretation */}
               {antibioticResults.map((result, index) => (
                 <Grid
                   fullWidth
-                  key={index}
+                  key={result.antibioticId || index}
                   style={{ marginBottom: "0.5rem", alignItems: "flex-end" }}
                 >
-                  {/* Panel Type */}
-                  <Column lg={2} md={1} sm={1}>
-                    <Dropdown
-                      id={`antibiotic-panel-${index}`}
-                      label="Select"
-                      items={[
-                        { id: "1ST_LINE", text: "1st Line" },
-                        { id: "2ND_LINE", text: "2nd Line" },
-                      ]}
-                      itemToString={(item) => (item ? item.text : "")}
-                      selectedItem={
-                        result.panelType === "1ST_LINE"
-                          ? { id: "1ST_LINE", text: "1st Line" }
-                          : { id: "2ND_LINE", text: "2nd Line" }
-                      }
-                      onChange={({ selectedItem }) =>
-                        handleUpdateAntibioticResult(
-                          index,
-                          "panelType",
-                          selectedItem?.id || "1ST_LINE",
-                        )
-                      }
-                      size="sm"
-                    />
+                  <Column lg={6} md={3} sm={2}>
+                    <p style={{ margin: "0.5rem 0", fontSize: "0.875rem" }}>
+                      {findAntibioticOption(antibioticOptions, result)?.text ||
+                        result.antibiotic ||
+                        "—"}
+                    </p>
                   </Column>
 
-                  {/* Antibiotic Name */}
-                  <Column lg={4} md={2} sm={1}>
-                    <Dropdown
-                      id={`antibiotic-name-${index}`}
-                      label="Select"
-                      items={antibiotics.filter(
-                        (antibiotic) =>
-                          // Keep if it's the currently selected antibiotic for this row
-                          antibiotic.id === result.antibioticId ||
-                          // OR keep if it's not selected in any other row
-                          !antibioticResults.some(
-                            (r, i) =>
-                              i !== index && r.antibioticId === antibiotic.id,
-                          ),
-                      )}
-                      itemToString={(item) => (item ? item.text : "")}
-                      selectedItem={antibiotics.find(
-                        (a) => a.id === result.antibioticId,
-                      )}
-                      onChange={({ selectedItem }) => {
-                        handleUpdateAntibioticResult(
-                          index,
-                          "antibiotic",
-                          selectedItem?.text || "",
-                        );
-                        handleUpdateAntibioticResult(
-                          index,
-                          "antibioticId",
-                          selectedItem?.id || "",
-                        );
-                      }}
-                      disabled={loadingAntibiotics}
-                      size="sm"
-                    />
-                  </Column>
-
-                  {/* Zone Diameter - Always visible */}
-                  <Column lg={2} md={1} sm={1}>
+                  <Column lg={3} md={2} sm={1}>
                     <TextInput
                       id={`zone-diameter-${index}`}
                       labelText=" "
+                      hideLabel
                       value={result.zoneDiameter || ""}
                       onChange={(e) =>
                         handleUpdateAntibioticResult(
@@ -6443,16 +6271,15 @@ function BacteriologyAssayTestExecutionPage({
                       }
                       placeholder="mm"
                       size="sm"
-                      disabled={false}
                       type="number"
                     />
                   </Column>
 
-                  {/* MIC - Always visible */}
-                  <Column lg={3} md={2} sm={1}>
+                  <Column lg={4} md={2} sm={1}>
                     <TextInput
                       id={`mic-value-${index}`}
                       labelText=" "
+                      hideLabel
                       value={result.mic || ""}
                       onChange={(e) =>
                         handleUpdateAntibioticResult(
@@ -6463,33 +6290,9 @@ function BacteriologyAssayTestExecutionPage({
                       }
                       placeholder="µg/mL"
                       size="sm"
-                      disabled={false}
-                      type="text"
                     />
                   </Column>
 
-                  {/* Interpretation - S, I, R per CLSI/EUCAST */}
-                  <Column lg={3} md={2} sm={1}>
-                    <Dropdown
-                      id={`interpretation-${index}`}
-                      label="Select"
-                      items={SUSCEPTIBILITY_INTERPRETATION}
-                      itemToString={(item) => (item ? item.text : "")}
-                      selectedItem={SUSCEPTIBILITY_INTERPRETATION.find(
-                        (i) => i.id === result.interpretation,
-                      )}
-                      onChange={({ selectedItem }) =>
-                        handleUpdateAntibioticResult(
-                          index,
-                          "interpretation",
-                          selectedItem?.id || "",
-                        )
-                      }
-                      size="sm"
-                    />
-                  </Column>
-
-                  {/* Remove Button */}
                   <Column lg={2} md={1} sm={1}>
                     <Button
                       kind="ghost"
@@ -6509,11 +6312,12 @@ function BacteriologyAssayTestExecutionPage({
                     color: "#6f6f6f",
                     fontStyle: "italic",
                     textAlign: "center",
+                    marginTop: "1rem",
                   }}
                 >
                   <FormattedMessage
                     id="notebook.bacteriology.assay.noAntibioticsAdded"
-                    defaultMessage="No antibiotics added. Click 'Add Antibiotic' to record results."
+                    defaultMessage="Select one or more antibiotics from the list above."
                   />
                 </p>
               )}
@@ -8888,10 +8692,19 @@ function BacteriologyAssayTestExecutionPage({
         </div>
       </Modal>
 
-      {/* E-Signature Modals (rendered outside all other modals) */}
-      <ESignatureModal {...authoredSignatureModalProps} />
-      <ESignatureModal {...rejectedSignatureModalProps} />
-      <ESignatureModal {...completeSignatureModalProps} />
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

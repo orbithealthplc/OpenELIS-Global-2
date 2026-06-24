@@ -107,6 +107,7 @@ function BacteriologyReceptionVerificationPage({
   pageData,
   progress: _progress,
   onProgressUpdate,
+  onNextPage,
 }) {
   const intl = useIntl();
   const componentMounted = useRef(false);
@@ -793,8 +794,8 @@ function BacteriologyReceptionVerificationPage({
               {
                 key: "receivedBy",
                 header: intl.formatMessage({
-                  id: "notebook.grid.receivedBy",
-                  defaultMessage: "Received By",
+                  id: "notebook.bacteriology.checkedBy",
+                  defaultMessage: "Checked By",
                 }),
               },
               {
@@ -915,8 +916,8 @@ function BacteriologyReceptionVerificationPage({
               {
                 key: "receivedBy",
                 header: intl.formatMessage({
-                  id: "notebook.grid.receivedBy",
-                  defaultMessage: "Received By",
+                  id: "notebook.bacteriology.checkedBy",
+                  defaultMessage: "Checked By",
                 }),
               },
               {
@@ -1081,8 +1082,8 @@ function BacteriologyReceptionVerificationPage({
                 <TextInput
                   id="receivedBy"
                   labelText={intl.formatMessage({
-                    id: "notebook.bacteriology.receivedBy",
-                    defaultMessage: "Received By (Staff Name)",
+                    id: "notebook.bacteriology.checkedBy",
+                    defaultMessage: "Checked By",
                   })}
                   value={bulkApplyValues.receivedBy}
                   onChange={(e) =>
@@ -1092,8 +1093,8 @@ function BacteriologyReceptionVerificationPage({
                     }))
                   }
                   placeholder={intl.formatMessage({
-                    id: "notebook.bacteriology.receivedBy.placeholder",
-                    defaultMessage: "Enter staff name",
+                    id: "notebook.bacteriology.checkedBy.placeholder",
+                    defaultMessage: "Enter name",
                   })}
                 />
               </Column>
@@ -1377,6 +1378,20 @@ function BacteriologyReceptionVerificationPage({
           )}
         </div>
       </Modal>
+
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

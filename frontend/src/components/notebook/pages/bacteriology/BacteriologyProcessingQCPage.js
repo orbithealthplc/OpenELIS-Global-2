@@ -235,7 +235,12 @@ const getQCProgress = (qcData) => {
 };
 
 // QC Section Component for Media
-const MediaQCSection = ({ mediaType, qcData = {}, onQCUpdate }) => {
+const MediaQCSection = ({
+  mediaType,
+  qcData = {},
+  qcHistory = [],
+  onQCUpdate,
+}) => {
   const intl = useIntl();
 
   // Provide default QC data structure for simplified interface
@@ -448,11 +453,48 @@ const MediaQCSection = ({ mediaType, qcData = {}, onQCUpdate }) => {
           style={{ marginTop: "1rem" }}
         />
       )}
+
+      {qcHistory.length > 0 && (
+        <div
+          style={{
+            marginTop: "1rem",
+            padding: "0.75rem",
+            backgroundColor: "#ffffff",
+            borderRadius: "4px",
+            border: "1px solid #e0e0e0",
+          }}
+        >
+          <h6 style={{ marginBottom: "0.5rem", fontSize: "14px" }}>
+            <FormattedMessage
+              id="media.qc.history.title"
+              defaultMessage="QC History"
+            />
+          </h6>
+          <ul style={{ margin: 0, paddingLeft: "1.25rem", fontSize: "13px" }}>
+            {qcHistory.map((entry, index) => (
+              <li key={`${entry.recordedAt || entry.qcDate || index}-${index}`}>
+                <strong>{entry.qcStatus || "—"}</strong>
+                {entry.qcDate ? ` · ${entry.qcDate}` : ""}
+                {entry.recordedAt
+                  ? ` · ${new Date(entry.recordedAt).toLocaleString()}`
+                  : ""}
+                {entry.qcPerformedBy ? ` · ${entry.qcPerformedBy}` : ""}
+                {entry.qcNotes ? ` — ${entry.qcNotes}` : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };
 
-function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
+function BacteriologyProcessingQCPage({
+  entryId,
+  pageData,
+  onProgressUpdate,
+  onNextPage,
+}) {
   const intl = useIntl();
   const componentMounted = useRef(false);
 
@@ -476,12 +518,20 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
     cultureMediaQC: {
       // Format: [mediaId]: { sterilityTest: "PENDING", ... }
     },
+    // Culture Media QC History (append-only)
+    cultureMediaQCHistory: {
+      // Format: [mediaId]: [ { ...qcTests, recordedAt, recordedBy } ]
+    },
     // Biochemical Media Selection
     biochemicalMedia: [],
     biochemicalMediaBatch: "",
     // Biochemical Media QC - Object storing QC data for each media by ID
     biochemicalMediaQC: {
       // Format: [mediaId]: { sterilityTest: "PENDING", reactivityTest: "PENDING", ... }
+    },
+    // Biochemical Media QC History (append-only)
+    biochemicalMediaQCHistory: {
+      // Format: [mediaId]: [ { ...qcTests, recordedAt, recordedBy } ]
     },
     // Enrichment Media (optional)
     enrichmentMedia: "",
@@ -500,6 +550,8 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
       qcPerformedBy: "",
       qcDate: "",
     },
+    // Enrichment QC History (append-only)
+    enrichmentMediaQCHistory: [],
     // Incubation Settings
     incubationCondition: "",
     incubationDuration: "",
@@ -558,6 +610,24 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
   useEffect(() => {
     let dataRestored = false;
 
+    if (pageData?.content) {
+      try {
+        const parsedContent =
+          typeof pageData.content === "string"
+            ? JSON.parse(pageData.content)
+            : pageData.content;
+        if (parsedContent?.preparationData) {
+          setPreparationData((prev) => ({
+            ...prev,
+            ...parsedContent.preparationData,
+          }));
+          dataRestored = true;
+        }
+      } catch (parseError) {
+        console.error("Failed to parse page content for QC data:", parseError);
+      }
+    }
+
     if (pageData?.preparationData) {
       console.log("Restoring preparation data from pageData:", {
         hasQCData: !!(
@@ -613,6 +683,7 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
       }
     }
   }, [
+    pageData?.content,
     pageData?.preparationData,
     pageData?.samples,
     pageData?.id,
@@ -692,21 +763,26 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
     }
 
     const pageQCData = {
-      cultureMediaQC: preparationData.cultureMediaQC,
-      biochemicalMediaQC: preparationData.biochemicalMediaQC,
-      enrichmentMediaQC: preparationData.enrichmentMediaQC,
-      // Also save the complete preparation data for persistence
       ...preparationData,
-    };
-
-    // Also save current sample states for persistence
-    const saveData = {
-      preparationData: pageQCData,
-      samples: samples, // Save current sample states
+      // Explicitly include QC + QC history (append-only)
+      cultureMediaQC: preparationData.cultureMediaQC,
+      cultureMediaQCHistory: preparationData.cultureMediaQCHistory,
+      biochemicalMediaQC: preparationData.biochemicalMediaQC,
+      biochemicalMediaQCHistory: preparationData.biochemicalMediaQCHistory,
+      enrichmentMediaQC: preparationData.enrichmentMediaQC,
+      enrichmentMediaQCHistory: preparationData.enrichmentMediaQCHistory,
       lastUpdated: Date.now(),
     };
 
-    // QC data is now managed in React state only
+    // Persist page-level QC content for navigation durability.
+    // Backend merges content; we only ever append to history fields.
+    postToOpenElisServer(
+      `/rest/notebook/bulk/page/${pageData.id}/content`,
+      JSON.stringify({
+        content: JSON.stringify({ preparationData: pageQCData }),
+      }),
+      () => {},
+    );
   }, [preparationData, samples, hasRealPageId, pageData?.id]);
 
   // Auto-save QC data and samples with debounce
@@ -726,22 +802,67 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
       // Update the preparationData with the QC results
       setPreparationData((prev) => {
         let updateField;
+        let historyField;
         if (mediaType === "culture") {
           updateField = "cultureMediaQC";
+          historyField = "cultureMediaQCHistory";
         } else if (mediaType === "biochemical") {
           updateField = "biochemicalMediaQC";
+          historyField = "biochemicalMediaQCHistory";
         } else if (mediaType === "enrichment") {
           updateField = "enrichmentMediaQC";
+          historyField = "enrichmentMediaQCHistory";
         } else {
           console.error("Unknown media type:", mediaType);
           return prev;
         }
+
+        const recordedAt = new Date().toISOString();
+        const recordedBy =
+          qcTests?.qcPerformedBy ||
+          qcTests?.performedBy ||
+          qcTests?.checkedBy ||
+          "";
+
+        if (mediaType === "enrichment") {
+          const nextHistory = Array.isArray(prev.enrichmentMediaQCHistory)
+            ? [...prev.enrichmentMediaQCHistory]
+            : [];
+          nextHistory.push({
+            ...qcTests,
+            recordedAt,
+            recordedBy,
+            mediaId,
+            mediaName,
+          });
+          return {
+            ...prev,
+            enrichmentMediaQC: { ...prev.enrichmentMediaQC, ...qcTests },
+            enrichmentMediaQCHistory: nextHistory,
+          };
+        }
+
+        const existingHistory = prev[historyField]?.[mediaId];
+        const nextHistory = Array.isArray(existingHistory)
+          ? [...existingHistory]
+          : [];
+        nextHistory.push({
+          ...qcTests,
+          recordedAt,
+          recordedBy,
+          mediaId,
+          mediaName,
+        });
 
         return {
           ...prev,
           [updateField]: {
             ...prev[updateField],
             [mediaId]: qcTests,
+          },
+          [historyField]: {
+            ...prev[historyField],
+            [mediaId]: nextHistory,
           },
         };
       });
@@ -756,13 +877,16 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
 
   // Simple QC failure check - blocks assignment if any QC test fails
   const hasQCFailures = useMemo(() => {
-    const qcData = [
-      preparationData.cultureMediaQC,
-      preparationData.biochemicalMediaQC,
-      preparationData.enrichmentMediaQC,
-    ].filter((qc) => qc?.qcStatus === "FAILED");
+    const cultureFailed = Object.values(
+      preparationData.cultureMediaQC || {},
+    ).some((qc) => qc?.qcStatus === "FAILED");
+    const biochemicalFailed = Object.values(
+      preparationData.biochemicalMediaQC || {},
+    ).some((qc) => qc?.qcStatus === "FAILED");
+    const enrichmentFailed =
+      preparationData.enrichmentMediaQC?.qcStatus === "FAILED";
 
-    return qcData.length > 0;
+    return cultureFailed || biochemicalFailed || enrichmentFailed;
   }, [
     preparationData.cultureMediaQC,
     preparationData.biochemicalMediaQC,
@@ -926,22 +1050,51 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
       return;
     }
 
-    // Reset preparation data
-    setPreparationData({
-      cultureMedia: [],
-      cultureMediaBatch: "",
-      biochemicalMedia: [],
-      biochemicalMediaBatch: "",
-      enrichmentMedia: "",
-      enrichmentMediaBatch: "",
-      incubationCondition: "",
-      incubationDuration: "",
-      customDuration: "",
-      notes: "",
-    });
+    let pagePreparationData = null;
+    if (pageData?.content) {
+      try {
+        const parsedContent =
+          typeof pageData.content === "string"
+            ? JSON.parse(pageData.content)
+            : pageData.content;
+        pagePreparationData = parsedContent?.preparationData || null;
+      } catch (parseError) {
+        console.error(
+          "Failed to parse page content for preparation modal:",
+          parseError,
+        );
+      }
+    }
+
+    // Preserve page-level QC state and history when reopening the modal
+    setPreparationData((prev) => ({
+      ...prev,
+      ...(pagePreparationData || {}),
+      cultureMediaQCHistory:
+        pagePreparationData?.cultureMediaQCHistory ??
+        prev.cultureMediaQCHistory ??
+        {},
+      biochemicalMediaQCHistory:
+        pagePreparationData?.biochemicalMediaQCHistory ??
+        prev.biochemicalMediaQCHistory ??
+        {},
+      enrichmentMediaQCHistory:
+        pagePreparationData?.enrichmentMediaQCHistory ??
+        prev.enrichmentMediaQCHistory ??
+        [],
+      cultureMediaQC:
+        pagePreparationData?.cultureMediaQC ?? prev.cultureMediaQC ?? {},
+      biochemicalMediaQC:
+        pagePreparationData?.biochemicalMediaQC ??
+        prev.biochemicalMediaQC ??
+        {},
+      enrichmentMediaQC:
+        pagePreparationData?.enrichmentMediaQC ?? prev.enrichmentMediaQC,
+    }));
+
     setQcOutcomeChoice(null);
     setPreparationModalOpen(true);
-  }, [selectedIds, intl]);
+  }, [selectedIds, intl, pageData?.content]);
 
   const handleSavePreparationData = useCallback(() => {
     if (preparationData.cultureMedia.length === 0) {
@@ -2298,6 +2451,9 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
                   key={`culture-${media.id}-${index}`}
                   mediaType={media.text}
                   qcData={preparationData.cultureMediaQC?.[media.id] || {}}
+                  qcHistory={
+                    preparationData.cultureMediaQCHistory?.[media.id] || []
+                  }
                   onQCUpdate={(updatedQC) => {
                     setPreparationData((prev) => ({
                       ...prev,
@@ -2405,6 +2561,9 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
                   key={`biochemical-${media.id}-${index}`}
                   mediaType={media.text}
                   qcData={preparationData.biochemicalMediaQC?.[media.id] || {}}
+                  qcHistory={
+                    preparationData.biochemicalMediaQCHistory?.[media.id] || []
+                  }
                   onQCUpdate={(updatedQC) => {
                     setPreparationData((prev) => ({
                       ...prev,
@@ -2519,6 +2678,9 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
                     key={`enrichment-${selectedMedia.id}`}
                     mediaType={selectedMedia.text}
                     qcData={preparationData.enrichmentMediaQC || {}}
+                    qcHistory={(
+                      preparationData.enrichmentMediaQCHistory || []
+                    ).filter((entry) => entry.mediaId === selectedMedia.id)}
                     onQCUpdate={(updatedQC) => {
                       setPreparationData((prev) => ({
                         ...prev,
@@ -3413,6 +3575,20 @@ function BacteriologyProcessingQCPage({ entryId, pageData, onProgressUpdate }) {
           </div>
         </div>
       </Modal>
+
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

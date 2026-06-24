@@ -19,6 +19,11 @@ import {
 } from "../../../utils/Utils";
 import config from "../../../../config.json";
 import "../../workflow/NotebookWorkflow.css";
+import {
+  ESignatureModal,
+  SignatureMeaning,
+  useESign,
+} from "../../../esignature";
 
 /**
  * BacteriologyReportingDataExportPage - Page 8 of the Bacteriology workflow.
@@ -47,9 +52,11 @@ function BacteriologyReportingDataExportPage({
   progress,
   onProgressUpdate,
   notebookId,
+  onNextPage,
 }) {
   const intl = useIntl();
   const componentMounted = useRef(false);
+  const pendingAction = useRef(null);
 
   // Loading and notification state
   const [loading, setLoading] = useState(true);
@@ -255,6 +262,38 @@ function BacteriologyReportingDataExportPage({
     intl,
   ]);
 
+  // ==========================================
+  // Final-stage signature (Requirement: signature only here, before report)
+  // ==========================================
+  const handleSignAndContinue = useCallback(() => {
+    if (pendingAction.current) {
+      pendingAction.current();
+      pendingAction.current = null;
+    }
+  }, []);
+
+  const { openSignatureModal, signatureModalProps } = useESign({
+    meaning: SignatureMeaning.VALIDATED_AND_RELEASED,
+    context: intl.formatMessage({
+      id: "notebook.bacteriology.reporting.esig.context",
+      defaultMessage: "Sign to release bacteriology report",
+    }),
+    recordType: "NOTEBOOK_ENTRY",
+    recordId: entryId || 0,
+    onSuccess: handleSignAndContinue,
+    onCancel: () => {
+      pendingAction.current = null;
+    },
+  });
+
+  const requireFinalSignatureThen = useCallback(
+    (action) => {
+      pendingAction.current = action;
+      window.setTimeout(openSignatureModal, 0);
+    },
+    [openSignatureModal],
+  );
+
   return (
     <div className="bacteriology-reporting-data-export-page">
       {/* Page Header */}
@@ -403,7 +442,7 @@ function BacteriologyReportingDataExportPage({
             <Button
               kind="primary"
               renderIcon={Report}
-              onClick={handleGenerateReport}
+              onClick={() => requireFinalSignatureThen(handleGenerateReport)}
               disabled={isGeneratingReport}
             >
               {isGeneratingReport ? (
@@ -454,7 +493,9 @@ function BacteriologyReportingDataExportPage({
             <Button
               kind="tertiary"
               renderIcon={Archive}
-              onClick={() => setShowArchiveModal(true)}
+              onClick={() =>
+                requireFinalSignatureThen(() => setShowArchiveModal(true))
+              }
             >
               <FormattedMessage
                 id="notebook.bacteriology.reporting.archiveResultsBtn"
@@ -482,7 +523,7 @@ function BacteriologyReportingDataExportPage({
       <Modal
         open={showArchiveModal}
         onRequestClose={() => setShowArchiveModal(false)}
-        onRequestSubmit={handleArchiveResults}
+        onRequestSubmit={() => requireFinalSignatureThen(handleArchiveResults)}
         modalHeading={intl.formatMessage({
           id: "notebook.bacteriology.reporting.archiveModal",
           defaultMessage: "Archive Bacteriology Results",
@@ -560,6 +601,23 @@ function BacteriologyReportingDataExportPage({
           />
         </div>
       </Modal>
+
+      {/* Final-stage signature modal */}
+      <ESignatureModal {...signatureModalProps} />
+
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }

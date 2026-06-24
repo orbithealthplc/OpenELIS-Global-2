@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import {
   Grid,
   Column,
@@ -7,7 +7,6 @@ import {
   InlineNotification,
   NumberInput,
   TextInput,
-  Modal,
   Tag,
   Select,
   SelectItem,
@@ -22,166 +21,196 @@ import {
 import SampleGrid from "../../workflow/SampleGrid";
 import "../../workflow/NotebookWorkflow.css";
 
+const OTHER_ISOLATE_TYPE = "__OTHER__";
+
 /**
- * BacteriologyIsolateCreationPage - Page 4 of the Bacteriology workflow.
- * STAGE 4: Isolate Creation
- *
- * Process:
- * - Create bacterial isolates from parent samples
- * - Assign Unique Child Sample Identifier
- * - Link Child ID to Parent Sample ID in system
- * - Document isolate type and description
- *
- * @param {Object} props
- * @param {number} props.entryId - The notebook entry ID
- * @param {number} props.notebookId - The notebook ID (used for API calls)
- * @param {Object} props.pageData - The notebook page data
- * @param {Object} props.progress - Page progress
- * @param {function} props.onProgressUpdate - Callback when progress changes
+ * BacteriologyIsolateCreationPage - Stage 6: Isolate Creation
  */
 function BacteriologyIsolateCreationPage({
   entryId,
   notebookId,
   pageData,
-  progress,
   onProgressUpdate,
+  onNextPage,
 }) {
   const intl = useIntl();
   const componentMounted = useRef(false);
+  const formRestoredRef = useRef(false);
+  const samplesLoadedRef = useRef(false);
 
-  // State
   const [samples, setSamples] = useState([]);
   const [selectedParentIds, setSelectedParentIds] = useState([]);
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-
-  // Create modal state
-  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [sampleTypes, setSampleTypes] = useState([]);
   const [creating, setCreating] = useState(false);
 
-  // Isolate creation form values
   const [isolateData, setIsolateData] = useState({
-    // Number of isolates per parent
     numberOfIsolates: 1,
-
-    // Isolate identification
     externalIdPrefix: "BACT-ISO",
-    isolateType: "", // Parent's sample type (preselected)
-    isolateTypeFreeText: "", // Custom description
+    isolateType: "",
+    customIsolateType: "",
+    isolateTypeFreeText: "",
   });
-
-  // Load samples for this page
-  useEffect(() => {
-    componentMounted.current = true;
-    loadPageSamples();
-
-    return () => {
-      componentMounted.current = false;
-    };
-  }, [entryId, pageData?.id]);
-
-  const loadPageSamples = useCallback(() => {
-    if (!pageData?.id) {
-      setLoading(false);
-      return;
-    }
-
-    if (String(pageData.id).startsWith("default-")) {
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    getFromOpenElisServer(
-      `/rest/notebook/page/${pageData.id}/samples`,
-      (response) => {
-        if (componentMounted.current) {
-          if (response && Array.isArray(response)) {
-            const transformedSamples = response.map((sample) => ({
-              id: String(sample.id || sample.sampleItemId),
-              externalId: sample.externalId,
-              accessionNumber: sample.accessionNumber,
-              sampleType: sample.sampleType || sample.typeOfSample?.description,
-              collectionDate: sample.collectionDate,
-              status: sample.pageStatus || "PENDING",
-              // Hierarchy information
-              hasChildren: sample.hasChildren || false,
-              childAliquotCount: sample.childAliquotCount || 0,
-              isAliquot: sample.isAliquot || false,
-              nestingLevel: sample.nestingLevel || 0,
-              parentSampleItemId: sample.parentSampleItemId,
-              parentExternalId: sample.parentExternalId,
-              // Isolate data from JSONB (stored in notes field as JSON)
-              isolateTypeFreeText: (() => {
-                try {
-                  const metadata = sample.data?.notes
-                    ? JSON.parse(sample.data.notes)
-                    : null;
-                  return metadata?.isolateTypeFreeText || "";
-                } catch (e) {
-                  return "";
-                }
-              })(),
-            }));
-            setSamples(transformedSamples);
-          } else {
-            setSamples([]);
-          }
-          setLoading(false);
-        }
-      },
-    );
-  }, [pageData?.id]);
 
   const hasRealPageId =
     pageData?.id && !String(pageData.id).startsWith("default-");
 
-  // Reset form
-  const resetIsolateData = () => {
-    setIsolateData({
-      numberOfIsolates: 1,
-      externalIdPrefix: "BACT-ISO",
-      isolateType: "",
-      isolateTypeFreeText: "",
-    });
-  };
+  const parsePageFormState = useCallback(() => {
+    if (!pageData?.content) return null;
+    try {
+      const parsed =
+        typeof pageData.content === "string"
+          ? JSON.parse(pageData.content)
+          : pageData.content;
+      return parsed?.isolateWizard?.isolateData || parsed?.isolateForm || null;
+    } catch {
+      return null;
+    }
+  }, [pageData?.content]);
 
-  // Get parent sample type for preselecting isolate type
+  const saveFormState = useCallback(() => {
+    if (!hasRealPageId) return;
+    postToOpenElisServer(
+      `/rest/notebook/bulk/page/${pageData.id}/content`,
+      JSON.stringify({
+        content: JSON.stringify({ isolateForm: isolateData }),
+      }),
+      () => {},
+    );
+  }, [isolateData, hasRealPageId, pageData?.id]);
+
+  useEffect(() => {
+    if (formRestoredRef.current) return;
+    formRestoredRef.current = true;
+    const saved = parsePageFormState();
+    if (saved) {
+      setIsolateData((prev) => ({ ...prev, ...saved }));
+    }
+  }, [parsePageFormState]);
+
+  useEffect(() => {
+    if (!hasRealPageId || !formRestoredRef.current) return;
+    const timeoutId = setTimeout(saveFormState, 1200);
+    return () => clearTimeout(timeoutId);
+  }, [isolateData, saveFormState, hasRealPageId]);
+
+  const loadPageSamples = useCallback(
+    (options = {}) => {
+      const { silent = false, initial = false } = options;
+      if (!pageData?.id || String(pageData.id).startsWith("default-")) {
+        setLoading(false);
+        return;
+      }
+
+      if (!silent && initial) {
+        setLoading(true);
+      }
+      setError(null);
+
+      getFromOpenElisServer(
+        `/rest/notebook/page/${pageData.id}/samples`,
+        (response) => {
+          if (!componentMounted.current) return;
+          if (response && Array.isArray(response)) {
+            setSamples(
+              response.map((sample) => ({
+                id: String(sample.id || sample.sampleItemId),
+                externalId: sample.externalId,
+                accessionNumber: sample.accessionNumber,
+                sampleType:
+                  sample.sampleType || sample.typeOfSample?.description,
+                collectionDate: sample.collectionDate,
+                status: sample.pageStatus || "PENDING",
+                hasChildren: sample.hasChildren || false,
+                childAliquotCount: sample.childAliquotCount || 0,
+                isAliquot: sample.isAliquot || false,
+                nestingLevel: sample.nestingLevel || 0,
+                parentSampleItemId: sample.parentSampleItemId,
+                parentExternalId: sample.parentExternalId,
+                isolateTypeFreeText: (() => {
+                  try {
+                    const metadata = sample.data?.notes
+                      ? JSON.parse(sample.data.notes)
+                      : null;
+                    return metadata?.isolateTypeFreeText || "";
+                  } catch {
+                    return "";
+                  }
+                })(),
+              })),
+            );
+            samplesLoadedRef.current = true;
+          } else {
+            setSamples([]);
+          }
+          setLoading(false);
+        },
+      );
+    },
+    [pageData?.id],
+  );
+
+  useEffect(() => {
+    componentMounted.current = true;
+    loadPageSamples({ initial: !samplesLoadedRef.current });
+    return () => {
+      componentMounted.current = false;
+    };
+  }, [entryId, pageData?.id, loadPageSamples]);
+
+  useEffect(() => {
+    getFromOpenElisServer(
+      "/rest/notebook/bacteriology/sample-types",
+      (response) => {
+        if (componentMounted.current && response?.sampleTypes) {
+          setSampleTypes(response.sampleTypes);
+        }
+      },
+    );
+  }, []);
+
   const getParentSampleType = useCallback(() => {
     if (selectedParentIds.length === 0) return "";
-    const firstSelected = samples.find((s) => s.id === selectedParentIds[0]);
-    return firstSelected?.sampleType || "";
+    const first = samples.find((s) => s.id === selectedParentIds[0]);
+    return first?.sampleType || "";
   }, [selectedParentIds, samples]);
 
-  // Handle create modal open
-  const handleOpenCreateModal = useCallback(() => {
-    if (selectedParentIds.length === 0) {
-      setError(
-        intl.formatMessage({
-          id: "notebook.bacteriology.isolate.error.noSelection",
-          defaultMessage: "Please select at least one parent sample.",
-        }),
-      );
-      return;
+  const getEffectiveIsolateType = useCallback(() => {
+    if (isolateData.isolateType === OTHER_ISOLATE_TYPE) {
+      return isolateData.customIsolateType || "";
     }
+    return isolateData.isolateType || getParentSampleType();
+  }, [
+    isolateData.isolateType,
+    isolateData.customIsolateType,
+    getParentSampleType,
+  ]);
 
-    // Preselect isolate type as parent's sample type
+  // Default isolate type to parent sample type when parents are selected
+  useEffect(() => {
+    if (selectedParentIds.length === 0) return;
     const parentType = getParentSampleType();
-    setIsolateData((prev) => ({
-      ...prev,
-      isolateType: parentType,
-    }));
+    if (!parentType) return;
+    setIsolateData((prev) => {
+      if (prev.isolateType === OTHER_ISOLATE_TYPE) return prev;
+      if (!prev.isolateType) {
+        return { ...prev, isolateType: parentType };
+      }
+      return prev;
+    });
+  }, [selectedParentIds, getParentSampleType]);
 
-    setCreateModalOpen(true);
-  }, [selectedParentIds, intl, getParentSampleType]);
+  const canCreateIsolates =
+    selectedParentIds.length > 0 &&
+    Boolean(getEffectiveIsolateType()) &&
+    isolateData.numberOfIsolates >= 1 &&
+    Boolean(isolateData.externalIdPrefix);
 
-  // Handle create isolates
   const handleCreateIsolates = useCallback(() => {
-    if (selectedParentIds.length === 0 || !hasRealPageId) return;
+    if (!canCreateIsolates || !hasRealPageId) return;
 
     if (!notebookId) {
       setError(
@@ -196,18 +225,12 @@ function BacteriologyIsolateCreationPage({
     setCreating(true);
     setError(null);
 
-    // Build aliquot data for isolates
-    // Store isolate-specific data in notes field as JSON
+    const effectiveIsolateType = getEffectiveIsolateType();
     const isolateMetadata = {
-      isolateType: isolateData.isolateType,
+      isolateType: effectiveIsolateType,
       isolateTypeFreeText: isolateData.isolateTypeFreeText,
       parentSampleType: getParentSampleType(),
       createdDate: new Date().toISOString(),
-    };
-
-    const aliquotData = {
-      aliquotType: isolateData.isolateType,
-      notes: JSON.stringify(isolateMetadata),
     };
 
     postToOpenElisServerJsonResponse(
@@ -217,13 +240,14 @@ function BacteriologyIsolateCreationPage({
         childCountPerParent: isolateData.numberOfIsolates,
         externalIdPrefix: isolateData.externalIdPrefix,
         pageId: pageData?.id,
-        aliquotData: aliquotData,
+        aliquotData: {
+          aliquotType: effectiveIsolateType,
+          notes: JSON.stringify(isolateMetadata),
+        },
       }),
       (response) => {
         setCreating(false);
-        setCreateModalOpen(false);
-
-        if (response && response.success) {
+        if (response?.success) {
           setSuccess(
             intl.formatMessage(
               {
@@ -235,11 +259,8 @@ function BacteriologyIsolateCreationPage({
             ),
           );
           setSelectedParentIds([]);
-          resetIsolateData();
-          loadPageSamples();
-          if (onProgressUpdate) {
-            onProgressUpdate();
-          }
+          loadPageSamples({ silent: true });
+          onProgressUpdate?.();
         } else {
           setError(
             response?.error ||
@@ -252,31 +273,21 @@ function BacteriologyIsolateCreationPage({
       },
     );
   }, [
-    selectedParentIds,
+    canCreateIsolates,
     hasRealPageId,
     notebookId,
     isolateData,
     pageData?.id,
     intl,
+    selectedParentIds,
+    getEffectiveIsolateType,
+    getParentSampleType,
     loadPageSamples,
     onProgressUpdate,
-    getParentSampleType,
   ]);
 
-  // Bulk mark as completed (parents + their child isolates on this page)
   const handleBulkMarkCompleted = useCallback(() => {
-    if (selectedParentIds.length === 0) return;
-
-    if (!hasRealPageId) {
-      setError(
-        intl.formatMessage({
-          id: "notebook.bacteriology.isolate.error.noPage",
-          defaultMessage:
-            "Cannot update status: Page not properly initialized.",
-        }),
-      );
-      return;
-    }
+    if (selectedParentIds.length === 0 || !hasRealPageId) return;
 
     const selectedParentSet = new Set(selectedParentIds.map(String));
     const sampleIds = [
@@ -284,9 +295,7 @@ function BacteriologyIsolateCreationPage({
         samples
           .filter((s) => {
             const id = String(s.id);
-            if (selectedParentSet.has(id)) {
-              return true;
-            }
+            if (selectedParentSet.has(id)) return true;
             return (
               s.parentSampleItemId != null &&
               selectedParentSet.has(String(s.parentSampleItemId))
@@ -297,16 +306,11 @@ function BacteriologyIsolateCreationPage({
       ),
     ];
 
-    if (sampleIds.length === 0) {
-      return;
-    }
+    if (sampleIds.length === 0) return;
 
     postToOpenElisServer(
       `/rest/notebook/bulk/page/${pageData.id}/samples/status`,
-      JSON.stringify({
-        sampleIds,
-        status: "COMPLETED",
-      }),
+      JSON.stringify({ sampleIds, status: "COMPLETED" }),
       (status) => {
         if (status === 200) {
           setSuccess(
@@ -319,11 +323,9 @@ function BacteriologyIsolateCreationPage({
               { count: sampleIds.length },
             ),
           );
-          loadPageSamples();
+          loadPageSamples({ silent: true });
           setSelectedParentIds([]);
-          if (onProgressUpdate) {
-            onProgressUpdate();
-          }
+          onProgressUpdate?.();
         } else {
           setError(
             intl.formatMessage({
@@ -344,8 +346,6 @@ function BacteriologyIsolateCreationPage({
     onProgressUpdate,
   ]);
 
-  // Calculate stats
-  // Parent samples are root-level samples (not children of other samples)
   const parentSamples = samples.filter(
     (s) => !s.isAliquot && s.nestingLevel === 0,
   );
@@ -363,9 +363,14 @@ function BacteriologyIsolateCreationPage({
     0,
   );
 
+  const parentType = getParentSampleType();
+  const typeSelectValue =
+    isolateData.isolateType === OTHER_ISOLATE_TYPE
+      ? OTHER_ISOLATE_TYPE
+      : isolateData.isolateType || parentType || "";
+
   return (
     <div className="bacteriology-isolate-creation-page">
-      {/* Page Header */}
       <div className="page-section-header">
         <h4>
           <FormattedMessage
@@ -376,12 +381,11 @@ function BacteriologyIsolateCreationPage({
         <p className="page-description">
           <FormattedMessage
             id="notebook.page.bacteriology.isolateCreation.description"
-            defaultMessage="Create bacterial isolates from verified samples. Select parent samples and specify isolate type and number of isolates. Parent-child relationships are automatically linked in the system."
+            defaultMessage="Select parent samples, configure isolate details, and create isolates in one place."
           />
         </p>
       </div>
 
-      {/* Progress Summary */}
       <Grid fullWidth className="progress-section">
         <Column lg={16} md={8} sm={4}>
           <div className="progress-tiles">
@@ -434,72 +438,224 @@ function BacteriologyIsolateCreationPage({
         </Column>
       </Grid>
 
-      {/* Action Buttons */}
-      <div className="page-actions-bar">
-        <Button
-          kind="primary"
-          size="sm"
-          renderIcon={Add}
-          onClick={handleOpenCreateModal}
-          disabled={selectedParentIds.length === 0}
-        >
-          <FormattedMessage
-            id="notebook.page.bacteriology.isolateCreation.createIsolates"
-            defaultMessage="Create Isolates ({count} selected)"
-            values={{ count: selectedParentIds.length }}
-          />
-        </Button>
-
-        {selectedParentIds.length > 0 && (
-          <Button
-            kind="secondary"
-            size="sm"
-            renderIcon={Checkmark}
-            onClick={handleBulkMarkCompleted}
-          >
-            <FormattedMessage
-              id="notebook.page.bacteriology.isolateCreation.markComplete"
-              defaultMessage="Mark Processing Complete ({count})"
-              values={{ count: selectedParentIds.length }}
-            />
-          </Button>
-        )}
-
-        <Button
-          kind="tertiary"
-          size="sm"
-          renderIcon={Renew}
-          onClick={loadPageSamples}
-        >
-          <FormattedMessage
-            id="notebook.page.bacteriology.isolateCreation.refresh"
-            defaultMessage="Refresh"
-          />
-        </Button>
-      </div>
-
-      {/* Notifications */}
       {error && (
         <InlineNotification
           kind="error"
           title={error}
-          hideCloseButton={false}
           lowContrast
           onClose={() => setError(null)}
         />
       )}
-
       {success && (
         <InlineNotification
           kind="success"
           title={success}
-          hideCloseButton={false}
           lowContrast
           onClose={() => setSuccess(null)}
         />
       )}
 
-      {/* Parent Samples Table */}
+      {/* Single configuration panel */}
+      <Tile style={{ marginBottom: "1rem", padding: "1rem" }}>
+        <h5 style={{ marginBottom: "1rem" }}>
+          <FormattedMessage
+            id="notebook.bacteriology.isolate.configPanel"
+            defaultMessage="Isolate Configuration"
+          />
+        </h5>
+        <Grid narrow>
+          <Column lg={4} md={4} sm={4}>
+            <Select
+              id="isolate-type"
+              labelText={intl.formatMessage({
+                id: "notebook.bacteriology.isolate.type",
+                defaultMessage: "Isolate Type",
+              })}
+              value={typeSelectValue}
+              onChange={(e) => {
+                const value = e.target.value;
+                setIsolateData((prev) => ({
+                  ...prev,
+                  isolateType: value,
+                  ...(value !== OTHER_ISOLATE_TYPE
+                    ? { customIsolateType: "" }
+                    : {}),
+                }));
+              }}
+            >
+              {parentType ? (
+                <SelectItem
+                  value={parentType}
+                  text={intl.formatMessage(
+                    {
+                      id: "notebook.bacteriology.isolate.type.sameAsParent",
+                      defaultMessage: "Same as parent ({type})",
+                    },
+                    { type: parentType },
+                  )}
+                />
+              ) : (
+                <SelectItem
+                  value=""
+                  text={intl.formatMessage({
+                    id: "notebook.bacteriology.isolate.type.selectParentFirst",
+                    defaultMessage: "Select a parent sample first",
+                  })}
+                />
+              )}
+              <SelectItem
+                value={OTHER_ISOLATE_TYPE}
+                text={intl.formatMessage({
+                  id: "notebook.bacteriology.isolate.type.other",
+                  defaultMessage: "Other",
+                })}
+              />
+            </Select>
+          </Column>
+
+          {isolateData.isolateType === OTHER_ISOLATE_TYPE && (
+            <Column lg={4} md={4} sm={4}>
+              <Select
+                id="isolate-custom-type"
+                labelText={intl.formatMessage({
+                  id: "notebook.bacteriology.isolate.customType",
+                  defaultMessage: "Sample Type",
+                })}
+                value={isolateData.customIsolateType || ""}
+                onChange={(e) =>
+                  setIsolateData((prev) => ({
+                    ...prev,
+                    customIsolateType: e.target.value,
+                  }))
+                }
+              >
+                <SelectItem
+                  value=""
+                  text={intl.formatMessage({
+                    id: "notebook.bacteriology.isolate.customType.placeholder",
+                    defaultMessage: "Select sample type...",
+                  })}
+                />
+                {sampleTypes.map((st) => (
+                  <SelectItem
+                    key={st.id || st.description}
+                    value={st.description}
+                    text={st.description}
+                  />
+                ))}
+              </Select>
+            </Column>
+          )}
+
+          <Column lg={4} md={4} sm={4}>
+            <TextInput
+              id="isolate-description"
+              labelText={intl.formatMessage({
+                id: "notebook.bacteriology.isolate.typeFreeText",
+                defaultMessage: "Description (optional)",
+              })}
+              placeholder={intl.formatMessage({
+                id: "notebook.bacteriology.isolate.typeFreeText.placeholder",
+                defaultMessage: "e.g., E. coli Colony 1",
+              })}
+              value={isolateData.isolateTypeFreeText}
+              onChange={(e) =>
+                setIsolateData((prev) => ({
+                  ...prev,
+                  isolateTypeFreeText: e.target.value,
+                }))
+              }
+            />
+          </Column>
+
+          <Column lg={4} md={4} sm={4}>
+            <NumberInput
+              id="isolate-count"
+              label={intl.formatMessage({
+                id: "notebook.bacteriology.isolate.number",
+                defaultMessage: "Number of Isolates",
+              })}
+              value={isolateData.numberOfIsolates}
+              onChange={(e, { value }) =>
+                setIsolateData((prev) => ({
+                  ...prev,
+                  numberOfIsolates: value,
+                }))
+              }
+              min={1}
+              max={20}
+            />
+          </Column>
+
+          <Column lg={4} md={4} sm={4}>
+            <TextInput
+              id="isolate-prefix"
+              labelText={intl.formatMessage({
+                id: "notebook.bacteriology.isolate.prefix",
+                defaultMessage: "External ID Prefix",
+              })}
+              value={isolateData.externalIdPrefix}
+              onChange={(e) =>
+                setIsolateData((prev) => ({
+                  ...prev,
+                  externalIdPrefix: e.target.value,
+                }))
+              }
+            />
+          </Column>
+        </Grid>
+
+        <div className="page-actions-bar" style={{ marginTop: "1rem" }}>
+          <Button
+            kind="primary"
+            size="sm"
+            renderIcon={Add}
+            onClick={handleCreateIsolates}
+            disabled={!canCreateIsolates || creating}
+          >
+            {creating ? (
+              <FormattedMessage
+                id="notebook.creating"
+                defaultMessage="Creating..."
+              />
+            ) : (
+              <FormattedMessage
+                id="notebook.page.bacteriology.isolateCreation.createIsolates"
+                defaultMessage="Create Isolates ({count} selected)"
+                values={{ count: selectedParentIds.length }}
+              />
+            )}
+          </Button>
+
+          {selectedParentIds.length > 0 && (
+            <Button
+              kind="secondary"
+              size="sm"
+              renderIcon={Checkmark}
+              onClick={handleBulkMarkCompleted}
+            >
+              <FormattedMessage
+                id="notebook.page.bacteriology.isolateCreation.markComplete"
+                defaultMessage="Mark Processing Complete ({count})"
+                values={{ count: selectedParentIds.length }}
+              />
+            </Button>
+          )}
+
+          <Button
+            kind="tertiary"
+            size="sm"
+            renderIcon={Renew}
+            onClick={() => loadPageSamples({ silent: true })}
+          >
+            <FormattedMessage
+              id="notebook.page.bacteriology.isolateCreation.refresh"
+              defaultMessage="Refresh"
+            />
+          </Button>
+        </div>
+      </Tile>
+
       <div className="sample-table-section">
         <div className="table-section-header">
           <h5>
@@ -514,7 +670,7 @@ function BacteriologyIsolateCreationPage({
           <p className="table-section-description">
             <FormattedMessage
               id="notebook.page.bacteriology.isolateCreation.parentTable.description"
-              defaultMessage="Select parent samples to create bacterial isolates. Each isolate will be linked to its parent in the system."
+              defaultMessage="Select parent samples to create bacterial isolates."
             />
           </p>
         </div>
@@ -538,44 +694,21 @@ function BacteriologyIsolateCreationPage({
                 }),
                 render: (value, sample) => {
                   const nestingLevel = sample.nestingLevel || 0;
-                  const nestingIndent = nestingLevel * 16;
                   const hasChildren =
                     sample.hasChildren || sample.childAliquotCount > 0;
-
                   return (
                     <div style={{ display: "flex", alignItems: "center" }}>
                       {nestingLevel > 0 && (
-                        <span
-                          style={{
-                            marginLeft: `${nestingIndent}px`,
-                            marginRight: "4px",
-                          }}
-                        >
-                          {"└─"}
+                        <span style={{ marginLeft: `${nestingLevel * 16}px` }}>
+                          └─
                         </span>
                       )}
-                      <span
-                        style={{
-                          marginRight: "4px",
-                          fontSize: "16px",
-                        }}
-                      >
+                      <span style={{ marginRight: "4px" }}>
                         {hasChildren ? "📁" : "📄"}
                       </span>
                       {hasChildren && (
                         <span style={{ fontSize: "12px", color: "#525252" }}>
                           ({sample.childAliquotCount || 0})
-                        </span>
-                      )}
-                      {nestingLevel > 0 && sample.parentExternalId && (
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "#8d8d8d",
-                            marginLeft: "4px",
-                          }}
-                        >
-                          from {sample.parentExternalId}
                         </span>
                       )}
                     </div>
@@ -619,53 +752,13 @@ function BacteriologyIsolateCreationPage({
                 }),
                 render: (value) => {
                   const status = value || "PENDING";
-                  switch (status) {
-                    case "COMPLETED":
-                      return (
-                        <Tag type="green">
-                          <FormattedMessage
-                            id="notebook.status.completed"
-                            defaultMessage="Completed"
-                          />
-                        </Tag>
-                      );
-                    case "IN_PROGRESS":
-                      return (
-                        <Tag type="blue">
-                          <FormattedMessage
-                            id="notebook.status.inProgress"
-                            defaultMessage="In Progress"
-                          />
-                        </Tag>
-                      );
-                    case "SKIPPED":
-                      return (
-                        <Tag type="purple">
-                          <FormattedMessage
-                            id="notebook.status.skipped"
-                            defaultMessage="Skipped"
-                          />
-                        </Tag>
-                      );
-                    case "REJECTED":
-                      return (
-                        <Tag type="red">
-                          <FormattedMessage
-                            id="notebook.status.rejected"
-                            defaultMessage="Rejected"
-                          />
-                        </Tag>
-                      );
-                    default:
-                      return (
-                        <Tag type="gray">
-                          <FormattedMessage
-                            id="notebook.status.pending"
-                            defaultMessage="Pending"
-                          />
-                        </Tag>
-                      );
-                  }
+                  const tagType =
+                    status === "COMPLETED"
+                      ? "green"
+                      : status === "IN_PROGRESS"
+                        ? "blue"
+                        : "gray";
+                  return <Tag type={tagType}>{status}</Tag>;
                 },
               },
             ]}
@@ -673,7 +766,6 @@ function BacteriologyIsolateCreationPage({
         </div>
       </div>
 
-      {/* Empty state */}
       {!loading && samples.length === 0 && (
         <div className="empty-state">
           <p>
@@ -685,163 +777,19 @@ function BacteriologyIsolateCreationPage({
         </div>
       )}
 
-      {/* Create Isolates Modal */}
-      <Modal
-        open={createModalOpen}
-        modalHeading={intl.formatMessage({
-          id: "notebook.page.bacteriology.isolateCreation.modal.title",
-          defaultMessage: "Create Isolates",
-        })}
-        primaryButtonText={
-          creating
-            ? intl.formatMessage({
-                id: "notebook.creating",
-                defaultMessage: "Creating...",
-              })
-            : intl.formatMessage({
-                id: "notebook.page.bacteriology.isolateCreation.modal.create",
-                defaultMessage: "Create Isolates",
-              })
-        }
-        secondaryButtonText={intl.formatMessage({
-          id: "notebook.cancel",
-          defaultMessage: "Cancel",
-        })}
-        onRequestClose={() => {
-          setCreateModalOpen(false);
-          resetIsolateData();
-        }}
-        onRequestSubmit={handleCreateIsolates}
-        primaryButtonDisabled={creating}
-        size="md"
-      >
-        <div className="bulk-apply-modal-content">
-          <p className="modal-description">
-            <FormattedMessage
-              id="notebook.page.bacteriology.isolateCreation.modal.description"
-              defaultMessage="Creating isolates from {count} selected parent sample(s). Configure isolate details below."
-              values={{ count: selectedParentIds.length }}
-            />
-          </p>
-
-          <Grid narrow>
-            <Column lg={8} md={4} sm={4}>
-              <Select
-                id="isolateType"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.isolate.type",
-                  defaultMessage: "Isolate Type",
-                })}
-                value={isolateData.isolateType}
-                onChange={(e) =>
-                  setIsolateData((prev) => ({
-                    ...prev,
-                    isolateType: e.target.value,
-                  }))
-                }
-              >
-                <SelectItem
-                  value={getParentSampleType()}
-                  text={getParentSampleType()}
-                />
-              </Select>
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="isolateTypeFreeText"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.isolate.typeFreeText",
-                  defaultMessage: "Isolate Type Description",
-                })}
-                placeholder={intl.formatMessage({
-                  id: "notebook.bacteriology.isolate.typeFreeText.placeholder",
-                  defaultMessage: "e.g., E. coli Colony 1",
-                })}
-                value={isolateData.isolateTypeFreeText}
-                onChange={(e) =>
-                  setIsolateData((prev) => ({
-                    ...prev,
-                    isolateTypeFreeText: e.target.value,
-                  }))
-                }
-              />
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <NumberInput
-                id="numberOfIsolates"
-                label={intl.formatMessage({
-                  id: "notebook.bacteriology.isolate.number",
-                  defaultMessage: "Number of Isolates",
-                })}
-                value={isolateData.numberOfIsolates}
-                onChange={(e, { value }) =>
-                  setIsolateData((prev) => ({
-                    ...prev,
-                    numberOfIsolates: value,
-                  }))
-                }
-                min={1}
-                max={20}
-                step={1}
-              />
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="externalIdPrefix"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.isolate.prefix",
-                  defaultMessage: "External ID Prefix",
-                })}
-                value={isolateData.externalIdPrefix}
-                onChange={(e) =>
-                  setIsolateData((prev) => ({
-                    ...prev,
-                    externalIdPrefix: e.target.value,
-                  }))
-                }
-                helperText={intl.formatMessage(
-                  {
-                    id: "notebook.bacteriology.isolate.prefixHelp",
-                    defaultMessage:
-                      "Isolates will be named: {prefix}-{year}-{sequence}",
-                  },
-                  {
-                    prefix: isolateData.externalIdPrefix || "PREFIX",
-                    year: new Date().getFullYear(),
-                    sequence: "0001",
-                  },
-                )}
-              />
-            </Column>
-          </Grid>
-
-          <div
-            style={{
-              marginTop: "1rem",
-              padding: "1rem",
-              backgroundColor: "#f4f4f4",
-              borderRadius: "4px",
-            }}
-          >
-            <p style={{ fontWeight: "bold", marginBottom: "0.5rem" }}>
-              <FormattedMessage
-                id="notebook.bacteriology.isolate.summary"
-                defaultMessage="Summary"
-              />
-            </p>
-            <p>
-              <FormattedMessage
-                id="notebook.bacteriology.isolate.totalToCreate"
-                defaultMessage="Total isolates to create: {total}"
-                values={{
-                  total:
-                    selectedParentIds.length * isolateData.numberOfIsolates,
-                }}
-              />
-            </p>
-          </div>
+      {typeof onNextPage === "function" && (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            marginTop: "1rem",
+          }}
+        >
+          <Button kind="primary" onClick={onNextPage}>
+            <FormattedMessage id="label.next" defaultMessage="Next" />
+          </Button>
         </div>
-      </Modal>
+      )}
     </div>
   );
 }

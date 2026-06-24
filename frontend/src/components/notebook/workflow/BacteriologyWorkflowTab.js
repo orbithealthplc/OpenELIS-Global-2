@@ -37,10 +37,12 @@ import "./NotebookWorkflow.css";
  * Default workflow pages for Bacteriology workflow.
  * Page 1: Sample Reception (Manifest Import)
  * Page 2: Laboratory Reception & Verification (QC Assessment)
- * Page 3: Isolate Creation
- * Page 4: Temporary Storage Assignment
- * Page 5: Processing & Quality Control
- * Page 6: Assay/Test Execution
+ * Page 1: Sample Reception (Manifest Import)
+ * Page 2: Laboratory Reception & Verification (QC Assessment)
+ * Page 3: Temporary Storage Assignment
+ * Page 4: Processing & Quality Control
+ * Page 5: Assay/Test Execution
+ * Page 6: Isolate Creation
  * Page 7: Post-Analysis Storage
  * Page 8: Sample Retrieval, Archival & Disposal
  * Page 9: Reporting & Data Export
@@ -48,10 +50,10 @@ import "./NotebookWorkflow.css";
 const DEFAULT_BACTERIOLOGY_WORKFLOW_PAGES = [
   { id: "default-1", order: 1, title: "Sample Reception" },
   { id: "default-2", order: 2, title: "Laboratory Reception & Verification" },
-  { id: "default-3", order: 3, title: "Isolate Creation" },
-  { id: "default-4", order: 4, title: "Temporary Storage Assignment" },
-  { id: "default-5", order: 5, title: "Processing & Quality Control" },
-  { id: "default-6", order: 6, title: "Assay/Test Execution" },
+  { id: "default-3", order: 3, title: "Temporary Storage Assignment" },
+  { id: "default-4", order: 4, title: "Processing & Quality Control" },
+  { id: "default-5", order: 5, title: "Assay/Test Execution" },
+  { id: "default-6", order: 6, title: "Isolate Creation" },
   { id: "default-7", order: 7, title: "Post-Analysis Storage" },
   { id: "default-8", order: 8, title: "Sample Retrieval, Archival & Disposal" },
   { id: "default-9", order: 9, title: "Reporting & Data Export" },
@@ -114,6 +116,59 @@ function BacteriologyWorkflowTab({
     };
   }, []);
 
+  const loadPageProgress = useCallback(() => {
+    if (!entryId || !effectivePages || effectivePages.length === 0) {
+      return;
+    }
+
+    const realPages = effectivePages.filter(
+      (p) => p?.id && !String(p.id).startsWith("default-"),
+    );
+
+    if (realPages.length === 0) {
+      return;
+    }
+
+    Promise.all(
+      realPages.map((p) =>
+        fetch(
+          `${config.serverBaseUrl}/rest/notebook/bulk/page/${p.id}/progress`,
+          {
+            method: "GET",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRF-Token": localStorage.getItem("CSRF"),
+            },
+          },
+        )
+          .then((r) => (r.ok ? r.json() : null))
+          .then((data) => ({ pageId: p.id, data }))
+          .catch(() => ({ pageId: p.id, data: null })),
+      ),
+    ).then((results) => {
+      if (!componentMounted.current) return;
+      setPageProgress((prev) => {
+        const next = { ...prev };
+        results.forEach(({ pageId, data }) => {
+          if (!data) return;
+          const total = Number(data.total || 0);
+          const completed =
+            Number(data.completed || 0) + Number(data.skipped || 0);
+          const inProgress = Number(data.inProgress || 0);
+          const percentage =
+            typeof data.percentage === "number"
+              ? data.percentage
+              : total > 0
+                ? Math.round((completed / total) * 100)
+                : 0;
+          next[pageId] = { total, completed, inProgress, percentage };
+        });
+        return next;
+      });
+    });
+  }, [entryId, effectivePages]);
+
   const getProgressForPage = (pageId) => {
     const progress = pageProgress[pageId];
     if (!progress) {
@@ -124,7 +179,25 @@ function BacteriologyWorkflowTab({
 
   const handleProgressUpdate = useCallback(() => {
     refreshSamples();
-  }, [refreshSamples]);
+    loadPageProgress();
+    if (entryId) {
+      loadEntryData(entryId, { silent: true });
+    }
+  }, [refreshSamples, loadPageProgress, loadEntryData, entryId]);
+
+  useEffect(() => {
+    loadPageProgress();
+  }, [loadPageProgress]);
+
+  const goToNextAccessiblePage = useCallback(() => {
+    if (!effectivePages || effectivePages.length === 0) return;
+    for (let i = activePage + 1; i < effectivePages.length; i++) {
+      if (effectivePages[i]?.hasAccess) {
+        setActivePage(i);
+        return;
+      }
+    }
+  }, [activePage, effectivePages, setActivePage]);
 
   // Sync pages from template to instance (adds missing pages)
   const handleSyncPages = useCallback(() => {
@@ -214,6 +287,7 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
@@ -226,23 +300,12 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
       case 3:
-        // Page 3: Isolate Creation
-        return (
-          <BacteriologyIsolateCreationPage
-            key={`isolate-creation-${page.id}`}
-            entryId={entryId}
-            pageData={page}
-            progress={progress}
-            onProgressUpdate={handleProgressUpdate}
-            notebookId={notebook?.id}
-          />
-        );
-      case 4:
-        // Page 4: Temporary Storage Assignment
+        // Page 3: Temporary Storage Assignment
         return (
           <BacteriologyTemporaryStoragePage
             key={`storage-${page.id}`}
@@ -250,11 +313,12 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
-      case 5:
-        // Page 5: Processing & Quality Control
+      case 4:
+        // Page 4: Processing & Quality Control
         return (
           <BacteriologyProcessingQCPage
             key={`processing-qc-${page.id}`}
@@ -262,11 +326,12 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
-      case 6:
-        // Page 6: Assay/Test Execution
+      case 5:
+        // Page 5: Assay/Test Execution
         return (
           <BacteriologyAssayTestExecutionPage
             key={`assay-execution-${page.id}`}
@@ -274,6 +339,20 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
+            notebookId={notebook?.id}
+          />
+        );
+      case 6:
+        // Page 6: Isolate Creation
+        return (
+          <BacteriologyIsolateCreationPage
+            key={`isolate-creation-${page.id}`}
+            entryId={entryId}
+            pageData={page}
+            progress={progress}
+            onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
@@ -286,6 +365,7 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
@@ -298,6 +378,7 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
@@ -310,6 +391,7 @@ function BacteriologyWorkflowTab({
             pageData={page}
             progress={progress}
             onProgressUpdate={handleProgressUpdate}
+            onNextPage={goToNextAccessiblePage}
             notebookId={notebook?.id}
           />
         );
