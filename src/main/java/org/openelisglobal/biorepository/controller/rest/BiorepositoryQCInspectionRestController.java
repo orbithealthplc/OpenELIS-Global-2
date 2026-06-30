@@ -1,6 +1,8 @@
 package org.openelisglobal.biorepository.controller.rest;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,7 +14,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.openelisglobal.biorepository.controller.rest.dto.QcWorksheetExportRequest;
 import org.openelisglobal.biorepository.service.BioSampleService;
+import org.openelisglobal.biorepository.service.BiorepositoryExportService;
 import org.openelisglobal.biorepository.service.BiorepositoryQCInspectionService;
 import org.openelisglobal.biorepository.service.BiorepositoryQcRoundGenerationService;
 import org.openelisglobal.biorepository.service.BiorepositoryQcRoundPlanService;
@@ -26,6 +30,7 @@ import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.storage.service.StorageLocationService;
 import org.openelisglobal.test.service.TestSectionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +41,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * REST controller for Biorepository QC Inspection operations.
@@ -56,6 +62,9 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
 
     @Autowired
     private BiorepositoryQcRoundPlanService qcRoundPlanService;
+
+    @Autowired
+    private BiorepositoryExportService exportService;
 
     @Autowired
     private BiorepositoryQcSamplePoolService qcSamplePoolService;
@@ -275,6 +284,31 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
             Map<String, Object> errorBody = qcRoundGenerationService.toErrorBody(e);
             errorBody.put("includeInspected", includeAll);
             return ResponseEntity.badRequest().body(errorBody);
+        }
+    }
+
+    /**
+     * Export QC worksheet PDF for a generated round before inspections are saved.
+     */
+    @PostMapping(value = "/export-worksheet-pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public void exportWorksheetPdf(@RequestBody QcWorksheetExportRequest request, HttpServletResponse response)
+            throws IOException {
+        if (request == null || request.getQcBatchId() == null || request.getQcBatchId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qcBatchId is required");
+        }
+        try {
+            byte[] exportData = exportService.exportQcBatchWorksheetToPDF(request.getQcBatchId().trim(),
+                    request.getSamples());
+            response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+            response.setHeader("Content-Disposition",
+                    "inline; filename=\"biorepository_qc_worksheet_" + request.getQcBatchId().trim() + ".pdf\"");
+            response.setContentLength(exportData.length);
+            response.getOutputStream().write(exportData);
+            response.getOutputStream().flush();
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Export failed: " + e.getMessage(), e);
         }
     }
 

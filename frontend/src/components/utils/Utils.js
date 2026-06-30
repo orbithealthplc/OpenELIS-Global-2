@@ -254,32 +254,34 @@ export const postToOpenElisServerForBlob = (
 };
 
 export const postToOpenElisServerForPDF = (endPoint, payLoad, callback) => {
-  fetch(
-    config.serverBaseUrl + endPoint,
-
-    {
-      //includes the browser sessionId in the Header for Authentication on the backend server
-      credentials: "include",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": localStorage.getItem("CSRF"),
-      },
-      body: payLoad,
+  fetch(config.serverBaseUrl + endPoint, {
+    credentials: "include",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": localStorage.getItem("CSRF"),
     },
-  )
-    .then((response) => response.blob())
+    body: payLoad,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        return response.text().then((text) => {
+          throw new Error(text || `HTTP ${response.status}`);
+        });
+      }
+      return response.blob();
+    })
     .then((blob) => {
       callback(true, blob);
-      let link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob, { type: "application/pdf" });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
       link.target = "_blank";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     })
     .catch((error) => {
-      callback(false);
+      callback(false, error);
       console.error(error);
     });
 };

@@ -847,7 +847,7 @@ function BiorepositoryQCInspectionPage({
     }
 
     postToOpenElisServerForPDF(
-      "/rest/biorepository/qc/export/pdf/worksheet",
+      "/rest/biorepository/qc-inspection/export-worksheet-pdf",
       JSON.stringify({ qcBatchId, samples: worksheetSamples }),
       (success) => {
         if (!success) {
