@@ -1,6 +1,5 @@
 package org.openelisglobal.biorepository.service;
 
-import jakarta.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.itextpdf.text.Document;
@@ -13,6 +12,7 @@ import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -29,9 +29,9 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.openelisglobal.biorepository.valueholder.ChainOfCustodyLog;
 import org.openelisglobal.biorepository.valueholder.ChainOfCustodyLog.CustodyAction;
-import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +52,9 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
 
     @Autowired
     private BiorepositoryQCInspectionService qcInspectionService;
+
+    @Autowired
+    private BiorepositoryQcRoundPlanService qcRoundPlanService;
 
     private static final String CSV_SEPARATOR = ",";
     private static final String CSV_QUOTE = "\"";
@@ -223,30 +226,30 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
             Map<String, Object> qc = castMap(dashboardData.get("qcCompliance"));
             Map<String, Object> retrieval = castMap(dashboardData.get("retrievalStats"));
 
-            addMetricTable(document, "Storage Capacity", capacity, bodyFont, sectionFont, List.of(
-                    metricRow("Total Devices", capacity.get("totalDevices")),
-                    metricRow("Total Samples Stored", capacity.get("totalSamplesStored")),
-                    metricRow("Pending Storage", capacity.get("pendingStorage")),
-                    metricRow("Average Utilization %", capacity.get("averageUtilization"))));
+            addMetricTable(document, "Storage Capacity", capacity, bodyFont, sectionFont,
+                    List.of(metricRow("Total Devices", capacity.get("totalDevices")),
+                            metricRow("Total Samples Stored", capacity.get("totalSamplesStored")),
+                            metricRow("Pending Storage", capacity.get("pendingStorage")),
+                            metricRow("Average Utilization %", capacity.get("averageUtilization"))));
 
-            addMetricTable(document, "Sample Aging", aging, bodyFont, sectionFont, List.of(
-                    metricRow("Total Active Samples", aging.get("total")),
-                    metricRow("Expiring within 30 days", aging.get("expiring30Days")),
-                    metricRow("Expiring within 60 days", aging.get("expiring60Days")),
-                    metricRow("Expiring within 90 days", aging.get("expiring90Days")),
-                    metricRow("Expired Samples", aging.get("expired"))));
+            addMetricTable(document, "Sample Aging", aging, bodyFont, sectionFont,
+                    List.of(metricRow("Total Active Samples", aging.get("total")),
+                            metricRow("Expiring within 30 days", aging.get("expiring30Days")),
+                            metricRow("Expiring within 60 days", aging.get("expiring60Days")),
+                            metricRow("Expiring within 90 days", aging.get("expiring90Days")),
+                            metricRow("Expired Samples", aging.get("expired"))));
 
-            addMetricTable(document, "QC Compliance", qc, bodyFont, sectionFont, List.of(
-                    metricRow("Total Inspections", qc.get("totalInspections")),
-                    metricRow("Passed Inspections", qc.get("passedInspections")),
-                    metricRow("Failed Inspections", qc.get("failedInspections")),
-                    metricRow("Compliance Rate %", qc.get("complianceRate"))));
+            addMetricTable(document, "QC Compliance", qc, bodyFont, sectionFont,
+                    List.of(metricRow("Total Inspections", qc.get("totalInspections")),
+                            metricRow("Passed Inspections", qc.get("passedInspections")),
+                            metricRow("Failed Inspections", qc.get("failedInspections")),
+                            metricRow("Compliance Rate %", qc.get("complianceRate"))));
 
-            addMetricTable(document, "Retrieval Statistics", retrieval, bodyFont, sectionFont, List.of(
-                    metricRow("Total Requests", retrieval.get("totalRequests")),
-                    metricRow("Pending Requests", retrieval.get("pendingRequests")),
-                    metricRow("Rejected Requests", retrieval.get("rejectedRequests")),
-                    metricRow("Completed Requests", retrieval.get("completedRequests"))));
+            addMetricTable(document, "Retrieval Statistics", retrieval, bodyFont, sectionFont,
+                    List.of(metricRow("Total Requests", retrieval.get("totalRequests")),
+                            metricRow("Pending Requests", retrieval.get("pendingRequests")),
+                            metricRow("Rejected Requests", retrieval.get("rejectedRequests")),
+                            metricRow("Completed Requests", retrieval.get("completedRequests"))));
 
             document.close();
             return baos.toByteArray();
@@ -468,7 +471,8 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
             addHeaderCell(table, "Notes", headerFont);
 
             for (ChainOfCustodyLog log : logs) {
-                addBodyCell(table, log.getActionTimestamp() != null ? log.getActionTimestamp().toString() : "", bodyFont);
+                addBodyCell(table, log.getActionTimestamp() != null ? log.getActionTimestamp().toString() : "",
+                        bodyFont);
                 addBodyCell(table,
                         log.getSampleItem() != null && log.getSampleItem().getExternalId() != null
                                 ? log.getSampleItem().getExternalId()
@@ -508,19 +512,27 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
         PrintWriter writer = new PrintWriter(new OutputStreamWriter(baos, StandardCharsets.UTF_8));
         writer.println(
                 "QC Batch ID,Inspection ID,Date Time,Technician ID,Inspector Name,BioSample ID,Accession Number,Expected Coordinate,Observed Status,QC Outcome,Comment");
-        for (BiorepositoryQCInspection inspection : inspections) {
-            writer.println(String.join(CSV_SEPARATOR,
-                    escapeCSV(safe(inspection.getQcBatchId())),
-                    escapeCSV(String.valueOf(inspection.getId())),
-                    escapeCSV(inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : ""),
-                    escapeCSV(safe(inspection.getSysUserId())),
-                    escapeCSV(safe(inspection.getInspectorName())),
-                    escapeCSV(inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId()) : ""),
-                    escapeCSV(getAccessionNumber(inspection)),
-                    escapeCSV(buildExpectedCoordinate(inspection)),
-                    escapeCSV(buildObservedStatus(inspection)),
-                    escapeCSV(inspection.getQcResult() != null ? inspection.getQcResult().name() : ""),
-                    escapeCSV(safe(inspection.getRemarks()))));
+        if (!inspections.isEmpty()) {
+            for (BiorepositoryQCInspection inspection : inspections) {
+                writer.println(String.join(CSV_SEPARATOR, escapeCSV(safe(inspection.getQcBatchId())),
+                        escapeCSV(String.valueOf(inspection.getId())),
+                        escapeCSV(inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString()
+                                : ""),
+                        escapeCSV(safe(inspection.getSysUserId())), escapeCSV(safe(inspection.getInspectorName())),
+                        escapeCSV(inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId())
+                                : ""),
+                        escapeCSV(getAccessionNumber(inspection)), escapeCSV(buildExpectedCoordinate(inspection)),
+                        escapeCSV(buildObservedStatus(inspection)),
+                        escapeCSV(inspection.getQcResult() != null ? inspection.getQcResult().name() : ""),
+                        escapeCSV(safe(inspection.getRemarks()))));
+            }
+        } else {
+            for (Map<String, Object> sample : qcRoundPlanService.getRoundPlanSamples(qcBatchId)) {
+                writer.println(String.join(CSV_SEPARATOR, escapeCSV(qcBatchId), escapeCSV(""), escapeCSV(""),
+                        escapeCSV(""), escapeCSV(""), escapeCSV(String.valueOf(sample.get("bioSampleId"))),
+                        escapeCSV(planAccessionNumber(sample)), escapeCSV(buildPlannedCoordinate(sample)),
+                        escapeCSV("PENDING INSPECTION"), escapeCSV(""), escapeCSV("")));
+            }
         }
         writer.flush();
         return baos.toByteArray();
@@ -549,19 +561,39 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
         createCell(headerRow, 9, "QC Outcome", headerStyle);
         createCell(headerRow, 10, "Comment", headerStyle);
         int rowNum = 1;
-        for (BiorepositoryQCInspection inspection : inspections) {
-            Row row = sheet.createRow(rowNum++);
-            createCell(row, 0, safe(inspection.getQcBatchId()), null);
-            createCell(row, 1, String.valueOf(inspection.getId()), null);
-            createCell(row, 2, inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : "", null);
-            createCell(row, 3, safe(inspection.getSysUserId()), null);
-            createCell(row, 4, safe(inspection.getInspectorName()), null);
-            createCell(row, 5, inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId()) : "", null);
-            createCell(row, 6, getAccessionNumber(inspection), null);
-            createCell(row, 7, buildExpectedCoordinate(inspection), null);
-            createCell(row, 8, buildObservedStatus(inspection), null);
-            createCell(row, 9, inspection.getQcResult() != null ? inspection.getQcResult().name() : "", null);
-            createCell(row, 10, safe(inspection.getRemarks()), null);
+        if (!inspections.isEmpty()) {
+            for (BiorepositoryQCInspection inspection : inspections) {
+                Row row = sheet.createRow(rowNum++);
+                createCell(row, 0, safe(inspection.getQcBatchId()), null);
+                createCell(row, 1, String.valueOf(inspection.getId()), null);
+                createCell(row, 2,
+                        inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : "", null);
+                createCell(row, 3, safe(inspection.getSysUserId()), null);
+                createCell(row, 4, safe(inspection.getInspectorName()), null);
+                createCell(row, 5,
+                        inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId()) : "",
+                        null);
+                createCell(row, 6, getAccessionNumber(inspection), null);
+                createCell(row, 7, buildExpectedCoordinate(inspection), null);
+                createCell(row, 8, buildObservedStatus(inspection), null);
+                createCell(row, 9, inspection.getQcResult() != null ? inspection.getQcResult().name() : "", null);
+                createCell(row, 10, safe(inspection.getRemarks()), null);
+            }
+        } else {
+            for (Map<String, Object> sample : qcRoundPlanService.getRoundPlanSamples(qcBatchId)) {
+                Row row = sheet.createRow(rowNum++);
+                createCell(row, 0, qcBatchId, null);
+                createCell(row, 1, "", null);
+                createCell(row, 2, "", null);
+                createCell(row, 3, "", null);
+                createCell(row, 4, "", null);
+                createCell(row, 5, String.valueOf(sample.get("bioSampleId")), null);
+                createCell(row, 6, planAccessionNumber(sample), null);
+                createCell(row, 7, buildPlannedCoordinate(sample), null);
+                createCell(row, 8, "PENDING INSPECTION", null);
+                createCell(row, 9, "", null);
+                createCell(row, 10, "", null);
+            }
         }
         for (int i = 0; i <= 10; i++) {
             sheet.autoSizeColumn(i);
@@ -577,20 +609,40 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
     public byte[] exportQcBatchToJSON(String qcBatchId) throws IOException {
         List<BiorepositoryQCInspection> inspections = qcInspectionService.getByQcBatchId(qcBatchId);
         List<Map<String, Object>> rows = new ArrayList<>();
-        for (BiorepositoryQCInspection inspection : inspections) {
-            Map<String, Object> row = new HashMap<>();
-            row.put("qcBatchId", inspection.getQcBatchId());
-            row.put("inspectionId", inspection.getId());
-            row.put("inspectionDateTime", inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : null);
-            row.put("technicianId", inspection.getSysUserId());
-            row.put("inspectorName", inspection.getInspectorName());
-            row.put("bioSampleId", inspection.getBioSample() != null ? inspection.getBioSample().getId() : null);
-            row.put("accessionNumber", getAccessionNumber(inspection));
-            row.put("expectedCoordinate", buildExpectedCoordinate(inspection));
-            row.put("observedStatus", buildObservedStatus(inspection));
-            row.put("qcOutcome", inspection.getQcResult() != null ? inspection.getQcResult().name() : null);
-            row.put("comment", inspection.getRemarks());
-            rows.add(row);
+        if (!inspections.isEmpty()) {
+            for (BiorepositoryQCInspection inspection : inspections) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("qcBatchId", inspection.getQcBatchId());
+                row.put("inspectionId", inspection.getId());
+                row.put("inspectionDateTime",
+                        inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : null);
+                row.put("technicianId", inspection.getSysUserId());
+                row.put("inspectorName", inspection.getInspectorName());
+                row.put("bioSampleId", inspection.getBioSample() != null ? inspection.getBioSample().getId() : null);
+                row.put("accessionNumber", getAccessionNumber(inspection));
+                row.put("expectedCoordinate", buildExpectedCoordinate(inspection));
+                row.put("observedStatus", buildObservedStatus(inspection));
+                row.put("qcOutcome", inspection.getQcResult() != null ? inspection.getQcResult().name() : null);
+                row.put("comment", inspection.getRemarks());
+                rows.add(row);
+            }
+        } else {
+            for (Map<String, Object> sample : qcRoundPlanService.getRoundPlanSamples(qcBatchId)) {
+                Map<String, Object> row = new HashMap<>();
+                row.put("qcBatchId", qcBatchId);
+                row.put("inspectionId", null);
+                row.put("inspectionDateTime", null);
+                row.put("technicianId", null);
+                row.put("inspectorName", null);
+                row.put("bioSampleId", sample.get("bioSampleId"));
+                row.put("accessionNumber", planAccessionNumber(sample));
+                row.put("expectedCoordinate", buildPlannedCoordinate(sample));
+                row.put("observedStatus", "PENDING INSPECTION");
+                row.put("qcOutcome", null);
+                row.put("comment", null);
+                row.put("externalId", sample.get("externalId"));
+                rows.add(row);
+            }
         }
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
@@ -605,6 +657,11 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
     @Transactional(readOnly = true)
     public byte[] exportQcBatchToPDF(String qcBatchId) throws IOException {
         List<BiorepositoryQCInspection> inspections = qcInspectionService.getByQcBatchId(qcBatchId);
+        List<Map<String, Object>> plannedSamples = inspections.isEmpty()
+                ? qcRoundPlanService.getRoundPlanSamples(qcBatchId)
+                : List.of();
+        int recordCount = inspections.isEmpty() ? plannedSamples.size() : inspections.size();
+        boolean worksheetMode = inspections.isEmpty() && !plannedSamples.isEmpty();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document(PageSize.A4.rotate(), 24, 24, 24, 24);
             PdfWriter.getInstance(document, baos);
@@ -616,7 +673,11 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
             title.setAlignment(Element.ALIGN_CENTER);
             title.setSpacingAfter(8f);
             document.add(title);
-            document.add(new Paragraph("Records: " + inspections.size(), bodyFont));
+            if (worksheetMode) {
+                document.add(new Paragraph("Worksheet: samples selected for inspection (results not yet recorded)",
+                        bodyFont));
+            }
+            document.add(new Paragraph("Records: " + recordCount, bodyFont));
             document.add(new Paragraph("Generated: " + Timestamp.valueOf(java.time.LocalDateTime.now()), bodyFont));
             document.add(new Paragraph(" ", bodyFont));
             PdfPTable table = new PdfPTable(new float[] { 1.3f, 1.8f, 1.8f, 1.1f, 1.2f, 2.4f, 1.6f, 1.6f, 2.0f });
@@ -630,16 +691,36 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
             addHeaderCell(table, "Observed Status", headerFont);
             addHeaderCell(table, "QC Outcome", headerFont);
             addHeaderCell(table, "Comment", headerFont);
-            for (BiorepositoryQCInspection inspection : inspections) {
-                addBodyCell(table, String.valueOf(inspection.getId()), bodyFont);
-                addBodyCell(table, inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : "", bodyFont);
-                addBodyCell(table, safe(inspection.getSysUserId()), bodyFont);
-                addBodyCell(table, inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId()) : "", bodyFont);
-                addBodyCell(table, getAccessionNumber(inspection), bodyFont);
-                addBodyCell(table, buildExpectedCoordinate(inspection), bodyFont);
-                addBodyCell(table, buildObservedStatus(inspection), bodyFont);
-                addBodyCell(table, inspection.getQcResult() != null ? inspection.getQcResult().name() : "", bodyFont);
-                addBodyCell(table, safe(inspection.getRemarks()), bodyFont);
+            if (!inspections.isEmpty()) {
+                for (BiorepositoryQCInspection inspection : inspections) {
+                    addBodyCell(table, String.valueOf(inspection.getId()), bodyFont);
+                    addBodyCell(table,
+                            inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : "",
+                            bodyFont);
+                    addBodyCell(table, safe(inspection.getSysUserId()), bodyFont);
+                    addBodyCell(table,
+                            inspection.getBioSample() != null ? String.valueOf(inspection.getBioSample().getId()) : "",
+                            bodyFont);
+                    addBodyCell(table, getAccessionNumber(inspection), bodyFont);
+                    addBodyCell(table, buildExpectedCoordinate(inspection), bodyFont);
+                    addBodyCell(table, buildObservedStatus(inspection), bodyFont);
+                    addBodyCell(table, inspection.getQcResult() != null ? inspection.getQcResult().name() : "",
+                            bodyFont);
+                    addBodyCell(table, safe(inspection.getRemarks()), bodyFont);
+                }
+            } else {
+                int rowNumber = 1;
+                for (Map<String, Object> sample : plannedSamples) {
+                    addBodyCell(table, String.valueOf(rowNumber++), bodyFont);
+                    addBodyCell(table, "", bodyFont);
+                    addBodyCell(table, "", bodyFont);
+                    addBodyCell(table, String.valueOf(sample.get("bioSampleId")), bodyFont);
+                    addBodyCell(table, planAccessionNumber(sample), bodyFont);
+                    addBodyCell(table, buildPlannedCoordinate(sample), bodyFont);
+                    addBodyCell(table, "PENDING INSPECTION", bodyFont);
+                    addBodyCell(table, "", bodyFont);
+                    addBodyCell(table, planExternalId(sample), bodyFont);
+                }
             }
             document.add(table);
             document.close();
@@ -687,6 +768,52 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
             return "PASS";
         }
         return "FAIL" + (inspection.getDiscrepancyType() != null ? " - " + inspection.getDiscrepancyType().name() : "");
+    }
+
+    private String planAccessionNumber(Map<String, Object> sample) {
+        if (sample == null) {
+            return "";
+        }
+        Object accession = sample.get("accessionNumber");
+        return accession != null ? String.valueOf(accession) : "";
+    }
+
+    private String planExternalId(Map<String, Object> sample) {
+        if (sample == null) {
+            return "";
+        }
+        Object externalId = sample.get("externalId");
+        return externalId != null ? String.valueOf(externalId) : "";
+    }
+
+    private String buildPlannedCoordinate(Map<String, Object> sample) {
+        if (sample == null) {
+            return "";
+        }
+        String path = safe(asPlanString(sample.get("locationPath")));
+        if (path.isEmpty()) {
+            List<String> segments = new ArrayList<>();
+            for (String key : List.of("freezer", "shelf", "rack", "box")) {
+                String part = asPlanString(sample.get(key));
+                if (!part.isEmpty()) {
+                    segments.add(part);
+                }
+            }
+            path = String.join(" > ", segments);
+        }
+        String position = safe(asPlanString(sample.get("positionCoordinate")));
+        if (!path.isEmpty() && !position.isEmpty()) {
+            return path + " > " + position;
+        }
+        return !path.isEmpty() ? path : position;
+    }
+
+    private String asPlanString(Object value) {
+        if (value == null) {
+            return "";
+        }
+        String text = String.valueOf(value).trim();
+        return text.isEmpty() || "null".equalsIgnoreCase(text) ? "" : text;
     }
 
     /**
