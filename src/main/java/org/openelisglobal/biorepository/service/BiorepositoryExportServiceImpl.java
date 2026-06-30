@@ -657,11 +657,28 @@ public class BiorepositoryExportServiceImpl implements BiorepositoryExportServic
     @Transactional(readOnly = true)
     public byte[] exportQcBatchToPDF(String qcBatchId) throws IOException {
         List<BiorepositoryQCInspection> inspections = qcInspectionService.getByQcBatchId(qcBatchId);
-        List<Map<String, Object>> plannedSamples = inspections.isEmpty()
-                ? qcRoundPlanService.getRoundPlanSamples(qcBatchId)
-                : List.of();
-        int recordCount = inspections.isEmpty() ? plannedSamples.size() : inspections.size();
-        boolean worksheetMode = inspections.isEmpty() && !plannedSamples.isEmpty();
+        if (!inspections.isEmpty()) {
+            return buildQcBatchPdf(qcBatchId, inspections, List.of(), false);
+        }
+        List<Map<String, Object>> plannedSamples = qcRoundPlanService.getRoundPlanSamples(qcBatchId);
+        return buildQcBatchPdf(qcBatchId, List.of(), plannedSamples, !plannedSamples.isEmpty());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] exportQcBatchWorksheetToPDF(String qcBatchId, List<Map<String, Object>> samples) throws IOException {
+        List<BiorepositoryQCInspection> inspections = qcInspectionService.getByQcBatchId(qcBatchId);
+        if (!inspections.isEmpty()) {
+            return buildQcBatchPdf(qcBatchId, inspections, List.of(), false);
+        }
+        List<Map<String, Object>> plannedSamples = samples != null && !samples.isEmpty() ? samples
+                : qcRoundPlanService.getRoundPlanSamples(qcBatchId);
+        return buildQcBatchPdf(qcBatchId, List.of(), plannedSamples, !plannedSamples.isEmpty());
+    }
+
+    private byte[] buildQcBatchPdf(String qcBatchId, List<BiorepositoryQCInspection> inspections,
+            List<Map<String, Object>> plannedSamples, boolean worksheetMode) throws IOException {
+        int recordCount = !inspections.isEmpty() ? inspections.size() : plannedSamples.size();
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             Document document = new Document(PageSize.A4.rotate(), 24, 24, 24, 24);
             PdfWriter.getInstance(document, baos);

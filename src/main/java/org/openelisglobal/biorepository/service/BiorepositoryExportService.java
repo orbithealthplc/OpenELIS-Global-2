@@ -2,6 +2,8 @@ package org.openelisglobal.biorepository.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 import org.openelisglobal.biorepository.valueholder.ChainOfCustodyLog.CustodyAction;
 
 /**
@@ -135,4 +137,10 @@ public interface BiorepositoryExportService {
      * Export QC inspection records for a specific QC batch.
      */
     byte[] exportQcBatchToPDF(String qcBatchId) throws IOException;
+
+    /**
+     * Export QC worksheet PDF using in-request samples (before inspections are
+     * saved).
+     */
+    byte[] exportQcBatchWorksheetToPDF(String qcBatchId, List<Map<String, Object>> samples) throws IOException;
 }
