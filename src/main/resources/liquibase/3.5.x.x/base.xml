@@ -148,5 +148,7 @@
     <include file="liquibase/3.5.x.x/076-reorder-biorepository-retention-to-end.xml"/>
     <include file="liquibase/3.5.x.x/077-biorepository-storage-zone-labels.xml"/>
     <include file="liquibase/3.5.x.x/078-add-biosample-manifest-sno.xml"/>
+    <include file="liquibase/3.5.x.x/079-reorder-bacteriology-isolate-creation-page.xml"/>
+    <include file="liquibase/3.5.x.x/080-biorepository-qc-round-plan.xml"/>
 
 </databaseChangeLog>

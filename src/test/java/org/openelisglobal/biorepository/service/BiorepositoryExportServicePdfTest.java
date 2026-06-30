@@ -31,6 +31,12 @@ public class BiorepositoryExportServicePdfTest {
     @Mock
     private ChainOfCustodyService custodyService;
 
+    @Mock
+    private BiorepositoryQCInspectionService qcInspectionService;
+
+    @Mock
+    private BiorepositoryQcRoundPlanService qcRoundPlanService;
+
     @InjectMocks
     private BiorepositoryExportServiceImpl exportService;
 
@@ -80,6 +86,30 @@ public class BiorepositoryExportServicePdfTest {
         assertEqualsPdfSignature(prefix);
         String contentProbe = new String(bytes, StandardCharsets.ISO_8859_1);
         assertFalse(contentProbe.trim().startsWith("{"));
+    }
+
+    @Test
+    public void exportQcBatchToPDF_UsesRoundPlanWhenNoInspectionsYet() throws Exception {
+        when(qcInspectionService.getByQcBatchId("QCBATCH-TEST")).thenReturn(List.of());
+        Map<String, Object> sample = Map.of(
+                "bioSampleId", 42,
+                "accessionNumber", "ACC-42",
+                "externalId", "LAB-42",
+                "freezer", "Freezer-A",
+                "shelf", "Shelf-1",
+                "rack", "Rack-1",
+                "box", "Box-1",
+                "positionCoordinate", "A1");
+        when(qcRoundPlanService.getRoundPlanSamples("QCBATCH-TEST")).thenReturn(List.of(sample));
+
+        byte[] bytes = exportService.exportQcBatchToPDF("QCBATCH-TEST");
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 32);
+        String prefix = new String(bytes, 0, 5, StandardCharsets.ISO_8859_1);
+        assertEqualsPdfSignature(prefix);
+        when(qcRoundPlanService.getRoundPlanSamples("QCBATCH-EMPTY")).thenReturn(List.of());
+        byte[] emptyWorksheet = exportService.exportQcBatchToPDF("QCBATCH-EMPTY");
+        assertTrue("Planned worksheet should be larger than empty export", bytes.length > emptyWorksheet.length);
     }
 
     private void assertEqualsPdfSignature(String prefix) {
