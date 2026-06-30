@@ -112,6 +112,27 @@ public class BiorepositoryExportServicePdfTest {
         assertTrue("Planned worksheet should be larger than empty export", bytes.length > emptyWorksheet.length);
     }
 
+    @Test
+    public void exportQcBatchWorksheetToPDF_UsesRequestSamplesBeforeInspections() throws Exception {
+        when(qcInspectionService.getByQcBatchId("QCBATCH-TEST")).thenReturn(List.of());
+        Map<String, Object> sample = Map.of(
+                "bioSampleId", 42,
+                "accessionNumber", "ACC-42",
+                "externalId", "LAB-42",
+                "freezer", "Freezer-A",
+                "shelf", "Shelf-1",
+                "rack", "Rack-1",
+                "box", "Box-1",
+                "positionCoordinate", "A1");
+        when(qcRoundPlanService.getRoundPlanSamples("QCBATCH-TEST")).thenReturn(List.of());
+
+        byte[] bytes = exportService.exportQcBatchWorksheetToPDF("QCBATCH-TEST", List.of(sample));
+        assertNotNull(bytes);
+        assertTrue(bytes.length > 32);
+        String prefix = new String(bytes, 0, 5, StandardCharsets.ISO_8859_1);
+        assertEqualsPdfSignature(prefix);
+    }
+
     private void assertEqualsPdfSignature(String prefix) {
         assertTrue("Expected PDF signature but got: " + prefix, "%PDF-".equals(prefix));
     }

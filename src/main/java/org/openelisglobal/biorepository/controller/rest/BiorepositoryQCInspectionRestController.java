@@ -263,8 +263,13 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
                     ? (List<Map<String, Object>>) result.get("samples")
                     : List.of();
             enrichRoundPlanSamples(selectedSamples);
-            qcRoundPlanService.saveRoundPlan(String.valueOf(result.get("qcBatchId")), selectedSamples,
-                    getSysUserId(httpRequest));
+            try {
+                qcRoundPlanService.saveRoundPlan(String.valueOf(result.get("qcBatchId")), selectedSamples,
+                        getSysUserId(httpRequest));
+            } catch (RuntimeException persistError) {
+                result.put("planPersistWarning",
+                        "QC round plan could not be saved; print the worksheet before leaving this page.");
+            }
             return ResponseEntity.ok(result);
         } catch (IllegalArgumentException e) {
             Map<String, Object> errorBody = qcRoundGenerationService.toErrorBody(e);

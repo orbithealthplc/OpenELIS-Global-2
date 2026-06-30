@@ -5,13 +5,17 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import org.openelisglobal.biorepository.controller.rest.dto.QcWorksheetExportRequest;
 import org.openelisglobal.biorepository.service.BiorepositoryExportService;
 import org.openelisglobal.biorepository.valueholder.ChainOfCustodyLog.CustodyAction;
 import org.openelisglobal.common.rest.BaseRestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -235,6 +239,33 @@ public class BiorepositoryExportRestController extends BaseRestController {
             String filename = "biorepository_qc_batch_" + qcBatchId.trim() + "_" + timestamp + "." + fileExtension;
             response.setContentType(contentType);
             response.setHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+            response.setContentLength(exportData.length);
+            response.getOutputStream().write(exportData);
+            response.getOutputStream().flush();
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Export failed: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Export QC worksheet PDF using samples from the current generated round
+     * (before inspections are saved).
+     */
+    @PostMapping(value = "/qc/export/pdf/worksheet", produces = MediaType.APPLICATION_PDF_VALUE)
+    public void exportQcWorksheetPdf(@RequestBody QcWorksheetExportRequest request, HttpServletResponse response)
+            throws IOException {
+        if (request == null || request.getQcBatchId() == null || request.getQcBatchId().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "qcBatchId is required");
+        }
+        try {
+            byte[] exportData = exportService.exportQcBatchWorksheetToPDF(request.getQcBatchId().trim(),
+                    request.getSamples());
+            String timestamp = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE);
+            String filename = "biorepository_qc_batch_" + request.getQcBatchId().trim() + "_" + timestamp + ".pdf";
+            response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+            response.setHeader("Content-Disposition", "inline; filename=\"" + filename + "\"");
             response.setContentLength(exportData.length);
             response.getOutputStream().write(exportData);
             response.getOutputStream().flush();
