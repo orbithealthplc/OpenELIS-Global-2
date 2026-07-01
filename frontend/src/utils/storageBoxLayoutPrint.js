@@ -131,28 +131,61 @@ export function buildStorageBoxLayoutPrintHtml({
         ${bodyRows}
       </tbody>
     </table>
-    <script>
-      window.onload = function () {
-        window.print();
-        window.onafterprint = function () { window.close(); };
-      };
-    </script>
   </body>
 </html>`;
 }
 
-export function openStorageBoxLayoutPrintWindow(options) {
-  const html = buildStorageBoxLayoutPrintHtml(options);
-  const printWindow = window.open(
-    "",
-    "_blank",
-    "noopener,noreferrer,width=900,height=700",
-  );
-  if (!printWindow) {
+/**
+ * Print box layout via a hidden iframe (avoids pop-up blockers).
+ */
+export function printStorageBoxLayout(options) {
+  if (typeof document === "undefined") {
     return false;
   }
-  printWindow.document.open();
-  printWindow.document.write(html);
-  printWindow.document.close();
+
+  const html = buildStorageBoxLayoutPrintHtml(options);
+  const iframe = document.createElement("iframe");
+  iframe.setAttribute("title", "Storage box layout print");
+  iframe.setAttribute("aria-label", "Storage box layout print preview");
+  iframe.style.cssText =
+    "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden;";
+
+  const cleanup = () => {
+    if (iframe.parentNode) {
+      iframe.parentNode.removeChild(iframe);
+    }
+  };
+
+  document.body.appendChild(iframe);
+
+  const frameWindow = iframe.contentWindow;
+  const frameDocument = frameWindow?.document;
+  if (!frameWindow || !frameDocument) {
+    cleanup();
+    return false;
+  }
+
+  frameDocument.open();
+  frameDocument.write(html);
+  frameDocument.close();
+
+  const triggerPrint = () => {
+    frameWindow.focus();
+    frameWindow.print();
+    frameWindow.addEventListener("afterprint", cleanup, { once: true });
+    window.setTimeout(cleanup, 3000);
+  };
+
+  if (frameDocument.readyState === "complete") {
+    window.setTimeout(triggerPrint, 0);
+  } else {
+    iframe.onload = () => window.setTimeout(triggerPrint, 0);
+  }
+
   return true;
+}
+
+/** @deprecated Use printStorageBoxLayout — pop-ups are often blocked */
+export function openStorageBoxLayoutPrintWindow(options) {
+  return printStorageBoxLayout(options);
 }

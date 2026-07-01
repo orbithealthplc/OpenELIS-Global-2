@@ -38,7 +38,7 @@ import SampleGrid from "../../workflow/SampleGrid";
 import StorageHierarchySelector from "../../workflow/StorageHierarchySelector";
 import BoxLayoutViewer from "../../workflow/BoxLayoutViewer";
 import { autoPopulateEmptyWells } from "../../../../utils/storagePositionUtils";
-import { openStorageBoxLayoutPrintWindow } from "../../../../utils/storageBoxLayoutPrint";
+import { printStorageBoxLayout } from "../../../../utils/storageBoxLayoutPrint";
 import {
   deriveStoragePageStatus,
   getStorageLocationLabel,
@@ -739,7 +739,7 @@ function BiorepositoryStorageAssignmentPage({
       return;
     }
 
-    const opened = openStorageBoxLayoutPrintWindow({
+    printStorageBoxLayout({
       pathLabel: intl.formatMessage({
         id: "notebook.storage.path",
         defaultMessage: "Path:",
@@ -753,16 +753,6 @@ function BiorepositoryStorageAssignmentPage({
       positionSchemaHint:
         storageSelection.box.positionSchemaHint || "number-number",
     });
-
-    if (!opened) {
-      setError(
-        intl.formatMessage({
-          id: "biorepository.storage.printBlocked",
-          defaultMessage:
-            "Could not open the print window. Allow pop-ups for this site and try again.",
-        }),
-      );
-    }
   }, [intl, storageSelection, getCombinedLayout]);
 
   const handleConfirmReassignment = () => {
