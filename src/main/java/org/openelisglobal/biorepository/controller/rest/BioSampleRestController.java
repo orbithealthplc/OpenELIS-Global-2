@@ -67,6 +67,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -1752,53 +1753,48 @@ public class BioSampleRestController extends BaseRestController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        TransactionTemplate batchTransaction = new TransactionTemplate(transactionManager);
+        TransactionTemplate sampleTransaction = new TransactionTemplate(transactionManager);
+        sampleTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         Map<String, TypeOfSample> sampleTypeLookup = buildManifestSampleTypeLookup();
         AccessionNumberHandler accessionNumberHandler = new AccessionNumberHandler(sampleService, sampleDAO,
                 entityManager, BioSampleRestController.class);
         List<String> reservedAccessions = accessionNumberHandler.reserveAccessionNumbers(samples.size(),
                 AccessionNumberHandler.DEFAULT_MAX_ATTEMPTS);
 
-        batchTransaction.execute(status -> {
-            for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
-                SampleRegistrationDTO dto = samples.get(rowIndex);
-                Object savepoint = status.createSavepoint();
-                try {
-                    if (dto.getProjectId() != null && !dto.getProjectId().isBlank() && !departmentIsolationService
-                            .isInventoryProjectConsistent(departmentResult.departmentId, dto.getProjectId())) {
-                        String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
-                        String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
-                                : "Sample '" + sampleRef + "'";
-                        response.addRowError(prefix + ": Selected project belongs to a different department.");
-                        status.releaseSavepoint(savepoint);
-                        continue;
-                    }
+        for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
+            SampleRegistrationDTO dto = samples.get(rowIndex);
+            if (dto.getProjectId() != null && !dto.getProjectId().isBlank() && !departmentIsolationService
+                    .isInventoryProjectConsistent(departmentResult.departmentId, dto.getProjectId())) {
+                String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
+                String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample" : "Sample '" + sampleRef + "'";
+                response.addRowError(prefix + ": Selected project belongs to a different department.");
+                continue;
+            }
 
-                    String reservedAccession = rowIndex < reservedAccessions.size() ? reservedAccessions.get(rowIndex)
-                            : null;
-                    BulkRegistrationResponse.RegisteredSample registered = registerSingleSample(dto,
+            final int rowIndexFinal = rowIndex;
+            final String reservedAccession = rowIndex < reservedAccessions.size() ? reservedAccessions.get(rowIndex)
+                    : null;
+            try {
+                BulkRegistrationResponse.RegisteredSample registered = sampleTransaction.execute(status -> {
+                    BulkRegistrationResponse.RegisteredSample rowResult = registerSingleSample(dto,
                             request.getShipmentId(), sysUserId, departmentResult.departmentId, sampleTypeLookup,
                             accessionNumberHandler, reservedAccession);
-
-                    if (registered != null) {
-                        response.addSample(registered);
-                    } else {
-                        response.addRowError("Sample registration returned no result");
-                    }
-                    status.releaseSavepoint(savepoint);
-                } catch (Exception e) {
-                    status.rollbackToSavepoint(savepoint);
-                    String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
-                    String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
-                            : "Sample '" + sampleRef + "'";
-                    String detailedError = getRootCauseMessage(e);
-                    logger.error("Bulk manifest import failed for {}", prefix, e);
-                    response.addRowError(prefix + ": " + detailedError);
+                    entityManager.flush();
+                    return rowResult;
+                });
+                if (registered != null) {
+                    response.addSample(registered);
+                } else {
+                    response.addRowError("Sample registration returned no result");
                 }
+            } catch (Exception e) {
+                String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
+                String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample" : "Sample '" + sampleRef + "'";
+                String detailedError = getRootCauseMessage(e);
+                logger.error("Bulk manifest import failed for row {}", rowIndexFinal, e);
+                response.addRowError(prefix + ": " + detailedError);
             }
-            entityManager.flush();
-            return null;
-        });
+        }
 
         if (response.getRegisteredCount() == 0) {
             response.setSuccess(false);
