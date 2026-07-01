@@ -1,6 +1,8 @@
 package org.openelisglobal.sample.util;
 
 import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
 import org.openelisglobal.common.log.LogEvent;
 import org.openelisglobal.common.provider.validation.IAccessionNumberGenerator;
 import org.openelisglobal.sample.dao.SampleDAO;
@@ -227,6 +229,59 @@ public class AccessionNumberHandler {
      */
     public String generateAndInsertWithUniqueAccessionNumber(Sample sample) {
         return generateAndInsertWithUniqueAccessionNumber(sample, DEFAULT_MAX_ATTEMPTS);
+    }
+
+    /**
+     * Reserves a block of unique accession numbers under a single lock acquisition.
+     * Used by bulk manifest import to avoid per-row synchronization overhead.
+     *
+     * @param count       number of accession numbers to reserve
+     * @param maxAttempts maximum retry attempts per number
+     * @return list of reserved accession numbers (size may be less than count if
+     *         generation fails)
+     */
+    public List<String> reserveAccessionNumbers(int count, int maxAttempts) {
+        if (count <= 0) {
+            return List.of();
+        }
+
+        synchronized (ACCESSION_NUMBER_LOCK) {
+            List<String> reserved = new ArrayList<>(count);
+            for (int i = 0; i < count; i++) {
+                String generatedAccessionNumber = null;
+                int attempts = 0;
+
+                while (generatedAccessionNumber == null && attempts < maxAttempts) {
+                    String candidateNumber = getNextAccessionNumberInternal();
+                    Sample existingSample = sampleService.getSampleByAccessionNumber(candidateNumber);
+                    if (existingSample == null) {
+                        generatedAccessionNumber = candidateNumber;
+                    } else {
+                        attempts++;
+                    }
+                }
+
+                if (generatedAccessionNumber == null) {
+                    break;
+                }
+                reserved.add(generatedAccessionNumber);
+            }
+            return reserved;
+        }
+    }
+
+    /**
+     * Inserts a sample using a pre-reserved accession number (no lock re-entry).
+     *
+     * @param sample          sample to insert (must have sysUserId, enteredDate,
+     *                        receivedTimestamp set)
+     * @param accessionNumber pre-reserved unique accession number
+     * @return database ID of inserted sample
+     */
+    public String insertSampleWithAccessionNumber(Sample sample, String accessionNumber) {
+        sample.setAccessionNumber(accessionNumber);
+        sampleService.insertDataWithAccessionNumber(sample);
+        return sample.getId();
     }
 
     /**

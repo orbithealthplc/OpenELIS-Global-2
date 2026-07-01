@@ -31,6 +31,10 @@ public class BioSampleListDTO {
     private String accessionNumber;
     private BigDecimal requiredTempMin;
     private BigDecimal requiredTempMax;
+    private String consentId;
+    private String specialHandling;
+    private String externalId;
+    private Integer manifestSno;
 
     // Retention policy fields
     private Integer retentionPolicyId;
@@ -226,6 +230,38 @@ public class BioSampleListDTO {
 
     public void setRequiredTempMax(BigDecimal requiredTempMax) {
         this.requiredTempMax = requiredTempMax;
+    }
+
+    public String getConsentId() {
+        return consentId;
+    }
+
+    public void setConsentId(String consentId) {
+        this.consentId = consentId;
+    }
+
+    public String getSpecialHandling() {
+        return specialHandling;
+    }
+
+    public void setSpecialHandling(String specialHandling) {
+        this.specialHandling = specialHandling;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    public Integer getManifestSno() {
+        return manifestSno;
+    }
+
+    public void setManifestSno(Integer manifestSno) {
+        this.manifestSno = manifestSno;
     }
 
     public Integer getRetentionPolicyId() {

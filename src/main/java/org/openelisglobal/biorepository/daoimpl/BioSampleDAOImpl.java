@@ -131,16 +131,45 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
         }
 
         Session session = entityManager.unwrap(Session.class);
-        String hql = "SELECT DISTINCT bs FROM BioSample bs "
-                + "LEFT JOIN FETCH bs.shipment "
-                + "LEFT JOIN FETCH bs.sampleItem si "
-                + "LEFT JOIN FETCH si.typeOfSample "
-                + "LEFT JOIN FETCH si.sample "
-                + "WHERE bs.workflowStatus = :workflowStatus "
-                + "ORDER BY bs.id DESC";
-        return session.createQuery(hql, BioSample.class)
-            .setParameter("workflowStatus", workflowStatus)
-                .getResultList();
+        String hql = "SELECT DISTINCT bs FROM BioSample bs " + "LEFT JOIN FETCH bs.shipment "
+                + "LEFT JOIN FETCH bs.sampleItem si " + "LEFT JOIN FETCH si.typeOfSample "
+                + "LEFT JOIN FETCH si.sample " + buildWorkflowStatusWhereClause(workflowStatus)
+                + " ORDER BY bs.manifestSno ASC NULLS LAST, bs.id ASC";
+        return session.createQuery(hql, BioSample.class).setParameter("workflowStatus", workflowStatus).getResultList();
+    }
+
+    @Override
+    public List<BioSample> getByWorkflowStatusWithRelationshipsPaginated(WorkflowStatus workflowStatus, int offset,
+            int limit) {
+        if (workflowStatus == null || limit <= 0) {
+            return List.of();
+        }
+
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "SELECT DISTINCT bs FROM BioSample bs " + "LEFT JOIN FETCH bs.shipment "
+                + "LEFT JOIN FETCH bs.sampleItem si " + "LEFT JOIN FETCH si.typeOfSample "
+                + "LEFT JOIN FETCH si.sample " + buildWorkflowStatusWhereClause(workflowStatus)
+                + " ORDER BY bs.manifestSno ASC NULLS LAST, bs.id ASC";
+        return session.createQuery(hql, BioSample.class).setParameter("workflowStatus", workflowStatus)
+                .setFirstResult(Math.max(offset, 0)).setMaxResults(limit).getResultList();
+    }
+
+    @Override
+    public long countByWorkflowStatus(WorkflowStatus workflowStatus) {
+        if (workflowStatus == null) {
+            return 0L;
+        }
+
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "SELECT COUNT(DISTINCT bs.id) FROM BioSample bs " + buildWorkflowStatusWhereClause(workflowStatus);
+        return session.createQuery(hql, Long.class).setParameter("workflowStatus", workflowStatus).getSingleResult();
+    }
+
+    private String buildWorkflowStatusWhereClause(WorkflowStatus workflowStatus) {
+        if (workflowStatus == WorkflowStatus.REGISTERED) {
+            return "WHERE (bs.workflowStatus = :workflowStatus OR bs.workflowStatus IS NULL) ";
+        }
+        return "WHERE bs.workflowStatus = :workflowStatus ";
     }
 
     @Override
@@ -253,7 +282,8 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
 
         Query<BioSample> query = session.createQuery(hql.toString(), BioSample.class);
         if (criteria.getWorkflowStatus() != null) {
-            // Bind as string to avoid PostgreSQL "character varying = bytea" on enum parameters
+            // Bind as string to avoid PostgreSQL "character varying = bytea" on enum
+            // parameters
             query.setParameter("workflowStatus", criteria.getWorkflowStatus().name());
         }
         if (criteria.getIdentityPattern() != null) {

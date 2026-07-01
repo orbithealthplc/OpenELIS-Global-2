@@ -121,6 +121,26 @@ public interface BioSampleDAO extends BaseDAO<BioSample, Integer> {
     List<BioSample> getByWorkflowStatusWithRelationships(WorkflowStatus workflowStatus);
 
     /**
+     * Get BioSamples by workflow status with pagination, ordered by manifest serial
+     * number then id.
+     *
+     * @param workflowStatus workflow status filter
+     * @param offset         zero-based offset
+     * @param limit          maximum rows
+     * @return list of bio samples with relationships loaded
+     */
+    List<BioSample> getByWorkflowStatusWithRelationshipsPaginated(WorkflowStatus workflowStatus, int offset, int limit);
+
+    /**
+     * Count BioSamples by workflow status (includes null status as REGISTERED when
+     * filtering for REGISTERED).
+     *
+     * @param workflowStatus workflow status filter
+     * @return total matching count
+     */
+    long countByWorkflowStatus(WorkflowStatus workflowStatus);
+
+    /**
      * Get samples expiring within a specified number of days.
      *
      * @param expiryDate the cutoff date (today + daysWindow)
