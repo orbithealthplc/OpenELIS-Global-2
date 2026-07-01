@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import {
   Grid,
   Column,
@@ -430,6 +436,7 @@ function StorageHierarchySelector({
         shelf: selectedShelf,
         rack: selectedRack,
         box: selectedBox,
+        hierarchicalPath: getHierarchicalPath(),
       });
     }
     // Note: onSelectionChange is intentionally not in dependencies to avoid infinite loops
@@ -438,7 +445,9 @@ function StorageHierarchySelector({
 
   const loadRooms = () => {
     clearHierarchyNotice();
-    const endpoint = buildScopedStorageEndpoint("/rest/storage/rooms?status=active");
+    const endpoint = buildScopedStorageEndpoint(
+      "/rest/storage/rooms?status=active",
+    );
     beginHierarchyLoad();
     getFromOpenElisServer(endpoint, (response, error) => {
       endHierarchyLoad();
@@ -815,7 +824,11 @@ function StorageHierarchySelector({
           </Column>
         </Grid>
       )}
-      <Grid fullWidth narrow style={biorepositoryOnly ? { marginTop: "0.5rem" } : undefined}>
+      <Grid
+        fullWidth
+        narrow
+        style={biorepositoryOnly ? { marginTop: "0.5rem" } : undefined}
+      >
         <Column lg={8} md={4} sm={4}>
           <Dropdown
             id="room-dropdown"
@@ -829,7 +842,9 @@ function StorageHierarchySelector({
               id: biorepositoryOnly
                 ? "biorepository.storage.selectZone"
                 : "notebook.storage.selectRoom",
-              defaultMessage: biorepositoryOnly ? "Select zone..." : "Select room...",
+              defaultMessage: biorepositoryOnly
+                ? "Select zone..."
+                : "Select room...",
             })}
             items={rooms}
             itemToString={(item) => (item ? item.label : "")}

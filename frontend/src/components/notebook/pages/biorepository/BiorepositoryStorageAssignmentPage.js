@@ -38,6 +38,7 @@ import SampleGrid from "../../workflow/SampleGrid";
 import StorageHierarchySelector from "../../workflow/StorageHierarchySelector";
 import BoxLayoutViewer from "../../workflow/BoxLayoutViewer";
 import { autoPopulateEmptyWells } from "../../../../utils/storagePositionUtils";
+import { openStorageBoxLayoutPrintWindow } from "../../../../utils/storageBoxLayoutPrint";
 import {
   deriveStoragePageStatus,
   getStorageLocationLabel,
@@ -716,6 +717,54 @@ function BiorepositoryStorageAssignmentPage({
     fetchBioSampleData(sampleItemIds);
   };
 
+  const getCombinedLayout = useCallback(() => {
+    const combined = { ...boxLayout };
+
+    Object.entries(wellAssignments).forEach(([sampleId, wellCoord]) => {
+      if (!combined[wellCoord]) {
+        const sample = samples.find((s) => s.id === sampleId);
+        combined[wellCoord] = {
+          sampleItemId: sampleId,
+          externalId: sample?.externalId || sampleId,
+          pending: true,
+        };
+      }
+    });
+
+    return combined;
+  }, [boxLayout, wellAssignments, samples]);
+
+  const handlePrintStorageLayout = useCallback(() => {
+    if (!storageSelection.box) {
+      return;
+    }
+
+    const opened = openStorageBoxLayoutPrintWindow({
+      pathLabel: intl.formatMessage({
+        id: "notebook.storage.path",
+        defaultMessage: "Path:",
+      }),
+      path: storageSelection.hierarchicalPath || "",
+      boxId: storageSelection.box.id,
+      boxLabel: storageSelection.box.label,
+      layout: getCombinedLayout(),
+      rows: storageSelection.box.rows || 9,
+      columns: storageSelection.box.columns || 9,
+      positionSchemaHint:
+        storageSelection.box.positionSchemaHint || "number-number",
+    });
+
+    if (!opened) {
+      setError(
+        intl.formatMessage({
+          id: "biorepository.storage.printBlocked",
+          defaultMessage:
+            "Could not open the print window. Allow pop-ups for this site and try again.",
+        }),
+      );
+    }
+  }, [intl, storageSelection, getCombinedLayout]);
+
   const handleConfirmReassignment = () => {
     setConfirmReassignModalOpen(false);
     openStorageAssignmentModal(true);
@@ -766,24 +815,6 @@ function BiorepositoryStorageAssignmentPage({
         ),
       );
     }
-  };
-
-  // Build combined layout for visualization
-  const getCombinedLayout = () => {
-    const combined = { ...boxLayout };
-
-    Object.entries(wellAssignments).forEach(([sampleId, wellCoord]) => {
-      if (!combined[wellCoord]) {
-        const sample = samples.find((s) => s.id === sampleId);
-        combined[wellCoord] = {
-          sampleItemId: sampleId,
-          externalId: sample?.externalId || sampleId,
-          pending: true,
-        };
-      }
-    });
-
-    return combined;
   };
 
   // Handle bulk storage assignment
@@ -1461,6 +1492,7 @@ function BiorepositoryStorageAssignmentPage({
             {storageSelection.box ? (
               <div>
                 <div
+                  className="storage-box-print-toolbar"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
@@ -1491,7 +1523,7 @@ function BiorepositoryStorageAssignmentPage({
                     kind="ghost"
                     size="sm"
                     renderIcon={Printer}
-                    onClick={() => window.print()}
+                    onClick={handlePrintStorageLayout}
                   >
                     <FormattedMessage
                       id="biorepository.storage.printLayout"
@@ -1501,6 +1533,17 @@ function BiorepositoryStorageAssignmentPage({
                 </div>
 
                 <div id="storage-box-print-area">
+                  {storageSelection.hierarchicalPath ? (
+                    <div className="storage-box-print-path">
+                      <strong>
+                        <FormattedMessage
+                          id="notebook.storage.path"
+                          defaultMessage="Path:"
+                        />
+                      </strong>{" "}
+                      {storageSelection.hierarchicalPath}
+                    </div>
+                  ) : null}
                   <BoxLayoutViewer
                     boxId={storageSelection.box.id}
                     layout={getCombinedLayout()}
@@ -1515,6 +1558,7 @@ function BiorepositoryStorageAssignmentPage({
                 </div>
 
                 <div
+                  className="storage-box-print-summary"
                   style={{
                     marginTop: "0.5rem",
                     fontSize: "0.875rem",
