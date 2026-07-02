@@ -810,7 +810,8 @@ public class PathologyWorkflowController extends BaseRestController {
         try {
             NotebookEntry entry = notebookEntryService.get(entryId);
             NoteBook notebook = notebookId != null ? noteBookService.get(notebookId) : null;
-            if (notebook == null && entry != null && entry.getNotebook() != null && entry.getNotebook().getId() != null) {
+            if (notebook == null && entry != null && entry.getNotebook() != null
+                    && entry.getNotebook().getId() != null) {
                 notebook = noteBookService.get(entry.getNotebook().getId());
             }
             if (notebook == null) {
@@ -848,15 +849,15 @@ public class PathologyWorkflowController extends BaseRestController {
                 }
 
                 NotebookPageSample.Status rowStatus = pageSample.getStatus();
-                if (rowStatus == NotebookPageSample.Status.SKIPPED
-                        || rowStatus == NotebookPageSample.Status.REJECTED) {
+                if (rowStatus == NotebookPageSample.Status.SKIPPED || rowStatus == NotebookPageSample.Status.REJECTED) {
                     continue;
                 }
 
                 // Hand off when the previous step's JSON flags say the work is done.
                 // Do not require NotebookPageSample.Status.COMPLETED: granular pathology pages
                 // often persist slidesCreated/stainingCompleted on save while status stays
-                // PENDING/IN_PROGRESS until a separate bulk "Mark complete" (microscopy was empty).
+                // PENDING/IN_PROGRESS until a separate bulk "Mark complete" (microscopy was
+                // empty).
                 if (!isStepCompleted(data, previousStepType)) {
                     continue;
                 }
@@ -1079,9 +1080,8 @@ public class PathologyWorkflowController extends BaseRestController {
             if (canonical == null || !canonical.equals(targetOrder)) {
                 continue;
             }
-            if (normalizedPathology != null
-                    && !PathologyWorkflowTypeConfig.isStageEnabledForPage(normalizedPathology, page.getTitle(),
-                            page.getOrder())) {
+            if (normalizedPathology != null && !PathologyWorkflowTypeConfig.isStageEnabledForPage(normalizedPathology,
+                    page.getTitle(), page.getOrder())) {
                 continue;
             }
             return page;
@@ -1132,28 +1132,21 @@ public class PathologyWorkflowController extends BaseRestController {
             Object qcResult = data.get("qcResult");
             Object qcStatus = data.get("qcStatus");
             return "PASS".equalsIgnoreCase(String.valueOf(qcResult))
-                    || "PASS".equalsIgnoreCase(String.valueOf(qcStatus))
-                    || isTruthy(data.get("qcCompleted"));
+                    || "PASS".equalsIgnoreCase(String.valueOf(qcStatus)) || isTruthy(data.get("qcCompleted"));
         case "processing":
             return pageStepDataHasAnyProcessingSignal(data);
         case "cassettes":
-            return isTruthy(data.get("cassettesCreated"))
-                    || hasValue(data.get("cassetteLabels"))
+            return isTruthy(data.get("cassettesCreated")) || hasValue(data.get("cassetteLabels"))
                     || parseIntSafe(data.get("numberOfCassettes")) > 0;
         case "blocks":
-            return isTruthy(data.get("blocksCreated"))
-                    || hasValue(data.get("blockLabels"))
+            return isTruthy(data.get("blocksCreated")) || hasValue(data.get("blockLabels"))
                     || parseIntSafe(data.get("numberOfBlocks")) > 0;
         case "slides":
-            return isTruthy(data.get("slidesCreated"))
-                    || hasValue(data.get("slideLabels"))
-                    || parseIntSafe(data.get("numberOfSlides")) > 0
-                    || parseIntSafe(data.get("slideCount")) > 0;
+            return isTruthy(data.get("slidesCreated")) || hasValue(data.get("slideLabels"))
+                    || parseIntSafe(data.get("numberOfSlides")) > 0 || parseIntSafe(data.get("slideCount")) > 0;
         case "staining":
-            return isTruthy(data.get("stainingCompleted"))
-                    || isTruthy(data.get("stainingComplete"))
-                    || hasValue(data.get("routineStains"))
-                    || hasValue(data.get("specialStains"))
+            return isTruthy(data.get("stainingCompleted")) || isTruthy(data.get("stainingComplete"))
+                    || hasValue(data.get("routineStains")) || hasValue(data.get("specialStains"))
                     || hasValue(data.get("stainingDate"));
         default:
             return false;
@@ -1248,17 +1241,15 @@ public class PathologyWorkflowController extends BaseRestController {
     }
 
     private boolean pageStepDataHasAnyProcessingSignal(Map<String, Object> data) {
-        return hasValue(data.get("processingAction"))
-                || hasValue(data.get("processingDate"))
-                || hasValue(data.get("staffInitials"))
-                || isTruthy(data.get("grossExamDone"))
-                || isTruthy(data.get("sectioningDone"))
-                || isTruthy(data.get("centrifugationDone"))
+        return hasValue(data.get("processingAction")) || hasValue(data.get("processingDate"))
+                || hasValue(data.get("staffInitials")) || isTruthy(data.get("grossExamDone"))
+                || isTruthy(data.get("sectioningDone")) || isTruthy(data.get("centrifugationDone"))
                 || isTruthy(data.get("wedgeSmearDone"));
     }
 
     private boolean hasValue(Object value) {
-        return value != null && !String.valueOf(value).trim().isEmpty() && !"null".equalsIgnoreCase(String.valueOf(value).trim());
+        return value != null && !String.valueOf(value).trim().isEmpty()
+                && !"null".equalsIgnoreCase(String.valueOf(value).trim());
     }
 
     private boolean isTruthy(Object value) {
@@ -1278,10 +1269,10 @@ public class PathologyWorkflowController extends BaseRestController {
 
     /**
      * After slide preparation is saved, create PENDING {@link NotebookPageSample}
-     * rows on the next applicable page when it is Slide Staining (canonical 8),
-     * one per expanded slide id. Matches {@code getSamplesReadyForStep} expansion
-     * so staining lists and progress update without requiring "Mark complete" on
-     * slide prep first.
+     * rows on the next applicable page when it is Slide Staining (canonical 8), one
+     * per expanded slide id. Matches {@code getSamplesReadyForStep} expansion so
+     * staining lists and progress update without requiring "Mark complete" on slide
+     * prep first.
      */
     private void ensureStainingPageSamplesAfterSlidesSubmit(String sampleItemId, Integer slidePrepPageId,
             Map<String, Object> slideData) {
@@ -3684,6 +3675,7 @@ public class PathologyWorkflowController extends BaseRestController {
             cassetteData.put("numberOfCassettes", requestData.get("numberOfCassettes"));
             cassetteData.put("cassettePrefix", requestData.get("cassettePrefix"));
             cassetteData.put("cassetteLabels", requestData.get("cassetteLabels"));
+            cassetteData.put("cassettes", requestData.get("cassettes"));
             cassetteData.put("cassetteColor", requestData.get("cassetteColor"));
             cassetteData.put("cassetteCount", requestData.get("cassetteCount"));
             cassetteData.put("tissueOrientation", requestData.get("tissueOrientation"));

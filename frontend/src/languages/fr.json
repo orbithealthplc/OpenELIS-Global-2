@@ -2537,5 +2537,17 @@
   "notebook.gbd.reception.formRunID": "ID de Passage",
   "notebook.gbd.reception.formOperator": "Opérateur",
   "notebook.gbd.reception.formProcessingDateTime": "Date et Heure du Traitement",
-  "notebook.gbd.reception.formNotes": "Remarques"
+  "notebook.gbd.reception.formNotes": "Remarques",
+  "biorepository.reporting.audit.exportFormat": "Format d'exportation",
+  "biorepository.reporting.audit.exportFiltered": "Exporter les enregistrements filtrés",
+  "biorepository.reporting.audit.exportAll": "Exporter toutes les transactions",
+  "biorepository.retrieval.print.description": "Exporter la piste d'audit de la chaîne de custody (toutes les transactions). Même export que Rapports → Piste d'audit. Filtre par date optionnel.",
+  "biorepository.retrieval.print.success": "Export téléchargé",
+  "biorepository.retrieval.print.successDetail": "Piste d'audit de la chaîne de custody enregistrée dans vos téléchargements.",
+  "biorepository.retrieval.print.format": "Format d'exportation",
+  "biorepository.retrieval.print.download": "Télécharger l'export de la piste d'audit",
+  "biorepository.retrieval.print.exportAll": "Exporter toutes les transactions (sans filtre de date)",
+  "pathology.cassettes.childTracking.tissuePieces": "Fragments de tissu",
+  "pathology.cassettes.tissuePieces.section": "Fragments de tissu par cassette",
+  "pathology.cassettes.tissuePieces.label": "Fragments de tissu"
 }

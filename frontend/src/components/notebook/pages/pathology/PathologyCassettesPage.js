@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Grid,
   Column,
@@ -85,6 +91,7 @@ function PathologyCassettesPage({
     cassettePrefix: "",
     cassetteColor: "",
     cassetteLabels: [],
+    cassettes: [],
     tissueOrientation: "",
     tissueType: "",
     sectioningNotes: "",
@@ -187,6 +194,9 @@ function PathologyCassettesPage({
                   technicianName: cassetteData.technicianName || "",
                   cassetteDate: cassetteData.cassetteDate || "",
                   cassetteLabels: cassetteData.cassetteLabels || [],
+                  cassettes: Array.isArray(cassetteData.cassettes)
+                    ? cassetteData.cassettes
+                    : [],
                   // QC status from current page ONLY - show nothing until cassettes created
                   qcStatus: cassetteData.qcStatus || "",
                 };
@@ -213,6 +223,40 @@ function PathologyCassettesPage({
     }));
   };
 
+  // Build the list of cassette entries (label + tissue piece count) derived
+  // from the current number/prefix, preserving any counts already entered.
+  const buildCassetteEntries = (prev) => {
+    const count = Number(prev.numberOfCassettes) || 0;
+    const prefix = prev.cassettePrefix || "";
+    const existing = Array.isArray(prev.cassettes) ? prev.cassettes : [];
+    const entries = [];
+    for (let i = 1; i <= count; i++) {
+      const label = `${prefix}-${String(i).padStart(2, "0")}`;
+      const prior = existing.find((c) => c.index === i);
+      entries.push({
+        index: i,
+        label,
+        tissuePieceCount:
+          prior && prior.tissuePieceCount != null ? prior.tissuePieceCount : 0,
+      });
+    }
+    return entries;
+  };
+
+  const cassetteEntries = buildCassetteEntries(cassetteData);
+
+  const handleTissuePieceChange = (index, value) => {
+    const parsed = value === "" || value == null ? 0 : Number(value);
+    setCassetteData((prev) => {
+      const entries = buildCassetteEntries(prev).map((entry) =>
+        entry.index === index
+          ? { ...entry, tissuePieceCount: Number.isNaN(parsed) ? 0 : parsed }
+          : entry,
+      );
+      return { ...prev, cassettes: entries };
+    });
+  };
+
   // Open cassette modal
   const openCassetteModal = (sample) => {
     setSelectedSample(sample);
@@ -225,6 +269,7 @@ function PathologyCassettesPage({
       cassettePrefix: sample.accessionNumber || "",
       cassetteColor: "",
       cassetteLabels: [],
+      cassettes: [],
       tissueOrientation: "",
       tissueType: "",
       sectioningNotes: "",
@@ -260,6 +305,9 @@ function PathologyCassettesPage({
               cassettePrefix: response.cassettePrefix || "",
               cassetteColor: response.cassetteColor || "",
               cassetteLabels: response.cassetteLabels || [],
+              cassettes: Array.isArray(response.cassettes)
+                ? response.cassettes
+                : [],
               tissueOrientation: response.tissueOrientation || "",
               tissueType: response.tissueType || "",
               sectioningNotes: response.sectioningNotes || "",
@@ -301,11 +349,28 @@ function PathologyCassettesPage({
       );
     }
 
+    // Build per-cassette entries (label + tissue piece count), preserving any
+    // counts already entered for a given cassette index.
+    const existingCassettes = Array.isArray(cassetteData.cassettes)
+      ? cassetteData.cassettes
+      : [];
+    const cassettes = labels.map((label, idx) => {
+      const index = idx + 1;
+      const prior = existingCassettes.find((c) => c.index === index);
+      return {
+        index,
+        label,
+        tissuePieceCount:
+          prior && prior.tissuePieceCount != null ? prior.tissuePieceCount : 0,
+      };
+    });
+
     const payload = {
       sampleId: selectedSample.id,
       pageId: pageData?.id,
       ...cassetteData,
       cassetteLabels: labels,
+      cassettes: cassettes,
       cassettesCreated: true,
       cassetteCount: cassetteData.numberOfCassettes,
     };
@@ -451,13 +516,23 @@ function PathologyCassettesPage({
   const childCassetteRows = useMemo(() => {
     const rows = [];
     samples.forEach((sample) => {
+      const cassettes = Array.isArray(sample.cassettes) ? sample.cassettes : [];
       (sample.cassetteLabels || []).forEach((label, index) => {
+        // Match persisted per-cassette data by index (1-based) or label.
+        const entry = cassettes.find(
+          (c) => c.index === index + 1 || c.label === label,
+        );
         rows.push({
           id: `${sample.id}-${index}`,
-          parentSpecimen: sample.externalId || sample.accessionNumber || sample.id,
+          parentSpecimen:
+            sample.externalId || sample.accessionNumber || sample.id,
           childCassette: label,
           parentStatus: sample.status || "PENDING",
           cassetteColor: sample.cassetteColor || "—",
+          tissuePieceCount:
+            entry && entry.tissuePieceCount != null
+              ? entry.tissuePieceCount
+              : "—",
         });
       });
     });
@@ -532,6 +607,12 @@ function PathologyCassettesPage({
                       </TableHeader>
                       <TableHeader>
                         <FormattedMessage
+                          id="pathology.cassettes.childTracking.tissuePieces"
+                          defaultMessage="Tissue Pieces"
+                        />
+                      </TableHeader>
+                      <TableHeader>
+                        <FormattedMessage
                           id="pathology.cassettes.childTracking.status"
                           defaultMessage="Status"
                         />
@@ -544,6 +625,7 @@ function PathologyCassettesPage({
                         <TableCell>{row.parentSpecimen}</TableCell>
                         <TableCell>{row.childCassette}</TableCell>
                         <TableCell>{row.cassetteColor}</TableCell>
+                        <TableCell>{row.tissuePieceCount}</TableCell>
                         <TableCell>{row.parentStatus}</TableCell>
                       </TableRow>
                     ))}
@@ -983,6 +1065,45 @@ function PathologyCassettesPage({
                   </div>
                 </div>
               )}
+
+            {/* Tissue Pieces per Cassette */}
+            {cassetteEntries.length > 0 && (
+              <div style={{ marginTop: "1.5rem" }}>
+                <h5 style={{ marginBottom: "1rem" }}>
+                  <FormattedMessage
+                    id="pathology.cassettes.tissuePieces.section"
+                    defaultMessage="Tissue Pieces per Cassette"
+                  />
+                </h5>
+                <Grid>
+                  {cassetteEntries.map((entry) => (
+                    <Column
+                      key={entry.index}
+                      lg={4}
+                      md={4}
+                      sm={4}
+                      style={{ marginBottom: "1rem" }}
+                    >
+                      <NumberInput
+                        id={`tissuePieceCount-${entry.index}`}
+                        name={`tissuePieceCount-${entry.index}`}
+                        label={`${entry.label} — ${intl.formatMessage({
+                          id: "pathology.cassettes.tissuePieces.label",
+                          defaultMessage: "Tissue pieces",
+                        })}`}
+                        value={entry.tissuePieceCount}
+                        min={0}
+                        max={999}
+                        onChange={(e, { value }) =>
+                          handleTissuePieceChange(entry.index, value)
+                        }
+                        disabled={cassetteViewMode}
+                      />
+                    </Column>
+                  ))}
+                </Grid>
+              </div>
+            )}
 
             {/* Tissue Information */}
             <h5 style={{ marginTop: "1.5rem", marginBottom: "1rem" }}>
