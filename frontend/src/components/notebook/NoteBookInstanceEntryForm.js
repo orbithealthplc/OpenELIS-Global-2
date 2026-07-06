@@ -39,6 +39,7 @@ import PageBreadCrumb from "../common/PageBreadCrumb";
 import {
   canEditNotebookEntry,
   getNotebookEntrySaveDisabledReason,
+  resolveEffectiveWorkflowType,
 } from "./utils/noteBookEntryEditPermissions";
 import {
   NoteBookFormValues,
@@ -222,7 +223,11 @@ const NoteBookInstanceEntryForm = () => {
         userId: userSessionDetails?.userId,
         creatorId: noteBookData.creatorId,
         technicianId: noteBookData.technicianId,
-        workflowType: noteBookData.workflowType,
+        workflowType: resolveEffectiveWorkflowType(noteBookData),
+        notebookHint: {
+          title: noteBookData.title,
+          notebookName: noteBookData.notebookName,
+        },
       }),
     [
       hasRoleForCurrentLabUnit,
@@ -595,6 +600,20 @@ const NoteBookInstanceEntryForm = () => {
         : Array.from(allowedRoles)
       : [];
 
+    if (!userSessionDetails?.authenticated) {
+      return true;
+    }
+
+    const workflowType = resolveEffectiveWorkflowType(
+      entryContext,
+      entryContext.templateData,
+    );
+    const notebookHint = {
+      title: entryContext.title,
+      notebookName: entryContext.notebookName,
+      templateData: entryContext.templateData,
+    };
+
     const hasAccess = canEditNotebookEntry({
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
@@ -602,7 +621,8 @@ const NoteBookInstanceEntryForm = () => {
       userId: userSessionDetails?.userId,
       creatorId: entryContext.creatorId,
       technicianId: entryContext.technicianId,
-      workflowType: entryContext.workflowType,
+      workflowType,
+      notebookHint,
     });
 
     if (!hasAccess) {
@@ -636,7 +656,11 @@ const NoteBookInstanceEntryForm = () => {
 
         // Check authorization using template's specific allowedRoles
         if (
-          !checkAuthorization(allowedRoles, { workflowType: data.workflowType })
+          !checkAuthorization(allowedRoles, {
+            workflowType: data.workflowType,
+            title: data.title,
+            notebookName: data.notebookName,
+          })
         ) {
           setLoading(false);
           return;
@@ -693,7 +717,10 @@ const NoteBookInstanceEntryForm = () => {
                 !checkAuthorization(allowedRoles, {
                   creatorId: data.creatorId,
                   technicianId: data.technicianId,
-                  workflowType: data.workflowType,
+                  workflowType: data.workflowType || templateData.workflowType,
+                  title: data.title || templateData.title,
+                  notebookName: data.notebookName || templateData.title,
+                  templateData,
                 })
               ) {
                 setLoading(false);
@@ -784,11 +811,12 @@ const NoteBookInstanceEntryForm = () => {
 
           // Check authorization - if no allowedRoles, fall back to generic permissions
           if (
-            allowedRoles.length > 0 &&
             !checkAuthorization(allowedRoles, {
               creatorId: data.creatorId,
               technicianId: data.technicianId,
               workflowType: data.workflowType,
+              title: data.title,
+              notebookName: data.notebookName,
             })
           ) {
             setLoading(false);

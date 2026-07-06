@@ -3,6 +3,7 @@ import {
   getNotebookEntrySaveDisabledReason,
   isPathologyWorkflowType,
   isMntdWorkflowType,
+  resolveEffectiveWorkflowType,
 } from "./noteBookEntryEditPermissions";
 import { Roles } from "../../../constants/roles";
 
@@ -87,6 +88,53 @@ describe("noteBookEntryEditPermissions", () => {
   test("isMntdWorkflowType recognizes mntd", () => {
     expect(isMntdWorkflowType("mntd")).toBe(true);
     expect(isMntdWorkflowType("medlab")).toBe(false);
+  });
+
+  test("isMntdWorkflowType detects MNTD from notebook title when workflowType missing", () => {
+    expect(
+      isMntdWorkflowType(null, { title: "MNTD Sample Registration" }),
+    ).toBe(true);
+    expect(
+      isMntdWorkflowType("", {
+        notebookName: "Neglected Tropical Disease Lab Notebook",
+      }),
+    ).toBe(true);
+    expect(
+      isMntdWorkflowType(null, { title: "General Chemistry Notebook" }),
+    ).toBe(false);
+  });
+
+  test("Sample Collector can edit instance entry without workflowType when title indicates MNTD", () => {
+    const sampleCollectorPersonaCheck = (personas) =>
+      personas.includes("Sample Collector");
+
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: sampleCollectorPersonaCheck,
+        templateAllowedRoles: ["Supervisor"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: null,
+        notebookHint: { title: "MNTD Sample Intake" },
+      }),
+    ).toBe(true);
+  });
+
+  test("resolveEffectiveWorkflowType infers mntd from title on instance data", () => {
+    expect(
+      resolveEffectiveWorkflowType({
+        title: "MNTD Registration",
+        workflowType: null,
+      }),
+    ).toBe("mntd");
+    expect(
+      resolveEffectiveWorkflowType(
+        { workflowType: null },
+        { workflowType: "mntd" },
+      ),
+    ).toBe("mntd");
   });
 
   test("isPathologyWorkflowType recognizes pathology variants", () => {

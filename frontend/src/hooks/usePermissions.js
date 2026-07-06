@@ -88,7 +88,10 @@ export const usePermissions = () => {
     if (userSessionDetails?.loginName === "admin") {
       return true;
     }
-    if (!userSessionDetails?.roles || !Array.isArray(userSessionDetails.roles)) {
+    if (
+      !userSessionDetails?.roles ||
+      !Array.isArray(userSessionDetails.roles)
+    ) {
       return false;
     }
     return userSessionDetails.roles.includes(Roles.GLOBAL_ADMIN);
@@ -195,7 +198,8 @@ export const usePermissions = () => {
       if (roleList.some((r) => allLabRoles.includes(r))) {
         return true;
       }
-      const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+      const activeLabUnit =
+        getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
       if (!activeLabUnit) {
         return false;
       }
@@ -222,7 +226,8 @@ export const usePermissions = () => {
     if (allLabRoles.includes(Roles.LAB_MANAGER)) {
       return true;
     }
-    const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+    const activeLabUnit =
+      getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
     if (!activeLabUnit) {
       return false;
     }
@@ -254,12 +259,19 @@ export const usePermissions = () => {
       if (roleList.some((r) => allLabRoles.includes(r))) {
         return true;
       }
-      const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
-      if (!activeLabUnit) {
-        return false;
+      const activeLabUnit =
+        getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+      if (activeLabUnit) {
+        const activeRoles = getRolesForLabUnitKey(map, activeLabUnit);
+        if (roleList.some((r) => activeRoles.includes(r))) {
+          return true;
+        }
       }
-      const activeRoles = getRolesForLabUnitKey(map, activeLabUnit);
-      return roleList.some((r) => activeRoles.includes(r));
+      const departmentKeys = getDepartmentLabUnitKeys(userSessionDetails);
+      return departmentKeys.some((key) => {
+        const deptRoles = getRolesForLabUnitKey(map, key);
+        return roleList.some((r) => deptRoles.includes(r));
+      });
     },
     [userSessionDetails, isGlobalAdminUser, hasLabManagerForActiveDepartment],
   );
