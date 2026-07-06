@@ -61,6 +61,10 @@ export const normalizeTemplateAllowedRoles = (roles) => {
   return arr;
 };
 
+/** Stable edit intent from URL (avoids stale React mode state during async load). */
+export const isEditFromUrl = (notebookEntryId, viewModeParam) =>
+  Boolean(notebookEntryId) && viewModeParam !== "view";
+
 export const NOTEBOOK_ENTRY_EDIT_AUTH_KEY = "notebookEntryEditAuth";
 
 export const readNotebookEntryEditAuth = () => {

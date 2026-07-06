@@ -145,4 +145,14 @@ public class NoteBookFullDisplayBean extends NoteBookDisplayBean {
     public void setAllowedRoles(java.util.Set<String> allowedRoles) {
         this.allowedRoles = allowedRoles;
     }
+
+    private Boolean canEdit;
+
+    public Boolean getCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(Boolean canEdit) {
+        this.canEdit = canEdit;
+    }
 }

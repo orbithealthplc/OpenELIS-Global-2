@@ -113,6 +113,19 @@ public interface NotebookSecurityService {
      */
     boolean canEditEntry(Integer entryId, String sysUserId, String loginLabUnit);
 
+    /**
+     * Check if user can edit a notebook instance (legacy entry or child instance).
+     * Mirrors POST /rest/notebook/update permission rules. When workflowEntryId is
+     * provided, creator/technician checks use the workflow NotebookEntry record.
+     *
+     * @param notebook        the notebook instance being edited
+     * @param sysUserId       the system user ID
+     * @param loginLabUnit    the user's login lab unit
+     * @param workflowEntryId optional workflow entry ID from the edit URL
+     * @return true if user may save changes to this instance
+     */
+    boolean canEditNotebookInstance(NoteBook notebook, String sysUserId, String loginLabUnit, Integer workflowEntryId);
+
     // ========== PAGE ACCESS (Role Based) ==========
 
     /**

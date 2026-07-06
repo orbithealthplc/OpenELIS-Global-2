@@ -477,6 +477,45 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
         return canEditEntry(entry, sysUserId, loginLabUnit);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean canEditNotebookInstance(NoteBook notebook, String sysUserId, String loginLabUnit,
+            Integer workflowEntryId) {
+        if (notebook == null) {
+            return false;
+        }
+        if (Boolean.TRUE.equals(notebook.getIsTemplate())) {
+            return canEditTemplate(sysUserId);
+        }
+
+        NoteBook parent = noteBookService.getParentTemplate(notebook.getId());
+        if (parent != null) {
+            boolean canViewParent = canViewTemplate(parent.getId(), sysUserId, loginLabUnit);
+            boolean canEditByRole = canCreateEntry(parent.getId(), sysUserId, loginLabUnit);
+            boolean isCreator = false;
+            boolean isTechnician = false;
+
+            if (workflowEntryId != null) {
+                NotebookEntry workflowEntry = notebookEntryService.get(workflowEntryId);
+                if (workflowEntry != null) {
+                    isCreator = workflowEntry.getCreator() != null
+                            && String.valueOf(workflowEntry.getCreator().getId()).equals(sysUserId);
+                    isTechnician = workflowEntry.getTechnician() != null
+                            && String.valueOf(workflowEntry.getTechnician().getId()).equals(sysUserId);
+                }
+            } else {
+                isCreator = notebook.getCreator() != null
+                        && String.valueOf(notebook.getCreator().getId()).equals(sysUserId);
+                isTechnician = notebook.getTechnician() != null
+                        && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId);
+            }
+
+            return canViewParent && (canEditByRole || isCreator || isTechnician);
+        }
+
+        return canEditTemplate(sysUserId);
+    }
+
     // ========== PAGE ACCESS (Role Based) ==========
 
     @Override

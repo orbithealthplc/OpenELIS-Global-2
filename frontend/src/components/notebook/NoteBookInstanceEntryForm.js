@@ -39,6 +39,7 @@ import PageBreadCrumb from "../common/PageBreadCrumb";
 import {
   canEditNotebookEntry,
   getNotebookEntrySaveDisabledReason,
+  isEditFromUrl,
   normalizeTemplateAllowedRoles,
   readNotebookEntryEditAuth,
   resolveEffectiveWorkflowType,
@@ -181,6 +182,7 @@ const NoteBookInstanceEntryForm = () => {
   const parsedWorkflowEntryId = workflowEntryIdParam
     ? Number(workflowEntryIdParam)
     : null;
+  const editingFromUrl = isEditFromUrl(notebookentryid, viewModeParam);
   const isViewMode = mode === MODES.VIEW; // Helper for read-only checks
 
   const { notificationVisible, setNotificationVisible, addNotification } =
@@ -216,11 +218,8 @@ const NoteBookInstanceEntryForm = () => {
   const [projectTags, setProjectTags] = useState([]); // Template tags (for display only)
   const [projectFiles, setProjectFiles] = useState([]); // Template files (for display only)
   const [workflowEntryAuth, setWorkflowEntryAuth] = useState(null);
-  const dashboardEditAuthRef = useRef(null);
-
-  useEffect(() => {
-    dashboardEditAuthRef.current = readNotebookEntryEditAuth();
-  }, []);
+  const dashboardEditAuthRef = useRef(readNotebookEntryEditAuth());
+  const pendingAuthorizeRef = useRef(null);
 
   const canEditEntry = useMemo(() => {
     const dashboardAuth = dashboardEditAuthRef.current;
@@ -300,10 +299,9 @@ const NoteBookInstanceEntryForm = () => {
     noteBookForm.comments = comments
       .filter((c) => c.id === null)
       .map((c) => ({ id: null, text: c.text }));
-    var url =
-      mode === MODES.EDIT
-        ? "/rest/notebook/update/" + notebookentryid
-        : "/rest/notebook/create";
+    var url = editingFromUrl
+      ? "/rest/notebook/update/" + notebookentryid
+      : "/rest/notebook/create";
     postToOpenElisServerFullResponse(
       url,
       JSON.stringify(noteBookForm),
@@ -553,8 +551,11 @@ const NoteBookInstanceEntryForm = () => {
         setMode(MODES.EDIT);
       }
       setLoading(true);
+      const viewQuery = parsedWorkflowEntryId
+        ? `?entryId=${parsedWorkflowEntryId}`
+        : "";
       getFromOpenElisServer(
-        "/rest/notebook/view/" + notebookentryid,
+        "/rest/notebook/view/" + notebookentryid + viewQuery,
         loadInitialData,
       );
     }
@@ -603,6 +604,25 @@ const NoteBookInstanceEntryForm = () => {
     });
   }, [notebookid, notebookentryid]);
 
+  const isSessionReadyForAuth = useCallback(() => {
+    if (userSessionDetails?.authenticated === false) {
+      return true;
+    }
+    return (
+      userSessionDetails?.authenticated === true &&
+      userSessionDetails?.userId != null
+    );
+  }, [userSessionDetails?.authenticated, userSessionDetails?.userId]);
+
+  useEffect(() => {
+    if (!pendingAuthorizeRef.current || !isSessionReadyForAuth()) {
+      return;
+    }
+    const pending = pendingAuthorizeRef.current;
+    pendingAuthorizeRef.current = null;
+    pending();
+  }, [isSessionReadyForAuth, userSessionDetails]);
+
   // Check if user is authorized to create entries for this notebook
   // Uses role-based permission checking: Global Roles → AllLabUnits → Specific Lab Unit
   // @param {Set|Array} allowedRoles - The template's specific allowedRoles
@@ -622,36 +642,48 @@ const NoteBookInstanceEntryForm = () => {
   };
 
   const authorizeLoadedEntry = (data, templateData, onAuthorized) => {
-    const dashboardAuth = dashboardEditAuthRef.current;
-    const rawRoles =
-      data?.allowedRoles?.length > 0
-        ? data.allowedRoles
-        : templateData?.allowedRoles?.length > 0
-          ? templateData.allowedRoles
-          : dashboardAuth?.allowedRoles || [];
-    const allowedRoles = normalizeTemplateAllowedRoles(rawRoles);
-    setTemplateAllowedRoles(
-      Array.isArray(allowedRoles) ? allowedRoles : Array.from(allowedRoles),
-    );
+    const runAuthorization = () => {
+      const dashboardAuth = dashboardEditAuthRef.current;
+      const rawRoles =
+        dashboardAuth?.allowedRoles?.length > 0
+          ? dashboardAuth.allowedRoles
+          : data?.allowedRoles?.length > 0
+            ? data.allowedRoles
+            : templateData?.allowedRoles?.length > 0
+              ? templateData.allowedRoles
+              : [];
+      const allowedRoles = normalizeTemplateAllowedRoles(rawRoles);
+      setTemplateAllowedRoles(
+        Array.isArray(allowedRoles) ? allowedRoles : Array.from(allowedRoles),
+      );
 
-    ensureWorkflowEntryAuth((workflowAuth) => {
-      const authContext = buildAuthContext(data, templateData, workflowAuth);
-      const dashboardAllowedEdit =
-        mode === MODES.EDIT && dashboardEditAuthRef.current != null;
+      ensureWorkflowEntryAuth((workflowAuth) => {
+        const authContext = buildAuthContext(data, templateData, workflowAuth);
+        const dashboardAllowedEdit =
+          editingFromUrl && dashboardEditAuthRef.current != null;
 
-      if (
-        !dashboardAllowedEdit &&
-        !checkAuthorization(allowedRoles, authContext)
-      ) {
-        setLoading(false);
-        return;
-      }
+        if (editingFromUrl && data?.canEdit === true) {
+          onAuthorized(workflowAuth);
+          return;
+        }
 
-      if (dashboardAllowedEdit) {
-        setTemplateAllowedRoles(allowedRoles);
-      }
-      onAuthorized(workflowAuth);
-    });
+        if (
+          !dashboardAllowedEdit &&
+          !checkAuthorization(allowedRoles, authContext)
+        ) {
+          setLoading(false);
+          return;
+        }
+
+        onAuthorized(workflowAuth);
+      });
+    };
+
+    if (!isSessionReadyForAuth()) {
+      pendingAuthorizeRef.current = runAuthorization;
+      return;
+    }
+    runAuthorization();
   };
 
   const ensureWorkflowEntryAuth = (onReady) => {
@@ -663,14 +695,24 @@ const NoteBookInstanceEntryForm = () => {
       onReady(workflowEntryAuth);
       return;
     }
+    const dashboardAuth = dashboardEditAuthRef.current;
     getFromOpenElisServer(
       `/rest/notebook-entry/${parsedWorkflowEntryId}`,
       (entry) => {
-        const auth = {
-          creatorId: entry?.creator?.id ?? null,
-          technicianId: entry?.technician?.id ?? null,
-        };
-        setWorkflowEntryAuth(auth);
+        const auth = entry?.creator
+          ? {
+              creatorId: entry.creator.id ?? null,
+              technicianId: entry.technician?.id ?? null,
+            }
+          : dashboardAuth
+            ? {
+                creatorId: dashboardAuth.creatorId ?? null,
+                technicianId: dashboardAuth.technicianId ?? null,
+              }
+            : null;
+        if (auth) {
+          setWorkflowEntryAuth(auth);
+        }
         onReady(auth);
       },
     );
@@ -708,7 +750,7 @@ const NoteBookInstanceEntryForm = () => {
         }),
       });
       setNotificationVisible(true);
-      if (mode !== MODES.EDIT) {
+      if (!editingFromUrl) {
         setTimeout(() => {
           window.location.href = "/NoteBookDashboard";
         }, 100);

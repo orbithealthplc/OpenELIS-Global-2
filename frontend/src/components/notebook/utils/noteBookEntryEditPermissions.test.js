@@ -1,8 +1,9 @@
 import {
   canEditNotebookEntry,
   getNotebookEntrySaveDisabledReason,
-  isPathologyWorkflowType,
+  isEditFromUrl,
   isMntdWorkflowType,
+  isPathologyWorkflowType,
   normalizeTemplateAllowedRoles,
   resolveEffectiveWorkflowType,
 } from "./noteBookEntryEditPermissions";
@@ -140,6 +141,13 @@ describe("noteBookEntryEditPermissions", () => {
         { workflowType: "mntd" },
       ),
     ).toBe("mntd");
+  });
+
+  test("isEditFromUrl detects edit mode from URL params", () => {
+    expect(isEditFromUrl("228", "edit")).toBe(true);
+    expect(isEditFromUrl("228", "view")).toBe(false);
+    expect(isEditFromUrl(null, "edit")).toBe(false);
+    expect(isEditFromUrl("228", null)).toBe(true);
   });
 
   test("isPathologyWorkflowType recognizes pathology variants", () => {

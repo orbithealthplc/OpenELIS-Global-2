@@ -37,6 +37,7 @@ import org.openelisglobal.department.service.DepartmentIsolationService;
 import org.openelisglobal.login.valueholder.UserSessionData;
 import org.openelisglobal.notebook.bean.NoteBookDashboardMetrics;
 import org.openelisglobal.notebook.bean.NoteBookDisplayBean;
+import org.openelisglobal.notebook.bean.NoteBookFullDisplayBean;
 import org.openelisglobal.notebook.bean.NotebookHierarchyDTO;
 import org.openelisglobal.notebook.bean.SampleDisplayBean;
 import org.openelisglobal.notebook.form.NoteBookForm;
@@ -262,7 +263,7 @@ public class NoteBookRestController extends BaseRestController {
     @GetMapping(value = "/view/{noteBookId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ResponseEntity<?> getNoteBookEntry(@PathVariable("noteBookId") Integer noteBookId,
-            HttpServletRequest request) {
+            @RequestParam(required = false) Integer entryId, HttpServletRequest request) {
         String sysUserId = getSysUserId(request);
         String loginLabUnit = getLoginLabUnit(request);
 
@@ -308,7 +309,9 @@ public class NoteBookRestController extends BaseRestController {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied to this notebook"));
         }
 
-        return ResponseEntity.ok(noteBookService.convertToFullDisplayBean(noteBookId));
+        NoteBookFullDisplayBean bean = noteBookService.convertToFullDisplayBean(noteBookId);
+        bean.setCanEdit(notebookSecurityService.canEditNotebookInstance(notebook, sysUserId, loginLabUnit, entryId));
+        return ResponseEntity.ok(bean);
     }
 
     /**
