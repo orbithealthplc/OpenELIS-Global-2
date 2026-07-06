@@ -31,49 +31,19 @@ const MNTD_WORKFLOW_TYPE_IDS = new Set(["mntd"]);
 /** SRS personas that may edit MNTD notebook entries (intake / registration stages). */
 export const MNTD_ENTRY_EDIT_PERSONAS = [...sampleRegistrationPersonas];
 
-export const isMntdWorkflowType = (workflowType, notebookHint = null) => {
-  if (MNTD_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType))) {
-    return true;
-  }
-  if (!notebookHint) {
-    return false;
-  }
-  const title = String(
-    notebookHint.title || notebookHint.notebookName || "",
-  ).toLowerCase();
-  return (
-    title.includes("mntd") ||
-    title.includes("neglected tropical disease") ||
-    title.includes("malaria and neglected")
-  );
-};
+export const isMntdWorkflowType = (workflowType) =>
+  MNTD_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
 
-/** Mirror backend getEffectiveWorkflowType for permission checks on the client. */
+/** Prefer instance workflow type, then parent template. */
 export const resolveEffectiveWorkflowType = (
   data = {},
   templateData = null,
 ) => {
-  if (isMntdWorkflowType(data?.workflowType, data)) {
-    return normalizeWorkflowTypeKey(data.workflowType) || "mntd";
-  }
-  if (
-    templateData &&
-    isMntdWorkflowType(templateData.workflowType, templateData)
-  ) {
-    return normalizeWorkflowTypeKey(templateData.workflowType) || "mntd";
-  }
-  if (isPathologyWorkflowType(data?.workflowType)) {
-    return normalizeWorkflowTypeKey(data.workflowType);
-  }
-  if (templateData && isPathologyWorkflowType(templateData.workflowType)) {
-    return normalizeWorkflowTypeKey(templateData.workflowType);
-  }
   const direct = String(data?.workflowType || "").trim();
   if (direct) {
     return direct;
   }
-  const fromTemplate = String(templateData?.workflowType || "").trim();
-  return fromTemplate;
+  return String(templateData?.workflowType || "").trim();
 };
 
 const idsMatch = (left, right) =>
@@ -94,7 +64,6 @@ export const canEditNotebookEntry = ({
   creatorId,
   technicianId,
   workflowType,
-  notebookHint = null,
 }) => {
   if (typeof hasRoleForCurrentLabUnit !== "function") {
     return false;
@@ -110,10 +79,7 @@ export const canEditNotebookEntry = ({
     return true;
   }
 
-  const resolvedWorkflowType = resolveEffectiveWorkflowType(
-    { workflowType, ...notebookHint },
-    notebookHint?.templateData,
-  );
+  const resolvedWorkflowType = normalizeWorkflowTypeKey(workflowType);
 
   if (
     isPathologyWorkflowType(resolvedWorkflowType) &&
@@ -124,7 +90,7 @@ export const canEditNotebookEntry = ({
   }
 
   if (
-    isMntdWorkflowType(resolvedWorkflowType, notebookHint) &&
+    isMntdWorkflowType(resolvedWorkflowType) &&
     typeof hasPersonaForActiveDepartment === "function" &&
     hasPersonaForActiveDepartment(MNTD_ENTRY_EDIT_PERSONAS)
   ) {

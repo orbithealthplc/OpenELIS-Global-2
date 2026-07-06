@@ -213,6 +213,7 @@ const NoteBookInstanceEntryForm = () => {
   const [questionnaires, setQuestionnaires] = useState([]);
   const [projectTags, setProjectTags] = useState([]); // Template tags (for display only)
   const [projectFiles, setProjectFiles] = useState([]); // Template files (for display only)
+  const [workflowEntryAuth, setWorkflowEntryAuth] = useState(null);
 
   const canEditEntry = useMemo(
     () =>
@@ -221,19 +222,17 @@ const NoteBookInstanceEntryForm = () => {
         hasPersonaForActiveDepartment,
         templateAllowedRoles,
         userId: userSessionDetails?.userId,
-        creatorId: noteBookData.creatorId,
-        technicianId: noteBookData.technicianId,
+        creatorId: workflowEntryAuth?.creatorId ?? noteBookData.creatorId,
+        technicianId: workflowEntryAuth?.technicianId ?? noteBookData.technicianId,
         workflowType: resolveEffectiveWorkflowType(noteBookData),
-        notebookHint: {
-          title: noteBookData.title,
-          notebookName: noteBookData.notebookName,
-        },
       }),
     [
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
       templateAllowedRoles,
       userSessionDetails?.userId,
+      workflowEntryAuth?.creatorId,
+      workflowEntryAuth?.technicianId,
       noteBookData.creatorId,
       noteBookData.technicianId,
       noteBookData.workflowType,
@@ -593,6 +592,57 @@ const NoteBookInstanceEntryForm = () => {
   // Check if user is authorized to create entries for this notebook
   // Uses role-based permission checking: Global Roles → AllLabUnits → Specific Lab Unit
   // @param {Set|Array} allowedRoles - The template's specific allowedRoles
+  const buildAuthContext = (data, templateData = null, workflowAuth = null) => ({
+    creatorId: workflowAuth?.creatorId ?? data?.creatorId,
+    technicianId: workflowAuth?.technicianId ?? data?.technicianId,
+    workflowType: resolveEffectiveWorkflowType(data, templateData),
+  });
+
+  const authorizeLoadedEntry = (data, templateData, onAuthorized) => {
+    const allowedRoles =
+      data?.allowedRoles?.length > 0
+        ? data.allowedRoles
+        : templateData?.allowedRoles || [];
+    setTemplateAllowedRoles(
+      Array.isArray(allowedRoles) ? allowedRoles : Array.from(allowedRoles),
+    );
+
+    ensureWorkflowEntryAuth((workflowAuth) => {
+      if (
+        !checkAuthorization(
+          allowedRoles,
+          buildAuthContext(data, templateData, workflowAuth),
+        )
+      ) {
+        setLoading(false);
+        return;
+      }
+      onAuthorized(workflowAuth);
+    });
+  };
+
+  const ensureWorkflowEntryAuth = (onReady) => {
+    if (!parsedWorkflowEntryId) {
+      onReady(null);
+      return;
+    }
+    if (workflowEntryAuth) {
+      onReady(workflowEntryAuth);
+      return;
+    }
+    getFromOpenElisServer(
+      `/rest/notebook-entry/${parsedWorkflowEntryId}`,
+      (entry) => {
+        const auth = {
+          creatorId: entry?.creator?.id ?? null,
+          technicianId: entry?.technician?.id ?? null,
+        };
+        setWorkflowEntryAuth(auth);
+        onReady(auth);
+      },
+    );
+  };
+
   const checkAuthorization = (allowedRoles, entryContext = {}) => {
     const rolesArray = allowedRoles
       ? Array.isArray(allowedRoles)
@@ -604,16 +654,6 @@ const NoteBookInstanceEntryForm = () => {
       return true;
     }
 
-    const workflowType = resolveEffectiveWorkflowType(
-      entryContext,
-      entryContext.templateData,
-    );
-    const notebookHint = {
-      title: entryContext.title,
-      notebookName: entryContext.notebookName,
-      templateData: entryContext.templateData,
-    };
-
     const hasAccess = canEditNotebookEntry({
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
@@ -621,8 +661,7 @@ const NoteBookInstanceEntryForm = () => {
       userId: userSessionDetails?.userId,
       creatorId: entryContext.creatorId,
       technicianId: entryContext.technicianId,
-      workflowType,
-      notebookHint,
+      workflowType: entryContext.workflowType,
     });
 
     if (!hasAccess) {
@@ -696,74 +735,66 @@ const NoteBookInstanceEntryForm = () => {
 
   const loadInitialData = (data) => {
     console.log("Loading data", { data });
-    if (componentMounted.current) {
-      if (data && data.id) {
-        // If this is an instance (isTemplate=false) and we have templateId from backend,
-        // fetch the latest parent template properties to ensure we always display the most up-to-date template data
-        if (data.isTemplate === false && data.templateId) {
-          getFromOpenElisServer(
-            "/rest/notebook/view/" + data.templateId,
-            (templateData) => {
-              // Store template's allowedRoles for permission checking
-              const allowedRoles = templateData.allowedRoles || [];
-              setTemplateAllowedRoles(
-                Array.isArray(allowedRoles)
-                  ? allowedRoles
-                  : Array.from(allowedRoles),
-              );
+    if (!componentMounted.current || !data?.id) {
+      return;
+    }
 
-              // Check authorization using template's specific allowedRoles
-              if (
-                !checkAuthorization(allowedRoles, {
-                  creatorId: data.creatorId,
-                  technicianId: data.technicianId,
-                  workflowType: data.workflowType || templateData.workflowType,
-                  title: data.title || templateData.title,
-                  notebookName: data.notebookName || templateData.title,
-                  templateData,
-                })
-              ) {
-                setLoading(false);
-                return;
-              }
+    const finishLoading = () => {
+      if (data.comments && Array.isArray(data.comments)) {
+        setComments(
+          data.comments.map((c) => ({
+            id: c.id,
+            text: c.text,
+            author: c.author
+              ? c.author.displayName || c.author.name
+              : "Unknown",
+            dateCreated: c.dateCreated,
+          })),
+        );
+      }
+      setLoading(false);
+      setInitialMount(true);
+    };
 
-              // Merge pages: Keep existing instance pages, add new template pages that don't exist
-              const instancePages = data.pages || [];
-              const templatePages = templateData.pages || [];
+    const applyNotebookData = (notebookData, instrumentNotebookId) => {
+      setNoteBookData(notebookData);
+      loadNotebookInstruments(instrumentNotebookId);
+      finishLoading();
+    };
 
-              // Create a set of existing page identifiers (id and title)
-              const existingPageIds = new Set(
-                instancePages.map((p) => p.id).filter((id) => id != null),
-              );
-              const existingPageTitles = new Set(
-                instancePages
-                  .map((p) => p.title?.trim().toLowerCase())
-                  .filter((t) => t),
-              );
+    if (data.isTemplate === false && data.templateId) {
+      getFromOpenElisServer(
+        "/rest/notebook/view/" + data.templateId,
+        (templateData) => {
+          authorizeLoadedEntry(data, templateData, () => {
+            const instancePages = data.pages || [];
+            const templatePages = templateData.pages || [];
+            const existingPageIds = new Set(
+              instancePages.map((p) => p.id).filter((id) => id != null),
+            );
+            const existingPageTitles = new Set(
+              instancePages
+                .map((p) => p.title?.trim().toLowerCase())
+                .filter((t) => t),
+            );
+            const newPagesFromTemplate = templatePages.filter(
+              (templatePage) => {
+                const pageId = templatePage.id;
+                const pageTitle = templatePage.title?.trim().toLowerCase();
+                return (
+                  !existingPageIds.has(pageId) &&
+                  !existingPageTitles.has(pageTitle)
+                );
+              },
+            );
+            const mergedPages = [...instancePages, ...newPagesFromTemplate];
 
-              // Add new pages from template that don't exist in instance
-              const newPagesFromTemplate = templatePages.filter(
-                (templatePage) => {
-                  const pageId = templatePage.id;
-                  const pageTitle = templatePage.title?.trim().toLowerCase();
-                  // Add page if neither ID nor title matches existing pages
-                  return (
-                    !existingPageIds.has(pageId) &&
-                    !existingPageTitles.has(pageTitle)
-                  );
-                },
-              );
+            setProjectTags(templateData.tags || []);
+            setProjectFiles(templateData.files || []);
 
-              const mergedPages = [...instancePages, ...newPagesFromTemplate];
-
-              // Merge template properties with instance-specific data
-              // Store project (template) tags and files separately for display
-              setProjectTags(templateData.tags || []);
-              setProjectFiles(templateData.files || []);
-
-              const mergedData = {
+            applyNotebookData(
+              {
                 ...data,
-                // Override with latest template properties (for display)
                 title: templateData.title,
                 type: templateData.type,
                 typeName: templateData.typeName || data.typeName,
@@ -775,18 +806,17 @@ const NoteBookInstanceEntryForm = () => {
                 technicianName:
                   data.technicianName || templateData.technicianName,
                 creatorId: data.creatorId,
-                // Keep instance-specific properties
                 id: data.id,
                 status: data.status,
                 creatorName: data.creatorName,
                 dateCreated: data.dateCreated,
                 samples: data.samples,
-                files: data.files || [], // Instance-specific files only
+                files: data.files || [],
                 comments: data.comments,
-                tags: data.tags || [], // Instance-specific tags only
+                tags: data.tags || [],
                 isTemplate: data.isTemplate,
                 templateId: data.templateId,
-                pages: mergedPages, // Merged pages (existing + new from template)
+                pages: mergedPages,
                 analyzers: data.analyzers,
                 workflowType:
                   data.workflowType ||
@@ -794,63 +824,28 @@ const NoteBookInstanceEntryForm = () => {
                   (isPathologyNotebook(templateData)
                     ? "histopathology_biopsy_tissue"
                     : ""),
-              };
-              setNoteBookData(mergedData);
-              loadNotebookInstruments(templateData.id || data.templateId);
-            },
-          );
-        } else {
-          // This is either a template or an entry without parent templateId
-          // For templates, use allowedRoles from the data itself if available
-          const allowedRoles = data.allowedRoles || [];
-          setTemplateAllowedRoles(
-            Array.isArray(allowedRoles)
-              ? allowedRoles
-              : Array.from(allowedRoles),
-          );
-
-          // Check authorization - if no allowedRoles, fall back to generic permissions
-          if (
-            !checkAuthorization(allowedRoles, {
-              creatorId: data.creatorId,
-              technicianId: data.technicianId,
-              workflowType: data.workflowType,
-              title: data.title,
-              notebookName: data.notebookName,
-            })
-          ) {
-            setLoading(false);
-            return;
-          }
-
-          setNoteBookData({
-            ...data,
-            workflowType:
-              data.workflowType ||
-              (isPathologyNotebook(data) && !data.workflowType
-                ? "histopathology_biopsy_tissue"
-                : data.workflowType),
+              },
+              templateData.id || data.templateId,
+            );
           });
-          loadNotebookInstruments(data.id);
-        }
-
-        // Load comments from backend (with proper id and author)
-        if (data.comments && Array.isArray(data.comments)) {
-          setComments(
-            data.comments.map((c) => ({
-              id: c.id,
-              text: c.text,
-              author: c.author
-                ? c.author.displayName || c.author.name
-                : "Unknown",
-              dateCreated: c.dateCreated,
-            })),
-          );
-        }
-        setLoading(false);
-        setInitialMount(true);
-      }
+        },
+      );
+      return;
     }
+
+    authorizeLoadedEntry(data, null, () => {
+      applyNotebookData(
+        {
+          ...data,
+          workflowType:
+            data.workflowType ||
+            (isPathologyNotebook(data) && !data.workflowType
+              ? "histopathology_biopsy_tissue"
+              : data.workflowType),
+        },
+        data.id,
+      );
+    });
   };
 
   const statusColors = {

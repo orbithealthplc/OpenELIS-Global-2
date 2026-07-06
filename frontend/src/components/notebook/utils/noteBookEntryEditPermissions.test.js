@@ -90,50 +90,26 @@ describe("noteBookEntryEditPermissions", () => {
     expect(isMntdWorkflowType("medlab")).toBe(false);
   });
 
-  test("isMntdWorkflowType detects MNTD from notebook title when workflowType missing", () => {
-    expect(
-      isMntdWorkflowType(null, { title: "MNTD Sample Registration" }),
-    ).toBe(true);
-    expect(
-      isMntdWorkflowType("", {
-        notebookName: "Neglected Tropical Disease Lab Notebook",
-      }),
-    ).toBe(true);
-    expect(
-      isMntdWorkflowType(null, { title: "General Chemistry Notebook" }),
-    ).toBe(false);
-  });
-
-  test("Sample Collector can edit instance entry without workflowType when title indicates MNTD", () => {
-    const sampleCollectorPersonaCheck = (personas) =>
-      personas.includes("Sample Collector");
-
+  test("workflow entry creator bypasses template role restriction", () => {
     expect(
       canEditNotebookEntry({
         hasRoleForCurrentLabUnit: () => false,
-        hasPersonaForActiveDepartment: sampleCollectorPersonaCheck,
+        hasPersonaForActiveDepartment: () => false,
         templateAllowedRoles: ["Supervisor"],
         userId: 10,
-        creatorId: 99,
-        technicianId: 88,
-        workflowType: null,
-        notebookHint: { title: "MNTD Sample Intake" },
+        creatorId: 10,
+        technicianId: 99,
+        workflowType: "mntd",
       }),
     ).toBe(true);
   });
 
-  test("resolveEffectiveWorkflowType infers mntd from title on instance data", () => {
+  test("resolveEffectiveWorkflowType prefers instance then template", () => {
     expect(
-      resolveEffectiveWorkflowType({
-        title: "MNTD Registration",
-        workflowType: null,
-      }),
+      resolveEffectiveWorkflowType({ workflowType: "mntd" }, { workflowType: "medlab" }),
     ).toBe("mntd");
     expect(
-      resolveEffectiveWorkflowType(
-        { workflowType: null },
-        { workflowType: "mntd" },
-      ),
+      resolveEffectiveWorkflowType({ workflowType: null }, { workflowType: "mntd" }),
     ).toBe("mntd");
   });
 
