@@ -1949,13 +1949,13 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
             NoteBook parentTemplate = notebook.getParentNotebook();
             if (parentTemplate != null) {
                 Hibernate.initialize(parentTemplate.getAllowedRoles());
-                return parentTemplate.getAllowedRoles();
+                return resolveRoleNamesForDisplay(parentTemplate.getAllowedRoles());
             }
         }
 
         // For templates and entries, use own allowedRoles
         Hibernate.initialize(notebook.getAllowedRoles());
-        return notebook.getAllowedRoles();
+        return resolveRoleNamesForDisplay(notebook.getAllowedRoles());
     }
 
     @Override

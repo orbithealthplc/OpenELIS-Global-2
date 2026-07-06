@@ -38,7 +38,7 @@ export APP_DIR='${APP_DIR}'
 cd "\${APP_DIR}"
 
 sudo cp docker-compose.yml "docker-compose.yml.bak-${RELEASE}"
-sudo sed -i 's#v2026\\.[0-9][0-9]\\.[0-9][0-9]\\.[0-9][0-9]#${RELEASE}#g' docker-compose.yml
+sudo sed -i 's#\(ghcr\.io/orbithealthplc/openelis-global-2[^:]*:\)v2026\.[^" ]*#\1${RELEASE}#g' docker-compose.yml
 echo '--- image tags ---'
 grep -E 'ghcr.io/orbithealthplc/openelis-global-2' docker-compose.yml || true
 

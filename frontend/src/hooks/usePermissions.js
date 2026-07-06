@@ -2,6 +2,7 @@ import { useContext, useCallback, useMemo } from "react";
 import UserSessionDetailsContext from "../UserSessionDetailsContext";
 import { Roles, RoleGroups } from "../constants/roles";
 import {
+  getDepartmentLabUnitKeys,
   getEffectiveLabUnitNameForRoleCheck,
   getRolesForLabUnitKey,
 } from "../security/routeAccess";
@@ -199,7 +200,15 @@ export const usePermissions = () => {
         return false;
       }
       const activeRoles = getRolesForLabUnitKey(map, activeLabUnit);
-      return roleList.some((r) => activeRoles.includes(r));
+      if (roleList.some((r) => activeRoles.includes(r))) {
+        return true;
+      }
+      // Fallback: user may lack loginLabUnit but still have the role on an assigned department.
+      const departmentKeys = getDepartmentLabUnitKeys(userSessionDetails);
+      return departmentKeys.some((key) => {
+        const deptRoles = getRolesForLabUnitKey(map, key);
+        return roleList.some((r) => deptRoles.includes(r));
+      });
     },
     [userSessionDetails, isGlobalAdminUser],
   );

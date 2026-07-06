@@ -26,6 +26,14 @@ export const normalizeWorkflowTypeKey = (workflowType) =>
 export const isPathologyWorkflowType = (workflowType) =>
   PATHOLOGY_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
 
+const MNTD_WORKFLOW_TYPE_IDS = new Set(["mntd"]);
+
+/** SRS personas that may edit MNTD notebook entries (intake / registration stages). */
+export const MNTD_ENTRY_EDIT_PERSONAS = [...sampleRegistrationPersonas];
+
+export const isMntdWorkflowType = (workflowType) =>
+  MNTD_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
+
 const idsMatch = (left, right) =>
   left != null && right != null && String(left) === String(right);
 
@@ -63,6 +71,14 @@ export const canEditNotebookEntry = ({
     isPathologyWorkflowType(workflowType) &&
     typeof hasPersonaForActiveDepartment === "function" &&
     hasPersonaForActiveDepartment(pathologyPersonas)
+  ) {
+    return true;
+  }
+
+  if (
+    isMntdWorkflowType(workflowType) &&
+    typeof hasPersonaForActiveDepartment === "function" &&
+    hasPersonaForActiveDepartment(MNTD_ENTRY_EDIT_PERSONAS)
   ) {
     return true;
   }

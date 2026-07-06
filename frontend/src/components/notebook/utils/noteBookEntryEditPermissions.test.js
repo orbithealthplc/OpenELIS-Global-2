@@ -2,6 +2,7 @@ import {
   canEditNotebookEntry,
   getNotebookEntrySaveDisabledReason,
   isPathologyWorkflowType,
+  isMntdWorkflowType,
 } from "./noteBookEntryEditPermissions";
 import { Roles } from "../../../constants/roles";
 
@@ -64,6 +65,28 @@ describe("noteBookEntryEditPermissions", () => {
         workflowType: "medlab",
       }),
     ).toBe(true);
+  });
+
+  test("Sample Collector on MNTD workflow can edit entry", () => {
+    const sampleCollectorPersonaCheck = (personas) =>
+      personas.includes("Sample Collector");
+
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: sampleCollectorPersonaCheck,
+        templateAllowedRoles: ["Supervisor"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "mntd",
+      }),
+    ).toBe(true);
+  });
+
+  test("isMntdWorkflowType recognizes mntd", () => {
+    expect(isMntdWorkflowType("mntd")).toBe(true);
+    expect(isMntdWorkflowType("medlab")).toBe(false);
   });
 
   test("isPathologyWorkflowType recognizes pathology variants", () => {

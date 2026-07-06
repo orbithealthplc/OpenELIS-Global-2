@@ -24,7 +24,7 @@ echo "Backing up docker-compose.yml..."
 cp docker-compose.yml "docker-compose.yml.bak-${RELEASE}"
 
 echo "Updating image tags to ${RELEASE}..."
-sed -i 's#v2026\.[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]#'"${RELEASE}"'#g' docker-compose.yml
+sed -i 's#\(ghcr\.io/orbithealthplc/openelis-global-2[^:]*:\)v2026\.[^" ]*#\1'"${RELEASE}"'#g' docker-compose.yml
 
 echo "--- image tags ---"
 grep -E 'ghcr.io/orbithealthplc/openelis-global-2' docker-compose.yml || true

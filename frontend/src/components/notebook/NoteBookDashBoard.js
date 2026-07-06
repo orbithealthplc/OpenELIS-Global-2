@@ -670,7 +670,6 @@ function NoteBookDashBoard() {
                             <Button
                               kind="secondary"
                               size="sm"
-                              disabled={!canEditDashboardEntry(entry)}
                               onClick={() => openNoteBookInstanceView(entry)}
                             >
                               <View size={13} />
