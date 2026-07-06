@@ -3,6 +3,7 @@ import {
   getNotebookEntrySaveDisabledReason,
   isPathologyWorkflowType,
   isMntdWorkflowType,
+  normalizeTemplateAllowedRoles,
   resolveEffectiveWorkflowType,
 } from "./noteBookEntryEditPermissions";
 import { Roles } from "../../../constants/roles";
@@ -85,6 +86,28 @@ describe("noteBookEntryEditPermissions", () => {
     ).toBe(true);
   });
 
+  test("normalizeTemplateAllowedRoles treats numeric role IDs as unresolved", () => {
+    expect(normalizeTemplateAllowedRoles(["83", "42"])).toEqual([]);
+    expect(normalizeTemplateAllowedRoles(["Sample Collector"])).toEqual([
+      "Sample Collector",
+    ]);
+  });
+
+  test("Sample Collector uses fallback when template stores numeric role IDs", () => {
+    const sampleCollectorRoleCheck = (roles) =>
+      roles.includes(Roles.SAMPLE_COLLECTOR);
+
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: sampleCollectorRoleCheck,
+        hasPersonaForActiveDepartment: () => false,
+        templateAllowedRoles: ["83"],
+        userId: 10,
+        workflowType: "mntd",
+      }),
+    ).toBe(true);
+  });
+
   test("isMntdWorkflowType recognizes mntd", () => {
     expect(isMntdWorkflowType("mntd")).toBe(true);
     expect(isMntdWorkflowType("medlab")).toBe(false);
@@ -106,10 +129,16 @@ describe("noteBookEntryEditPermissions", () => {
 
   test("resolveEffectiveWorkflowType prefers instance then template", () => {
     expect(
-      resolveEffectiveWorkflowType({ workflowType: "mntd" }, { workflowType: "medlab" }),
+      resolveEffectiveWorkflowType(
+        { workflowType: "mntd" },
+        { workflowType: "medlab" },
+      ),
     ).toBe("mntd");
     expect(
-      resolveEffectiveWorkflowType({ workflowType: null }, { workflowType: "mntd" }),
+      resolveEffectiveWorkflowType(
+        { workflowType: null },
+        { workflowType: "mntd" },
+      ),
     ).toBe("mntd");
   });
 

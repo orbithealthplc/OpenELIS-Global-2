@@ -39,6 +39,8 @@ import PageBreadCrumb from "../common/PageBreadCrumb";
 import {
   canEditNotebookEntry,
   getNotebookEntrySaveDisabledReason,
+  normalizeTemplateAllowedRoles,
+  readNotebookEntryEditAuth,
   resolveEffectiveWorkflowType,
 } from "./utils/noteBookEntryEditPermissions";
 import {
@@ -214,30 +216,42 @@ const NoteBookInstanceEntryForm = () => {
   const [projectTags, setProjectTags] = useState([]); // Template tags (for display only)
   const [projectFiles, setProjectFiles] = useState([]); // Template files (for display only)
   const [workflowEntryAuth, setWorkflowEntryAuth] = useState(null);
+  const dashboardEditAuthRef = useRef(null);
 
-  const canEditEntry = useMemo(
-    () =>
-      canEditNotebookEntry({
-        hasRoleForCurrentLabUnit,
-        hasPersonaForActiveDepartment,
-        templateAllowedRoles,
-        userId: userSessionDetails?.userId,
-        creatorId: workflowEntryAuth?.creatorId ?? noteBookData.creatorId,
-        technicianId: workflowEntryAuth?.technicianId ?? noteBookData.technicianId,
-        workflowType: resolveEffectiveWorkflowType(noteBookData),
-      }),
-    [
+  useEffect(() => {
+    dashboardEditAuthRef.current = readNotebookEntryEditAuth();
+  }, []);
+
+  const canEditEntry = useMemo(() => {
+    const dashboardAuth = dashboardEditAuthRef.current;
+    return canEditNotebookEntry({
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
-      templateAllowedRoles,
-      userSessionDetails?.userId,
-      workflowEntryAuth?.creatorId,
-      workflowEntryAuth?.technicianId,
-      noteBookData.creatorId,
-      noteBookData.technicianId,
-      noteBookData.workflowType,
-    ],
-  );
+      templateAllowedRoles: normalizeTemplateAllowedRoles(templateAllowedRoles),
+      userId: userSessionDetails?.userId,
+      creatorId:
+        workflowEntryAuth?.creatorId ??
+        dashboardAuth?.creatorId ??
+        noteBookData.creatorId,
+      technicianId:
+        workflowEntryAuth?.technicianId ??
+        dashboardAuth?.technicianId ??
+        noteBookData.technicianId,
+      workflowType:
+        dashboardAuth?.workflowType ||
+        resolveEffectiveWorkflowType(noteBookData),
+    });
+  }, [
+    hasRoleForCurrentLabUnit,
+    hasPersonaForActiveDepartment,
+    templateAllowedRoles,
+    userSessionDetails?.userId,
+    workflowEntryAuth?.creatorId,
+    workflowEntryAuth?.technicianId,
+    noteBookData.creatorId,
+    noteBookData.technicianId,
+    noteBookData.workflowType,
+  ]);
 
   const handleSubmit = () => {
     if (isSubmitting) {
@@ -592,30 +606,49 @@ const NoteBookInstanceEntryForm = () => {
   // Check if user is authorized to create entries for this notebook
   // Uses role-based permission checking: Global Roles → AllLabUnits → Specific Lab Unit
   // @param {Set|Array} allowedRoles - The template's specific allowedRoles
-  const buildAuthContext = (data, templateData = null, workflowAuth = null) => ({
-    creatorId: workflowAuth?.creatorId ?? data?.creatorId,
-    technicianId: workflowAuth?.technicianId ?? data?.technicianId,
-    workflowType: resolveEffectiveWorkflowType(data, templateData),
-  });
+  const buildAuthContext = (data, templateData = null, workflowAuth = null) => {
+    const dashboardAuth = dashboardEditAuthRef.current;
+    return {
+      creatorId:
+        workflowAuth?.creatorId ?? dashboardAuth?.creatorId ?? data?.creatorId,
+      technicianId:
+        workflowAuth?.technicianId ??
+        dashboardAuth?.technicianId ??
+        data?.technicianId,
+      workflowType:
+        dashboardAuth?.workflowType ||
+        resolveEffectiveWorkflowType(data, templateData),
+    };
+  };
 
   const authorizeLoadedEntry = (data, templateData, onAuthorized) => {
-    const allowedRoles =
+    const dashboardAuth = dashboardEditAuthRef.current;
+    const rawRoles =
       data?.allowedRoles?.length > 0
         ? data.allowedRoles
-        : templateData?.allowedRoles || [];
+        : templateData?.allowedRoles?.length > 0
+          ? templateData.allowedRoles
+          : dashboardAuth?.allowedRoles || [];
+    const allowedRoles = normalizeTemplateAllowedRoles(rawRoles);
     setTemplateAllowedRoles(
       Array.isArray(allowedRoles) ? allowedRoles : Array.from(allowedRoles),
     );
 
     ensureWorkflowEntryAuth((workflowAuth) => {
+      const authContext = buildAuthContext(data, templateData, workflowAuth);
+      const dashboardAllowedEdit =
+        mode === MODES.EDIT && dashboardEditAuthRef.current != null;
+
       if (
-        !checkAuthorization(
-          allowedRoles,
-          buildAuthContext(data, templateData, workflowAuth),
-        )
+        !dashboardAllowedEdit &&
+        !checkAuthorization(allowedRoles, authContext)
       ) {
         setLoading(false);
         return;
+      }
+
+      if (dashboardAllowedEdit) {
+        setTemplateAllowedRoles(allowedRoles);
       }
       onAuthorized(workflowAuth);
     });
@@ -675,10 +708,11 @@ const NoteBookInstanceEntryForm = () => {
         }),
       });
       setNotificationVisible(true);
-      // Redirect back to dashboard
-      setTimeout(() => {
-        window.location.href = "/NoteBookDashboard";
-      }, 100);
+      if (mode !== MODES.EDIT) {
+        setTimeout(() => {
+          window.location.href = "/NoteBookDashboard";
+        }, 100);
+      }
       return false;
     }
     return true;

@@ -24,7 +24,11 @@ import "../pathology/PathologyDashboard.css";
 import PageBreadCrumb from "../common/PageBreadCrumb";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Permissions } from "../../constants/roles";
-import { canEditNotebookEntry } from "./utils/noteBookEntryEditPermissions";
+import {
+  canEditNotebookEntry,
+  stashNotebookEntryEditAuth,
+  normalizeTemplateAllowedRoles,
+} from "./utils/noteBookEntryEditPermissions";
 import CustomDatePicker from "../common/CustomDatePicker";
 import {
   Document,
@@ -57,11 +61,13 @@ function NoteBookDashBoard() {
   const intl = useIntl();
 
   const canEditDashboardEntry = (entry) => {
-    const entryRoles = entry?.allowedRoles
-      ? Array.isArray(entry.allowedRoles)
-        ? entry.allowedRoles
-        : Array.from(entry.allowedRoles)
-      : [];
+    const entryRoles = normalizeTemplateAllowedRoles(
+      entry?.allowedRoles
+        ? Array.isArray(entry.allowedRoles)
+          ? entry.allowedRoles
+          : Array.from(entry.allowedRoles)
+        : [],
+    );
     return canEditNotebookEntry({
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
@@ -213,6 +219,7 @@ function NoteBookDashBoard() {
   };
 
   const openNoteBookInstanceEdit = (entry) => {
+    stashNotebookEntryEditAuth(entry);
     if (isWorkflowEntry(entry)) {
       window.location.href = `/NoteBookInstanceEditForm/${entry.instanceNotebookId}?mode=edit&tab=workflow&entryId=${entry.workflowEntryId}`;
       return;

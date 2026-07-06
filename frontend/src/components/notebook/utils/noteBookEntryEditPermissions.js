@@ -49,6 +49,50 @@ export const resolveEffectiveWorkflowType = (
 const idsMatch = (left, right) =>
   left != null && right != null && String(left) === String(right);
 
+/** Templates may still expose numeric role IDs; fall back to generic entry roles. */
+export const normalizeTemplateAllowedRoles = (roles) => {
+  const arr = roles ? (Array.isArray(roles) ? roles : Array.from(roles)) : [];
+  if (arr.length === 0) {
+    return [];
+  }
+  if (arr.every((role) => /^\d+$/.test(String(role || "").trim()))) {
+    return [];
+  }
+  return arr;
+};
+
+export const NOTEBOOK_ENTRY_EDIT_AUTH_KEY = "notebookEntryEditAuth";
+
+export const readNotebookEntryEditAuth = () => {
+  try {
+    const raw = sessionStorage.getItem(NOTEBOOK_ENTRY_EDIT_AUTH_KEY);
+    if (!raw) {
+      return null;
+    }
+    sessionStorage.removeItem(NOTEBOOK_ENTRY_EDIT_AUTH_KEY);
+    return JSON.parse(raw);
+  } catch (error) {
+    return null;
+  }
+};
+
+export const stashNotebookEntryEditAuth = (entry) => {
+  if (!entry) {
+    return;
+  }
+  sessionStorage.setItem(
+    NOTEBOOK_ENTRY_EDIT_AUTH_KEY,
+    JSON.stringify({
+      creatorId: entry.creatorId ?? null,
+      technicianId: entry.technicianId ?? null,
+      allowedRoles: entry.allowedRoles ?? [],
+      workflowType: entry.workflowType ?? null,
+      workflowEntryId: entry.workflowEntryId ?? null,
+      instanceNotebookId: entry.instanceNotebookId ?? null,
+    }),
+  );
+};
+
 /**
  * Whether the current user may edit a notebook entry (Save button / dashboard Edit).
  * Mirrors backend entry-update rules: template roles, fallback roles, creator/technician,
@@ -73,8 +117,12 @@ export const canEditNotebookEntry = ({
     return true;
   }
 
+  const normalizedTemplateRoles =
+    normalizeTemplateAllowedRoles(templateAllowedRoles);
   const rolesToCheck =
-    templateAllowedRoles.length > 0 ? templateAllowedRoles : fallbackRoles;
+    normalizedTemplateRoles.length > 0
+      ? normalizedTemplateRoles
+      : fallbackRoles;
   if (hasRoleForCurrentLabUnit(rolesToCheck)) {
     return true;
   }
