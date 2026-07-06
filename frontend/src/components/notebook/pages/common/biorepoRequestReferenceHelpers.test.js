@@ -10,7 +10,7 @@ describe("biorepoRequestReferenceHelpers", () => {
   test("createEmptyRequestRow returns editable defaults", () => {
     const row = createEmptyRequestRow();
     expect(row.requestedSampleType).toBe("");
-    expect(row.quantityRequested).toBe("");
+    expect(row.quantityRequested).toBe(0);
     expect(row.id).toBeTruthy();
   });
 

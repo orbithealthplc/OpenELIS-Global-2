@@ -9,7 +9,7 @@ export const createEmptyRequestRow = () => ({
   requestedSampleType: "",
   requestedOriginLab: "",
   requestedProjectId: "",
-  quantityRequested: "",
+  quantityRequested: 0,
   unitOfMeasure: "",
   remark: "",
 });
@@ -39,7 +39,8 @@ export const validateRequestReferenceRows = (rows) => {
 
 export const buildReferenceItemsPayload = (rows) =>
   (rows || []).map((row) => ({
-    requestedAccessionNumber: String(row.requestedAccessionNumber || "").trim() || null,
+    requestedAccessionNumber:
+      String(row.requestedAccessionNumber || "").trim() || null,
     requestedBarcode: String(row.requestedBarcode || "").trim() || null,
     requestedSampleType: String(row.requestedSampleType || "").trim() || null,
     requestedOriginLab: String(row.requestedOriginLab || "").trim() || null,
