@@ -291,6 +291,28 @@ public class NotebookSecurityServiceImplTest {
         assertTrue("User with Hematology Technician role should be allowed for Hematology lab unit", result);
     }
 
+    @Test
+    public void canCreateEntry_templateAllowedRolesStoredAsRoleIds_allowedForMatchingLabUnitUser() {
+        NoteBook templateWithRoleIds = new NoteBook();
+        templateWithRoleIds.setId(102);
+        templateWithRoleIds.setIsTemplate(true);
+        Set<String> allowedRoleIds = new HashSet<>();
+        allowedRoleIds.add(TECHNICIAN_ROLE_ID);
+        templateWithRoleIds.setAllowedRoles(allowedRoleIds);
+
+        setupNonAdminUser(CYTOLOGY_TECH_USER_ID);
+        setupCanViewTemplate(CYTOLOGY_TECH_USER_ID, CYTOLOGY_LAB_UNIT);
+
+        when(userRoleService.userInRole(eq(CYTOLOGY_TECH_USER_ID), any(Collection.class))).thenReturn(false);
+
+        UserLabUnitRoles labRoles = createUserLabUnitRoles(CYTOLOGY_TEST_SECTION_ID, TECHNICIAN_ROLE_ID);
+        when(userRoleService.getUserLabUnitRoles(CYTOLOGY_TECH_USER_ID)).thenReturn(labRoles);
+
+        boolean result = securityService.canCreateEntry(templateWithRoleIds, CYTOLOGY_TECH_USER_ID, CYTOLOGY_LAB_UNIT);
+
+        assertTrue("User should be allowed when template allowedRoles are stored as role IDs", result);
+    }
+
     // ========== TEST: NO MATCHING ROLES ==========
 
     @Test

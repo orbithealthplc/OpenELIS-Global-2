@@ -1,5 +1,6 @@
 package org.openelisglobal.notebook.service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import org.openelisglobal.common.constants.Constants;
@@ -70,7 +71,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
         // Check departments (test sections) first - this is the primary access control
         Set<TestSection> templateDepts = template.getDepartments();
         if (templateDepts != null && !templateDepts.isEmpty()) {
-            // If no lab unit is selected in session, fall back to assigned lab-unit mappings.
+            // If no lab unit is selected in session, fall back to assigned lab-unit
+            // mappings.
             if (isBlank(loginLabUnit)) {
                 return hasDepartmentAccessWithoutLoginLabUnit(sysUserId, templateDepts);
             }
@@ -110,40 +112,41 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
 
             Integer effectiveNotebookId = notebookId;
             if (Boolean.FALSE.equals(notebook.getIsTemplate())) {
-                if (notebook.getParentNotebook() == null && notebook.getEntries() != null && !notebook.getEntries().isEmpty()) {
+                if (notebook.getParentNotebook() == null && notebook.getEntries() != null
+                        && !notebook.getEntries().isEmpty()) {
                     effectiveNotebookId = notebookId;
                 } else {
-                // This is either a child instance or an entry (not a template)
-                // First check if it's a child instance (has parentNotebook)
-                NoteBook parentNotebook = notebook.getParentNotebook();
-                if (parentNotebook != null) {
-                    // This is a child instance - check access via the parent template
-                    effectiveNotebookId = parentNotebook.getId();
-                    LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId=" + notebookId
-                            + " is a child instance, using parent template id=" + effectiveNotebookId);
-                } else {
-                    // Not a child instance - try finding parent via entries collection (legacy)
-                    NoteBook parent = noteBookService.getParentTemplate(notebookId);
-                    if (parent != null) {
-                        effectiveNotebookId = parent.getId();
+                    // This is either a child instance or an entry (not a template)
+                    // First check if it's a child instance (has parentNotebook)
+                    NoteBook parentNotebook = notebook.getParentNotebook();
+                    if (parentNotebook != null) {
+                        // This is a child instance - check access via the parent template
+                        effectiveNotebookId = parentNotebook.getId();
                         LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId=" + notebookId
-                                + " is an entry, using parent template id=" + effectiveNotebookId);
+                                + " is a child instance, using parent template id=" + effectiveNotebookId);
                     } else {
-                        // Orphaned entry - allow if user is creator or technician
-                        if (notebook.getTechnician() != null
-                                && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId)) {
-                            return true;
+                        // Not a child instance - try finding parent via entries collection (legacy)
+                        NoteBook parent = noteBookService.getParentTemplate(notebookId);
+                        if (parent != null) {
+                            effectiveNotebookId = parent.getId();
+                            LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId="
+                                    + notebookId + " is an entry, using parent template id=" + effectiveNotebookId);
+                        } else {
+                            // Orphaned entry - allow if user is creator or technician
+                            if (notebook.getTechnician() != null
+                                    && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId)) {
+                                return true;
+                            }
+                            if (notebook.getCreator() != null
+                                    && String.valueOf(notebook.getCreator().getId()).equals(sysUserId)) {
+                                return true;
+                            }
+                            // No parent and not creator/technician - deny
+                            LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate",
+                                    "NotebookId=" + notebookId + " is an orphaned entry with no parent, access denied");
+                            return false;
                         }
-                        if (notebook.getCreator() != null
-                                && String.valueOf(notebook.getCreator().getId()).equals(sysUserId)) {
-                            return true;
-                        }
-                        // No parent and not creator/technician - deny
-                        LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate",
-                                "NotebookId=" + notebookId + " is an orphaned entry with no parent, access denied");
-                        return false;
                     }
-                }
                 }
             }
 
@@ -162,7 +165,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                                     + ", localizedName=" + dept.getLocalizedName());
                 }
 
-                // If no lab unit is selected in session, fall back to assigned lab-unit mappings.
+                // If no lab unit is selected in session, fall back to assigned lab-unit
+                // mappings.
                 if (isBlank(loginLabUnit)) {
                     return hasDepartmentAccessWithoutLoginLabUnit(sysUserId, templateDepts);
                 }
@@ -216,8 +220,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
 
     /**
      * Fallback access check when user has no selected login lab unit in session.
-     * This allows department-scoped users to still see templates when their assigned
-     * lab-unit mappings overlap with template departments.
+     * This allows department-scoped users to still see templates when their
+     * assigned lab-unit mappings overlap with template departments.
      */
     private boolean hasDepartmentAccessWithoutLoginLabUnit(String sysUserId, Set<TestSection> templateDepts) {
         if (hasAllLabUnitsAccess(sysUserId)) {
@@ -307,9 +311,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                 String localizedName = mappedSection.getLocalizedName();
                 String testSectionName = mappedSection.getTestSectionName();
 
-                boolean resolvedOrgMatch = templateOrgs.stream()
-                        .anyMatch(org -> matchesLoginLabUnit(org, localizedName)
-                                || matchesLoginLabUnit(org, testSectionName));
+                boolean resolvedOrgMatch = templateOrgs.stream().anyMatch(
+                        org -> matchesLoginLabUnit(org, localizedName) || matchesLoginLabUnit(org, testSectionName));
                 if (resolvedOrgMatch) {
                     return true;
                 }
@@ -393,7 +396,7 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             Set<TestSection> templateDepts = noteBookService.getNoteBookDepartments(notebookId);
             boolean hasRole = hasRequiredRoleForTemplateDepartments(sysUserId, templateDepts, allowedRoles);
             LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
-                "hasRequiredRoleForTemplateDepartments result=" + hasRole + " (no loginLabUnit selected)");
+                    "hasRequiredRoleForTemplateDepartments result=" + hasRole + " (no loginLabUnit selected)");
             return hasRole;
         }
 
@@ -594,8 +597,10 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return false;
         }
 
+        Set<String> normalizedRequiredRoles = resolveRoleIdentifiers(requiredRoles);
+
         // First check global roles (not lab-unit specific)
-        if (userRoleService.userInRole(sysUserId, requiredRoles)) {
+        if (userRoleService.userInRole(sysUserId, normalizedRequiredRoles)) {
             LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
                     "User has global role matching requiredRoles=" + requiredRoles);
             return true;
@@ -646,22 +651,22 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                     labUnitMatches = normalizedLoginLabUnit.equalsIgnoreCase(tsLocalizedName)
                             || normalizedLoginLabUnit.equalsIgnoreCase(tsName)
                             || normalizedLoginLabUnit.equals(normalizedLabUnit); // Also match by
-                                                                                                      // ID
+                                                                                 // ID
                     LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
-                            "TestSection lookup: id=" + normalizedLabUnit + ", localizedName=" + tsLocalizedName + ", name="
-                                    + tsName + ", matches=" + labUnitMatches);
+                            "TestSection lookup: id=" + normalizedLabUnit + ", localizedName=" + tsLocalizedName
+                                    + ", name=" + tsName + ", matches=" + labUnitMatches);
                 }
             }
 
             if (labUnitMatches && userRoleIds != null) {
-                if (hasMatchingRole(userRoleIds, requiredRoles)) {
+                if (hasMatchingRole(userRoleIds, normalizedRequiredRoles, requiredRoles)) {
                     return true;
                 }
             }
         }
 
         LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
-                "No matching role found for requiredRoles=" + requiredRoles);
+                "No matching role found for requiredRoles=" + normalizedRequiredRoles);
         return false;
     }
 
@@ -675,7 +680,9 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return false;
         }
 
-        if (userRoleService.userInRole(sysUserId, requiredRoles)) {
+        Set<String> normalizedRequiredRoles = resolveRoleIdentifiers(requiredRoles);
+
+        if (userRoleService.userInRole(sysUserId, normalizedRequiredRoles)) {
             return true;
         }
 
@@ -697,9 +704,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             }
 
             String normalizedMappedLabUnit = mappedLabUnit.trim();
-            boolean departmentMatches = "AllLabUnits".equalsIgnoreCase(normalizedMappedLabUnit)
-                    || templateDepts.stream().anyMatch(
-                            dept -> matchesLoginLabUnitToDepartment(dept, normalizedMappedLabUnit));
+            boolean departmentMatches = "AllLabUnits".equalsIgnoreCase(normalizedMappedLabUnit) || templateDepts
+                    .stream().anyMatch(dept -> matchesLoginLabUnitToDepartment(dept, normalizedMappedLabUnit));
 
             if (!departmentMatches) {
                 TestSection mappedSection = testSectionService.get(normalizedMappedLabUnit);
@@ -712,7 +718,7 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                 }
             }
 
-            if (departmentMatches && hasMatchingRole(userRoleIds, requiredRoles)) {
+            if (departmentMatches && hasMatchingRole(userRoleIds, normalizedRequiredRoles, requiredRoles)) {
                 return true;
             }
         }
@@ -720,7 +726,40 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
         return false;
     }
 
-    private boolean hasMatchingRole(Set<String> userRoleIds, Set<String> requiredRoles) {
+    /**
+     * Templates may store allowedRoles as role IDs (from the admin UI) or as role
+     * names (from workflow configuration). Normalize to names for comparisons.
+     */
+    private Set<String> resolveRoleIdentifiers(Set<String> roleIdsOrNames) {
+        Set<String> resolved = new HashSet<>();
+        if (roleIdsOrNames == null) {
+            return resolved;
+        }
+        for (String idOrName : roleIdsOrNames) {
+            if (isBlank(idOrName)) {
+                continue;
+            }
+            String trimmed = idOrName.trim();
+            Role role = safeGetRoleById(trimmed);
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                resolved.add(role.getName().trim());
+            } else {
+                resolved.add(trimmed);
+            }
+        }
+        return resolved;
+    }
+
+    private Role safeGetRoleById(String roleId) {
+        try {
+            return roleService.getRoleById(roleId);
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
+
+    private boolean hasMatchingRole(Set<String> userRoleIds, Set<String> normalizedRequiredRoles,
+            Set<String> originalRequiredRoles) {
         // Convert user role IDs to role names and check against required roles
         for (String userRoleId : userRoleIds) {
             Role role = roleService.getRoleById(userRoleId);
@@ -730,12 +769,20 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                 String trimmedUserRoleName = userRoleName != null ? userRoleName.trim() : null;
                 LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
                         "User has role: id=" + userRoleId + ", name='" + trimmedUserRoleName + "'");
-                for (String requiredRole : requiredRoles) {
+                for (String requiredRole : normalizedRequiredRoles) {
                     String trimmedRequiredRole = requiredRole != null ? requiredRole.trim() : null;
                     if (trimmedUserRoleName != null && trimmedUserRoleName.equalsIgnoreCase(trimmedRequiredRole)) {
                         LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
                                 "Match found: userRole='" + trimmedUserRoleName + "' matches requiredRole='"
                                         + trimmedRequiredRole + "'");
+                        return true;
+                    }
+                }
+            }
+            if (originalRequiredRoles != null) {
+                for (String requiredRole : originalRequiredRoles) {
+                    String trimmedRequiredRole = requiredRole != null ? requiredRole.trim() : null;
+                    if (userRoleId != null && userRoleId.equals(trimmedRequiredRole)) {
                         return true;
                     }
                 }

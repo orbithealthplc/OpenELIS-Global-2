@@ -47,6 +47,8 @@ import org.openelisglobal.organization.service.OrganizationService;
 import org.openelisglobal.organization.valueholder.Organization;
 import org.openelisglobal.result.service.ResultService;
 import org.openelisglobal.result.valueholder.Result;
+import org.openelisglobal.role.service.RoleService;
+import org.openelisglobal.role.valueholder.Role;
 import org.openelisglobal.sample.service.SampleService;
 import org.openelisglobal.sample.valueholder.Sample;
 import org.openelisglobal.sampleitem.service.SampleItemService;
@@ -110,6 +112,9 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
     @Autowired
     private NotebookEntryService notebookEntryService;
 
+    @Autowired
+    private RoleService roleService;
+
     public NoteBookServiceImpl() {
         super(NoteBook.class);
         this.auditTrailLog = true;
@@ -118,6 +123,35 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
     @Override
     protected BaseDAO<NoteBook, Integer> getBaseObjectDAO() {
         return baseObjectDAO;
+    }
+
+    /**
+     * API responses expose role names; templates may store role IDs from the admin
+     * UI.
+     */
+    private Set<String> resolveRoleNamesForDisplay(Set<String> roleIdsOrNames) {
+        if (roleIdsOrNames == null || roleIdsOrNames.isEmpty()) {
+            return new HashSet<>();
+        }
+        Set<String> resolved = new HashSet<>();
+        for (String idOrName : roleIdsOrNames) {
+            if (idOrName == null || idOrName.isBlank()) {
+                continue;
+            }
+            String trimmed = idOrName.trim();
+            Role role = null;
+            try {
+                role = roleService.getRoleById(trimmed);
+            } catch (RuntimeException e) {
+                // Not a numeric role id — treat value as an already-resolved role name.
+            }
+            if (role != null && role.getName() != null && !role.getName().isBlank()) {
+                resolved.add(role.getName().trim());
+            } else {
+                resolved.add(trimmed);
+            }
+        }
+        return resolved;
     }
 
     @Override
@@ -324,14 +358,13 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
         }
         if (parentTemplate != null) {
             Hibernate.initialize(parentTemplate.getAllowedRoles());
-            displayBean.setAllowedRoles(new HashSet<>(parentTemplate.getAllowedRoles()));
+            displayBean.setAllowedRoles(resolveRoleNamesForDisplay(parentTemplate.getAllowedRoles()));
             if (parentTemplate.getType() != null && displayBean.getTypeName() == null) {
                 displayBean.setTypeName(parentTemplate.getType().getDictEntry());
             }
         } else {
             Hibernate.initialize(instance.getAllowedRoles());
-            displayBean.setAllowedRoles(
-                    instance.getAllowedRoles() != null ? new HashSet<>(instance.getAllowedRoles()) : new HashSet<>());
+            displayBean.setAllowedRoles(resolveRoleNamesForDisplay(instance.getAllowedRoles()));
         }
 
         return displayBean;
@@ -580,11 +613,11 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 NoteBook parentTemplate = noteBook.getParentNotebook();
                 if (parentTemplate != null) {
                     Hibernate.initialize(parentTemplate.getAllowedRoles());
-                    displayBean.setAllowedRoles(new HashSet<>(parentTemplate.getAllowedRoles()));
+                    displayBean.setAllowedRoles(resolveRoleNamesForDisplay(parentTemplate.getAllowedRoles()));
                 } else {
                     // Fallback to own allowedRoles if parent not found (shouldn't happen)
                     Hibernate.initialize(noteBook.getAllowedRoles());
-                    displayBean.setAllowedRoles(new HashSet<>(noteBook.getAllowedRoles()));
+                    displayBean.setAllowedRoles(resolveRoleNamesForDisplay(noteBook.getAllowedRoles()));
                 }
             } else if (noteBook.getIsTemplate() != null && !noteBook.getIsTemplate()) {
                 // Entry (not a child instance) - find parent via entries collection
@@ -595,7 +628,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 // Entries inherit allowedRoles from their parent template
                 if (parentTemplate != null) {
                     Hibernate.initialize(parentTemplate.getAllowedRoles());
-                    displayBean.setAllowedRoles(new HashSet<>(parentTemplate.getAllowedRoles()));
+                    displayBean.setAllowedRoles(resolveRoleNamesForDisplay(parentTemplate.getAllowedRoles()));
                 }
 
                 // Use direct parent's title for display name and calculate entry number
@@ -628,7 +661,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
             } else {
                 // For parent templates, use their own allowedRoles
                 Hibernate.initialize(noteBook.getAllowedRoles());
-                displayBean.setAllowedRoles(new HashSet<>(noteBook.getAllowedRoles()));
+                displayBean.setAllowedRoles(resolveRoleNamesForDisplay(noteBook.getAllowedRoles()));
             }
         }
         return displayBean;
@@ -676,7 +709,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                     Hibernate.initialize(page.getAllowedRoles());
                     // Ensure allowedRoles is a regular HashSet (not Hibernate proxy) for JSON
                     // serialization
-                    page.setAllowedRoles(new HashSet<>(page.getAllowedRoles()));
+                    page.setAllowedRoles(resolveRoleNamesForDisplay(page.getAllowedRoles()));
                 }
             }
             Hibernate.initialize(noteBook.getFiles());
@@ -803,7 +836,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                     fullDisplayBean.setDepartments(parentTemplate.getDepartments());
 
                     Hibernate.initialize(parentTemplate.getAllowedRoles());
-                    fullDisplayBean.setAllowedRoles(parentTemplate.getAllowedRoles());
+                    fullDisplayBean.setAllowedRoles(resolveRoleNamesForDisplay(parentTemplate.getAllowedRoles()));
                 } else {
                     // Fallback to own settings
                     Hibernate.initialize(noteBook.getOrganizations());
@@ -813,7 +846,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                     fullDisplayBean.setDepartments(noteBook.getDepartments());
 
                     Hibernate.initialize(noteBook.getAllowedRoles());
-                    fullDisplayBean.setAllowedRoles(noteBook.getAllowedRoles());
+                    fullDisplayBean.setAllowedRoles(resolveRoleNamesForDisplay(noteBook.getAllowedRoles()));
                 }
             } else {
                 Hibernate.initialize(noteBook.getOrganizations());
@@ -823,7 +856,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 fullDisplayBean.setDepartments(noteBook.getDepartments());
 
                 Hibernate.initialize(noteBook.getAllowedRoles());
-                fullDisplayBean.setAllowedRoles(noteBook.getAllowedRoles());
+                fullDisplayBean.setAllowedRoles(resolveRoleNamesForDisplay(noteBook.getAllowedRoles()));
             }
 
         }
