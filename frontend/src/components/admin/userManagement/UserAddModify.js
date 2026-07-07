@@ -6,6 +6,7 @@ import {
   FormGroup,
   Grid,
   Heading,
+  InlineNotification,
   ListItem,
   Loading,
   PasswordInput,
@@ -86,6 +87,9 @@ function UserAddModify() {
   const [selectedTestSectionLabUnits, setSelectedTestSectionLabUnits] =
     useState({});
   const [selectedTestSectionList, setSelectedTestSectionList] = useState([]);
+  const [presetTestSectionId, setPresetTestSectionId] = useState("");
+  const [presetLabUnitRoleId, setPresetLabUnitRoleId] = useState("");
+  const [presetNotice, setPresetNotice] = useState(null);
   const [passwordTouched, setPasswordTouched] = useState({
     userPassword: false,
     confirmPassword: false,
@@ -768,6 +772,58 @@ function UserAddModify() {
     });
   };
 
+  const applyPresetPermission = () => {
+    if (!presetTestSectionId || !presetLabUnitRoleId) {
+      setPresetNotice({
+        kind: "error",
+        message: intl.formatMessage({ id: "systemuserrole.preset.error" }),
+      });
+      return;
+    }
+
+    const knownTestSections = Array.isArray(userDataShow?.testSections)
+      ? userDataShow.testSections
+      : [];
+    if (!knownTestSections.some((ts) => ts.id === presetTestSectionId)) {
+      setPresetNotice({
+        kind: "error",
+        message: intl.formatMessage({
+          id: "systemuserrole.preset.error.invalidSection",
+        }),
+      });
+      return;
+    }
+
+    const allLabUnitRoleIds = Array.isArray(userDataShow?.labUnitRoles)
+      ? userDataShow.labUnitRoles.map((r) => r.roleId)
+      : [];
+
+    const isAll = presetLabUnitRoleId === "__ALL__";
+    const roleIdsToApply = isAll
+      ? allLabUnitRoleIds
+      : [presetLabUnitRoleId].filter(Boolean);
+
+    setSelectedTestSectionLabUnits((prev) => ({
+      ...(prev || {}),
+      [presetTestSectionId]: Array.from(
+        new Set([...(prev?.[presetTestSectionId] || []), ...roleIdsToApply]),
+      ),
+    }));
+
+    setSelectedTestSectionList((prev) =>
+      prev.includes(presetTestSectionId)
+        ? prev
+        : [...prev, presetTestSectionId],
+    );
+
+    setPresetNotice({
+      kind: "success",
+      message: intl.formatMessage({ id: "systemuserrole.preset.applied" }),
+    });
+    setSaveButton(false);
+    setValidation({ ...validation, selectedLab: true });
+  };
+
   const addNewSection = () => {
     const newSectionsToAdd = userDataShow.testSections.filter(
       (section) =>
@@ -1257,6 +1313,98 @@ function UserAddModify() {
                     <FormattedMessage id="systemuserrole.apply" />
                   </Button>
                 </Grid>
+                <br />
+                <Grid fullWidth={true} className="gridBoundary">
+                  <Column lg={16} md={8} sm={4}>
+                    <Heading>
+                      <FormattedMessage id="systemuserrole.preset.title" />
+                    </Heading>
+                  </Column>
+                </Grid>
+                <Grid fullWidth={true}>
+                  <Column lg={6} md={4} sm={4}>
+                    <Select
+                      id="preset-test-section"
+                      data-cy="preset-test-section"
+                      labelText={intl.formatMessage({
+                        id: "systemuserrole.preset.testSection",
+                      })}
+                      value={presetTestSectionId}
+                      onChange={(e) => {
+                        setPresetTestSectionId(e.target.value);
+                        setPresetNotice(null);
+                      }}
+                    >
+                      <SelectItem
+                        value=""
+                        text={intl.formatMessage({ id: "select.option" })}
+                      />
+                      {(userDataShow?.testSections || []).map((section) => (
+                        <SelectItem
+                          key={`preset-ts-${section.id}`}
+                          value={section.id}
+                          text={section.value}
+                        />
+                      ))}
+                    </Select>
+                  </Column>
+                  <Column lg={6} md={4} sm={4}>
+                    <Select
+                      id="preset-lab-role"
+                      data-cy="preset-lab-role"
+                      labelText={intl.formatMessage({
+                        id: "systemuserrole.preset.labRole",
+                      })}
+                      value={presetLabUnitRoleId}
+                      onChange={(e) => {
+                        setPresetLabUnitRoleId(e.target.value);
+                        setPresetNotice(null);
+                      }}
+                    >
+                      <SelectItem
+                        value=""
+                        text={intl.formatMessage({ id: "select.option" })}
+                      />
+                      <SelectItem
+                        value="__ALL__"
+                        text={intl.formatMessage({
+                          id: "systemuserrole.preset.allPermissions",
+                        })}
+                      />
+                      {(userDataShow?.labUnitRoles || []).map((role) => (
+                        <SelectItem
+                          key={`preset-role-${role.roleId}`}
+                          value={role.roleId}
+                          text={role.roleName}
+                        />
+                      ))}
+                    </Select>
+                  </Column>
+                  <Column lg={4} md={4} sm={4} style={{ marginTop: "1.5rem" }}>
+                    <Button
+                      kind="secondary"
+                      type="button"
+                      data-cy="preset-apply"
+                      onClick={applyPresetPermission}
+                      disabled={!presetTestSectionId || !presetLabUnitRoleId}
+                    >
+                      <FormattedMessage id="systemuserrole.preset.apply" />
+                    </Button>
+                  </Column>
+                </Grid>
+                {presetNotice ? (
+                  <Grid fullWidth={true}>
+                    <Column lg={16} md={8} sm={4}>
+                      <InlineNotification
+                        lowContrast
+                        kind={presetNotice.kind}
+                        title={intl.formatMessage({ id: "notification.title" })}
+                        subtitle={presetNotice.message}
+                        onCloseButtonClick={() => setPresetNotice(null)}
+                      />
+                    </Column>
+                  </Grid>
+                ) : null}
                 <hr />
                 <br />
                 <Grid fullWidth={true}>
