@@ -514,23 +514,45 @@ public class SampleRoutingServiceImpl extends AuditableBaseObjectServiceImpl<Sam
         String notes = String.format("Storage condition: %s | Retention: %d years | Expiry: %s",
                 condition != null ? condition.name() : "UNSPECIFIED", retentionYears, expiryDate);
 
-        // Use SampleStorageService to create the storage assignment (with audit trail)
-        Map<String, Object> assignmentResult;
-        try {
-            assignmentResult = sampleStorageService.assignSampleItemWithLocation(sampleItemId.toString(), locationId,
-                    locationType, positionCoordinate, notes);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to create storage assignment: " + e.getMessage(), e);
+        // Use SampleStorageService to create or move the storage assignment (with audit trail).
+        // If the sample already has a SampleStorageAssignment, we must NOT call assign again
+        // (unique constraint) — we either move it or (if the location is unchanged) reuse it.
+        Map<String, Object> existingLocation = sampleStorageService.getSampleItemLocation(sampleItemId.toString());
+        boolean hasExistingAssignment = existingLocation != null && !existingLocation.isEmpty()
+                && existingLocation.containsKey("sampleItemId");
+
+        SampleStorageAssignment assignment = null;
+        if (hasExistingAssignment) {
+            SampleStorageAssignment existingAssignment = storageAssignmentDAO.findBySampleItemId(sampleItemId.toString());
+            if (existingAssignment != null) {
+                boolean sameLocation = safeEquals(existingAssignment.getLocationType(), locationType)
+                        && safeEquals(existingAssignment.getLocationId(),
+                                locationId != null ? Integer.valueOf(locationId) : null)
+                        && safeEquals(trimOrNull(existingAssignment.getPositionCoordinate()), trimOrNull(positionCoordinate));
+
+                if (sameLocation) {
+                    assignment = existingAssignment;
+                } else {
+                    sampleStorageService.moveSampleItemWithLocation(sampleItemId.toString(), locationId, locationType,
+                            positionCoordinate, "Notebook storage assignment update", notes, userId);
+                    assignment = storageAssignmentDAO.findBySampleItemId(sampleItemId.toString());
+                }
+            }
         }
 
-        // Get the assignment ID from the result
-        String assignmentIdStr = (String) assignmentResult.get("assignmentId");
-        Integer assignmentId = assignmentIdStr != null ? Integer.parseInt(assignmentIdStr) : null;
-
-        // Retrieve the created assignment to link to routing
-        SampleStorageAssignment assignment = null;
-        if (assignmentId != null) {
-            assignment = storageAssignmentDAO.get(assignmentId).orElse(null);
+        // No existing assignment record: create a new assignment
+        try {
+            if (assignment == null) {
+                Map<String, Object> assignmentResult = sampleStorageService.assignSampleItemWithLocation(
+                        sampleItemId.toString(), locationId, locationType, positionCoordinate, notes, userId);
+                String assignmentIdStr = (String) assignmentResult.get("assignmentId");
+                Integer assignmentId = assignmentIdStr != null ? Integer.parseInt(assignmentIdStr) : null;
+                if (assignmentId != null) {
+                    assignment = storageAssignmentDAO.get(assignmentId).orElse(null);
+                }
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Failed to create storage assignment: " + e.getMessage(), e);
         }
 
         // Use allowRerouting=true since samples may have been routed to internal
@@ -548,6 +570,24 @@ public class SampleRoutingServiceImpl extends AuditableBaseObjectServiceImpl<Sam
             routing.setId(id);
         }
         return routing;
+    }
+
+    private static String trimOrNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static boolean safeEquals(Object left, Object right) {
+        if (left == null && right == null) {
+            return true;
+        }
+        if (left == null || right == null) {
+            return false;
+        }
+        return left.equals(right);
     }
 
     @Override
