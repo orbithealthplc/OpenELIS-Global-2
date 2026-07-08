@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from "react";
 import {
   Grid,
   Column,
@@ -36,9 +42,12 @@ import { FormattedMessage, useIntl } from "react-intl";
 import {
   getFromOpenElisServer,
   postToOpenElisServer,
+  postToOpenElisServerJsonResponse,
 } from "../../../utils/Utils";
 import SampleGrid from "../../workflow/SampleGrid";
-import StorageHierarchySelector from "../../workflow/StorageHierarchySelector";
+import SendToBiorepositoryModal, {
+  mapPageSamplesForBiorepositoryTransfer,
+} from "../biorepository/SendToBiorepositoryModal";
 import "../../workflow/NotebookWorkflow.css";
 
 /**
@@ -96,20 +105,6 @@ function BacteriologySampleRetrievalDisposalPage({
     retrievedBy: "",
     retrievalDestination: "",
     retrievalNotes: "",
-  });
-
-  // Biorepository transfer form data
-  const [biorepositoryData, setBiorepositoryData] = useState({
-    biorepositoryName: "",
-    transferDate: new Date().toISOString().split("T")[0],
-    chainOfCustodyNumber: "",
-    transferDocuments: [],
-    transferConditions: "",
-    transferredBy: "",
-    receivedBy: "",
-    biorepositoryAccessionNumber: "",
-    // New storage location for biorepository transfer
-    newStorageLocation: null,
   });
 
   // Disposal form data
@@ -176,27 +171,6 @@ function BacteriologySampleRetrievalDisposalPage({
     { value: "CHEMICAL_TREATMENT", label: "Chemical Treatment - Disinfection" },
     { value: "CERTIFIED_WASTE", label: "Certified Waste Disposal" },
     { value: "OTHER", label: "Other" },
-  ];
-
-  // Transfer conditions
-  const transferConditions = [
-    { value: "DRY_ICE", label: "Dry Ice (-78°C)" },
-    { value: "COLD_PACK", label: "Cold Pack (2-8°C)" },
-    { value: "AMBIENT", label: "Ambient Temperature" },
-    { value: "LIQUID_NITROGEN", label: "Liquid Nitrogen (-196°C)" },
-    { value: "FROZEN_MINUS80", label: "Frozen (-80°C)" },
-    { value: "FROZEN_MINUS20", label: "Frozen (-20°C)" },
-  ];
-
-  // Transfer documents
-  const transferDocumentOptions = [
-    { value: "SAMPLE_MANIFEST", label: "Sample Manifest" },
-    { value: "CHAIN_OF_CUSTODY", label: "Chain of Custody Form" },
-    { value: "TEST_RESULTS", label: "Test Results" },
-    { value: "ISOLATION_RECORDS", label: "Isolation Records" },
-    { value: "IDENTIFICATION_REPORT", label: "Identification Report" },
-    { value: "AST_RESULTS", label: "AST Results" },
-    { value: "MOLECULAR_DATA", label: "Molecular Data" },
   ];
 
   const hasRealPageId =
@@ -566,129 +540,89 @@ function BacteriologySampleRetrievalDisposalPage({
     });
   };
 
-  // Handle biorepository transfer - moves samples to new storage location
-  const handleApplyBiorepositoryData = () => {
-    if (selectedIds.length === 0) {
-      setError(
-        intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.noSamplesSelected",
-          defaultMessage: "Please select samples to transfer",
-        }),
-      );
-      return;
-    }
+  const bioTransferSamples = useMemo(
+    () => mapPageSamplesForBiorepositoryTransfer(samples, selectedIds),
+    [samples, selectedIds],
+  );
 
-    if (!biorepositoryData.biorepositoryName) {
-      setError(
-        intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.nameRequired",
-          defaultMessage: "Biorepository name is required",
-        }),
-      );
-      return;
-    }
+  // Creates a real SampleTransferRequest so Biorepository Intake → Sample Transfer shows Pending
+  const handleBiorepositoryTransferSuccess = useCallback(
+    (transferResponse) => {
+      if (!hasRealPageId) {
+        setShowBiorepositoryModal(false);
+        return;
+      }
 
-    if (!biorepositoryData.chainOfCustodyNumber) {
-      setError(
-        intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.chainRequired",
-          defaultMessage: "Chain of custody number is required",
-        }),
-      );
-      return;
-    }
+      const numericIds = selectedIds.map((id) => parseInt(id, 10));
+      const transferId = transferResponse?.id;
 
-    if (!hasRealPageId) {
-      setShowBiorepositoryModal(false);
-      return;
-    }
-
-    const numericIds = selectedIds.map((id) => parseInt(id, 10));
-
-    // If a new storage location is selected, move samples to that location first
-    const moveToStoragePromises = selectedIds.map((sampleId) => {
-      return new Promise((resolve) => {
-        if (biorepositoryData.newStorageLocation) {
-          const loc = biorepositoryData.newStorageLocation;
-          postToOpenElisServer(
-            "/rest/storage/sample-items/move",
-            JSON.stringify({
-              sampleItemId: sampleId,
-              locationId: loc.id,
-              locationType: loc.type,
-              positionCoordinate: loc.positionCoordinate || null,
-              reason: `Transferred to biorepository: ${biorepositoryData.biorepositoryName}`,
-              notes: `Chain of custody: ${biorepositoryData.chainOfCustodyNumber}`,
-            }),
-            () => resolve(),
-          );
-        } else {
-          resolve();
-        }
-      });
-    });
-
-    // Wait for storage moves, then apply biorepository data
-    Promise.all(moveToStoragePromises).then(() => {
-      // Build storage path for display
-      const newStoragePath = biorepositoryData.newStorageLocation
-        ? biorepositoryData.newStorageLocation.path ||
-          biorepositoryData.newStorageLocation.label
-        : null;
-
-      postToOpenElisServer(
+      postToOpenElisServerJsonResponse(
         `/rest/notebook/bulk/page/${pageData.id}/samples/apply`,
         JSON.stringify({
           sampleIds: numericIds,
           data: {
-            ...biorepositoryData,
             isTransferred: true,
             transferToBiorepository: true,
-            newStoragePath: newStoragePath,
+            archiveType: "BIOREPOSITORY",
+            biorepositoryTransferId: transferId,
+            biorepositoryTransferStatus: transferResponse?.status || "PENDING",
             transferredToStorageDate: new Date().toISOString(),
           },
         }),
         (response) => {
-          if (componentMounted.current) {
-            if (response && !response.error) {
-              // Mark samples as COMPLETED
-              postToOpenElisServer(
-                `/rest/notebook/bulk/page/${pageData.id}/samples/status`,
-                JSON.stringify({
-                  sampleIds: numericIds,
-                  status: "COMPLETED",
-                }),
-                () => {
-                  setSuccess(
-                    intl.formatMessage(
-                      {
-                        id: "notebook.bacteriology.biorepository.success",
-                        defaultMessage:
-                          "Transferred {count} sample(s) to biorepository{location}.",
-                      },
-                      {
-                        count: selectedIds.length,
-                        location: newStoragePath ? ` (${newStoragePath})` : "",
-                      },
-                    ),
-                  );
-                  setShowBiorepositoryModal(false);
-                  setSelectedIds([]);
-                  resetBiorepositoryForm();
-                  loadSamples();
-                  if (onProgressUpdate) {
-                    onProgressUpdate();
-                  }
-                },
-              );
-            } else {
-              setError(response?.error || "Failed to apply transfer data");
-            }
+          if (!componentMounted.current) {
+            return;
+          }
+          if (response && !response.error) {
+            postToOpenElisServerJsonResponse(
+              `/rest/notebook/bulk/page/${pageData.id}/samples/status`,
+              JSON.stringify({
+                sampleIds: numericIds,
+                status: "COMPLETED",
+              }),
+              () => {
+                if (!componentMounted.current) {
+                  return;
+                }
+                setSuccess(
+                  intl.formatMessage(
+                    {
+                      id: "notebook.bacteriology.biorepository.successWithRequest",
+                      defaultMessage:
+                        "Transferred {count} sample(s) to biorepository. Transfer request #{transferId} is pending acceptance.",
+                    },
+                    {
+                      count: selectedIds.length,
+                      transferId: transferId || "—",
+                    },
+                  ),
+                );
+                setShowBiorepositoryModal(false);
+                setSelectedIds([]);
+                loadSamples();
+                if (onProgressUpdate) {
+                  onProgressUpdate();
+                }
+              },
+            );
+          } else {
+            setError(
+              response?.error ||
+                "Transfer created but failed to update notebook samples.",
+            );
           }
         },
       );
-    });
-  };
+    },
+    [
+      hasRealPageId,
+      selectedIds,
+      pageData?.id,
+      intl,
+      loadSamples,
+      onProgressUpdate,
+    ],
+  );
 
   // Handle disposal - removes samples from storage and marks as disposed
   const handleApplyDisposalData = () => {
@@ -825,20 +759,6 @@ function BacteriologySampleRetrievalDisposalPage({
       retrievedBy: "",
       retrievalDestination: "",
       retrievalNotes: "",
-    });
-  };
-
-  const resetBiorepositoryForm = () => {
-    setBiorepositoryData({
-      biorepositoryName: "",
-      transferDate: new Date().toISOString().split("T")[0],
-      chainOfCustodyNumber: "",
-      transferDocuments: [],
-      transferConditions: "",
-      transferredBy: "",
-      receivedBy: "",
-      biorepositoryAccessionNumber: "",
-      newStorageLocation: null,
     });
   };
 
@@ -1671,243 +1591,17 @@ function BacteriologySampleRetrievalDisposalPage({
         </div>
       </Modal>
 
-      {/* Biorepository Transfer Modal */}
-      <Modal
+      {/* Biorepository Transfer Modal — creates SampleTransferRequest for Intake queue */}
+      <SendToBiorepositoryModal
         open={showBiorepositoryModal}
-        onRequestClose={() => setShowBiorepositoryModal(false)}
-        onRequestSubmit={handleApplyBiorepositoryData}
-        modalHeading={intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.modalTitle",
-          defaultMessage: "Transfer to Biorepository",
-        })}
-        primaryButtonText={intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.confirm",
-          defaultMessage: "Confirm Transfer",
-        })}
-        secondaryButtonText={intl.formatMessage({
-          id: "notebook.bacteriology.biorepository.cancel",
-          defaultMessage: "Cancel",
-        })}
-        size="lg"
-      >
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <InlineNotification
-            kind="info"
-            title={intl.formatMessage(
-              {
-                id: "notebook.bacteriology.biorepository.info",
-                defaultMessage:
-                  "Transferring {count} sample(s) to biorepository",
-              },
-              { count: selectedIds.length },
-            )}
-            hideCloseButton
-            lowContrast
-          />
-
-          <Grid fullWidth narrow>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="biorepository-name"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.biorepository.name",
-                  defaultMessage: "Biorepository Name *",
-                })}
-                value={biorepositoryData.biorepositoryName}
-                onChange={(e) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    biorepositoryName: e.target.value,
-                  })
-                }
-                required
-              />
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="chain-of-custody"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.biorepository.chainOfCustody",
-                  defaultMessage: "Chain of Custody Number *",
-                })}
-                value={biorepositoryData.chainOfCustodyNumber}
-                onChange={(e) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    chainOfCustodyNumber: e.target.value,
-                  })
-                }
-                required
-              />
-            </Column>
-          </Grid>
-
-          <Grid fullWidth narrow>
-            <Column lg={8} md={4} sm={4}>
-              <DatePicker
-                datePickerType="single"
-                value={biorepositoryData.transferDate}
-                onChange={([date]) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    transferDate: date?.toISOString().split("T")[0] || "",
-                  })
-                }
-              >
-                <DatePickerInput
-                  id="transfer-date"
-                  labelText={intl.formatMessage({
-                    id: "notebook.bacteriology.biorepository.transferDate",
-                    defaultMessage: "Transfer Date",
-                  })}
-                  placeholder="mm/dd/yyyy"
-                />
-              </DatePicker>
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <Select
-                id="transfer-conditions"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.biorepository.conditions",
-                  defaultMessage: "Transfer Conditions",
-                })}
-                value={biorepositoryData.transferConditions}
-                onChange={(e) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    transferConditions: e.target.value,
-                  })
-                }
-              >
-                <SelectItem value="" text="Select conditions..." />
-                {transferConditions.map((condition) => (
-                  <SelectItem
-                    key={condition.value}
-                    value={condition.value}
-                    text={condition.label}
-                  />
-                ))}
-              </Select>
-            </Column>
-          </Grid>
-
-          <Grid fullWidth narrow>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="transferred-by"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.biorepository.transferredBy",
-                  defaultMessage: "Transferred By",
-                })}
-                value={biorepositoryData.transferredBy}
-                onChange={(e) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    transferredBy: e.target.value,
-                  })
-                }
-              />
-            </Column>
-            <Column lg={8} md={4} sm={4}>
-              <TextInput
-                id="received-by"
-                labelText={intl.formatMessage({
-                  id: "notebook.bacteriology.biorepository.receivedBy",
-                  defaultMessage: "Received By (Biorepository)",
-                })}
-                value={biorepositoryData.receivedBy}
-                onChange={(e) =>
-                  setBiorepositoryData({
-                    ...biorepositoryData,
-                    receivedBy: e.target.value,
-                  })
-                }
-              />
-            </Column>
-          </Grid>
-
-          <TextInput
-            id="biorepository-accession"
-            labelText={intl.formatMessage({
-              id: "notebook.bacteriology.biorepository.accessionNumber",
-              defaultMessage: "Biorepository Accession Number",
-            })}
-            value={biorepositoryData.biorepositoryAccessionNumber}
-            onChange={(e) =>
-              setBiorepositoryData({
-                ...biorepositoryData,
-                biorepositoryAccessionNumber: e.target.value,
-              })
-            }
-          />
-
-          {/* New Storage Location Selector */}
-          <div style={{ marginTop: "1rem" }}>
-            <h5 style={{ marginBottom: "0.5rem" }}>
-              <FormattedMessage
-                id="notebook.bacteriology.biorepository.newStorageLocation"
-                defaultMessage="New Storage Location (Optional)"
-              />
-            </h5>
-            <p
-              style={{
-                fontSize: "0.875rem",
-                color: "#525252",
-                marginBottom: "1rem",
-              }}
-            >
-              <FormattedMessage
-                id="notebook.bacteriology.biorepository.newStorageDescription"
-                defaultMessage="Select a new storage location in the biorepository for these samples. Leave empty to keep current storage."
-              />
-            </p>
-            <StorageHierarchySelector
-              onLocationSelect={(location) =>
-                setBiorepositoryData({
-                  ...biorepositoryData,
-                  newStorageLocation: location,
-                })
-              }
-              selectedLocation={biorepositoryData.newStorageLocation}
-              notebookId={notebookId}
-              showPositionCoordinate={true}
-              compact={true}
-            />
-            {biorepositoryData.newStorageLocation && (
-              <div style={{ marginTop: "0.5rem" }}>
-                <Tag type="teal" size="sm">
-                  <FormattedMessage
-                    id="notebook.bacteriology.biorepository.newLocation"
-                    defaultMessage="New Location: {path}"
-                    values={{
-                      path:
-                        biorepositoryData.newStorageLocation.path ||
-                        biorepositoryData.newStorageLocation.label ||
-                        "Selected",
-                    }}
-                  />
-                </Tag>
-                <Button
-                  kind="ghost"
-                  size="sm"
-                  onClick={() =>
-                    setBiorepositoryData({
-                      ...biorepositoryData,
-                      newStorageLocation: null,
-                    })
-                  }
-                  style={{ marginLeft: "0.5rem" }}
-                >
-                  <FormattedMessage
-                    id="notebook.bacteriology.biorepository.clearLocation"
-                    defaultMessage="Clear"
-                  />
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </Modal>
+        onClose={() => setShowBiorepositoryModal(false)}
+        sourceLab="Bacteriology"
+        notebookId={notebookId}
+        entryId={entryId}
+        selectedSamples={bioTransferSamples}
+        onSuccess={handleBiorepositoryTransferSuccess}
+        onError={(message) => setError(message)}
+      />
 
       {/* Disposal Modal */}
       <Modal
