@@ -175,9 +175,9 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
 
     private String buildWorkflowStatusWhereClause(WorkflowStatus workflowStatus) {
         if (workflowStatus == WorkflowStatus.REGISTERED) {
-            return "WHERE (str(bs.workflowStatus) = :workflowStatus OR bs.workflowStatus IS NULL) ";
+            return "WHERE (cast(bs.workflowStatus as string) = :workflowStatus OR bs.workflowStatus IS NULL) ";
         }
-        return "WHERE str(bs.workflowStatus) = :workflowStatus ";
+        return "WHERE cast(bs.workflowStatus as string) = :workflowStatus ";
     }
 
     @Override
