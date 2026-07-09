@@ -146,10 +146,16 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
         }
 
         Session session = entityManager.unwrap(Session.class);
+        // Intake "Received Samples" UI requests workflowStatus=REGISTERED with a limited page size.
+        // Ordering oldest-first can hide newly imported samples when there are many REGISTERED rows.
+        // For REGISTERED, order newest-first so users immediately see recent imports/transfers.
+        String orderByClause = workflowStatus == WorkflowStatus.REGISTERED
+                ? " ORDER BY bs.id DESC"
+                : " ORDER BY bs.manifestSno ASC NULLS LAST, bs.id ASC";
         String hql = "SELECT DISTINCT bs FROM BioSample bs " + "LEFT JOIN FETCH bs.shipment "
                 + "LEFT JOIN FETCH bs.sampleItem si " + "LEFT JOIN FETCH si.typeOfSample "
                 + "LEFT JOIN FETCH si.sample " + buildWorkflowStatusWhereClause(workflowStatus)
-                + " ORDER BY bs.manifestSno ASC NULLS LAST, bs.id ASC";
+                + orderByClause;
         return session.createQuery(hql, BioSample.class).setParameter("workflowStatus", workflowStatus)
                 .setFirstResult(Math.max(offset, 0)).setMaxResults(limit).getResultList();
     }
