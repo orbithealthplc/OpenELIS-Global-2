@@ -1637,9 +1637,8 @@ public class BioSampleRestController extends BaseRestController {
                 }
             }
 
-            if (sample.getExternalId() == null || sample.getExternalId().trim().isEmpty()) {
-                rowResult.addError("External/Donor ID is required");
-            }
+            // External/Donor ID is optional for manifest import.
+            // Barcode (sample ID) is the primary required identifier.
 
             // Validate sample type
             String sampleTypeId = sample.getSampleTypeId();
@@ -1678,14 +1677,8 @@ public class BioSampleRestController extends BaseRestController {
                 rowResult.addError("Invalid receipt date format: " + sample.getReceiptDate());
             }
 
-            if (sample.getRequiredTempMin() == null) {
-                rowResult.addError("Minimum storage temperature is required");
-            }
-
-            if (sample.getRequiredTempMax() == null) {
-                rowResult.addError("Maximum storage temperature is required");
-            }
-
+            // Storage temperature requirements are optional for manifest import.
+            // When absent, downstream registration will apply a safe default range.
             if (sample.getRequiredTempMin() != null && sample.getRequiredTempMax() != null
                     && sample.getRequiredTempMin().compareTo(sample.getRequiredTempMax()) > 0) {
                 rowResult.addError(
@@ -1883,11 +1876,18 @@ public class BioSampleRestController extends BaseRestController {
         bioSample.setProjectId(dto.getProjectId());
         bioSample.setDepartmentTestSectionId(departmentTestSectionId);
         bioSample.setManifestSno(dto.getSno());
+        // Temperature requirements: optional in manifest import.
+        // If missing, apply a safe default (-80 to -20) to keep downstream retention
+        // policies and storage selection logic consistent.
         if (dto.getRequiredTempMin() != null) {
             bioSample.setRequiredTempMin(dto.getRequiredTempMin());
+        } else {
+            bioSample.setRequiredTempMin(new java.math.BigDecimal("-80"));
         }
         if (dto.getRequiredTempMax() != null) {
             bioSample.setRequiredTempMax(dto.getRequiredTempMax());
+        } else {
+            bioSample.setRequiredTempMax(new java.math.BigDecimal("-20"));
         }
         if (shipmentId != null) {
             Shipment shipment = shipmentService.get(shipmentId);

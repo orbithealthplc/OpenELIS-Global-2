@@ -77,8 +77,6 @@ const REQUIRED_FIELDS = [
   "sampleType",
   "originLab",
   "receiptDate",
-  "requiredTempMin",
-  "requiredTempMax",
 ];
 
 const CONDITIONAL_FIELDS = [
@@ -91,7 +89,9 @@ const OPTIONAL_FIELDS = MANIFEST_FIELDS.filter(
   (field) => !REQUIRED_FIELDS.includes(field),
 );
 
-const VALIDATION_BATCH_SIZE = 500;
+// Batch backend validation/import to keep payload sizes safe while minimizing
+// round-trips for typical manifests.
+const VALIDATION_BATCH_SIZE = 2000;
 
 /**
  * ManifestUploadModal - manifest upload modal for bulk sample import
