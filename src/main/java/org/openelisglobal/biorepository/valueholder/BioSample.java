@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -253,7 +255,7 @@ public class BioSample extends BaseObject<Integer> {
      * lifecycle: Intake → Storage Assignment → Stored → In Use → Disposed.
      */
     @Column(name = "workflow_status", length = 20)
-    @Convert(converter = WorkflowStatusConverter.class)
+    @Enumerated(EnumType.STRING)
     private WorkflowStatus workflowStatus = WorkflowStatus.REGISTERED;
 
     // ========================================

@@ -135,7 +135,7 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
                 + "LEFT JOIN FETCH bs.sampleItem si " + "LEFT JOIN FETCH si.typeOfSample "
                 + "LEFT JOIN FETCH si.sample " + buildWorkflowStatusWhereClause(workflowStatus)
                 + " ORDER BY bs.manifestSno ASC NULLS LAST, bs.id ASC";
-        return session.createQuery(hql, BioSample.class).getResultList();
+        return session.createQuery(hql, BioSample.class).setParameter("workflowStatus", workflowStatus).getResultList();
     }
 
     @Override
@@ -156,8 +156,8 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
                 + "LEFT JOIN FETCH bs.sampleItem si " + "LEFT JOIN FETCH si.typeOfSample "
                 + "LEFT JOIN FETCH si.sample " + buildWorkflowStatusWhereClause(workflowStatus)
                 + orderByClause;
-        return session.createQuery(hql, BioSample.class).setFirstResult(Math.max(offset, 0)).setMaxResults(limit)
-                .getResultList();
+        return session.createQuery(hql, BioSample.class).setParameter("workflowStatus", workflowStatus)
+                .setFirstResult(Math.max(offset, 0)).setMaxResults(limit).getResultList();
     }
 
     @Override
@@ -168,16 +168,14 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
 
         Session session = entityManager.unwrap(Session.class);
         String hql = "SELECT COUNT(DISTINCT bs.id) FROM BioSample bs " + buildWorkflowStatusWhereClause(workflowStatus);
-        return session.createQuery(hql, Long.class).getSingleResult();
+        return session.createQuery(hql, Long.class).setParameter("workflowStatus", workflowStatus).getSingleResult();
     }
 
     private String buildWorkflowStatusWhereClause(WorkflowStatus workflowStatus) {
         if (workflowStatus == WorkflowStatus.REGISTERED) {
-            return "WHERE (bs.workflowStatus = org.openelisglobal.biorepository.valueholder.BioSample$WorkflowStatus.REGISTERED "
-                    + "OR bs.workflowStatus IS NULL) ";
+            return "WHERE (bs.workflowStatus = :workflowStatus OR bs.workflowStatus IS NULL) ";
         }
-        return "WHERE bs.workflowStatus = org.openelisglobal.biorepository.valueholder.BioSample$WorkflowStatus."
-                + workflowStatus.name() + " ";
+        return "WHERE bs.workflowStatus = :workflowStatus ";
     }
 
     @Override
