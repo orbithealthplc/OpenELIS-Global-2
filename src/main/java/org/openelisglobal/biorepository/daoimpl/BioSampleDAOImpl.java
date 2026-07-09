@@ -175,9 +175,11 @@ public class BioSampleDAOImpl extends BaseDAOImpl<BioSample, Integer> implements
 
     private String buildWorkflowStatusWhereClause(WorkflowStatus workflowStatus) {
         if (workflowStatus == WorkflowStatus.REGISTERED) {
-            return "WHERE (cast(bs.workflowStatus as string) = :workflowStatus OR bs.workflowStatus IS NULL) ";
+            // PostgreSQL does not have a SQL type named "string"; use text to keep
+            // this comparison stable across enum/converter mappings.
+            return "WHERE (cast(bs.workflowStatus as text) = :workflowStatus OR bs.workflowStatus IS NULL) ";
         }
-        return "WHERE cast(bs.workflowStatus as string) = :workflowStatus ";
+        return "WHERE cast(bs.workflowStatus as text) = :workflowStatus ";
     }
 
     @Override
