@@ -65,6 +65,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -1746,16 +1747,19 @@ public class BioSampleRestController extends BaseRestController {
         }
 
         TransactionTemplate batchTransaction = new TransactionTemplate(transactionManager);
+        // Savepoints are not supported by all JPA dialects/providers (and throw on use).
+        // Use per-row REQUIRES_NEW transactions instead so one bad row doesn't abort the whole import.
+        batchTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         Map<String, TypeOfSample> sampleTypeLookup = buildManifestSampleTypeLookup();
         AccessionNumberHandler accessionNumberHandler = new AccessionNumberHandler(sampleService, sampleDAO,
                 entityManager, BioSampleRestController.class);
         List<String> reservedAccessions = accessionNumberHandler.reserveAccessionNumbers(samples.size(),
                 AccessionNumberHandler.DEFAULT_MAX_ATTEMPTS);
 
-        batchTransaction.execute(status -> {
-            for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
-                SampleRegistrationDTO dto = samples.get(rowIndex);
-                Object savepoint = status.createSavepoint();
+        for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
+            final int row = rowIndex;
+            final SampleRegistrationDTO dto = samples.get(rowIndex);
+            batchTransaction.execute(status -> {
                 try {
                     if (dto.getProjectId() != null && !dto.getProjectId().isBlank() && !departmentIsolationService
                             .isInventoryProjectConsistent(departmentResult.departmentId, dto.getProjectId())) {
@@ -1763,12 +1767,11 @@ public class BioSampleRestController extends BaseRestController {
                         String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
                                 : "Sample '" + sampleRef + "'";
                         response.addRowError(prefix + ": Selected project belongs to a different department.");
-                        status.releaseSavepoint(savepoint);
-                        continue;
+                        status.setRollbackOnly();
+                        return null;
                     }
 
-                    String reservedAccession = rowIndex < reservedAccessions.size() ? reservedAccessions.get(rowIndex)
-                            : null;
+                    String reservedAccession = row < reservedAccessions.size() ? reservedAccessions.get(row) : null;
                     BulkRegistrationResponse.RegisteredSample registered = registerSingleSample(dto,
                             request.getShipmentId(), sysUserId, departmentResult.departmentId, sampleTypeLookup,
                             accessionNumberHandler, reservedAccession);
@@ -1777,10 +1780,10 @@ public class BioSampleRestController extends BaseRestController {
                         response.addSample(registered);
                     } else {
                         response.addRowError("Sample registration returned no result");
+                        status.setRollbackOnly();
                     }
-                    status.releaseSavepoint(savepoint);
                 } catch (Exception e) {
-                    status.rollbackToSavepoint(savepoint);
+                    status.setRollbackOnly();
                     String sampleRef = firstNonBlank(dto.getBarcode(), dto.getExternalId());
                     String prefix = (sampleRef == null || sampleRef.isBlank()) ? "Sample"
                             : "Sample '" + sampleRef + "'";
@@ -1788,10 +1791,9 @@ public class BioSampleRestController extends BaseRestController {
                     logger.error("Bulk manifest import failed for {}", prefix, e);
                     response.addRowError(prefix + ": " + detailedError);
                 }
-            }
-            entityManager.flush();
-            return null;
-        });
+                return null;
+            });
+        }
 
         if (response.getRegisteredCount() == 0) {
             response.setSuccess(false);
