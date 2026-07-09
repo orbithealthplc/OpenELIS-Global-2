@@ -1820,6 +1820,85 @@ public class BioSampleRestController extends BaseRestController {
         if (barcode == null || barcode.isBlank()) {
             barcode = generateBarcode().getBody().get("barcode");
         }
+        barcode = barcode.trim();
+
+        // If the barcode already exists in core OpenELIS (SampleItem.externalId),
+        // do NOT attempt to create a duplicate Sample/SampleItem. Instead, attach
+        // a BioSample extension to the existing SampleItem so it can appear in
+        // Biorepository Intake (Received Samples).
+        try {
+            List<SampleItem> existingItems = sampleItemService.getSampleItemsByExternalID(barcode);
+            if (existingItems != null && !existingItems.isEmpty()) {
+                SampleItem existing = existingItems.get(0);
+                if (existing != null && existing.getId() != null) {
+                    Integer existingId = Integer.valueOf(existing.getId());
+                    BioSample existingBio = bioSampleService.getBySampleItemId(existingId);
+                    if (existingBio != null) {
+                        BulkRegistrationResponse.RegisteredSample registered = new BulkRegistrationResponse.RegisteredSample();
+                        registered.setId(existingBio.getId());
+                        registered.setBarcode(barcode);
+                        registered.setSampleItemId(existingId);
+                        if (existing.getSample() != null && existing.getSample().getId() != null) {
+                            registered.setSampleId(Integer.valueOf(existing.getSample().getId()));
+                        }
+                        return registered;
+                    }
+
+                    TypeOfSample existingType = existing.getTypeOfSample();
+                    if (existingType != null) {
+                        ensureBiorepositoryApprovedSampleType(existingType, sysUserId);
+                    }
+
+                    BioSample bioSample = new BioSample();
+                    bioSample.setBiosafetyLevel(dto.getBiosafetyLevel() != null ? BiosafetyLevel.valueOf(dto.getBiosafetyLevel())
+                            : BiosafetyLevel.BSL_1);
+                    bioSample.setEthicsApprovalRef(dto.getEthicsApprovalRef());
+                    bioSample.setMtaReference(dto.getMtaReference());
+                    bioSample.setConsentId(dto.getConsentId());
+                    bioSample.setPrincipalInvestigator(dto.getPrincipalInvestigator());
+                    bioSample.setPreservationMedium(dto.getPreservationMedium());
+                    bioSample.setArrivalCondition(dto.getArrivalCondition());
+                    bioSample.setSpecialHandling(
+                            mergeExternalIdIntoSpecialHandling(dto.getSpecialHandling(), dto.getExternalId(), barcode));
+                    bioSample.setOriginLab(dto.getOriginLab());
+                    bioSample.setProjectId(dto.getProjectId());
+                    bioSample.setDepartmentTestSectionId(departmentTestSectionId);
+                    bioSample.setManifestSno(dto.getSno());
+                    bioSample.setWorkflowStatus(BioSample.WorkflowStatus.REGISTERED);
+                    // Temperature defaults align with new import behavior (optional temps).
+                    if (dto.getRequiredTempMin() != null) {
+                        bioSample.setRequiredTempMin(dto.getRequiredTempMin());
+                    } else {
+                        bioSample.setRequiredTempMin(new java.math.BigDecimal("-80"));
+                    }
+                    if (dto.getRequiredTempMax() != null) {
+                        bioSample.setRequiredTempMax(dto.getRequiredTempMax());
+                    } else {
+                        bioSample.setRequiredTempMax(new java.math.BigDecimal("-20"));
+                    }
+                    if (shipmentId != null) {
+                        Shipment shipment = shipmentService.get(shipmentId);
+                        if (shipment != null) {
+                            bioSample.setShipment(shipment);
+                        }
+                    }
+                    bioSample.setSysUserId(sysUserId);
+                    BioSample created = bioSampleService.createForSampleItem(existing, bioSample);
+
+                    BulkRegistrationResponse.RegisteredSample registered = new BulkRegistrationResponse.RegisteredSample();
+                    registered.setId(created.getId());
+                    registered.setBarcode(barcode);
+                    registered.setSampleItemId(existingId);
+                    if (existing.getSample() != null && existing.getSample().getId() != null) {
+                        registered.setSampleId(Integer.valueOf(existing.getSample().getId()));
+                    }
+                    return registered;
+                }
+            }
+        } catch (RuntimeException e) {
+            // Fall back to standard new sample creation path below; outer caller will record row error.
+            throw e;
+        }
 
         TypeOfSample sampleType;
         if (sampleTypeLookup != null) {
