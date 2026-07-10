@@ -162,13 +162,23 @@ function BiorepositoryIntakePage({
 
   const applyShipmentSelection = useCallback(
     (shipment, { advanceTab = true } = {}) => {
-      setCurrentShipment(shipment);
+      if (!shipment) {
+        return;
+      }
+      const documentationStatus =
+        shipment.documentationStatus || shipment.docStatus || "PENDING";
+      const docsComplete =
+        documentationStatus === "VERIFIED" ||
+        documentationStatus === "QUARANTINE";
+      const normalizedShipment = {
+        ...shipment,
+        documentationStatus,
+      };
+      setCurrentShipment(normalizedShipment);
       setSubStageComplete((prev) => ({
         ...prev,
         shipment: true,
-        documentation:
-          shipment.documentationStatus === "VERIFIED" ||
-          shipment.documentationStatus === "QUARANTINE",
+        documentation: docsComplete,
       }));
       if (shipmentStorageKey) {
         sessionStorage.setItem(shipmentStorageKey, String(shipment.id));
@@ -176,14 +186,8 @@ function BiorepositoryIntakePage({
       if (!advanceTab) {
         return;
       }
-      if (
-        shipment.documentationStatus === "VERIFIED" ||
-        shipment.documentationStatus === "QUARANTINE"
-      ) {
-        setActiveSubStage(2);
-      } else {
-        setActiveSubStage(1);
-      }
+      // Verified/quarantine shipments skip straight to Sample Registration.
+      setActiveSubStage(docsComplete ? 2 : 1);
     },
     [shipmentStorageKey],
   );
@@ -191,7 +195,10 @@ function BiorepositoryIntakePage({
   const handleShipmentCreated = useCallback(
     (shipment) => {
       setShipmentListRefreshKey((k) => k + 1);
-      applyShipmentSelection(shipment);
+      applyShipmentSelection({
+        ...shipment,
+        documentationStatus: shipment.documentationStatus || "PENDING",
+      });
     },
     [applyShipmentSelection],
   );
@@ -780,7 +787,22 @@ function BiorepositoryIntakePage({
                     />
                   </h4>
 
-                  {!subStageComplete.documentation ? (
+                  {!currentShipment ? (
+                    <InlineNotification
+                      kind="info"
+                      title={intl.formatMessage({
+                        id: "biorepository.intake.registration.selectShipment",
+                        defaultMessage: "Select a shipment first",
+                      })}
+                      subtitle={intl.formatMessage({
+                        id: "biorepository.intake.registration.selectShipment.message",
+                        defaultMessage:
+                          "Go to Shipment Reception and select an existing shipment, or receive a new one.",
+                      })}
+                      lowContrast
+                      hideCloseButton
+                    />
+                  ) : !subStageComplete.documentation ? (
                     <InlineNotification
                       kind="warning"
                       title={intl.formatMessage({
@@ -797,6 +819,29 @@ function BiorepositoryIntakePage({
                     />
                   ) : (
                     <>
+                      <InlineNotification
+                        kind="success"
+                        title={intl.formatMessage(
+                          {
+                            id: "biorepository.intake.registration.activeShipment",
+                            defaultMessage:
+                              "Registering samples for shipment {ref}",
+                          },
+                          {
+                            ref:
+                              currentShipment.deliveryReference ||
+                              currentShipment.id,
+                          },
+                        )}
+                        subtitle={intl.formatMessage({
+                          id: "biorepository.intake.registration.activeShipment.message",
+                          defaultMessage:
+                            "Documentation is verified. Import a manifest or register samples for this shipment.",
+                        })}
+                        lowContrast
+                        hideCloseButton
+                        style={{ marginBottom: "1rem" }}
+                      />
                       {registeredSamples.length > 0 && (
                         <InlineNotification
                           kind="info"

@@ -11,11 +11,15 @@ import {
   Button,
   InlineNotification,
   Loading,
+  Search,
 } from "@carbon/react";
 import { ArrowRight, Document } from "@carbon/icons-react";
 import { FormattedMessage, useIntl } from "react-intl";
 import PropTypes from "prop-types";
 import { getFromOpenElisServer } from "../../../utils/Utils";
+
+const isDocsComplete = (status) =>
+  status === "VERIFIED" || status === "QUARANTINE";
 
 function ShipmentListTable({
   onSelect,
@@ -29,27 +33,35 @@ function ShipmentListTable({
   const intl = useIntl();
   const [shipments, setShipments] = useState([]);
   const [loadingShipments, setLoadingShipments] = useState(true);
+  const [loadError, setLoadError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const loadShipments = useCallback(() => {
     setLoadingShipments(true);
-    getFromOpenElisServer(
-      "/rest/biorepository/shipment?limit=50",
-      (data) => {
-        if (data && Array.isArray(data)) {
-          setShipments(data);
-        } else if (data && data.shipments) {
-          setShipments(data.shipments);
-        } else {
-          setShipments([]);
-        }
-        setLoadingShipments(false);
-      },
-      () => {
+    setLoadError(null);
+    getFromOpenElisServer("/rest/biorepository/shipment?limit=200", (data) => {
+      if (data && Array.isArray(data)) {
+        setShipments(data);
+        setLoadError(null);
+      } else if (data && Array.isArray(data.shipments)) {
+        setShipments(data.shipments);
+        setLoadError(null);
+      } else if (data === undefined) {
         setShipments([]);
-        setLoadingShipments(false);
-      },
-    );
-  }, []);
+        setLoadError(
+          intl.formatMessage({
+            id: "biorepository.shipment.list.loadError",
+            defaultMessage:
+              "Could not load shipments. Check your connection and try again.",
+          }),
+        );
+      } else {
+        setShipments([]);
+        setLoadError(null);
+      }
+      setLoadingShipments(false);
+    });
+  }, [intl]);
 
   useEffect(() => {
     loadShipments();
@@ -104,6 +116,22 @@ function ShipmentListTable({
     } catch {
       return dateString;
     }
+  };
+
+  const getContinueLabel = (shipment) => {
+    if (selectButtonLabel) {
+      return selectButtonLabel;
+    }
+    if (isDocsComplete(shipment?.documentationStatus)) {
+      return intl.formatMessage({
+        id: "biorepository.shipment.button.continueToRegistration",
+        defaultMessage: "Continue to Sample Registration",
+      });
+    }
+    return intl.formatMessage({
+      id: "biorepository.shipment.button.continueToDocumentation",
+      defaultMessage: "Continue to Documentation",
+    });
   };
 
   const headers = [
@@ -163,19 +191,65 @@ function ShipmentListTable({
     },
   ];
 
-  const rows = shipments.map((shipment) => ({
+  const normalizedSearch = searchTerm.trim().toLowerCase();
+  const filteredShipments = normalizedSearch
+    ? shipments.filter((shipment) => {
+        const haystack = [
+          shipment.deliveryReference,
+          shipment.senderName,
+          shipment.senderOrganization,
+          shipment.documentationStatus,
+          shipment.status,
+          shipment.id,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(normalizedSearch);
+      })
+    : shipments;
+
+  const rows = filteredShipments.map((shipment) => ({
     id: String(shipment.id),
-    deliveryReference: shipment.deliveryReference,
-    senderName: shipment.senderName,
+    deliveryReference: shipment.deliveryReference || "-",
+    senderName: shipment.senderName || "-",
     expectedSampleCount: shipment.expectedSampleCount ?? "-",
     status: shipment.status,
     documentationStatus: shipment.documentationStatus || "PENDING",
     receptionTimestamp: shipment.receptionTimestamp,
-    _original: shipment,
+    actions: "",
   }));
 
   if (loadingShipments) {
     return <Loading withOverlay description="Loading shipments..." />;
+  }
+
+  if (loadError) {
+    return (
+      <div>
+        <InlineNotification
+          kind="error"
+          title={intl.formatMessage({
+            id: "biorepository.shipment.list.loadError.title",
+            defaultMessage: "Failed to load shipments",
+          })}
+          subtitle={loadError}
+          lowContrast
+          hideCloseButton
+        />
+        <Button
+          kind="tertiary"
+          size="sm"
+          onClick={loadShipments}
+          style={{ marginTop: "0.75rem" }}
+        >
+          <FormattedMessage
+            id="biorepository.shipment.list.retry"
+            defaultMessage="Retry"
+          />
+        </Button>
+      </div>
+    );
   }
 
   if (shipments.length === 0) {
@@ -197,111 +271,151 @@ function ShipmentListTable({
     );
   }
 
-  const defaultSelectLabel = intl.formatMessage({
-    id: "biorepository.shipment.button.continue",
-    defaultMessage: "Continue",
-  });
-
   return (
-    <DataTable rows={rows} headers={headers} isSortable>
-      {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-        <Table {...getTableProps()}>
-          <TableHead>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeader key={header.key} {...getHeaderProps({ header })}>
-                  {header.header}
-                </TableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              const originalShipment = shipments.find(
-                (s) => String(s.id) === row.id,
-              );
-              const isSelected =
-                selectedShipmentId != null &&
-                String(selectedShipmentId) === row.id;
+    <div>
+      <Search
+        id="shipment-list-search"
+        size="md"
+        labelText={intl.formatMessage({
+          id: "biorepository.shipment.list.search",
+          defaultMessage: "Search shipments",
+        })}
+        placeholder={intl.formatMessage({
+          id: "biorepository.shipment.list.search.placeholder",
+          defaultMessage: "Search by delivery ref, sender, or status...",
+        })}
+        value={searchTerm}
+        onChange={(event) => setSearchTerm(event.target?.value || "")}
+        onClear={() => setSearchTerm("")}
+        style={{ marginBottom: "1rem", maxWidth: "28rem" }}
+      />
 
-              return (
-                <TableRow
-                  key={row.id}
-                  {...getRowProps({ row })}
-                  style={
-                    isSelected
-                      ? { backgroundColor: "var(--cds-layer-selected)" }
-                      : undefined
-                  }
-                >
-                  {row.cells.map((cell) => {
-                    if (cell.info.header === "status") {
-                      return (
-                        <TableCell key={cell.id}>
-                          {getStatusTag(cell.value)}
-                        </TableCell>
-                      );
-                    }
-                    if (cell.info.header === "documentationStatus") {
-                      return (
-                        <TableCell key={cell.id}>
-                          {getDocStatusTag(cell.value)}
-                        </TableCell>
-                      );
-                    }
-                    if (cell.info.header === "receptionTimestamp") {
-                      return (
-                        <TableCell key={cell.id}>
-                          {formatDate(cell.value)}
-                        </TableCell>
-                      );
-                    }
-                    if (cell.info.header === "actions") {
-                      return (
-                        <TableCell key={cell.id}>
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: "0.5rem",
-                              flexWrap: "wrap",
-                            }}
-                          >
-                            <Button
-                              kind="ghost"
-                              size="sm"
-                              renderIcon={ArrowRight}
-                              onClick={() => onSelect?.(originalShipment)}
-                            >
-                              {selectButtonLabel || defaultSelectLabel}
-                            </Button>
-                            {showVerifyAction && onVerify && (
-                              <Button
-                                kind="ghost"
-                                size="sm"
-                                renderIcon={Document}
-                                onClick={() => onVerify(originalShipment)}
-                              >
-                                <FormattedMessage
-                                  id="biorepository.shipment.button.verifyDocs"
-                                  defaultMessage="Verify docs"
-                                />
-                              </Button>
-                            )}
-                          </div>
-                        </TableCell>
-                      );
-                    }
-                    return (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    );
-                  })}
+      {filteredShipments.length === 0 ? (
+        <InlineNotification
+          kind="info"
+          title={intl.formatMessage({
+            id: "biorepository.shipment.list.noMatches.title",
+            defaultMessage: "No matching shipments",
+          })}
+          subtitle={intl.formatMessage({
+            id: "biorepository.shipment.list.noMatches.message",
+            defaultMessage: "Try a different search term.",
+          })}
+          lowContrast
+          hideCloseButton
+        />
+      ) : (
+        <DataTable rows={rows} headers={headers} isSortable>
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <Table {...getTableProps()}>
+              <TableHead>
+                <TableRow>
+                  {headers.map((header) => (
+                    <TableHeader
+                      key={header.key}
+                      {...getHeaderProps({ header })}
+                    >
+                      {header.header}
+                    </TableHeader>
+                  ))}
                 </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => {
+                  const originalShipment = filteredShipments.find(
+                    (s) => String(s.id) === row.id,
+                  );
+                  const isSelected =
+                    selectedShipmentId != null &&
+                    String(selectedShipmentId) === row.id;
+
+                  return (
+                    <TableRow
+                      key={row.id}
+                      {...getRowProps({ row })}
+                      style={{
+                        cursor: onSelect ? "pointer" : undefined,
+                        ...(isSelected
+                          ? {
+                              backgroundColor: "var(--cds-layer-selected)",
+                            }
+                          : {}),
+                      }}
+                      onClick={() => onSelect?.(originalShipment)}
+                    >
+                      {row.cells.map((cell) => {
+                        if (cell.info.header === "status") {
+                          return (
+                            <TableCell key={cell.id}>
+                              {getStatusTag(cell.value)}
+                            </TableCell>
+                          );
+                        }
+                        if (cell.info.header === "documentationStatus") {
+                          return (
+                            <TableCell key={cell.id}>
+                              {getDocStatusTag(cell.value)}
+                            </TableCell>
+                          );
+                        }
+                        if (cell.info.header === "receptionTimestamp") {
+                          return (
+                            <TableCell key={cell.id}>
+                              {formatDate(cell.value)}
+                            </TableCell>
+                          );
+                        }
+                        if (cell.info.header === "actions") {
+                          return (
+                            <TableCell
+                              key={cell.id}
+                              onClick={(event) => event.stopPropagation()}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  gap: "0.5rem",
+                                  flexWrap: "wrap",
+                                }}
+                              >
+                                <Button
+                                  kind="ghost"
+                                  size="sm"
+                                  renderIcon={ArrowRight}
+                                  onClick={() => onSelect?.(originalShipment)}
+                                >
+                                  {getContinueLabel(originalShipment)}
+                                </Button>
+                                {showVerifyAction && onVerify && (
+                                  <Button
+                                    kind="ghost"
+                                    size="sm"
+                                    renderIcon={Document}
+                                    onClick={() => onVerify(originalShipment)}
+                                  >
+                                    <FormattedMessage
+                                      id="biorepository.shipment.button.verifyDocs"
+                                      defaultMessage="Verify docs"
+                                    />
+                                  </Button>
+                                )}
+                              </div>
+                            </TableCell>
+                          );
+                        }
+                        return (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        );
+                      })}
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </DataTable>
       )}
-    </DataTable>
+    </div>
   );
 }
 
