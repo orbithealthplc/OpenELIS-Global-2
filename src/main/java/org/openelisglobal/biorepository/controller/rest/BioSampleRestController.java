@@ -65,8 +65,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -1747,18 +1747,32 @@ public class BioSampleRestController extends BaseRestController {
         }
 
         TransactionTemplate batchTransaction = new TransactionTemplate(transactionManager);
-        // Savepoints are not supported by all JPA dialects/providers (and throw on use).
-        // Use per-row REQUIRES_NEW transactions instead so one bad row doesn't abort the whole import.
+        // Savepoints are not supported by all JPA dialects/providers (and throw on
+        // use).
+        // Use per-row REQUIRES_NEW transactions instead so one bad row doesn't abort
+        // the whole import.
         batchTransaction.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
         Map<String, TypeOfSample> sampleTypeLookup = buildManifestSampleTypeLookup();
         AccessionNumberHandler accessionNumberHandler = new AccessionNumberHandler(sampleService, sampleDAO,
                 entityManager, BioSampleRestController.class);
         List<String> reservedAccessions = accessionNumberHandler.reserveAccessionNumbers(samples.size(),
                 AccessionNumberHandler.DEFAULT_MAX_ATTEMPTS);
+        Set<Integer> approvedDuplicateRows = getApprovedDuplicateRows(request);
+        Set<String> claimedBarcodes = new HashSet<>();
 
         for (int rowIndex = 0; rowIndex < samples.size(); rowIndex++) {
             final int row = rowIndex;
             final SampleRegistrationDTO dto = samples.get(rowIndex);
+            final String requestedBarcode = firstNonBlank(dto.getBarcode(), dto.getExternalId());
+            final String resolvedBarcode;
+            if (approvedDuplicateRows.contains(row) && requestedBarcode != null && !requestedBarcode.isBlank()) {
+                resolvedBarcode = resolveUniqueReplicaBarcode(requestedBarcode.trim(), claimedBarcodes);
+            } else {
+                resolvedBarcode = null;
+                if (requestedBarcode != null && !requestedBarcode.isBlank()) {
+                    claimedBarcodes.add(requestedBarcode.trim());
+                }
+            }
             batchTransaction.execute(status -> {
                 try {
                     if (dto.getProjectId() != null && !dto.getProjectId().isBlank() && !departmentIsolationService
@@ -1774,7 +1788,7 @@ public class BioSampleRestController extends BaseRestController {
                     String reservedAccession = row < reservedAccessions.size() ? reservedAccessions.get(row) : null;
                     BulkRegistrationResponse.RegisteredSample registered = registerSingleSample(dto,
                             request.getShipmentId(), sysUserId, departmentResult.departmentId, sampleTypeLookup,
-                            accessionNumberHandler, reservedAccession);
+                            accessionNumberHandler, reservedAccession, resolvedBarcode);
 
                     if (registered != null) {
                         response.addSample(registered);
@@ -1811,14 +1825,14 @@ public class BioSampleRestController extends BaseRestController {
      */
     private BulkRegistrationResponse.RegisteredSample registerSingleSample(SampleRegistrationDTO dto,
             Integer shipmentId, String sysUserId, Integer departmentTestSectionId) {
-        return registerSingleSample(dto, shipmentId, sysUserId, departmentTestSectionId, null, null, null);
+        return registerSingleSample(dto, shipmentId, sysUserId, departmentTestSectionId, null, null, null, null);
     }
 
     private BulkRegistrationResponse.RegisteredSample registerSingleSample(SampleRegistrationDTO dto,
             Integer shipmentId, String sysUserId, Integer departmentTestSectionId,
             Map<String, TypeOfSample> sampleTypeLookup, AccessionNumberHandler accessionNumberHandler,
-            String reservedAccessionNumber) {
-        String barcode = firstNonBlank(dto.getBarcode(), dto.getExternalId());
+            String reservedAccessionNumber, String resolvedBarcode) {
+        String barcode = firstNonBlank(resolvedBarcode, dto.getBarcode(), dto.getExternalId());
         if (barcode == null || barcode.isBlank()) {
             barcode = generateBarcode().getBody().get("barcode");
         }
@@ -1852,8 +1866,9 @@ public class BioSampleRestController extends BaseRestController {
                     }
 
                     BioSample bioSample = new BioSample();
-                    bioSample.setBiosafetyLevel(dto.getBiosafetyLevel() != null ? BiosafetyLevel.valueOf(dto.getBiosafetyLevel())
-                            : BiosafetyLevel.BSL_1);
+                    bioSample.setBiosafetyLevel(
+                            dto.getBiosafetyLevel() != null ? BiosafetyLevel.valueOf(dto.getBiosafetyLevel())
+                                    : BiosafetyLevel.BSL_1);
                     bioSample.setEthicsApprovalRef(dto.getEthicsApprovalRef());
                     bioSample.setMtaReference(dto.getMtaReference());
                     bioSample.setConsentId(dto.getConsentId());
@@ -1898,7 +1913,8 @@ public class BioSampleRestController extends BaseRestController {
                 }
             }
         } catch (RuntimeException e) {
-            // Fall back to standard new sample creation path below; outer caller will record row error.
+            // Fall back to standard new sample creation path below; outer caller will
+            // record row error.
             throw e;
         }
 
@@ -1957,6 +1973,9 @@ public class BioSampleRestController extends BaseRestController {
         bioSample.setProjectId(dto.getProjectId());
         bioSample.setDepartmentTestSectionId(departmentTestSectionId);
         bioSample.setManifestSno(dto.getSno());
+        // Manifest import is the Intake/Received Samples stage. Storage is advanced
+        // explicitly by the user after reviewing the registered rows.
+        bioSample.setWorkflowStatus(BioSample.WorkflowStatus.REGISTERED);
         // Temperature requirements: optional in manifest import.
         // If missing, apply a safe default (-80 to -20) to keep downstream retention
         // policies and storage selection logic consistent.
@@ -1985,6 +2004,31 @@ public class BioSampleRestController extends BaseRestController {
         registered.setSampleItemId(Integer.valueOf(savedSampleItem.getId()));
         registered.setSampleId(Integer.valueOf(savedSample.getId()));
         return registered;
+    }
+
+    private Set<Integer> getApprovedDuplicateRows(ManifestImportRequest request) {
+        ManifestImportRequest.DuplicateResolution resolution = request.getDuplicateResolution();
+        if (resolution == null || resolution.getAllowedRowIndexes() == null
+                || !"SUFFIX".equalsIgnoreCase(resolution.getMode())) {
+            return Set.of();
+        }
+        return resolution.getAllowedRowIndexes().stream().filter(index -> index != null && index >= 0)
+                .collect(Collectors.toSet());
+    }
+
+    private String resolveUniqueReplicaBarcode(String baseBarcode, Set<String> claimedBarcodes) {
+        int replicaIndex = 2;
+        String candidate;
+        do {
+            candidate = baseBarcode + "-R" + replicaIndex++;
+        } while (claimedBarcodes.contains(candidate) || sampleItemBarcodeExists(candidate));
+        claimedBarcodes.add(candidate);
+        return candidate;
+    }
+
+    private boolean sampleItemBarcodeExists(String barcode) {
+        List<SampleItem> matches = sampleItemService.getSampleItemsByExternalID(barcode);
+        return matches != null && !matches.isEmpty();
     }
 
     private Sample createSampleWithReservedAccession(Timestamp receiptTimestamp, String sysUserId,
