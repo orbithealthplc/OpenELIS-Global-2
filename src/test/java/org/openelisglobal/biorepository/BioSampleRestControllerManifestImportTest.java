@@ -16,6 +16,7 @@ import org.openelisglobal.BaseWebContextSensitiveTest;
 import org.openelisglobal.biorepository.controller.rest.dto.ManifestImportRequest;
 import org.openelisglobal.biorepository.controller.rest.dto.SampleRegistrationDTO;
 import org.openelisglobal.biorepository.service.BioSampleService;
+import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.login.valueholder.UserSessionData;
 import org.openelisglobal.sample.service.SampleService;
 import org.openelisglobal.sample.valueholder.Sample;
@@ -443,6 +444,9 @@ public class BioSampleRestControllerManifestImportTest extends BaseWebContextSen
         // Verify samples actually exist in database
         assertTrue("First barcode should exist after registration", bioSampleService.barcodeExists(barcode1));
         assertTrue("Second barcode should exist after registration", bioSampleService.barcodeExists(barcode2));
+        int firstBioSampleId = response.get("samples").get(0).get("id").asInt();
+        assertEquals("Manifest imports must remain visible in Received Samples", BioSample.WorkflowStatus.REGISTERED,
+                bioSampleService.get(firstBioSampleId).getWorkflowStatus());
     }
 
     @Test
@@ -625,6 +629,30 @@ public class BioSampleRestControllerManifestImportTest extends BaseWebContextSen
                 response.get("samples").get(0).get("barcode").asText());
         assertEquals("Second sample keeps same barcode", duplicateBarcode,
                 response.get("samples").get(1).get("barcode").asText());
+    }
+
+    @Test
+    public void testRegisterBulk_ApprovedDuplicate_AssignsUniqueReplicaBarcode() throws Exception {
+        ManifestImportRequest request = new ManifestImportRequest();
+        String duplicateBarcode = "APPROVED-REPLICA-" + System.currentTimeMillis();
+        createExistingSampleItem(duplicateBarcode);
+
+        SampleRegistrationDTO duplicate = createValidSampleDTO(duplicateBarcode);
+        request.setSamples(List.of(duplicate));
+        ManifestImportRequest.DuplicateResolution resolution = new ManifestImportRequest.DuplicateResolution();
+        resolution.setMode("SUFFIX");
+        resolution.setAllowedRowIndexes(List.of(0));
+        request.setDuplicateResolution(resolution);
+
+        MvcResult result = mockMvc.perform(post("/rest/biorepository/sample/register-bulk")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", userSessionData)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isOk()).andReturn();
+
+        JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
+        assertTrue(response.get("success").asBoolean());
+        assertEquals(duplicateBarcode + "-R2", response.get("samples").get(0).get("barcode").asText());
+        int bioSampleId = response.get("samples").get(0).get("id").asInt();
+        assertEquals(BioSample.WorkflowStatus.REGISTERED, bioSampleService.get(bioSampleId).getWorkflowStatus());
     }
 
     @Test
