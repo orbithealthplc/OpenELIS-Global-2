@@ -1,5 +1,6 @@
 import {
   canEditNotebookEntry,
+  getEntryEditPersonasForWorkflow,
   getNotebookEntrySaveDisabledReason,
   isEditFromUrl,
   isMntdWorkflowType,
@@ -21,7 +22,7 @@ describe("noteBookEntryEditPermissions", () => {
       canEditNotebookEntry({
         hasRoleForCurrentLabUnit: () => false,
         hasPersonaForActiveDepartment: pathologyPersonaCheck,
-        templateAllowedRoles: ["Technician"],
+        templateAllowedRoles: ["Supervisor"],
         userId: 10,
         creatorId: 99,
         technicianId: 88,
@@ -85,6 +86,96 @@ describe("noteBookEntryEditPermissions", () => {
         workflowType: "mntd",
       }),
     ).toBe(true);
+  });
+
+  test.each([
+    "biorepository",
+    "immunology",
+    "bacteriology",
+    "tuberculosis",
+    "medlab",
+    "virology",
+    "genomics",
+  ])(
+    "Sample Collector on %s workflow can edit entry via registry intake personas",
+    (workflowType) => {
+      const sampleCollectorPersonaCheck = (personas) =>
+        personas.includes("Sample Collector");
+
+      expect(
+        canEditNotebookEntry({
+          hasRoleForCurrentLabUnit: () => false,
+          hasPersonaForActiveDepartment: sampleCollectorPersonaCheck,
+          templateAllowedRoles: ["Supervisor"],
+          userId: 10,
+          creatorId: 99,
+          technicianId: 88,
+          workflowType,
+        }),
+      ).toBe(true);
+    },
+  );
+
+  test("getEntryEditPersonasForWorkflow uses registry stage 1 for non-pathology", () => {
+    const mntd = getEntryEditPersonasForWorkflow("mntd");
+    expect(mntd).toContain("Sample Collector");
+    expect(mntd).toContain("Laboratory Technician");
+
+    const immuno = getEntryEditPersonasForWorkflow("immunology");
+    expect(immuno).toContain("Sample Collector");
+    expect(immuno).toContain("Laboratory Technician");
+  });
+
+  test("getEntryEditPersonasForWorkflow keeps pathology registration+processing set", () => {
+    const pathology = getEntryEditPersonasForWorkflow("fnac");
+    expect(pathology).toContain("Sample Collector");
+    expect(pathology).toContain("Junior Researcher");
+    expect(pathology).toContain("Senior Researcher");
+    expect(pathology).toContain("Pathologist");
+    expect(pathology).toContain("Cytopathologist");
+  });
+
+  test("Pathologist can edit pathology entries via persona bypass", () => {
+    const pathologistPersonaCheck = (personas) =>
+      personas.includes("Pathologist");
+
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: pathologistPersonaCheck,
+        templateAllowedRoles: ["Sample Collector"],
+        userId: 10,
+        workflowType: "pathology",
+      }),
+    ).toBe(true);
+  });
+
+  test("Cytopathologist can edit pathology entries via persona bypass", () => {
+    const cytoPersonaCheck = (personas) =>
+      personas.includes("Cytopathologist");
+
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: cytoPersonaCheck,
+        templateAllowedRoles: ["Sample Collector"],
+        userId: 10,
+        workflowType: "fnac",
+      }),
+    ).toBe(true);
+  });
+
+  test("unknown workflow types get no persona bypass", () => {
+    expect(getEntryEditPersonasForWorkflow("unknown_lab")).toEqual([]);
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: () => true,
+        templateAllowedRoles: ["Supervisor"],
+        userId: 10,
+        workflowType: "unknown_lab",
+      }),
+    ).toBe(false);
   });
 
   test("normalizeTemplateAllowedRoles treats numeric role IDs as unresolved", () => {

@@ -75,7 +75,13 @@ function NoteBookDashBoard() {
       userId: userSessionDetails?.userId,
       creatorId: entry?.creatorId,
       technicianId: entry?.technicianId,
-      workflowType: entry?.workflowType,
+      // Prefer entry workflow; fall back to selected notebook/template type
+      // so pathology Pathologist bypass applies when entry.workflowType is blank.
+      workflowType:
+        entry?.workflowType ||
+        selectedNoteBook?.workflowType ||
+        selectedNoteBook?.parentWorkflowType ||
+        null,
     });
   };
 

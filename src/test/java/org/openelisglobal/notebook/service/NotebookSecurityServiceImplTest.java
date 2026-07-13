@@ -64,6 +64,9 @@ public class NotebookSecurityServiceImplTest {
     @Mock
     private RoleService roleService;
 
+    @Mock
+    private WorkflowRegistryService workflowRegistryService;
+
     @InjectMocks
     private NotebookSecurityServiceImpl securityService;
 
@@ -341,6 +344,109 @@ public class NotebookSecurityServiceImplTest {
                 CYTOLOGY_LAB_UNIT);
 
         assertTrue("User should be allowed when template has no role restrictions", result);
+    }
+
+    @Test
+    public void canCreateEntry_sampleCollectorViaRegistryIntakePersona_allowedWhenTemplateOmitsRole() {
+        String collectorUserId = "17";
+        String collectorRoleId = "83";
+        String sampleCollector = "Sample Collector";
+
+        NoteBook mntdTemplate = new NoteBook();
+        mntdTemplate.setId(200);
+        mntdTemplate.setIsTemplate(true);
+        mntdTemplate.setWorkflowType("mntd");
+        Set<String> supervisorOnly = new HashSet<>();
+        supervisorOnly.add("Supervisor");
+        mntdTemplate.setAllowedRoles(supervisorOnly);
+        Set<TestSection> departments = new HashSet<>();
+        departments.add(createMockedTestSection(CYTOLOGY_TEST_SECTION_ID, CYTOLOGY_LAB_UNIT));
+        mntdTemplate.setDepartments(departments);
+
+        setupNonAdminUser(collectorUserId);
+        when(userRoleService.userInRole(eq(collectorUserId), any(Collection.class))).thenReturn(false);
+
+        Role collectorRole = new Role();
+        collectorRole.setId(collectorRoleId);
+        collectorRole.setName(sampleCollector);
+        when(roleService.getRoleById(collectorRoleId)).thenReturn(collectorRole);
+
+        UserLabUnitRoles labRoles = createUserLabUnitRoles(CYTOLOGY_TEST_SECTION_ID, collectorRoleId);
+        when(userRoleService.getUserLabUnitRoles(collectorUserId)).thenReturn(labRoles);
+        when(workflowRegistryService.getAllowedPersonas("mntd", 1))
+                .thenReturn(java.util.List.of(sampleCollector, "Laboratory Technician", "Lab Manager"));
+
+        boolean result = securityService.canCreateEntry(mntdTemplate, collectorUserId, CYTOLOGY_LAB_UNIT);
+
+        assertTrue("Sample Collector should create entries via registry intake personas", result);
+    }
+
+    @Test
+    public void canCreateEntry_sampleCollectorViaRegistryIntakePersona_allowedForImmunology() {
+        String collectorUserId = "18";
+        String collectorRoleId = "84";
+        String sampleCollector = "Sample Collector";
+
+        NoteBook immunoTemplate = new NoteBook();
+        immunoTemplate.setId(201);
+        immunoTemplate.setIsTemplate(true);
+        immunoTemplate.setWorkflowType("immunology");
+        Set<String> supervisorOnly = new HashSet<>();
+        supervisorOnly.add("Supervisor");
+        immunoTemplate.setAllowedRoles(supervisorOnly);
+        Set<TestSection> departments = new HashSet<>();
+        departments.add(createMockedTestSection(CYTOLOGY_TEST_SECTION_ID, CYTOLOGY_LAB_UNIT));
+        immunoTemplate.setDepartments(departments);
+
+        setupNonAdminUser(collectorUserId);
+        when(userRoleService.userInRole(eq(collectorUserId), any(Collection.class))).thenReturn(false);
+
+        Role collectorRole = new Role();
+        collectorRole.setId(collectorRoleId);
+        collectorRole.setName(sampleCollector);
+        when(roleService.getRoleById(collectorRoleId)).thenReturn(collectorRole);
+
+        UserLabUnitRoles labRoles = createUserLabUnitRoles(CYTOLOGY_TEST_SECTION_ID, collectorRoleId);
+        when(userRoleService.getUserLabUnitRoles(collectorUserId)).thenReturn(labRoles);
+        when(workflowRegistryService.getAllowedPersonas("immunology", 1))
+                .thenReturn(java.util.List.of(sampleCollector, "Laboratory Technician"));
+
+        boolean result = securityService.canCreateEntry(immunoTemplate, collectorUserId, CYTOLOGY_LAB_UNIT);
+
+        assertTrue("Sample Collector should create immunology entries via registry intake personas", result);
+    }
+
+    @Test
+    public void canCreateEntry_pathologistAllowedForPathologyEvenWhenTemplateOmitsRole() {
+        String pathologistUserId = "19";
+        String pathologistRoleId = "72";
+        String pathologist = Constants.ROLE_PATHOLOGIST;
+
+        NoteBook pathologyTemplate = new NoteBook();
+        pathologyTemplate.setId(202);
+        pathologyTemplate.setIsTemplate(true);
+        pathologyTemplate.setWorkflowType("pathology");
+        Set<String> collectorOnly = new HashSet<>();
+        collectorOnly.add("Sample Collector");
+        pathologyTemplate.setAllowedRoles(collectorOnly);
+        Set<TestSection> departments = new HashSet<>();
+        departments.add(createMockedTestSection(CYTOLOGY_TEST_SECTION_ID, CYTOLOGY_LAB_UNIT));
+        pathologyTemplate.setDepartments(departments);
+
+        setupNonAdminUser(pathologistUserId);
+        when(userRoleService.userInRole(eq(pathologistUserId), any(Collection.class))).thenReturn(false);
+
+        Role pathRole = new Role();
+        pathRole.setId(pathologistRoleId);
+        pathRole.setName(pathologist);
+        when(roleService.getRoleById(pathologistRoleId)).thenReturn(pathRole);
+
+        UserLabUnitRoles labRoles = createUserLabUnitRoles(CYTOLOGY_TEST_SECTION_ID, pathologistRoleId);
+        when(userRoleService.getUserLabUnitRoles(pathologistUserId)).thenReturn(labRoles);
+
+        boolean result = securityService.canCreateEntry(pathologyTemplate, pathologistUserId, CYTOLOGY_LAB_UNIT);
+
+        assertTrue("Pathologist should create/edit pathology entries via pathology entry personas", result);
     }
 
     // ========== TEST: ROLE HIERARCHY PRIORITY ==========

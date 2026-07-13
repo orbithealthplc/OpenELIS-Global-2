@@ -1,38 +1,58 @@
-import { Permissions } from "../../../constants/roles";
+import { Permissions, Roles } from "../../../constants/roles";
 import {
   sampleProcessingPersonas,
   sampleRegistrationPersonas,
 } from "../../../constants/ahriSrsPersonas";
+import {
+  getRegistryStages,
+  normalizeWorkflowType,
+  resolvePageAllowedRoles,
+} from "../../../constants/ahriWorkflowRegistry";
 
-const PATHOLOGY_WORKFLOW_TYPE_IDS = new Set([
-  "pathology",
-  "histopathology_biopsy_tissue",
-  "peripheral_smear_bone_marrow_morphology",
-  "fnac",
-  "cytology_liquid_based_pap_smear",
-]);
-
-/** SRS lab personas allowed to edit pathology notebook entries (workflow registry). */
+/**
+ * Personas allowed to edit pathology notebook entries.
+ * Registration + processing SRS personas, plus clinical Pathologist roles
+ * used for microscopy / diagnosis (not in stage-1 intake alone).
+ */
 export const PATHOLOGY_ENTRY_EDIT_PERSONAS = [
-  ...new Set([...sampleRegistrationPersonas, ...sampleProcessingPersonas]),
+  ...new Set([
+    ...sampleRegistrationPersonas,
+    ...sampleProcessingPersonas,
+    Roles.PATHOLOGIST,
+    Roles.CYTOPATHOLOGIST,
+  ]),
 ];
 
-export const normalizeWorkflowTypeKey = (workflowType) =>
-  String(workflowType || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_");
-
-export const isPathologyWorkflowType = (workflowType) =>
-  PATHOLOGY_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
-
-const MNTD_WORKFLOW_TYPE_IDS = new Set(["mntd"]);
-
-/** SRS personas that may edit MNTD notebook entries (intake / registration stages). */
+/** @deprecated Prefer getEntryEditPersonasForWorkflow — kept for MNTD tests/callers. */
 export const MNTD_ENTRY_EDIT_PERSONAS = [...sampleRegistrationPersonas];
 
+export const normalizeWorkflowTypeKey = (workflowType) =>
+  normalizeWorkflowType(workflowType);
+
+export const isPathologyWorkflowType = (workflowType) =>
+  normalizeWorkflowType(workflowType) === "pathology";
+
 export const isMntdWorkflowType = (workflowType) =>
-  MNTD_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
+  normalizeWorkflowType(workflowType) === "mntd";
+
+/**
+ * Intake / registration personas that may create or edit notebook entries for a
+ * workflow. Driven by ahri-workflows.csv (stage order 1). Pathology keeps a
+ * broader registration+processing set (existing behavior).
+ */
+export const getEntryEditPersonasForWorkflow = (workflowType) => {
+  const key = normalizeWorkflowType(workflowType);
+  if (!key || getRegistryStages(key).length === 0) {
+    return [];
+  }
+  if (key === "pathology") {
+    return PATHOLOGY_ENTRY_EDIT_PERSONAS;
+  }
+  const intakePersonas = resolvePageAllowedRoles(key, { order: 1 });
+  return intakePersonas.length > 0
+    ? intakePersonas
+    : [...sampleRegistrationPersonas];
+};
 
 /** Prefer instance workflow type, then parent template. */
 export const resolveEffectiveWorkflowType = (
@@ -100,13 +120,14 @@ export const stashNotebookEntryEditAuth = (entry) => {
 /**
  * Whether the current user may edit a notebook entry (Save button / dashboard Edit).
  * Mirrors backend entry-update rules: template roles, fallback roles, creator/technician,
- * and AHRI pathology personas on the active department.
+ * and AHRI workflow-registry intake personas on the active department.
  */
 export const canEditNotebookEntry = ({
   hasRoleForCurrentLabUnit,
   hasPersonaForActiveDepartment,
   templateAllowedRoles = [],
   fallbackRoles = Permissions.CREATE_OR_EDIT_NOTEBOOK_ENTRY,
+  entryEditPersonas,
   pathologyPersonas = PATHOLOGY_ENTRY_EDIT_PERSONAS,
   userId,
   creatorId,
@@ -131,25 +152,18 @@ export const canEditNotebookEntry = ({
     return true;
   }
 
-  const resolvedWorkflowType = normalizeWorkflowTypeKey(workflowType);
-
-  if (
-    isPathologyWorkflowType(resolvedWorkflowType) &&
-    typeof hasPersonaForActiveDepartment === "function" &&
-    hasPersonaForActiveDepartment(pathologyPersonas)
-  ) {
-    return true;
+  if (typeof hasPersonaForActiveDepartment !== "function") {
+    return false;
   }
 
-  if (
-    isMntdWorkflowType(resolvedWorkflowType) &&
-    typeof hasPersonaForActiveDepartment === "function" &&
-    hasPersonaForActiveDepartment(MNTD_ENTRY_EDIT_PERSONAS)
-  ) {
-    return true;
+  let personas = entryEditPersonas;
+  if (personas == null) {
+    personas = isPathologyWorkflowType(workflowType)
+      ? pathologyPersonas
+      : getEntryEditPersonasForWorkflow(workflowType);
   }
 
-  return false;
+  return personas.length > 0 && hasPersonaForActiveDepartment(personas);
 };
 
 export const getNotebookEntrySaveDisabledReason = ({

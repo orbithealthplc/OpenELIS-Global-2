@@ -1,6 +1,9 @@
 package org.openelisglobal.notebook.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import org.openelisglobal.common.constants.Constants;
@@ -51,6 +54,9 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private WorkflowRegistryService workflowRegistryService;
 
     // ========== TEMPLATE ACCESS (Admin Only for Edit) ==========
 
@@ -326,6 +332,51 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
         return value == null || value.trim().isEmpty();
     }
 
+    /**
+     * Registry stage-1 (intake) personas may create/edit entries even when the
+     * template's allowedRoles omit them (SRS Sample Collector pattern for all
+     * AHRI departments, not only MNTD).
+     * <p>
+     * Pathology also allows registration+processing personas plus clinical
+     * Pathologist / Cytopathologist (dashboard Edit / entry update parity with
+     * frontend {@code PATHOLOGY_ENTRY_EDIT_PERSONAS}).
+     */
+    private boolean hasWorkflowIntakePersona(String sysUserId, String loginLabUnit, String workflowType,
+            Set<TestSection> departments) {
+        if (isBlank(workflowType) || workflowRegistryService == null) {
+            return false;
+        }
+        Set<String> personas = new HashSet<>(resolveEntryEditPersonas(workflowType));
+        if (personas.isEmpty()) {
+            return false;
+        }
+        if (isBlank(loginLabUnit)) {
+            return departments != null && hasRequiredRoleForTemplateDepartments(sysUserId, departments, personas);
+        }
+        return hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, personas);
+    }
+
+    private List<String> resolveEntryEditPersonas(String workflowType) {
+        String normalized = WorkflowRegistryService.normalizeWorkflowType(workflowType);
+        if (isBlank(normalized)) {
+            return Collections.emptyList();
+        }
+        if ("pathology".equals(normalized)) {
+            // Match frontend PATHOLOGY_ENTRY_EDIT_PERSONAS
+            LinkedHashSet<String> pathology = new LinkedHashSet<>();
+            pathology.add(Constants.ROLE_SAMPLE_COLLECTOR);
+            pathology.add(Constants.ROLE_LABORATORY_TECHNICIAN);
+            pathology.add(Constants.ROLE_LAB_MANAGER);
+            pathology.add(Constants.ROLE_JUNIOR_RESEARCHER);
+            pathology.add(Constants.ROLE_SENIOR_RESEARCHER);
+            pathology.add(Constants.ROLE_PATHOLOGIST);
+            pathology.add("Cytopathologist");
+            return new ArrayList<>(pathology);
+        }
+        List<String> intakePersonas = workflowRegistryService.getAllowedPersonas(workflowType, 1);
+        return intakePersonas != null ? intakePersonas : Collections.emptyList();
+    }
+
     // ========== ENTRY ACCESS (Role + Location Based) ==========
 
     @Override
@@ -349,11 +400,20 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return true;
         }
 
+        boolean hasTemplateRole;
         if (isBlank(loginLabUnit)) {
-            return hasRequiredRoleForTemplateDepartments(sysUserId, template.getDepartments(), allowedRoles);
+            hasTemplateRole = hasRequiredRoleForTemplateDepartments(sysUserId, template.getDepartments(),
+                    allowedRoles);
+        } else {
+            hasTemplateRole = hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles);
+        }
+        if (hasTemplateRole) {
+            return true;
         }
 
-        return hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles);
+        // Registry-driven intake personas (same pattern as frontend entry edit).
+        return hasWorkflowIntakePersona(sysUserId, loginLabUnit, template.getWorkflowType(),
+                template.getDepartments());
     }
 
     @Override
@@ -397,13 +457,30 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             boolean hasRole = hasRequiredRoleForTemplateDepartments(sysUserId, templateDepts, allowedRoles);
             LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
                     "hasRequiredRoleForTemplateDepartments result=" + hasRole + " (no loginLabUnit selected)");
-            return hasRole;
+            if (hasRole) {
+                return true;
+            }
+            NoteBook template = noteBookService.get(notebookId);
+            String workflowType = template != null ? template.getWorkflowType() : null;
+            boolean intakeOk = hasWorkflowIntakePersona(sysUserId, loginLabUnit, workflowType, templateDepts);
+            LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
+                    "hasWorkflowIntakePersona result=" + intakeOk);
+            return intakeOk;
         }
 
         boolean hasRole = hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles);
         LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
                 "hasRequiredRoleForLabUnit result=" + hasRole);
-        return hasRole;
+        if (hasRole) {
+            return true;
+        }
+        NoteBook template = noteBookService.get(notebookId);
+        String workflowType = template != null ? template.getWorkflowType() : null;
+        Set<TestSection> templateDepts = noteBookService.getNoteBookDepartments(notebookId);
+        boolean intakeOk = hasWorkflowIntakePersona(sysUserId, loginLabUnit, workflowType, templateDepts);
+        LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
+                "hasWorkflowIntakePersona result=" + intakeOk);
+        return intakeOk;
     }
 
     @Override
@@ -464,7 +541,11 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return true;
         }
 
-        return hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles);
+        if (hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles)) {
+            return true;
+        }
+        return hasWorkflowIntakePersona(sysUserId, loginLabUnit, template.getWorkflowType(),
+                template.getDepartments());
     }
 
     @Override
