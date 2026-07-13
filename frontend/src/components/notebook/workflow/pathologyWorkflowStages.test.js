@@ -55,6 +55,8 @@ describe("pathology workflow subtypes", () => {
     (subtype) => {
       const roles = resolvePageAllowedRoles(subtype, { order: 9 });
       expect(roles).toContain("Senior Researcher");
+      expect(roles).toContain("Pathologist");
+      expect(roles).toContain("Cytopathologist");
       expect(roles.length).toBeGreaterThan(0);
     },
   );
@@ -65,6 +67,15 @@ describe("pathology workflow subtypes", () => {
       const roles = resolvePageAllowedRoles(subtype, { order: 10 });
       expect(roles).toContain("Lab Manager");
       expect(roles).toContain("Senior Researcher");
+      expect(roles).toContain("Pathologist");
     },
   );
+
+  it("Pathologist can access every pathology stage", () => {
+    for (let order = 1; order <= 13; order += 1) {
+      const roles = resolvePageAllowedRoles("pathology", { order });
+      expect(roles).toContain("Pathologist");
+      expect(roles).toContain("Cytopathologist");
+    }
+  });
 });

@@ -370,7 +370,7 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             pathology.add(Constants.ROLE_JUNIOR_RESEARCHER);
             pathology.add(Constants.ROLE_SENIOR_RESEARCHER);
             pathology.add(Constants.ROLE_PATHOLOGIST);
-            pathology.add("Cytopathologist");
+            pathology.add(Constants.ROLE_CYTOPATHOLOGIST);
             return new ArrayList<>(pathology);
         }
         List<String> intakePersonas = workflowRegistryService.getAllowedPersonas(workflowType, 1);

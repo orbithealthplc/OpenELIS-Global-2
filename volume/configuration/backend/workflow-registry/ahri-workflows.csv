@@ -69,19 +69,19 @@ Bioequivalence Laboratory,bioequivalence,2,assignment,assignment,Test Assignment
 Bioequivalence Laboratory,bioequivalence,3,analysis,analysis,Conduct Analysis / Test,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
 Bioequivalence Laboratory,bioequivalence,4,reporting,reporting,Reporting & Release,VIEW|EDIT|COMPLETE,Lab Manager|Senior Researcher
 Bioequivalence Laboratory,bioequivalence,5,post_test,post_test,Post-Test Sample & Data Handling,VIEW|EDIT|COMPLETE,Laboratory Technician|Lab Manager
-Pathology Laboratory,pathology,1,creation,creation,Sample Creation and Metadata Capture,VIEW|EDIT|COMPLETE,Sample Collector|Laboratory Technician
-Pathology Laboratory,pathology,2,qc,qc,Sample Quality Control,VIEW|EDIT|COMPLETE,Laboratory Technician|Lab Manager
-Pathology Laboratory,pathology,3,gross,gross,Gross Examination,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,4,cassette,cassette,Cassette Setup,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,5,processing,processing,Sample Processing,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,6,block,block,Block Creation,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,7,slide_prep,slide_prep,Slide Preparation,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,8,staining,staining,Slide Staining,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher
-Pathology Laboratory,pathology,9,microscopy,microscopy,Microscopy and Diagnosis,VIEW|EDIT|COMPLETE,Junior Researcher|Senior Researcher|Laboratory Technician
-Pathology Laboratory,pathology,10,report_print,report_print,Individual Patient Report Preview and Print,VIEW|EDIT|COMPLETE,Lab Manager|Senior Researcher
-Pathology Laboratory,pathology,11,storage,storage,Storage and Inventory Management,VIEW|EDIT|COMPLETE,Laboratory Technician|Lab Manager
-Pathology Laboratory,pathology,12,performance,performance,Reporting and Performance Monitoring,VIEW|EDIT|COMPLETE,Lab Manager|Senior Researcher
-Pathology Laboratory,pathology,13,disposal,disposal,Disposal and Archiving,VIEW|EDIT|COMPLETE,Lab Manager
+Pathology Laboratory,pathology,1,creation,creation,Sample Creation and Metadata Capture,VIEW|EDIT|COMPLETE,Sample Collector|Laboratory Technician|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,2,qc,qc,Sample Quality Control,VIEW|EDIT|COMPLETE,Laboratory Technician|Lab Manager|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,3,gross,gross,Gross Examination,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,4,cassette,cassette,Cassette Setup,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,5,processing,processing,Sample Processing,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,6,block,block,Block Creation,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,7,slide_prep,slide_prep,Slide Preparation,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,8,staining,staining,Slide Staining,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,9,microscopy,microscopy,Microscopy and Diagnosis,VIEW|EDIT|COMPLETE,Junior Researcher|Senior Researcher|Laboratory Technician|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,10,report_print,report_print,Individual Patient Report Preview and Print,VIEW|EDIT|COMPLETE,Lab Manager|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,11,storage,storage,Storage and Inventory Management,VIEW|EDIT|COMPLETE,Laboratory Technician|Lab Manager|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,12,performance,performance,Reporting and Performance Monitoring,VIEW|EDIT|COMPLETE,Lab Manager|Senior Researcher|Pathologist|Cytopathologist
+Pathology Laboratory,pathology,13,disposal,disposal,Disposal and Archiving,VIEW|EDIT|COMPLETE,Lab Manager|Pathologist|Cytopathologist
 CTD,medlab,1,patient,patient,Patient Registration,VIEW|EDIT|COMPLETE,Sample Collector|Laboratory Technician
 CTD,medlab,2,collection,collection,Sample Collection,VIEW|EDIT|COMPLETE,Sample Collector|Laboratory Technician
 CTD,medlab,3,transport,transport,Transport & Packaging,VIEW|EDIT|COMPLETE,Laboratory Technician|Junior Researcher|Senior Researcher

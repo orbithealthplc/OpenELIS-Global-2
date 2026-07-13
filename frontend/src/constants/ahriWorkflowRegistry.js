@@ -54,6 +54,20 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
     },
     {
       "stageOrder": 4,
+      "stageId": "retention",
+      "pageKey": "retention",
+      "stageTitle": "Retention & Disposal",
+      "requiredActions": [
+        "VIEW",
+        "EDIT",
+        "COMPLETE"
+      ],
+      "allowedPersonas": [
+        "Lab Manager"
+      ]
+    },
+    {
+      "stageOrder": 5,
       "stageId": "request",
       "pageKey": "request",
       "stageTitle": "Sample Request & Retrieval",
@@ -68,7 +82,7 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 5,
+      "stageOrder": 6,
       "stageId": "qc",
       "pageKey": "qc",
       "stageTitle": "QC Inspection",
@@ -83,7 +97,7 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 6,
+      "stageOrder": 7,
       "stageId": "reporting",
       "pageKey": "reporting",
       "stageTitle": "Reporting & Audit",
@@ -95,20 +109,6 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Lab Manager",
         "Senior Researcher"
-      ]
-    },
-    {
-      "stageOrder": 7,
-      "stageId": "retention",
-      "pageKey": "retention",
-      "stageTitle": "Retention & Disposal",
-      "requiredActions": [
-        "VIEW",
-        "EDIT",
-        "COMPLETE"
-      ],
-      "allowedPersonas": [
-        "Lab Manager"
       ]
     }
   ],
@@ -301,6 +301,22 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
     },
     {
       "stageOrder": 3,
+      "stageId": "isolate",
+      "pageKey": "isolate",
+      "stageTitle": "Isolate Creation",
+      "requiredActions": [
+        "VIEW",
+        "EDIT",
+        "COMPLETE"
+      ],
+      "allowedPersonas": [
+        "Laboratory Technician",
+        "Junior Researcher",
+        "Senior Researcher"
+      ]
+    },
+    {
+      "stageOrder": 4,
       "stageId": "temp_storage",
       "pageKey": "temp_storage",
       "stageTitle": "Temporary Storage Assignment",
@@ -315,7 +331,7 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 4,
+      "stageOrder": 5,
       "stageId": "processing_qc",
       "pageKey": "processing_qc",
       "stageTitle": "Processing & Quality Control",
@@ -330,26 +346,10 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ]
     },
     {
-      "stageOrder": 5,
+      "stageOrder": 6,
       "stageId": "test_execution",
       "pageKey": "test_execution",
       "stageTitle": "Assay/Test Execution",
-      "requiredActions": [
-        "VIEW",
-        "EDIT",
-        "COMPLETE"
-      ],
-      "allowedPersonas": [
-        "Laboratory Technician",
-        "Junior Researcher",
-        "Senior Researcher"
-      ]
-    },
-    {
-      "stageOrder": 6,
-      "stageId": "isolate",
-      "pageKey": "isolate",
-      "stageTitle": "Isolate Creation",
       "requiredActions": [
         "VIEW",
         "EDIT",
@@ -1112,7 +1112,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ],
       "allowedPersonas": [
         "Sample Collector",
-        "Laboratory Technician"
+        "Laboratory Technician",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1127,7 +1129,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ],
       "allowedPersonas": [
         "Laboratory Technician",
-        "Lab Manager"
+        "Lab Manager",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1143,7 +1147,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1159,7 +1165,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1175,7 +1183,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1191,7 +1201,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1207,7 +1219,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1223,7 +1237,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Laboratory Technician",
         "Junior Researcher",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1239,7 +1255,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       "allowedPersonas": [
         "Junior Researcher",
         "Senior Researcher",
-        "Laboratory Technician"
+        "Laboratory Technician",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1254,7 +1272,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ],
       "allowedPersonas": [
         "Lab Manager",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1269,7 +1289,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ],
       "allowedPersonas": [
         "Laboratory Technician",
-        "Lab Manager"
+        "Lab Manager",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1284,7 +1306,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
       ],
       "allowedPersonas": [
         "Lab Manager",
-        "Senior Researcher"
+        "Senior Researcher",
+        "Pathologist",
+        "Cytopathologist"
       ]
     },
     {
@@ -1298,7 +1322,9 @@ const REGISTRY_BY_WORKFLOW_TYPE = {
         "COMPLETE"
       ],
       "allowedPersonas": [
-        "Lab Manager"
+        "Lab Manager",
+        "Pathologist",
+        "Cytopathologist"
       ]
     }
   ],

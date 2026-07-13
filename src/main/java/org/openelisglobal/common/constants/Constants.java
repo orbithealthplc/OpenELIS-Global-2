@@ -21,6 +21,7 @@ public class Constants {
     public static final String ROLE_VALIDATION = "Validation";
     public static final String ROLE_REPORTS = "Reports";
     public static final String ROLE_PATHOLOGIST = "Pathologist";
+    public static final String ROLE_CYTOPATHOLOGIST = "Cytopathologist";
     public static final String ROLE_NOTEBOOK_ADMIN = "Notebook Administrator";
 
     // AHRI SRS global roles
