@@ -1072,7 +1072,15 @@ function BiorepositoryStorageAssignmentPage({
           defaultMessage: "Storage Location",
         }),
         render: (value, row) => (
-          <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
+          <div
+            style={{
+              display: "flex",
+              gap: "4px",
+              alignItems: "center",
+              minWidth: "18rem",
+              flexWrap: "wrap",
+            }}
+          >
             {getStorageTag(row)}
             {getConditionTag(row)}
           </div>
