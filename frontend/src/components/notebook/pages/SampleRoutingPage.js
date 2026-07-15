@@ -310,19 +310,10 @@ function SampleRoutingPage({
         routeRequest.trackingNumber = trackingNumber;
       }
     } else if (routeDestination.id === "STORAGE") {
-      // Box is REQUIRED for storage to create proper storage assignment
-      if (!selectedBox) {
+      // Require at least room + device; box/shelf/rack are optional for finer tracking
+      if (!storageSelection.room || !storageSelection.device) {
         setError(
-          "Please select a storage box. Storage routing requires a box assignment.",
-        );
-        setRouting(false);
-        return;
-      }
-
-      // Check if wells have been assigned (via Auto-Populate button)
-      if (Object.keys(storageWellAssignments).length === 0) {
-        setError(
-          "Please click Auto-Populate to assign samples to wells before routing.",
+          "Please select at least a room and device for storage routing.",
         );
         setRouting(false);
         return;
@@ -330,8 +321,6 @@ function SampleRoutingPage({
 
       const storagePayload = {
         sampleIds: selectedSampleIds.map((id) => parseInt(id, 10)),
-        boxId: selectedBox.id,
-        wellAssignments: storageWellAssignments,
         condition: storageTemperature || "REFRIGERATED",
         storagePurpose: storagePurpose,
         retrievalDate: retrievalDate,
@@ -339,6 +328,49 @@ function SampleRoutingPage({
         retentionYears: 5, // Default retention
         pageId: pageData?.id,
       };
+
+      if (selectedBox) {
+        // Box-level assignment requires well preview via Auto-Populate
+        if (Object.keys(storageWellAssignments).length === 0) {
+          setError(
+            "Please click Auto-Populate to assign samples to wells before routing.",
+          );
+          setRouting(false);
+          return;
+        }
+        storagePayload.boxId = selectedBox.id;
+        storagePayload.wellAssignments = storageWellAssignments;
+      } else {
+        // Hierarchy-level assignment (device / shelf / rack) without box wells
+        let locationType = "device";
+        let locationId = storageSelection.device.id;
+
+        if (storageSelection.rack?.id) {
+          locationType = "rack";
+          locationId = storageSelection.rack.id;
+        } else if (storageSelection.shelf?.id) {
+          locationType = "shelf";
+          locationId = storageSelection.shelf.id;
+        }
+
+        const storagePath = [
+          storageSelection.room?.label || storageSelection.room?.name,
+          storageSelection.device?.label || storageSelection.device?.name,
+          storageSelection.shelf?.label || storageSelection.shelf?.name,
+          storageSelection.rack?.label || storageSelection.rack?.name,
+        ]
+          .filter(Boolean)
+          .join(" > ");
+
+        storagePayload.locationId = String(locationId);
+        storagePayload.locationType = locationType;
+        storagePayload.storageNotes = [
+          storageNotes,
+          `Storage routing at ${locationType} level: ${storagePath}`,
+        ]
+          .filter(Boolean)
+          .join(" | ");
+      }
 
       postToOpenElisServerJsonResponse(
         `/rest/notebook/${notebookId}/samples/assign-storage`,
@@ -392,6 +424,7 @@ function SampleRoutingPage({
     routeDestination,
     hasRealPageId,
     selectedBox,
+    storageSelection,
     externalLabName,
     externalLabContact,
     shipmentDate,
@@ -1189,6 +1222,7 @@ function SampleRoutingPage({
                 <StorageHierarchySelector
                   onSelectionChange={(selection) => {
                     setStorageSelection(selection);
+                    setError(null);
                     // Clear pending well assignments when box changes
                     setStorageWellAssignments({});
                     if (selection.box) {
@@ -1233,14 +1267,17 @@ function SampleRoutingPage({
                         defaultMessage="Selected Location:"
                       />
                     </strong>{" "}
-                    {storageSelection.room?.name || "-"}
+                    {storageSelection.room?.label ||
+                      storageSelection.room?.name ||
+                      "-"}
                     {storageSelection.device &&
-                      ` → ${storageSelection.device.name}`}
+                      ` → ${storageSelection.device.label || storageSelection.device.name}`}
                     {storageSelection.shelf &&
-                      ` → ${storageSelection.shelf.name}`}
+                      ` → ${storageSelection.shelf.label || storageSelection.shelf.name}`}
                     {storageSelection.rack &&
-                      ` → ${storageSelection.rack.name}`}
-                    {storageSelection.box && ` → ${storageSelection.box.name}`}
+                      ` → ${storageSelection.rack.label || storageSelection.rack.name}`}
+                    {storageSelection.box &&
+                      ` → ${storageSelection.box.label || storageSelection.box.name}`}
                   </div>
                 )}
 

@@ -1731,16 +1731,22 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
                 return samples;
             }
 
-            // Find the sample-collection page (previous step) and QC page
+            // Find the sample-collection page (previous step) and QC page.
+            // Match pageId first; fall back to title when page_id was never
+            // persisted (common on AHRI CTD/medlab notebooks).
             Integer collectionPageId = null;
             Integer qcPageId = null;
             for (NoteBookPage page : pages) {
-                if ("sample-collection".equals(page.getPageId())) {
+                String pageKey = page.getPageId() != null ? page.getPageId().trim() : "";
+                String title = page.getTitle() != null ? page.getTitle().toLowerCase() : "";
+                if ("sample-collection".equals(pageKey)
+                        || (pageKey.isEmpty() && title.contains("sample collection"))) {
                     collectionPageId = page.getId();
                     LogEvent.logInfo(this.getClass().getSimpleName(), "getSamplesForQC",
                             "Found sample-collection page with id: " + collectionPageId);
-                } else if ("quality-check".equals(page.getPageId())
-                        || "medlab-quality-check".equals(page.getPageId())) {
+                } else if ("quality-check".equals(pageKey) || "medlab-quality-check".equals(pageKey)
+                        || (pageKey.isEmpty() && (title.contains("quality assessment")
+                                || title.contains("sample receipt") || title.contains("quality check")))) {
                     qcPageId = page.getId();
                     LogEvent.logInfo(this.getClass().getSimpleName(), "getSamplesForQC",
                             "Found QC page with id: " + qcPageId);
@@ -1928,7 +1934,10 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             // Find the collection page (transport-packaging page no longer exists)
             Integer collectionPageId = null;
             for (NoteBookPage page : pages) {
-                if ("sample-collection".equals(page.getPageId())) {
+                String pageKey = page.getPageId() != null ? page.getPageId().trim() : "";
+                String title = page.getTitle() != null ? page.getTitle().toLowerCase() : "";
+                if ("sample-collection".equals(pageKey)
+                        || (pageKey.isEmpty() && title.contains("sample collection"))) {
                     collectionPageId = page.getId();
                     LogEvent.logInfo(this.getClass().getSimpleName(), "getSamplesForTransport",
                             "Found collection page with id: " + collectionPageId);
@@ -6585,7 +6594,7 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
     /**
      * Get the entity class for a storage location type.
      *
-     * @param locationType the location type string (box, rack, shelf, device)
+     * @param locationType the location type string (box, rack, shelf, device, room)
      * @return the corresponding entity class, or null if unknown
      */
     private Class<?> getStorageEntityClass(String locationType) {
@@ -6601,6 +6610,8 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             return org.openelisglobal.storage.valueholder.StorageShelf.class;
         case "device":
             return org.openelisglobal.storage.valueholder.StorageDevice.class;
+        case "room":
+            return org.openelisglobal.storage.valueholder.StorageRoom.class;
         default:
             return null;
         }

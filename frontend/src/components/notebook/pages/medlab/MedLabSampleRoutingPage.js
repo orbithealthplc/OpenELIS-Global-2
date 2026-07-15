@@ -634,36 +634,59 @@ function MedLabSampleRoutingPage({
         routeRequest.shipmentDate = shipmentDate;
       }
     } else if (routeDestination.id === "STORAGE") {
-      // Box is REQUIRED for storage to create proper storage assignment
-      if (!selectedBox) {
+      // Require at least room + device; box/shelf/rack are optional for finer tracking
+      if (!storageSelection.room || !storageSelection.device) {
         setError(
-          "Please select a storage box. Storage routing requires a box assignment.",
+          "Please select at least a room and device for storage routing.",
         );
         setRouting(false);
         return;
       }
 
-      // Check if wells have been assigned (via Auto-Populate button)
-      if (Object.keys(storageWellAssignments).length === 0) {
-        setError(
-          "Please click Auto-Populate to assign samples to wells before routing.",
-        );
-        setRouting(false);
-        return;
-      }
+      if (selectedBox) {
+        // Box-level assignment requires well preview via Auto-Populate
+        if (Object.keys(storageWellAssignments).length === 0) {
+          setError(
+            "Please click Auto-Populate to assign samples to wells before routing.",
+          );
+          setRouting(false);
+          return;
+        }
 
-      // Add storage metadata to route request
-      // For each sample, we send the first well assignment as the primary position
-      // The full well assignments can be used for batch processing
-      routeRequest.storageBoxId = selectedBox.id;
-      routeRequest.locationType = "box"; // storageBoxId refers to storage_box table
-      routeRequest.storageWellAssignments = storageWellAssignments;
+        routeRequest.storageBoxId = selectedBox.id;
+        routeRequest.locationType = "box";
+        routeRequest.storageWellAssignments = storageWellAssignments;
 
-      // Get first sample's position as primary coordinate (for single-sample case)
-      const firstSampleId = selectedSampleIds[0];
-      const firstWellPosition = storageWellAssignments[firstSampleId];
-      if (firstWellPosition) {
-        routeRequest.positionCoordinate = firstWellPosition;
+        const firstSampleId = selectedSampleIds[0];
+        const firstWellPosition = storageWellAssignments[firstSampleId];
+        if (firstWellPosition) {
+          routeRequest.positionCoordinate = firstWellPosition;
+        }
+      } else {
+        // Hierarchy-level assignment (device / shelf / rack) without box wells
+        let locationType = "device";
+        let locationId = storageSelection.device.id;
+
+        if (storageSelection.rack?.id) {
+          locationType = "rack";
+          locationId = storageSelection.rack.id;
+        } else if (storageSelection.shelf?.id) {
+          locationType = "shelf";
+          locationId = storageSelection.shelf.id;
+        }
+
+        const storagePath = [
+          storageSelection.room?.label,
+          storageSelection.device?.label,
+          storageSelection.shelf?.label,
+          storageSelection.rack?.label,
+        ]
+          .filter(Boolean)
+          .join(" > ");
+
+        routeRequest.storageBoxId = locationId;
+        routeRequest.locationType = locationType;
+        routeRequest.storageNotes = `Storage routing at ${locationType} level: ${storagePath}`;
       }
     }
 
@@ -696,6 +719,7 @@ function MedLabSampleRoutingPage({
     routeDestination,
     hasRealPageId,
     selectedBox,
+    storageSelection,
     externalLabName,
     shipmentDate,
     pageData?.id,
@@ -1871,9 +1895,19 @@ function MedLabSampleRoutingPage({
                 defaultMessage="Samples will be routed to long-term storage. Select storage location using the hierarchy below."
               />
             </p>
+            {error && (
+              <InlineNotification
+                kind="error"
+                title={error}
+                lowContrast
+                hideCloseButton
+                style={{ marginBottom: "1rem" }}
+              />
+            )}
             <StorageHierarchySelector
               onSelectionChange={(selection) => {
                 setStorageSelection(selection);
+                setError(null);
                 // Clear pending well assignments when box changes
                 setStorageWellAssignments({});
                 if (selection.box) {
@@ -1988,7 +2022,7 @@ function MedLabSampleRoutingPage({
             >
               <FormattedMessage
                 id="notebook.routing.modal.storageBoxHelp"
-                defaultMessage="Select a box and click Auto-Populate to preview assignments before routing."
+                defaultMessage="Select at least a room and device to route. Optionally select a box and click Auto-Populate to preview well assignments."
               />
             </p>
           </div>
