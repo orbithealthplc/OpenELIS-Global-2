@@ -143,7 +143,6 @@
     <include file="liquibase/3.5.x.x/071-tb-department-sample-types-backfill.xml"/>
     <include file="liquibase/3.5.x.x/072-mntd-sample-archiving-page.xml"/>
     <include file="liquibase/3.5.x.x/073-medlab-patient-registration-access.xml"/>
-    <include file="liquibase/3.5.x.x/074-ahri-project-roles-and-ctd-lab-unit.xml"/>
     <include file="liquibase/3.5.x.x/075-add-doc-verification-biosafety-classification.xml"/>
     <include file="liquibase/3.5.x.x/076-reorder-biorepository-retention-to-end.xml"/>
     <include file="liquibase/3.5.x.x/077-biorepository-storage-zone-labels.xml"/>

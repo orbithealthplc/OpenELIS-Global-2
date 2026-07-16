@@ -38,28 +38,3 @@ Reference: SRS §5 Use Case 2 (Role-Based Access Control)
 ## API spot-check
 
 `POST /rest/notebook-entry/create?notebookId={id}` returns 403 when department or persona does not match.
-
-## Department super-users (all roles per lab)
-
-Seeded by [`scripts/populate-department-super-users.sh`](../scripts/populate-department-super-users.sh). Credentials: [`department-super-user-credentials.md`](department-super-user-credentials.md).
-
-Automated smoke: `UAT_BASE_URL=https://localhost python3 scripts/verify-department-super-users.py --all`
-
-| Lab | Super-user | Notebook visible | Stage 1 | Mid stage | Late stage |
-|-----|------------|------------------|---------|-----------|------------|
-| MNTD | `newmntd` | ☐ | ☐ intake | ☐ processing | ☐ reporting |
-| Biorepository | `biorepository` | ☐ | ☐ intake | ☐ storage | ☐ reporting |
-| TB | `tblab` | ☐ | ☐ accession | ☐ test | ☐ reporting |
-| Bacteriology | `bacteriology` | ☐ | ☐ reception | ☐ test execution | ☐ reporting |
-| Bioanalytical | `bioanalytical` | ☐ | ☐ reception | ☐ analysis | ☐ reporting |
-| Immunology | `immunology` | ☐ | ☐ reception | ☐ analysis | ☐ reporting |
-| Pathology | `pathology` | ☐ | ☐ creation | ☐ microscopy | ☐ reporting |
-| Pharmaceutical | `pharma` | ☐ | ☐ creation | ☐ assay | ☐ reporting |
-| Traditional Medicine | `tmmd` | ☐ | ☐ intake | ☐ extraction | ☐ archive |
-| Viral Vaccine | `viralvaccine` | ☐ | ☐ | ☐ | ☐ |
-| CTD | `ctd` | ☐ | ☐ registration | ☐ testing | ☐ validation |
-| Bioequivalence | `bioequivalence` | ☐ | ☐ reception | ☐ analysis | ☐ reporting |
-| Genomics | `genomics` | ☐ | ☐ intake | ☐ PCR | ☐ reporting |
-| Virology | `virology` | ☐ | ☐ | ☐ | ☐ |
-
-Super-users intentionally have **all six SRS lab roles** so every workflow stage gate should pass for their department notebook.
