@@ -62,6 +62,7 @@ import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
 import { FormattedMessage, useIntl } from "react-intl";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Permissions } from "../../constants/roles";
+import { canEditNotebookEntry } from "./utils/noteBookEntryEditPermissions";
 import {
   NoteBookFormValues,
   NoteBookInitialData,
@@ -78,6 +79,45 @@ import {
   buildLinkedEquipmentInstrumentsUrl,
   mapLinkedEquipmentOptions,
 } from "./notebookLinkedEquipment";
+
+const normalizeWorkflowTypeKey = (notebook) =>
+  String(notebook?.workflowType || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+
+/** Order-types picker is CTD/MedLab only (Stage 1 lab orders). */
+const isCtdOrderTypesNotebook = (notebook, departments = []) => {
+  const workflowType = normalizeWorkflowTypeKey(notebook);
+  if (workflowType === "medlab" || workflowType === "medical_laboratory") {
+    return true;
+  }
+  const depts = departments.length ? departments : notebook?.departments || [];
+  const deptMatch = depts.some((dept) => {
+    const name = String(dept?.value || dept?.name || dept?.label || "")
+      .trim()
+      .toLowerCase();
+    return (
+      name === "ctd" ||
+      name.includes("ctd department") ||
+      name.includes("medical laboratory")
+    );
+  });
+  if (deptMatch) {
+    return true;
+  }
+
+  // Fallback to keyword matching for CTD instances where workflowType/departments
+  // can be missing in the API response.
+  const text = String(
+    notebook?.protocol ||
+      notebook?.title ||
+      notebook?.objective ||
+      notebook?.content ||
+      "",
+  ).toLowerCase();
+  return /\bctd\b/i.test(text);
+};
 
 const NoteBookEntryForm = () => {
   let breadcrumbs = [
@@ -107,7 +147,11 @@ const NoteBookEntryForm = () => {
   const { notificationVisible, setNotificationVisible, addNotification } =
     useContext(NotificationContext);
   const { userSessionDetails } = useContext(UserSessionDetailsContext);
-  const { hasAnyRole, hasRoleForCurrentLabUnit } = usePermissions();
+  const {
+    hasAnyRole,
+    hasRoleForCurrentLabUnit,
+    hasPersonaForActiveDepartment,
+  } = usePermissions();
 
   // Check if user can create/edit notebook templates
   const canEditTemplate = hasAnyRole(Permissions.CREATE_OR_EDIT_NOTEBOOK);
@@ -123,11 +167,15 @@ const NoteBookEntryForm = () => {
       : Array.from(data.allowedRoles);
   };
 
-  const canEditInstance = hasRoleForCurrentLabUnit(
-    resolveEntryAllowedRoles(noteBookData).length > 0
-      ? resolveEntryAllowedRoles(noteBookData)
-      : Permissions.CREATE_OR_EDIT_NOTEBOOK_ENTRY,
-  );
+  const canEditInstance = canEditNotebookEntry({
+    hasRoleForCurrentLabUnit,
+    hasPersonaForActiveDepartment,
+    templateAllowedRoles: resolveEntryAllowedRoles(noteBookData),
+    userId: userSessionDetails?.userId,
+    creatorId: noteBookData?.creatorId,
+    technicianId: noteBookData?.technicianId,
+    workflowType: noteBookData?.workflowType,
+  });
 
   const canEditNotebook =
     noteBookData?.isTemplate === false ? canEditInstance : canEditTemplate;
@@ -166,6 +214,9 @@ const NoteBookEntryForm = () => {
   const [rolesLoaded, setRolesLoaded] = useState(false);
   const [pendingSelectedRoleIds, setPendingSelectedRoleIds] = useState(null);
   const [availableRoles, setAvailableRoles] = useState([]);
+  const [selectedAllowedTests, setSelectedAllowedTests] = useState([]);
+  const [availableOrderableTests, setAvailableOrderableTests] = useState([]);
+  const [pendingSelectedTestIds, setPendingSelectedTestIds] = useState(null);
 
   const isFormValid = () => {
     const experimentType =
@@ -258,6 +309,10 @@ const NoteBookEntryForm = () => {
     }
     if (rolesLoaded || mode === MODES.CREATE) {
       noteBookForm.allowedRoles = selectedAllowedRoles.map((role) => role.id);
+    }
+    // Only persist order-type filter for CTD/MedLab notebooks
+    if (isCtdOrderTypesNotebook(noteBookData, selectedOrganizations)) {
+      noteBookForm.allowedTestIds = selectedAllowedTests.map((t) => t.id);
     }
     console.log(JSON.stringify(noteBookForm));
     var url =
@@ -735,6 +790,13 @@ const NoteBookEntryForm = () => {
               }
             },
           );
+          // Pre-populate allowed tests from fullDisplayBean allowedTestIds
+          if (data.allowedTestIds && data.allowedTestIds.length > 0) {
+            // Store as pending IDs; matched once availableOrderableTests is loaded
+            setPendingSelectedTestIds(
+              data.allowedTestIds.map((id) => Number(id)),
+            );
+          }
         }
         setLoading(false);
         setInitialMount(true);
@@ -801,6 +863,29 @@ const NoteBookEntryForm = () => {
         }
       },
     );
+    // Load orderable tests for the "Allowed Tests" filter on templates
+    getFromOpenElisServer("/rest/medlab/orderable-tests", (response) => {
+      const list = Array.isArray(response) ? response : response?.tests || [];
+      if (list.length > 0) {
+        setAvailableOrderableTests(
+          list.map((t) => ({
+            id: Number(t.id || t.value),
+            label: t.value || t.name || t.localizedTestName || String(t.id),
+          })),
+        );
+      } else {
+        // Fallback to generic test list
+        getFromOpenElisServer("/rest/test-list", (fallback) => {
+          const fl = Array.isArray(fallback) ? fallback : [];
+          setAvailableOrderableTests(
+            fl.map((t) => ({
+              id: Number(t.id || t.value),
+              label: t.value || t.name || String(t.id),
+            })),
+          );
+        });
+      }
+    });
     // Fetch available roles dynamically from backend
     // Using /rest/systemroles which returns {label: description, value: name}
     getFromOpenElisServer("/rest/systemroles", (roles) => {
@@ -870,6 +955,21 @@ const NoteBookEntryForm = () => {
       setPendingSelectedRoleIds(null);
     }
   }, [pendingSelectedRoleIds, availableRoles]);
+
+  // Match pending selected test IDs to actual test objects once the list is loaded
+  useEffect(() => {
+    if (
+      pendingSelectedTestIds !== null &&
+      availableOrderableTests.length > 0 &&
+      pendingSelectedTestIds.length > 0
+    ) {
+      const matchedTests = availableOrderableTests.filter((t) =>
+        pendingSelectedTestIds.includes(t.id),
+      );
+      setSelectedAllowedTests(matchedTests);
+      setPendingSelectedTestIds(null);
+    }
+  }, [pendingSelectedTestIds, availableOrderableTests]);
 
   useEffect(() => {
     if (!notebookid) {
@@ -979,6 +1079,39 @@ const NoteBookEntryForm = () => {
                   }}
                 />
               </Column>
+              <Column lg={16} md={8} sm={4}>
+                <br />
+              </Column>
+              {isCtdOrderTypesNotebook(noteBookData, selectedOrganizations) && (
+                <Column lg={16} md={8} sm={4}>
+                  <FilterableMultiSelect
+                    key={`allowed-tests-${selectedAllowedTests.map((t) => t.id).join(",")}`}
+                    id="allowedTests"
+                    titleText={intl.formatMessage({
+                      id: "notebook.label.allowedTests",
+                      defaultMessage: "Order types for this project",
+                    })}
+                    placeholder={intl.formatMessage({
+                      id: "notebook.label.allowedTests.placeholder",
+                      defaultMessage:
+                        "Select the lab tests/orders used by this project",
+                    })}
+                    items={availableOrderableTests}
+                    itemToString={(item) => (item ? item.label : "")}
+                    initialSelectedItems={selectedAllowedTests}
+                    onChange={({ selectedItems }) => {
+                      setSelectedAllowedTests(selectedItems || []);
+                    }}
+                  />
+                  <p className="cds--label-description">
+                    {intl.formatMessage({
+                      id: "notebook.label.allowedTests.helper",
+                      defaultMessage:
+                        "Only these tests will appear when creating lab orders in Stage 1. Leave empty to show all tests.",
+                    })}
+                  </p>
+                </Column>
+              )}
             </Grid>
           </Column>
         )}

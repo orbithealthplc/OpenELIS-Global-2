@@ -43,6 +43,7 @@ function BulkOrderModal({
   notebookPageId,
   sampleCollectionPageId,
   tests: testsFromParent,
+  allowedTestIds,
   onSuccess,
 }) {
   const intl = useIntl();
@@ -67,22 +68,34 @@ function BulkOrderModal({
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState([]);
 
+  const applyAllowedTestFilter = useCallback(
+    (tests) => {
+      const ids = allowedTestIds;
+      if (!ids || ids.length === 0) {
+        return tests;
+      }
+      const idSet = new Set(ids.map((id) => Number(id)));
+      return tests.filter((t) => idSet.has(Number(t.id || t.value)));
+    },
+    [allowedTestIds],
+  );
+
   const loadAvailableTests = useCallback(() => {
     setLoadingTests(true);
     getFromOpenElisServer("/rest/medlab/orderable-tests", (response) => {
-      let tests = normalizeOrderableTestList(response);
-      if (tests.length > 0) {
+      let tests = applyAllowedTestFilter(normalizeOrderableTestList(response));
+      if (tests.length > 0 || (allowedTestIds && allowedTestIds.length > 0)) {
         setAvailableTests(tests);
         setLoadingTests(false);
         return;
       }
       getFromOpenElisServer("/rest/test-list", (fallback) => {
-        tests = normalizeOrderableTestList(fallback);
+        tests = applyAllowedTestFilter(normalizeOrderableTestList(fallback));
         setAvailableTests(tests);
         setLoadingTests(false);
       });
     });
-  }, []);
+  }, [applyAllowedTestFilter, allowedTestIds]);
 
   const loadLabNumberPreview = useCallback(() => {
     if (!labNumberPrefix.trim()) {
@@ -113,7 +126,9 @@ function BulkOrderModal({
       setError(null);
       setValidationErrors([]);
       setSelectedTests([]);
-      const preloaded = normalizeOrderableTestList(testsFromParent);
+      const preloaded = applyAllowedTestFilter(
+        normalizeOrderableTestList(testsFromParent),
+      );
       if (preloaded.length > 0) {
         setAvailableTests(preloaded);
       } else {
@@ -123,7 +138,7 @@ function BulkOrderModal({
       const year = new Date().getFullYear();
       setLabNumberPrefix(`MEDLAB-${year}-`);
     }
-  }, [open, testsFromParent, loadAvailableTests]);
+  }, [open, testsFromParent, loadAvailableTests, applyAllowedTestFilter]);
 
   // Load preview of lab numbers when prefix changes or patients change
   useEffect(() => {
@@ -398,26 +413,26 @@ function BulkOrderModal({
                     </p>
                   ) : (
                     availableTests.map((test) => (
-                    <div
-                      key={test.id}
-                      className="test-checkbox-item"
-                      onClick={() => handleTestToggle(test.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <Checkbox
-                        id={`test-${test.id}`}
-                        labelText={
-                          test.value ||
-                          test.localizedTestName ||
-                          test.testName ||
-                          test.name ||
-                          "Unknown Test"
-                        }
-                        checked={selectedTests.includes(String(test.id))}
-                        onChange={() => {}}
-                      />
-                    </div>
-                  ))
+                      <div
+                        key={test.id}
+                        className="test-checkbox-item"
+                        onClick={() => handleTestToggle(test.id)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <Checkbox
+                          id={`test-${test.id}`}
+                          labelText={
+                            test.value ||
+                            test.localizedTestName ||
+                            test.testName ||
+                            test.name ||
+                            "Unknown Test"
+                          }
+                          checked={selectedTests.includes(String(test.id))}
+                          onChange={() => {}}
+                        />
+                      </div>
+                    ))
                   )}
                 </div>
               )}

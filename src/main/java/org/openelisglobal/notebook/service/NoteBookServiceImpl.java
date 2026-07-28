@@ -522,6 +522,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
         Hibernate.initialize(noteBook.getOrganizations());
         Hibernate.initialize(noteBook.getDepartments());
         Hibernate.initialize(noteBook.getAllowedRoles());
+        Hibernate.initialize(noteBook.getAllowedTestIds());
         if (noteBook.getTechnician() != null) {
             Hibernate.initialize(noteBook.getTechnician());
         }
@@ -804,6 +805,17 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
 
                     Hibernate.initialize(parentTemplate.getAllowedRoles());
                     fullDisplayBean.setAllowedRoles(parentTemplate.getAllowedRoles());
+
+                    // Prefer this entry's saved order-type filter; fall back to parent
+                    // template only when the entry has none configured.
+                    Hibernate.initialize(noteBook.getAllowedTestIds());
+                    java.util.Set<Integer> allowedTests = new java.util.HashSet<>(
+                            noteBook.getAllowedTestIds());
+                    if (allowedTests.isEmpty()) {
+                        Hibernate.initialize(parentTemplate.getAllowedTestIds());
+                        allowedTests = new java.util.HashSet<>(parentTemplate.getAllowedTestIds());
+                    }
+                    fullDisplayBean.setAllowedTestIds(allowedTests);
                 } else {
                     // Fallback to own settings
                     Hibernate.initialize(noteBook.getOrganizations());
@@ -814,6 +826,9 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
 
                     Hibernate.initialize(noteBook.getAllowedRoles());
                     fullDisplayBean.setAllowedRoles(noteBook.getAllowedRoles());
+
+                    Hibernate.initialize(noteBook.getAllowedTestIds());
+                    fullDisplayBean.setAllowedTestIds(new java.util.HashSet<>(noteBook.getAllowedTestIds()));
                 }
             } else {
                 Hibernate.initialize(noteBook.getOrganizations());
@@ -824,6 +839,18 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
 
                 Hibernate.initialize(noteBook.getAllowedRoles());
                 fullDisplayBean.setAllowedRoles(noteBook.getAllowedRoles());
+
+                Hibernate.initialize(noteBook.getAllowedTestIds());
+                java.util.Set<Integer> allowedTests = new java.util.HashSet<>(noteBook.getAllowedTestIds());
+                // Entries (legacy/non-child) inherit order-filter tests from parent template
+                if (allowedTests.isEmpty() && noteBook.getIsTemplate() != null && !noteBook.getIsTemplate()) {
+                    NoteBook parentTemplate = baseObjectDAO.findParentTemplate(noteBook.getId());
+                    if (parentTemplate != null) {
+                        Hibernate.initialize(parentTemplate.getAllowedTestIds());
+                        allowedTests = new java.util.HashSet<>(parentTemplate.getAllowedTestIds());
+                    }
+                }
+                fullDisplayBean.setAllowedTestIds(allowedTests);
             }
 
         }
@@ -1100,6 +1127,12 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
             noteBook.getAllowedRoles().addAll(form.getAllowedRoles());
         }
 
+        // Handle allowed test IDs (for templates - filters which tests appear in Stage 1 order creation)
+        if (form.getAllowedTestIds() != null) {
+            noteBook.getAllowedTestIds().clear();
+            noteBook.getAllowedTestIds().addAll(form.getAllowedTestIds());
+        }
+
         return noteBook;
     }
 
@@ -1340,6 +1373,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 instancePage.setOrder(templatePage.getOrder());
                 instancePage.setContent(templatePage.getContent());
                 instancePage.setInstructions(templatePage.getInstructions());
+                instancePage.setPageId(templatePage.getPageId());
+                instancePage.setPageType(templatePage.getPageType());
                 instancePage.setSampleTypeId(templatePage.getSampleTypeId());
                 instancePage.setNotebook(instance);
 
@@ -1719,6 +1754,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 newPage.setOrder(templatePage.getOrder());
                 newPage.setContent(templatePage.getContent());
                 newPage.setInstructions(templatePage.getInstructions());
+                newPage.setPageId(templatePage.getPageId());
+                newPage.setPageType(templatePage.getPageType());
                 newPage.setSampleTypeId(templatePage.getSampleTypeId());
                 newPage.setNotebook(instance);
                 newPage.setCompleted(false);
@@ -2052,6 +2089,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                 childPage.setTitle(parentPage.getTitle());
                 childPage.setInstructions(parentPage.getInstructions());
                 childPage.setContent(parentPage.getContent());
+                childPage.setPageId(parentPage.getPageId());
+                childPage.setPageType(parentPage.getPageType());
                 childPage.setSampleTypeId(parentPage.getSampleTypeId());
                 childPage.setCompleted(false); // Reset completion status for new instance
 

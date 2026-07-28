@@ -38,6 +38,7 @@ import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
 import PageBreadCrumb from "../common/PageBreadCrumb";
 import {
   canEditNotebookEntry,
+  canOpenNotebookEntry,
   getNotebookEntrySaveDisabledReason,
 } from "./utils/noteBookEntryEditPermissions";
 import {
@@ -93,6 +94,40 @@ const isPathologyNotebook = (notebook) => {
 const isMedLabNotebook = (notebook) => {
   const workflowType = normalizeWorkflowTypeKey(notebook);
   return workflowType === "medlab" || workflowType === "medical_laboratory";
+};
+
+/** Order-types picker is CTD/MedLab only (Stage 1 lab orders). */
+const isCtdOrderTypesNotebook = (notebook, departments = []) => {
+  if (isMedLabNotebook(notebook)) {
+    return true;
+  }
+  const depts = departments.length ? departments : notebook?.departments || [];
+  const deptMatch = depts.some((dept) => {
+    const name = String(dept?.value || dept?.name || dept?.label || "")
+      .trim()
+      .toLowerCase();
+    return (
+      name === "ctd" ||
+      name.includes("ctd department") ||
+      name.includes("medical laboratory")
+    );
+  });
+  if (deptMatch) {
+    return true;
+  }
+
+  // Some CTD instances/templates arrive from the API without workflowType
+  // and without resolved departments. Fallback to keyword matching.
+  const text = String(
+    notebook?.protocol ||
+      notebook?.title ||
+      notebook?.objective ||
+      notebook?.content ||
+      "",
+  ).toLowerCase();
+
+  // Match CTD as a standalone word to reduce false positives.
+  return /\bctd\b/i.test(text);
 };
 
 const isBiorepositoryNotebook = (notebook) =>
@@ -212,6 +247,9 @@ const NoteBookInstanceEntryForm = () => {
   const [questionnaires, setQuestionnaires] = useState([]);
   const [projectTags, setProjectTags] = useState([]); // Template tags (for display only)
   const [projectFiles, setProjectFiles] = useState([]); // Template files (for display only)
+  const [selectedAllowedTests, setSelectedAllowedTests] = useState([]);
+  const [availableOrderableTests, setAvailableOrderableTests] = useState([]);
+  const [pendingSelectedTestIds, setPendingSelectedTestIds] = useState(null);
 
   const canEditEntry = useMemo(
     () =>
@@ -278,6 +316,10 @@ const NoteBookInstanceEntryForm = () => {
       .filter((id) => Number.isFinite(id) && id > 0);
     noteBookForm.analyzerIds = [];
     noteBookForm.tags = noteBookData.tags;
+    // Only persist order-type filter for CTD/MedLab notebooks
+    if (isCtdOrderTypesNotebook(noteBookData)) {
+      noteBookForm.allowedTestIds = selectedAllowedTests.map((t) => t.id);
+    }
     // Send only new comments (those without id) with just text
     noteBookForm.comments = comments
       .filter((c) => c.id === null)
@@ -508,10 +550,52 @@ const NoteBookInstanceEntryForm = () => {
     getFromOpenElisServer("/rest/panels", setAllPanels);
     getFromOpenElisServer("/rest/user-sample-types", setSampleTypes);
     getFromOpenElisServer("/rest/notebook/questionnaires", setQuestionnaires);
+    getFromOpenElisServer("/rest/medlab/orderable-tests", (response) => {
+      const list = Array.isArray(response) ? response : response?.tests || [];
+      if (list.length > 0) {
+        setAvailableOrderableTests(
+          list.map((t) => ({
+            id: Number(t.id || t.value),
+            label: t.value || t.name || t.localizedTestName || String(t.id),
+          })),
+        );
+      } else {
+        getFromOpenElisServer("/rest/test-list", (fallback) => {
+          const fl = Array.isArray(fallback) ? fallback : [];
+          setAvailableOrderableTests(
+            fl.map((t) => ({
+              id: Number(t.id || t.value),
+              label: t.value || t.name || String(t.id),
+            })),
+          );
+        });
+      }
+    });
     return () => {
       componentMounted.current = false;
     };
   }, []);
+
+  // Match pending allowed-test IDs once the orderable list is loaded
+  useEffect(() => {
+    if (
+      pendingSelectedTestIds !== null &&
+      availableOrderableTests.length > 0 &&
+      pendingSelectedTestIds.length > 0
+    ) {
+      const matched = availableOrderableTests.filter((t) =>
+        pendingSelectedTestIds.includes(t.id),
+      );
+      setSelectedAllowedTests(matched);
+      setPendingSelectedTestIds(null);
+    } else if (
+      pendingSelectedTestIds !== null &&
+      pendingSelectedTestIds.length === 0
+    ) {
+      setSelectedAllowedTests([]);
+      setPendingSelectedTestIds(null);
+    }
+  }, [pendingSelectedTestIds, availableOrderableTests]);
 
   useEffect(() => {
     const tabParam = urlParams.get("tab");
@@ -595,7 +679,7 @@ const NoteBookInstanceEntryForm = () => {
         : Array.from(allowedRoles)
       : [];
 
-    const hasAccess = canEditNotebookEntry({
+    const hasAccess = canOpenNotebookEntry({
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
       templateAllowedRoles: rolesArray,
@@ -769,6 +853,18 @@ const NoteBookInstanceEntryForm = () => {
                     : ""),
               };
               setNoteBookData(mergedData);
+              // Prefer instance allowed tests; fall back to template filter
+              const instanceTests = Array.isArray(data.allowedTestIds)
+                ? data.allowedTestIds
+                : [];
+              const templateTests = Array.isArray(templateData.allowedTestIds)
+                ? templateData.allowedTestIds
+                : [];
+              setPendingSelectedTestIds(
+                (instanceTests.length > 0 ? instanceTests : templateTests).map(
+                  (id) => Number(id),
+                ),
+              );
               loadNotebookInstruments(templateData.id || data.templateId);
             },
           );
@@ -803,6 +899,11 @@ const NoteBookInstanceEntryForm = () => {
                 ? "histopathology_biopsy_tissue"
                 : data.workflowType),
           });
+          setPendingSelectedTestIds(
+            (Array.isArray(data.allowedTestIds) ? data.allowedTestIds : []).map(
+              (id) => Number(id),
+            ),
+          );
           loadNotebookInstruments(data.id);
         }
 
@@ -1258,6 +1359,73 @@ const NoteBookInstanceEntryForm = () => {
                   </p>
                 ) : null}
               </Column>
+              {isCtdOrderTypesNotebook(noteBookData) && (
+                <>
+                  <Column lg={16} md={8} sm={4}>
+                    <br />
+                  </Column>
+                  <Column lg={16} md={8} sm={4}>
+                    <h5>
+                      <FormattedMessage
+                        id="notebook.label.allowedTests"
+                        defaultMessage="Order types for this project"
+                      />
+                    </h5>
+                  </Column>
+                  <Column lg={16} md={8} sm={4}>
+                    {(initialMount || mode === MODES.CREATE) &&
+                      mode !== MODES.VIEW && (
+                        <FilterableMultiSelect
+                          key={`allowed-tests-${selectedAllowedTests.map((t) => t.id).join(",")}`}
+                          id="allowedTests"
+                          titleText={intl.formatMessage({
+                            id: "notebook.label.allowedTests",
+                            defaultMessage: "Order types for this project",
+                          })}
+                          placeholder={intl.formatMessage({
+                            id: "notebook.label.allowedTests.placeholder",
+                            defaultMessage:
+                              "Select the lab tests/orders used by this project",
+                          })}
+                          items={availableOrderableTests}
+                          itemToString={(item) => (item ? item.label : "")}
+                          initialSelectedItems={selectedAllowedTests}
+                          onChange={({ selectedItems }) => {
+                            setSelectedAllowedTests(selectedItems || []);
+                          }}
+                          selectionFeedback="top-after-reopen"
+                        />
+                      )}
+                    <p style={{ color: "#8d8d8d", fontSize: "0.875rem" }}>
+                      <FormattedMessage
+                        id="notebook.label.allowedTests.helper"
+                        defaultMessage="Only these tests will appear when creating lab orders in Stage 1. Leave empty to show all tests."
+                      />
+                    </p>
+                    {selectedAllowedTests.length > 0 && (
+                      <div style={{ marginTop: "0.5rem" }}>
+                        {selectedAllowedTests.map((test) => (
+                          <Tag
+                            key={test.id}
+                            type="blue"
+                            filter={mode !== MODES.VIEW}
+                            onClose={
+                              mode === MODES.VIEW
+                                ? undefined
+                                : () =>
+                                    setSelectedAllowedTests((prev) =>
+                                      prev.filter((t) => t.id !== test.id),
+                                    )
+                            }
+                          >
+                            {test.label}
+                          </Tag>
+                        ))}
+                      </div>
+                    )}
+                  </Column>
+                </>
+              )}
               <Column lg={16} md={8} sm={4}>
                 <br />
               </Column>

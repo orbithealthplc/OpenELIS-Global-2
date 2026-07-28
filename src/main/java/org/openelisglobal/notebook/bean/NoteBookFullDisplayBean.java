@@ -120,6 +120,7 @@ public class NoteBookFullDisplayBean extends NoteBookDisplayBean {
     private java.util.Set<org.openelisglobal.organization.valueholder.Organization> organizations;
     private java.util.Set<org.openelisglobal.test.valueholder.TestSection> departments;
     private java.util.Set<String> allowedRoles;
+    private java.util.Set<Integer> allowedTestIds;
 
     public java.util.Set<org.openelisglobal.organization.valueholder.Organization> getOrganizations() {
         return organizations;
@@ -144,5 +145,23 @@ public class NoteBookFullDisplayBean extends NoteBookDisplayBean {
 
     public void setAllowedRoles(java.util.Set<String> allowedRoles) {
         this.allowedRoles = allowedRoles;
+    }
+
+    public java.util.Set<Integer> getAllowedTestIds() {
+        return allowedTestIds;
+    }
+
+    public void setAllowedTestIds(java.util.Set<Integer> allowedTestIds) {
+        this.allowedTestIds = allowedTestIds;
+    }
+
+    private Boolean canEdit;
+
+    public Boolean getCanEdit() {
+        return canEdit;
+    }
+
+    public void setCanEdit(Boolean canEdit) {
+        this.canEdit = canEdit;
     }
 }

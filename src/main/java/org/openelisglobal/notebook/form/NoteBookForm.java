@@ -57,6 +57,7 @@ public class NoteBookForm {
     private Set<String> organizationIds;
     private Set<String> departmentIds;
     private Set<String> allowedRoles;
+    private Set<Integer> allowedTestIds;
 
     public String getTitle() {
         return title;
@@ -280,6 +281,14 @@ public class NoteBookForm {
 
     public void setAllowedRoles(Set<String> allowedRoles) {
         this.allowedRoles = allowedRoles;
+    }
+
+    public Set<Integer> getAllowedTestIds() {
+        return allowedTestIds;
+    }
+
+    public void setAllowedTestIds(Set<Integer> allowedTestIds) {
+        this.allowedTestIds = allowedTestIds;
     }
 
     public static class NoteBookFileForm extends NoteBookFile {
