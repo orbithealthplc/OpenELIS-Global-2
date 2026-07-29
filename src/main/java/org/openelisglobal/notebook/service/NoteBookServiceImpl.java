@@ -523,6 +523,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
         Hibernate.initialize(noteBook.getDepartments());
         Hibernate.initialize(noteBook.getAllowedRoles());
         Hibernate.initialize(noteBook.getAllowedTestIds());
+        Hibernate.initialize(noteBook.getParticipantIds());
         if (noteBook.getTechnician() != null) {
             Hibernate.initialize(noteBook.getTechnician());
         }
@@ -815,6 +816,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                         allowedTests = new java.util.HashSet<>(parentTemplate.getAllowedTestIds());
                     }
                     fullDisplayBean.setAllowedTestIds(allowedTests);
+                    Hibernate.initialize(noteBook.getParticipantIds());
+                    fullDisplayBean.setParticipantIds(new java.util.HashSet<>(noteBook.getParticipantIds()));
                 } else {
                     // Fallback to own settings
                     Hibernate.initialize(noteBook.getOrganizations());
@@ -828,6 +831,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
 
                     Hibernate.initialize(noteBook.getAllowedTestIds());
                     fullDisplayBean.setAllowedTestIds(new java.util.HashSet<>(noteBook.getAllowedTestIds()));
+                    Hibernate.initialize(noteBook.getParticipantIds());
+                    fullDisplayBean.setParticipantIds(new java.util.HashSet<>(noteBook.getParticipantIds()));
                 }
             } else {
                 Hibernate.initialize(noteBook.getOrganizations());
@@ -850,6 +855,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                     }
                 }
                 fullDisplayBean.setAllowedTestIds(allowedTests);
+                Hibernate.initialize(noteBook.getParticipantIds());
+                fullDisplayBean.setParticipantIds(new java.util.HashSet<>(noteBook.getParticipantIds()));
             }
 
         }
@@ -1131,6 +1138,12 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
         if (form.getAllowedTestIds() != null) {
             noteBook.getAllowedTestIds().clear();
             noteBook.getAllowedTestIds().addAll(form.getAllowedTestIds());
+        }
+
+        // Handle participant IDs
+        if (form.getParticipantIds() != null) {
+            noteBook.getParticipantIds().clear();
+            noteBook.getParticipantIds().addAll(form.getParticipantIds());
         }
 
         return noteBook;

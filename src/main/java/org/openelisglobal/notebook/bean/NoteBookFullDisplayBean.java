@@ -155,6 +155,16 @@ public class NoteBookFullDisplayBean extends NoteBookDisplayBean {
         this.allowedTestIds = allowedTestIds;
     }
 
+    private java.util.Set<Integer> participantIds;
+
+    public java.util.Set<Integer> getParticipantIds() {
+        return participantIds;
+    }
+
+    public void setParticipantIds(java.util.Set<Integer> participantIds) {
+        this.participantIds = participantIds;
+    }
+
     private Boolean canEdit;
 
     public Boolean getCanEdit() {
