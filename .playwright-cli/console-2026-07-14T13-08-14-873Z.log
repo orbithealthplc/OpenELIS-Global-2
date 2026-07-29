@@ -1,0 +1,28 @@
+[   51592ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   51637ms] [ERROR] The script has an unsupported MIME type ('text/html'). @ :0
+[   51638ms] [ERROR] Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/') with script ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/service-worker.js'): The script has an unsupported MIME type ('text/html'). @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   51718ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   51719ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   52627ms] [LOG] Loading data {data: Object} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   53044ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/orders:0
+[   53082ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients?all=true:0
+[   53096ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients:0
+[   56444ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141348ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141356ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141368ms] [LOG] [QC Page] Loading samples for entry: 126 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141423ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141424ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141452ms] [LOG] [QC Page] Raw response from backend: [] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141452ms] [LOG] [QC Page] Number of samples received: 0 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141452ms] [LOG] [QC Page] Sample breakdown by pageStatus: {PENDING: 0, COMPLETED: 0, SKIPPED: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141452ms] [LOG] [QC Page] Transformed samples: [] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141452ms] [LOG] [QC Page] Transformed samples count by status: {} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141454ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141456ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141459ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  141461ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  199358ms] [WARNING] single-spa minified message #41: See https://single-spa.js.org/error/?code=41 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  220925ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://lims.ahri.gov.et/login:0
+[  221040ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  225888ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1

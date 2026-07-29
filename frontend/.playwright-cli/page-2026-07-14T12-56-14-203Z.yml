@@ -1,0 +1,70 @@
+- generic [ref=e3]:
+    - banner [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+            - /url: /
+            - img "AHRI LIMS" [ref=e8]
+            - generic [ref=e9]:
+                - heading "AHRI LIMS" [level=5] [ref=e10]
+                - paragraph [ref=e11]: "Version: 3.2.1.2"
+        - generic [ref=e12]:
+            - generic [ref=e13]:
+                - button "Lang" [ref=e14] [cursor=pointer]
+                - tooltip
+            - generic [ref=e17]:
+                - button "Help" [ref=e18] [cursor=pointer]
+                - tooltip
+            - generic "Help Panel":
+                - list:
+                    - listitem:
+                        - button "User Manual" [ref=e23] [cursor=pointer]
+                    - listitem:
+                        - button "Video Tutorials" [ref=e27] [cursor=pointer]
+                    - listitem:
+                        - button "Release Notes" [ref=e31] [cursor=pointer]
+        - generic "Header Panel":
+            - list:
+                - listitem:
+                    - generic [ref=e36]:
+                        - generic [ref=e37]: Select Locale
+                        - combobox "Select Locale" [ref=e39] [cursor=pointer]:
+                            - option "English" [selected]
+                            - option "English (UK)"
+                            - option "English (Sri Lanka)"
+                            - option "English (US)"
+                            - option "Español"
+                            - option "Français"
+                            - option "Indonesia"
+                            - option "Indonesia (ID)"
+                            - option "Malagasy"
+                            - option "Română"
+                            - option "සිංහල"
+                            - option "සිංහල (Sri Lanka)"
+                            - option "தமிழ்"
+                            - option "தமிழ் (Sri Lanka)"
+                            - option "Swahili"
+                            - option "Amharic"
+                - listitem:
+                    - generic [ref=e40]: "Version:: 3.2.1.2"
+    - main [ref=e42]:
+        - generic [ref=e43]:
+            - img "AHRI LIMS" [ref=e44]
+            - generic [ref=e45]: AHRI LIMS
+        - generic [ref=e46]:
+            - generic [ref=e47]:
+                - img "AHRI LIMS" [ref=e51]
+                - generic [ref=e54]: "Notice: Access to this service is for authorized personnel only. If you do not have the expressed authorization of the administrator, you must exit now. This organization prohibits unauthorized access, disclosure, duplication, modification, diversion, destruction, loss, misuse, or theft of its information."
+            - generic [ref=e62]:
+                - heading "Login" [level=2] [ref=e64]
+                - generic [ref=e65]:
+                    - generic: Username
+                    - textbox "Username" [active] [ref=e69]
+                - generic [ref=e70]:
+                    - generic [ref=e71]: Password
+                    - generic [ref=e73]:
+                        - textbox "Password" [ref=e74]
+                        - button "Show password" [ref=e75] [cursor=pointer]
+                - generic [ref=e80]:
+                    - button "Login" [ref=e81] [cursor=pointer]
+                    - button "Change Password" [ref=e82] [cursor=pointer]
+    - contentinfo:
+        - paragraph

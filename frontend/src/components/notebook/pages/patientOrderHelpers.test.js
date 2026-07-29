@@ -31,9 +31,9 @@ describe("patientOrderHelpers", () => {
   });
 
   it("birthDateForDisplayFromAge uses Jan 1 of birth year", () => {
-    expect(
-      birthDateForDisplayFromAge(25, new Date(2026, 5, 4)),
-    ).toBe("01/01/2001");
+    expect(birthDateForDisplayFromAge(25, new Date(2026, 5, 4))).toBe(
+      "01/01/2001",
+    );
     expect(birthDateForDisplayFromAge("", new Date(2026, 5, 4))).toBe("");
     expect(birthDateForDisplayFromAge(0, new Date(2026, 5, 4))).toBe(
       "01/01/2026",

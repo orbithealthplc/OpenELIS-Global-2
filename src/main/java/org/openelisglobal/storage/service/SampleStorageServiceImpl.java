@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import org.hibernate.StaleObjectStateException;
 import org.openelisglobal.biorepository.dao.BioSampleDAO;
+import org.openelisglobal.biorepository.service.BioSampleService;
 import org.openelisglobal.biorepository.service.ChainOfCustodyService;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
@@ -26,7 +27,6 @@ import org.openelisglobal.test.service.TestSectionService;
 import org.openelisglobal.test.valueholder.TestSection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.openelisglobal.biorepository.service.BioSampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -292,8 +292,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
                 String externalId = row.get("sampleItemExternalId") != null
                         ? String.valueOf(row.get("sampleItemExternalId"))
                         : "";
-                if (!externalId.isEmpty()
-                        && externalId.toLowerCase(java.util.Locale.ROOT).contains(normalizedQuery)) {
+                if (!externalId.isEmpty() && externalId.toLowerCase(java.util.Locale.ROOT).contains(normalizedQuery)) {
                     matches = true;
                 }
             }
@@ -301,8 +300,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
                 String accession = row.get("sampleAccessionNumber") != null
                         ? String.valueOf(row.get("sampleAccessionNumber"))
                         : "";
-                if (!accession.isEmpty()
-                        && accession.toLowerCase(java.util.Locale.ROOT).contains(normalizedQuery)) {
+                if (!accession.isEmpty() && accession.toLowerCase(java.util.Locale.ROOT).contains(normalizedQuery)) {
                     matches = true;
                 }
             }
@@ -362,7 +360,8 @@ public class SampleStorageServiceImpl implements SampleStorageService {
             return result;
         }
 
-        List<SampleStorageAssignment> assignments = sampleStorageAssignmentDAO.findBySampleItemIds(numericSampleItemIds);
+        List<SampleStorageAssignment> assignments = sampleStorageAssignmentDAO
+                .findBySampleItemIds(numericSampleItemIds);
         if (assignments.isEmpty()) {
             return result;
         }
@@ -378,9 +377,8 @@ public class SampleStorageServiceImpl implements SampleStorageService {
                 continue;
             }
 
-            result.put(assignment.getSampleItemId().toString(),
-                    buildLocationDetailsFromAssignment(assignment, roomCache, deviceCache, shelfCache, rackCache,
-                            boxCache));
+            result.put(assignment.getSampleItemId().toString(), buildLocationDetailsFromAssignment(assignment,
+                    roomCache, deviceCache, shelfCache, rackCache, boxCache));
         }
 
         return result;
@@ -438,7 +436,8 @@ public class SampleStorageServiceImpl implements SampleStorageService {
             }
 
             SampleItem sampleItem = resolveSampleItem(sampleItemId);
-            SampleStorageAssignment existingAssignment = sampleStorageAssignmentDAO.findBySampleItemId(sampleItem.getId());
+            SampleStorageAssignment existingAssignment = sampleStorageAssignmentDAO
+                    .findBySampleItemId(sampleItem.getId());
 
             Integer previousLocationId = null;
             String previousLocationType = null;
@@ -513,8 +512,8 @@ public class SampleStorageServiceImpl implements SampleStorageService {
             }
 
             SampleItem sampleItem = resolveSampleItem(sampleItemId);
-            SampleStorageAssignment existingAssignment =
-                    sampleStorageAssignmentDAO.findBySampleItemId(sampleItem.getId());
+            SampleStorageAssignment existingAssignment = sampleStorageAssignmentDAO
+                    .findBySampleItemId(sampleItem.getId());
 
             if (existingAssignment == null || existingAssignment.getLocationId() == null) {
                 Map<String, Object> response = new HashMap<>();
@@ -1031,8 +1030,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
         if ((path == null || path.isEmpty()) && locationType != null) {
             return locationType;
         }
-        if (positionCoordinate != null && !positionCoordinate.trim().isEmpty()
-                && !"box".equals(locationType)
+        if (positionCoordinate != null && !positionCoordinate.trim().isEmpty() && !"box".equals(locationType)
                 && (path == null || !path.endsWith(positionCoordinate.trim()))) {
             return path;
         }
@@ -1296,8 +1294,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
                     bioSampleDAO.update(bioSample);
                 }
 
-                CustodyAction action = isReturnToStorage(sampleItem, workflowStatusBefore)
-                        ? CustodyAction.RETURN_STORED
+                CustodyAction action = isReturnToStorage(sampleItem, workflowStatusBefore) ? CustodyAction.RETURN_STORED
                         : CustodyAction.STORAGE_ASSIGNED;
                 logLifecycleEvent(sampleItem, action, null, null, effectiveCoordinate, null, hierarchicalPath, null,
                         notes, sysUserId, "SampleStorageMovement", movementIdInt, workflowStatusBefore,
@@ -1551,8 +1548,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
                         previousPositionCoordinate);
                 String newPath = buildHierarchicalPathForEntity(targetLocationEntity, locationType,
                         newPositionCoordinateValue);
-                CustodyAction action = isReturnToStorage(sampleItem, workflowStatusBefore)
-                        ? CustodyAction.RETURN_STORED
+                CustodyAction action = isReturnToStorage(sampleItem, workflowStatusBefore) ? CustodyAction.RETURN_STORED
                         : (WorkflowStatus.PENDING_STORAGE.name().equals(workflowStatusBefore)
                                 || WorkflowStatus.REGISTERED.name().equals(workflowStatusBefore)
                                         ? CustodyAction.STORAGE_ASSIGNED
@@ -1667,9 +1663,9 @@ public class SampleStorageServiceImpl implements SampleStorageService {
             String notes, String sysUserId, String sourceRecordType, Integer sourceRecordId,
             String workflowStatusBefore, String workflowStatusAfter) {
         SystemUser actor = systemUserService.get(sysUserId);
-        chainOfCustodyService.logCustodyAction(sampleItem, action, transferRequest, retrievalRequest, storageCoordinates,
-                actor, fromLocation, toLocation, temperature, notes, sysUserId, sourceRecordType, sourceRecordId,
-                workflowStatusBefore, workflowStatusAfter);
+        chainOfCustodyService.logCustodyAction(sampleItem, action, transferRequest, retrievalRequest,
+                storageCoordinates, actor, fromLocation, toLocation, temperature, notes, sysUserId, sourceRecordType,
+                sourceRecordId, workflowStatusBefore, workflowStatusAfter);
     }
 
     private String buildPathFromLocation(Integer locationId, String locationType, String positionCoordinate) {
@@ -1686,8 +1682,7 @@ public class SampleStorageServiceImpl implements SampleStorageService {
         default -> null;
         };
 
-        return locationEntity != null
-                ? buildHierarchicalPathForEntity(locationEntity, locationType, positionCoordinate)
+        return locationEntity != null ? buildHierarchicalPathForEntity(locationEntity, locationType, positionCoordinate)
                 : null;
     }
 

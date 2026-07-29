@@ -8,8 +8,7 @@ const WARNING_LABEL_KEYS = {
 };
 
 const WARNING_LABEL_DEFAULTS = {
-  QC_PENDING:
-    "QC pending: usable for preparation, but review before release.",
+  QC_PENDING: "QC pending: usable for preparation, but review before release.",
   QC_FAILED: "QC failed: verify lot status before use.",
   QC_QUARANTINED: "QC quarantined: do not use until cleared.",
   ZERO_QUANTITY: "No stock on hand for the displayed lot(s).",
@@ -60,14 +59,18 @@ export const formatReagentWarningLabel = (intl, warningCode) => {
 };
 
 export const buildReagentOptionLabel = (item, intl) => {
-  const baseName = item.name || item.description || item.label || String(item.id);
+  const baseName =
+    item.name || item.description || item.label || String(item.id);
   const warnings = item.selectionWarnings || [];
   if (warnings.length === 0) {
     return baseName;
   }
 
   const suffix = warnings
-    .map((code) => DROPDOWN_WARNING_SUFFIX[code] || formatReagentWarningLabel(intl, code))
+    .map(
+      (code) =>
+        DROPDOWN_WARNING_SUFFIX[code] || formatReagentWarningLabel(intl, code),
+    )
     .join(", ");
 
   return `${baseName} (${suffix})`;

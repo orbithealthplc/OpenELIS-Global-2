@@ -111,7 +111,9 @@ function SampleDuplicationSection({ onSamplesCreated }) {
           defaultMessage="User-Defined Sample Duplication"
         />
       </h4>
-      <p style={{ color: "#525252", marginBottom: "1rem", fontSize: "0.875rem" }}>
+      <p
+        style={{ color: "#525252", marginBottom: "1rem", fontSize: "0.875rem" }}
+      >
         <FormattedMessage
           id="biorepository.duplication.description"
           defaultMessage="Create multiple sub-samples from one registered parent sample (e.g., 30 aliquots from one patient sample)."
@@ -169,7 +171,11 @@ function SampleDuplicationSection({ onSamplesCreated }) {
           value={subsampleCount}
           onChange={(_, { value }) => setSubsampleCount(value)}
         />
-        <Button kind="primary" onClick={handleCreateSubsamples} disabled={loading}>
+        <Button
+          kind="primary"
+          onClick={handleCreateSubsamples}
+          disabled={loading}
+        >
           <FormattedMessage
             id="biorepository.duplication.create"
             defaultMessage="Create Sub-samples"

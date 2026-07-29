@@ -259,10 +259,15 @@ function PathologyWorkflowTab({
     activePage,
     setActivePage,
     handlePageChange: navigateAccessiblePage,
-  } = usePageAccessControl(pathologyStagePages, DEFAULT_PATHOLOGY_WORKFLOW_PAGES, 0, {
-    isCreating: isCreatingEntry,
-    workflowType: registryWorkflowType,
-  });
+  } = usePageAccessControl(
+    pathologyStagePages,
+    DEFAULT_PATHOLOGY_WORKFLOW_PAGES,
+    0,
+    {
+      isCreating: isCreatingEntry,
+      workflowType: registryWorkflowType,
+    },
+  );
 
   /** Comma-separated real DB page IDs (excludes default-* placeholders) for progress API. */
   const pathologyRealPageIdsKey = useMemo(
@@ -842,37 +847,40 @@ function PathologyWorkflowTab({
             {effectivePages.length > 0 &&
               effectivePages[activePage] &&
               effectivePages[activePage].hasAccess && (
-              <div className="page-panel">
-                <div className="page-header">
-                  <h3>{effectivePages[activePage].title}</h3>
-                  <div className="page-progress">
-                    {(() => {
-                      const progress = getProgressForPage(
-                        effectivePages[activePage].id,
-                      );
-                      return (
-                        <span>
-                          {progress.completed}/{progress.total}{" "}
-                          <FormattedMessage id="notebook.workflow.samplesCompleted" />
-                        </span>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                <div className="page-content">
-                  {effectivePages[activePage].instructions && (
-                    <div className="page-instructions">
-                      {effectivePages[activePage].instructions}
+                <div className="page-panel">
+                  <div className="page-header">
+                    <h3>{effectivePages[activePage].title}</h3>
+                    <div className="page-progress">
+                      {(() => {
+                        const progress = getProgressForPage(
+                          effectivePages[activePage].id,
+                        );
+                        return (
+                          <span>
+                            {progress.completed}/{progress.total}{" "}
+                            <FormattedMessage id="notebook.workflow.samplesCompleted" />
+                          </span>
+                        );
+                      })()}
                     </div>
-                  )}
+                  </div>
 
-                  <div key={`page-content-${effectivePages[activePage].id}`}>
-                    {renderPageContent(effectivePages[activePage], activePage)}
+                  <div className="page-content">
+                    {effectivePages[activePage].instructions && (
+                      <div className="page-instructions">
+                        {effectivePages[activePage].instructions}
+                      </div>
+                    )}
+
+                    <div key={`page-content-${effectivePages[activePage].id}`}>
+                      {renderPageContent(
+                        effectivePages[activePage],
+                        activePage,
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
             {effectivePages.length > 0 &&
               effectivePages[activePage] &&
               !effectivePages[activePage].hasAccess && (

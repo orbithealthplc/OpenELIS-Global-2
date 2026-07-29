@@ -8,8 +8,8 @@ import jakarta.servlet.http.HttpServletRequest;
 public interface BioSampleFulfillmentSearchService {
 
     /**
-     * Run waterfall fulfillment search: exact accession, exact barcode, partial identity,
-     * type+origin, then project.
+     * Run waterfall fulfillment search: exact accession, exact barcode, partial
+     * identity, type+origin, then project.
      */
     FulfillmentSearchOutcome search(FulfillmentSearchInput input, HttpServletRequest request);
 }

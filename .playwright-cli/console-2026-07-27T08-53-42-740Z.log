@@ -1,0 +1,34 @@
+[    1780ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[    2099ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://localhost:3000/login:0
+[    6943ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[   49292ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   49560ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[   49625ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739481
+[   49625ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739483
+[   54088ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   54259ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[   54315ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739481
+[   54316ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739483
+[   54365ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[   54366ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[   54490ms] [LOG] Loading data {data: Object} @ https://localhost:3000/static/js/bundle.js:349253
+[   59173ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[   60871ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notebook/my-stage-access:0
+[  659274ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  662836ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  663419ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739513
+[  663420ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739515
+[  678952ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  679475ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  679603ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739518
+[  679604ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739520
+[  679757ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  679757ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  683001ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  683284ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  683360ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739621
+[  683361ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739623
+[  683468ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  683468ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  683638ms] [LOG] Loading data {data: Object} @ https://localhost:3000/static/js/bundle.js:349285
+[  688150ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814

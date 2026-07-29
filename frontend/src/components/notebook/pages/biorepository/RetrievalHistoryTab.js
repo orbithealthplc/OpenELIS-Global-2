@@ -604,7 +604,12 @@ function RetrievalHistoryTab({ onActionComplete, refreshToken }) {
                           })}
                           :
                         </strong>
-                        <ul style={{ marginTop: "0.25rem", paddingLeft: "1.25rem" }}>
+                        <ul
+                          style={{
+                            marginTop: "0.25rem",
+                            paddingLeft: "1.25rem",
+                          }}
+                        >
                           {item.fulfillments.map((fulfillment) => {
                             const itemStatus = getItemDisplayStatus(
                               fulfillment,

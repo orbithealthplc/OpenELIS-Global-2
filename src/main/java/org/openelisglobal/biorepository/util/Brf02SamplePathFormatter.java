@@ -25,8 +25,7 @@ public final class Brf02SamplePathFormatter {
         String boxLabel = text(location.get("boxLabel"));
         String positionCoordinate = text(location.get("positionCoordinate"));
 
-        if (roomName == null && deviceName == null && shelfLabel == null && rackLabel == null
-                && boxLabel == null) {
+        if (roomName == null && deviceName == null && shelfLabel == null && rackLabel == null && boxLabel == null) {
             String hierarchicalPath = text(location.get("hierarchicalPath"));
             if (hierarchicalPath == null) {
                 hierarchicalPath = text(location.get("location"));
@@ -47,8 +46,7 @@ public final class Brf02SamplePathFormatter {
 
     public static String formatFromHierarchicalPath(String hierarchicalPath, String positionCoordinate) {
         if (hierarchicalPath == null || hierarchicalPath.isBlank()) {
-            return positionCoordinate != null && !positionCoordinate.isBlank()
-                    ? "Pos " + positionCoordinate.trim()
+            return positionCoordinate != null && !positionCoordinate.isBlank() ? "Pos " + positionCoordinate.trim()
                     : null;
         }
 

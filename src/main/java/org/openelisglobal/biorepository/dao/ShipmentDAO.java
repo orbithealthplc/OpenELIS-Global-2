@@ -69,4 +69,12 @@ public interface ShipmentDAO extends BaseDAO<Shipment, Integer> {
      * @return list of matching shipments
      */
     List<Shipment> search(String searchTerm, int limit);
+
+    /**
+     * Load a shipment with receiver initialized for JSON serialization.
+     *
+     * @param id shipment id
+     * @return shipment or null
+     */
+    Shipment getWithReceiver(Integer id);
 }

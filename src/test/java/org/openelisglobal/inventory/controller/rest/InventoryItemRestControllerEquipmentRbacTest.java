@@ -1,6 +1,7 @@
 package org.openelisglobal.inventory.controller.rest;
 
 import static org.junit.Assert.assertEquals;
+
 import java.lang.reflect.Method;
 import org.junit.Test;
 import org.junit.runner.RunWith;

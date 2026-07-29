@@ -1,7 +1,8 @@
 package org.openelisglobal.rbac;
 
 /**
- * Thrown when department access passed but the user lacks the required RBAC action.
+ * Thrown when department access passed but the user lacks the required RBAC
+ * action.
  */
 public class RbacAccessDeniedException extends RuntimeException {
 

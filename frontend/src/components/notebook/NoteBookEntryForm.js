@@ -9,6 +9,7 @@ import { useParams } from "react-router-dom";
 import PageBreadCrumb from "../common/PageBreadCrumb";
 import {
   Button,
+  ComboBox,
   TextInput,
   TextArea,
   Select,
@@ -62,6 +63,7 @@ import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
 import { FormattedMessage, useIntl } from "react-intl";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Permissions } from "../../constants/roles";
+import { canEditNotebookEntry } from "./utils/noteBookEntryEditPermissions";
 import {
   NoteBookFormValues,
   NoteBookInitialData,
@@ -78,6 +80,45 @@ import {
   buildLinkedEquipmentInstrumentsUrl,
   mapLinkedEquipmentOptions,
 } from "./notebookLinkedEquipment";
+
+const normalizeWorkflowTypeKey = (notebook) =>
+  String(notebook?.workflowType || "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, "_");
+
+/** Order-types picker is CTD/MedLab only (Stage 1 lab orders). */
+const isCtdOrderTypesNotebook = (notebook, departments = []) => {
+  const workflowType = normalizeWorkflowTypeKey(notebook);
+  if (workflowType === "medlab" || workflowType === "medical_laboratory") {
+    return true;
+  }
+  const depts = departments.length ? departments : notebook?.departments || [];
+  const deptMatch = depts.some((dept) => {
+    const name = String(dept?.value || dept?.name || dept?.label || "")
+      .trim()
+      .toLowerCase();
+    return (
+      name === "ctd" ||
+      name.includes("ctd department") ||
+      name.includes("medical laboratory")
+    );
+  });
+  if (deptMatch) {
+    return true;
+  }
+
+  // Fallback to keyword matching for CTD instances where workflowType/departments
+  // can be missing in the API response.
+  const text = String(
+    notebook?.protocol ||
+      notebook?.title ||
+      notebook?.objective ||
+      notebook?.content ||
+      "",
+  ).toLowerCase();
+  return /\bctd\b/i.test(text);
+};
 
 const NoteBookEntryForm = () => {
   let breadcrumbs = [
@@ -107,7 +148,11 @@ const NoteBookEntryForm = () => {
   const { notificationVisible, setNotificationVisible, addNotification } =
     useContext(NotificationContext);
   const { userSessionDetails } = useContext(UserSessionDetailsContext);
-  const { hasAnyRole, hasRoleForCurrentLabUnit } = usePermissions();
+  const {
+    hasAnyRole,
+    hasRoleForCurrentLabUnit,
+    hasPersonaForActiveDepartment,
+  } = usePermissions();
 
   // Check if user can create/edit notebook templates
   const canEditTemplate = hasAnyRole(Permissions.CREATE_OR_EDIT_NOTEBOOK);
@@ -123,11 +168,15 @@ const NoteBookEntryForm = () => {
       : Array.from(data.allowedRoles);
   };
 
-  const canEditInstance = hasRoleForCurrentLabUnit(
-    resolveEntryAllowedRoles(noteBookData).length > 0
-      ? resolveEntryAllowedRoles(noteBookData)
-      : Permissions.CREATE_OR_EDIT_NOTEBOOK_ENTRY,
-  );
+  const canEditInstance = canEditNotebookEntry({
+    hasRoleForCurrentLabUnit,
+    hasPersonaForActiveDepartment,
+    templateAllowedRoles: resolveEntryAllowedRoles(noteBookData),
+    userId: userSessionDetails?.userId,
+    creatorId: noteBookData?.creatorId,
+    technicianId: noteBookData?.technicianId,
+    workflowType: noteBookData?.workflowType,
+  });
 
   const canEditNotebook =
     noteBookData?.isTemplate === false ? canEditInstance : canEditTemplate;
@@ -166,6 +215,9 @@ const NoteBookEntryForm = () => {
   const [rolesLoaded, setRolesLoaded] = useState(false);
   const [pendingSelectedRoleIds, setPendingSelectedRoleIds] = useState(null);
   const [availableRoles, setAvailableRoles] = useState([]);
+  const [selectedAllowedTests, setSelectedAllowedTests] = useState([]);
+  const [availableOrderableTests, setAvailableOrderableTests] = useState([]);
+  const [pendingSelectedTestIds, setPendingSelectedTestIds] = useState(null);
 
   const isFormValid = () => {
     const experimentType =
@@ -258,6 +310,12 @@ const NoteBookEntryForm = () => {
     }
     if (rolesLoaded || mode === MODES.CREATE) {
       noteBookForm.allowedRoles = selectedAllowedRoles.map((role) => role.id);
+    }
+    // Always persist order-type filter for CTD/MedLab notebooks (including empty = none)
+    if (isCtdOrderTypesNotebook(noteBookData, selectedOrganizations)) {
+      noteBookForm.allowedTestIds = selectedAllowedTests
+        .map((t) => Number(t?.id ?? t?.value))
+        .filter((id) => Number.isFinite(id) && id > 0);
     }
     console.log(JSON.stringify(noteBookForm));
     var url =
@@ -735,6 +793,13 @@ const NoteBookEntryForm = () => {
               }
             },
           );
+          // Pre-populate allowed tests from fullDisplayBean allowedTestIds
+          if (data.allowedTestIds && data.allowedTestIds.length > 0) {
+            // Store as pending IDs; matched once availableOrderableTests is loaded
+            setPendingSelectedTestIds(
+              data.allowedTestIds.map((id) => Number(id)),
+            );
+          }
         }
         setLoading(false);
         setInitialMount(true);
@@ -801,6 +866,29 @@ const NoteBookEntryForm = () => {
         }
       },
     );
+    // Load orderable tests for the "Allowed Tests" filter on templates
+    getFromOpenElisServer("/rest/medlab/orderable-tests", (response) => {
+      const list = Array.isArray(response) ? response : response?.tests || [];
+      if (list.length > 0) {
+        setAvailableOrderableTests(
+          list.map((t) => ({
+            id: Number(t.id || t.value),
+            label: t.value || t.name || t.localizedTestName || String(t.id),
+          })),
+        );
+      } else {
+        // Fallback to generic test list
+        getFromOpenElisServer("/rest/test-list", (fallback) => {
+          const fl = Array.isArray(fallback) ? fallback : [];
+          setAvailableOrderableTests(
+            fl.map((t) => ({
+              id: Number(t.id || t.value),
+              label: t.value || t.name || String(t.id),
+            })),
+          );
+        });
+      }
+    });
     // Fetch available roles dynamically from backend
     // Using /rest/systemroles which returns {label: description, value: name}
     getFromOpenElisServer("/rest/systemroles", (roles) => {
@@ -870,6 +958,21 @@ const NoteBookEntryForm = () => {
       setPendingSelectedRoleIds(null);
     }
   }, [pendingSelectedRoleIds, availableRoles]);
+
+  // Match pending selected test IDs to actual test objects once the list is loaded
+  useEffect(() => {
+    if (
+      pendingSelectedTestIds !== null &&
+      availableOrderableTests.length > 0 &&
+      pendingSelectedTestIds.length > 0
+    ) {
+      const matchedTests = availableOrderableTests.filter((t) =>
+        pendingSelectedTestIds.includes(t.id),
+      );
+      setSelectedAllowedTests(matchedTests);
+      setPendingSelectedTestIds(null);
+    }
+  }, [pendingSelectedTestIds, availableOrderableTests]);
 
   useEffect(() => {
     if (!notebookid) {
@@ -979,6 +1082,39 @@ const NoteBookEntryForm = () => {
                   }}
                 />
               </Column>
+              <Column lg={16} md={8} sm={4}>
+                <br />
+              </Column>
+              {isCtdOrderTypesNotebook(noteBookData, selectedOrganizations) && (
+                <Column lg={16} md={8} sm={4}>
+                  <FilterableMultiSelect
+                    key={`allowed-tests-template-${initialMount}`}
+                    id="allowedTests"
+                    titleText={intl.formatMessage({
+                      id: "notebook.label.allowedTests",
+                      defaultMessage: "Order types for this project",
+                    })}
+                    placeholder={intl.formatMessage({
+                      id: "notebook.label.allowedTests.placeholder",
+                      defaultMessage:
+                        "Select the lab tests/orders used by this project",
+                    })}
+                    items={availableOrderableTests}
+                    itemToString={(item) => (item ? item.label : "")}
+                    initialSelectedItems={selectedAllowedTests}
+                    onChange={({ selectedItems }) => {
+                      setSelectedAllowedTests(selectedItems || []);
+                    }}
+                  />
+                  <p className="cds--label-description">
+                    {intl.formatMessage({
+                      id: "notebook.label.allowedTests.helper",
+                      defaultMessage:
+                        "Only these tests will appear when creating lab orders in Stage 1. Select tests here, then Save. If none are saved, Stage 1 will show no tests.",
+                    })}
+                  </p>
+                </Column>
+              )}
             </Grid>
           </Column>
         )}
@@ -2135,31 +2271,48 @@ const NoteBookEntryForm = () => {
               </Select>
             </Column>
             <Column lg={8} md={8} sm={4}>
-              <Select
+              <ComboBox
                 id="technician"
-                name="technician"
-                labelText={intl.formatMessage({
+                titleText={intl.formatMessage({
                   id: "label.button.select.technician",
                 })}
-                value={noteBookData.technicianId || ""}
-                onChange={(event) => {
-                  const selectedUser = technicianUsers.find(
-                    (user) => user.id === event.target.value,
+                placeholder={intl.formatMessage({
+                  id: "notebook.label.technician.search",
+                  defaultMessage: "Search technician...",
+                })}
+                items={technicianUsers.map((u) => ({
+                  id: u.id,
+                  label: u.value || u.name || u.displayName || String(u.id),
+                }))}
+                itemToString={(item) => (item ? item.label : "")}
+                shouldFilterItem={({ item, inputValue }) =>
+                  !inputValue ||
+                  item.label.toLowerCase().includes(inputValue.toLowerCase())
+                }
+                selectedItem={(() => {
+                  if (!noteBookData.technicianId) return null;
+                  const matched = technicianUsers.find(
+                    (u) => String(u.id) === String(noteBookData.technicianId),
                   );
+                  return matched
+                    ? {
+                        id: matched.id,
+                        label:
+                          matched.value ||
+                          matched.name ||
+                          matched.displayName ||
+                          String(matched.id),
+                      }
+                    : null;
+                })()}
+                onChange={({ selectedItem }) => {
                   setNoteBookData({
                     ...noteBookData,
-                    technicianId: event.target.value,
-                    technicianName: selectedUser ? selectedUser.value : "",
+                    technicianId: selectedItem?.id ?? null,
+                    technicianName: selectedItem?.label ?? "",
                   });
                 }}
-              >
-                <SelectItem />
-                {technicianUsers.map((user, index) => {
-                  return (
-                    <SelectItem key={index} text={user.value} value={user.id} />
-                  );
-                })}
-              </Select>
+              />
             </Column>
           </Grid>
         </Column>

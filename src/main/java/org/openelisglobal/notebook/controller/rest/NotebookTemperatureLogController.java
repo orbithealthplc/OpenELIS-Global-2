@@ -147,8 +147,7 @@ public class NotebookTemperatureLogController extends BaseRestController {
     @ResponseBody
     public ResponseEntity<Map<String, Object>> importTemperatureLogs(@PathVariable("entryId") Integer entryId,
             @RequestBody TemperatureLogImportRequest request,
-            @RequestParam(value = "deviceCode", required = false) String deviceCode,
-            HttpServletRequest httpRequest) {
+            @RequestParam(value = "deviceCode", required = false) String deviceCode, HttpServletRequest httpRequest) {
 
         String sysUserId = getSysUserId(httpRequest);
         if (sysUserId == null) {
@@ -164,7 +163,8 @@ public class NotebookTemperatureLogController extends BaseRestController {
         }
 
         String scopeDeviceCode = deviceCode != null && !deviceCode.isBlank() ? deviceCode.trim()
-                : (request.getDeviceCode() != null && !request.getDeviceCode().isBlank() ? request.getDeviceCode().trim()
+                : (request.getDeviceCode() != null && !request.getDeviceCode().isBlank()
+                        ? request.getDeviceCode().trim()
                         : null);
 
         Map<String, Object> result = temperatureLogService.importTemperatureLogs(entryId, request.getRows(),

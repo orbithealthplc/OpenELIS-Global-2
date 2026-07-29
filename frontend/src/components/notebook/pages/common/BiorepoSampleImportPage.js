@@ -32,9 +32,7 @@ import {
 import UserSessionDetailsContext from "../../../../UserSessionDetailsContext";
 import RequestorDetailsSection from "./sections/RequestorDetailsSection";
 import SampleSelectionSection from "./sections/SampleSelectionSection";
-import {
-  formatQuantityWithUnit,
-} from "../biorepository/biorepositoryQuantityHelpers";
+import { formatQuantityWithUnit } from "../biorepository/biorepositoryQuantityHelpers";
 import {
   buildReferenceItemsPayload,
   formatRequestedReferenceSummary,
@@ -95,7 +93,8 @@ function BiorepoSampleImportPage({
   const [submitError, setSubmitError] = useState(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [showDestroyValidation, setShowDestroyValidation] = useState(false);
-  const [showReturnDateValidation, setShowReturnDateValidation] = useState(false);
+  const [showReturnDateValidation, setShowReturnDateValidation] =
+    useState(false);
   const notebookDefaultsRef = useRef({
     principalInvestigator: "",
     projectTitle: "",
@@ -119,10 +118,7 @@ function BiorepoSampleImportPage({
       const notebookPrefill = {
         principalInvestigator: notebookData?.principalInvestigator || "",
         projectTitle:
-          entryTitle ||
-          notebookData?.title ||
-          notebookData?.notebookName ||
-          "",
+          entryTitle || notebookData?.title || notebookData?.notebookName || "",
         requesterLabUnit,
       };
 
@@ -269,12 +265,16 @@ function BiorepoSampleImportPage({
 
   // Submit a new request
   const handleSubmit = useCallback(() => {
-    const validationErrors = validateBrf02RequestForm(formData, selectedSamples);
+    const validationErrors = validateBrf02RequestForm(
+      formData,
+      selectedSamples,
+    );
     const destroyMissing =
       formData.samplesWillBeDestroyed !== true &&
       formData.samplesWillBeDestroyed !== false;
     const returnDateMissing =
-      formData.samplesWillBeDestroyed === false && !formData.estimatedReturnDate;
+      formData.samplesWillBeDestroyed === false &&
+      !formData.estimatedReturnDate;
 
     setShowDestroyValidation(destroyMissing);
     setShowReturnDateValidation(returnDateMissing);
@@ -287,7 +287,9 @@ function BiorepoSampleImportPage({
     setSubmitting(true);
     setSubmitError(null);
 
-    const destinationType = deriveDestinationType(formData.samplesWillBeDestroyed);
+    const destinationType = deriveDestinationType(
+      formData.samplesWillBeDestroyed,
+    );
 
     const requestBody = {
       requestPurpose: formData.intendedUseDescription,
@@ -359,7 +361,9 @@ function BiorepoSampleImportPage({
           );
         } else {
           setSubmitting(false);
-          setSubmitError("Failed to create sample request. No request ID returned.");
+          setSubmitError(
+            "Failed to create sample request. No request ID returned.",
+          );
         }
       },
     );
@@ -438,8 +442,7 @@ function BiorepoSampleImportPage({
             rows={allRequestedItems.map((item, idx) => ({
               id: item.id?.toString() || idx.toString(),
               reference: formatRequestedReferenceSummary(item),
-              sampleType:
-                item.requestedSampleType || item.sampleType || "-",
+              sampleType: item.requestedSampleType || item.sampleType || "-",
               requestNumber: item.requestNumber || "-",
               quantityRequested: formatQuantityWithUnit(
                 item.quantityRequested,

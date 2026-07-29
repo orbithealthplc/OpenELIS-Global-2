@@ -162,13 +162,24 @@ function BiorepositoryIntakePage({
 
   const applyShipmentSelection = useCallback(
     (shipment, { advanceTab = true } = {}) => {
-      setCurrentShipment(shipment);
+      if (!shipment || shipment.id == null) {
+        return;
+      }
+      const documentationStatus =
+        shipment.documentationStatus ||
+        shipment.documentation_status ||
+        "PENDING";
+      const normalizedShipment = {
+        ...shipment,
+        documentationStatus,
+      };
+      setCurrentShipment(normalizedShipment);
       setSubStageComplete((prev) => ({
         ...prev,
         shipment: true,
         documentation:
-          shipment.documentationStatus === "VERIFIED" ||
-          shipment.documentationStatus === "QUARANTINE",
+          documentationStatus === "VERIFIED" ||
+          documentationStatus === "QUARANTINE",
       }));
       if (shipmentStorageKey) {
         sessionStorage.setItem(shipmentStorageKey, String(shipment.id));
@@ -177,9 +188,10 @@ function BiorepositoryIntakePage({
         return;
       }
       if (
-        shipment.documentationStatus === "VERIFIED" ||
-        shipment.documentationStatus === "QUARANTINE"
+        documentationStatus === "VERIFIED" ||
+        documentationStatus === "QUARANTINE"
       ) {
+        // Already documentation-verified → Sample Registration
         setActiveSubStage(2);
       } else {
         setActiveSubStage(1);
@@ -795,8 +807,46 @@ function BiorepositoryIntakePage({
                       lowContrast
                       hideCloseButton
                     />
+                  ) : !currentShipment ? (
+                    <InlineNotification
+                      kind="warning"
+                      title={intl.formatMessage({
+                        id: "biorepository.intake.registration.shipmentRequired",
+                        defaultMessage: "Shipment Required",
+                      })}
+                      subtitle={intl.formatMessage({
+                        id: "biorepository.intake.registration.shipmentRequired.message",
+                        defaultMessage:
+                          "Select an existing shipment from Shipment Reception, then continue.",
+                      })}
+                      lowContrast
+                      hideCloseButton
+                    />
                   ) : (
                     <>
+                      <InlineNotification
+                        kind="info"
+                        title={intl.formatMessage(
+                          {
+                            id: "biorepository.intake.registration.activeShipment",
+                            defaultMessage:
+                              "Registering samples for shipment {ref}",
+                          },
+                          {
+                            ref:
+                              currentShipment.deliveryReference ||
+                              currentShipment.id,
+                          },
+                        )}
+                        subtitle={intl.formatMessage({
+                          id: "biorepository.intake.registration.activeShipment.hint",
+                          defaultMessage:
+                            "Import a manifest or accept samples for this shipment.",
+                        })}
+                        lowContrast
+                        hideCloseButton
+                        style={{ marginBottom: "1rem" }}
+                      />
                       {registeredSamples.length > 0 && (
                         <InlineNotification
                           kind="info"

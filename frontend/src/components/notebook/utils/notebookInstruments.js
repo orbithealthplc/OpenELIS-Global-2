@@ -2,7 +2,10 @@
  * Resolve linked equipment for workflow pages.
  * Parent form state takes precedence over notebook view API data.
  */
-export function resolveNotebookInstruments(linkedInstruments, notebookAnalyzers) {
+export function resolveNotebookInstruments(
+  linkedInstruments,
+  notebookAnalyzers,
+) {
   if (linkedInstruments !== undefined && linkedInstruments !== null) {
     return linkedInstruments;
   }

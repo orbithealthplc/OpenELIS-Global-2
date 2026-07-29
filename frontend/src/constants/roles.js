@@ -168,10 +168,13 @@ export const Permissions = {
     Roles.SUPERVISOR,
     Roles.TECHNICIAN,
     Roles.RESULTS,
+    Roles.SAMPLE_COLLECTOR,
     Roles.LABORATORY_TECHNICIAN,
     Roles.JUNIOR_RESEARCHER,
     Roles.SENIOR_RESEARCHER,
     Roles.LAB_MANAGER,
+    Roles.PATHOLOGIST,
+    Roles.CYTOPATHOLOGIST,
   ],
 
   // @deprecated Use CREATE_OR_EDIT_NOTEBOOK_ENTRY instead
@@ -181,10 +184,13 @@ export const Permissions = {
     Roles.SUPERVISOR,
     Roles.TECHNICIAN,
     Roles.RESULTS,
+    Roles.SAMPLE_COLLECTOR,
     Roles.LABORATORY_TECHNICIAN,
     Roles.JUNIOR_RESEARCHER,
     Roles.SENIOR_RESEARCHER,
     Roles.LAB_MANAGER,
+    Roles.PATHOLOGIST,
+    Roles.CYTOPATHOLOGIST,
   ],
 
   // Can approve/lock/finalize notebook entries (SRS lab personas)

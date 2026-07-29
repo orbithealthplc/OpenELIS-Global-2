@@ -12,7 +12,7 @@
                 <columnExists schemaName="clinlims" tableName="chain_of_custody_log" columnName="source_record_type"/>
             </not>
         </preConditions>
-        
+
         <comment>Add lifecycle linkage and workflow transition columns to chain_of_custody_log.</comment>
 
         <addColumn schemaName="clinlims" tableName="chain_of_custody_log">

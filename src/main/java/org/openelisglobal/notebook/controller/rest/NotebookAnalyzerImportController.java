@@ -291,16 +291,18 @@ public class NotebookAnalyzerImportController extends BaseRestController {
             }
 
             List<String> headers = form.getHeaders() == null ? List.of() : form.getHeaders();
-            Map<String, String> columnMapping = form.getColumnMapping() == null ? new HashMap<>() : form.getColumnMapping();
+            Map<String, String> columnMapping = form.getColumnMapping() == null ? new HashMap<>()
+                    : form.getColumnMapping();
             String fileName = form.getFileName() == null || form.getFileName().isBlank() ? "json-import.csv"
                     : form.getFileName();
             AnalyzerResultImportService.FileFormat fileFormat = parseRequestedFormat(form.getFileFormat());
 
-            AnalyzerResultImportService.ParseResult parseResult = new AnalyzerResultImportService.ParseResult(headers, rows,
-                    fileFormat, rows.size(), new ArrayList<>());
+            AnalyzerResultImportService.ParseResult parseResult = new AnalyzerResultImportService.ParseResult(headers,
+                    rows, fileFormat, rows.size(), new ArrayList<>());
 
             ImportResult importResult = analyzerResultImportService.executeImport(pageId, parseResult, columnMapping,
-                    form.getAssayRunId(), form.getOperatorId(), form.getMachineParameters(), form.getReagentLots(), userId);
+                    form.getAssayRunId(), form.getOperatorId(), form.getMachineParameters(), form.getReagentLots(),
+                    userId);
 
             response.put("success", AnalyzerResultImportService.isFullySuccessful(importResult));
             response.put("importId", importResult.importId());
@@ -318,7 +320,8 @@ public class NotebookAnalyzerImportController extends BaseRestController {
             response.put("error", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (Exception e) {
-            LogEvent.logError(this.getClass().getName(), "executeImportJson", "Error executing JSON import: " + e.getMessage());
+            LogEvent.logError(this.getClass().getName(), "executeImportJson",
+                    "Error executing JSON import: " + e.getMessage());
             response.put("error", "Failed to execute JSON import: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }

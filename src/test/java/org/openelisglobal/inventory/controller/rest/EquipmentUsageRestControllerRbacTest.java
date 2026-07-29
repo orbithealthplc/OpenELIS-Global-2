@@ -1,8 +1,8 @@
 package org.openelisglobal.inventory.controller.rest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -74,10 +74,7 @@ public class EquipmentUsageRestControllerRbacTest {
         when(departmentIsolationService.canAccessInventoryItem(eq(item), any())).thenReturn(true);
         when(rbacPermissionService.hasPermission(any(), eq(RbacAction.MANAGE_EQUIPMENT))).thenReturn(false);
 
-        mockMvc.perform(post("/rest/equipment/usage/record")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/rest/equipment/usage/record").session(session).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))).andExpect(status().isForbidden());
     }
 }

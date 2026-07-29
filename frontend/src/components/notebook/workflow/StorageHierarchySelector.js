@@ -1,17 +1,26 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from "react";
 import {
   Grid,
   Column,
   Dropdown,
   Loading,
   InlineNotification,
-  TextInput,
 } from "@carbon/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { getFromOpenElisServer } from "../../utils/Utils";
 import { buildBiorepositoryStorageUrl } from "../pages/biorepository/biorepositoryStorageHelpers";
 import { usePermissions } from "../../../hooks/usePermissions";
-import { resolveBiorepositoryPhysicalRoomName } from "../pages/biorepository/biorepositoryDisplayHelpers";
+import {
+  BIOREPOSITORY_PHYSICAL_ROOMS,
+  filterZonesForPhysicalRoom,
+  resolveBiorepositoryPhysicalRoomName,
+} from "../pages/biorepository/biorepositoryDisplayHelpers";
 
 const normalizeResponseList = (response) => {
   if (Array.isArray(response)) {
@@ -166,7 +175,8 @@ function StorageHierarchySelector({
   }, [biorepositoryOnly, loginLabUnit, physicalRoomName]);
 
   // Hierarchical storage selection state
-  const [rooms, setRooms] = useState([]);
+  const [allRooms, setAllRooms] = useState([]);
+  const [selectedPhysicalRoom, setSelectedPhysicalRoom] = useState(null);
   const [devices, setDevices] = useState([]);
   const [shelves, setShelves] = useState([]);
   const [racks, setRacks] = useState([]);
@@ -177,6 +187,22 @@ function StorageHierarchySelector({
   const [selectedShelf, setSelectedShelf] = useState(null);
   const [selectedRack, setSelectedRack] = useState(null);
   const [selectedBox, setSelectedBox] = useState(null);
+
+  const rooms = useMemo(() => {
+    if (!biorepositoryOnly) {
+      return allRooms;
+    }
+    return filterZonesForPhysicalRoom(allRooms, selectedPhysicalRoom?.id);
+  }, [allRooms, biorepositoryOnly, selectedPhysicalRoom]);
+
+  const physicalRoomOptions = useMemo(
+    () =>
+      BIOREPOSITORY_PHYSICAL_ROOMS.map((room) => ({
+        id: room.id,
+        label: room.label,
+      })),
+    [],
+  );
 
   const [loadingHierarchy, setLoadingHierarchy] = useState(false);
   const [hierarchyNotice, setHierarchyNotice] = useState(null);
@@ -438,7 +464,9 @@ function StorageHierarchySelector({
 
   const loadRooms = () => {
     clearHierarchyNotice();
-    const endpoint = buildScopedStorageEndpoint("/rest/storage/rooms?status=active");
+    const endpoint = buildScopedStorageEndpoint(
+      "/rest/storage/rooms?status=active",
+    );
     beginHierarchyLoad();
     getFromOpenElisServer(endpoint, (response, error) => {
       endHierarchyLoad();
@@ -447,7 +475,7 @@ function StorageHierarchySelector({
       }
 
       if (error) {
-        setRooms([]);
+        setAllRooms([]);
         logHierarchyError("rooms", endpoint, error);
         setHierarchyErrorNotice(
           intl.formatMessage({
@@ -465,11 +493,29 @@ function StorageHierarchySelector({
         .map((room) => toOption(room, ["name", "label"]))
         .filter((room) => room.id);
 
-      setRooms(mappedRooms);
+      setAllRooms(mappedRooms);
       if (mappedRooms.length === 0) {
         setHierarchyEmptyNotice("rooms");
       }
     });
+  };
+
+  const clearLowerLevels = () => {
+    setSelectedRoom(null);
+    setSelectedDevice(null);
+    setSelectedShelf(null);
+    setSelectedRack(null);
+    setSelectedBox(null);
+    setDevices([]);
+    setShelves([]);
+    setRacks([]);
+    setBoxes([]);
+  };
+
+  const handlePhysicalRoomChange = ({ selectedItem }) => {
+    clearHierarchyNotice();
+    setSelectedPhysicalRoom(selectedItem || null);
+    clearLowerLevels();
   };
 
   // Load devices when room changes
@@ -787,7 +833,9 @@ function StorageHierarchySelector({
   // Build hierarchical path
   const getHierarchicalPath = () => {
     const parts = [];
-    if (biorepositoryOnly && biorepositoryPhysicalRoomName) {
+    if (biorepositoryOnly && selectedPhysicalRoom?.label) {
+      parts.push(selectedPhysicalRoom.label);
+    } else if (biorepositoryOnly && biorepositoryPhysicalRoomName) {
       parts.push(biorepositoryPhysicalRoomName);
     }
     if (selectedRoom) parts.push(selectedRoom.label);
@@ -803,19 +851,34 @@ function StorageHierarchySelector({
       {biorepositoryOnly && (
         <Grid fullWidth narrow>
           <Column lg={8} md={4} sm={4}>
-            <TextInput
+            <Dropdown
               id="biorepository-physical-room"
-              readOnly
-              labelText={intl.formatMessage({
+              titleText={intl.formatMessage({
                 id: "biorepository.storage.physicalRoom",
                 defaultMessage: "Room",
               })}
-              value={biorepositoryPhysicalRoomName || ""}
+              label={intl.formatMessage({
+                id: "biorepository.storage.selectPhysicalRoom",
+                defaultMessage: "Select room...",
+              })}
+              items={physicalRoomOptions}
+              itemToString={(item) => (item ? item.label : "")}
+              selectedItem={selectedPhysicalRoom}
+              onChange={handlePhysicalRoomChange}
+              helperText={intl.formatMessage({
+                id: "biorepository.storage.physicalRoom.helper",
+                defaultMessage:
+                  "2 rooms: Minus 20 freezers only, or Ultra Low (zones + reception).",
+              })}
             />
           </Column>
         </Grid>
       )}
-      <Grid fullWidth narrow style={biorepositoryOnly ? { marginTop: "0.5rem" } : undefined}>
+      <Grid
+        fullWidth
+        narrow
+        style={biorepositoryOnly ? { marginTop: "0.5rem" } : undefined}
+      >
         <Column lg={8} md={4} sm={4}>
           <Dropdown
             id="room-dropdown"
@@ -829,7 +892,9 @@ function StorageHierarchySelector({
               id: biorepositoryOnly
                 ? "biorepository.storage.selectZone"
                 : "notebook.storage.selectRoom",
-              defaultMessage: biorepositoryOnly ? "Select zone..." : "Select room...",
+              defaultMessage: biorepositoryOnly
+                ? "Select zone..."
+                : "Select room...",
             })}
             items={rooms}
             itemToString={(item) => (item ? item.label : "")}
@@ -841,6 +906,7 @@ function StorageHierarchySelector({
                 : null
             }
             onChange={handleRoomChange}
+            disabled={biorepositoryOnly && !selectedPhysicalRoom}
           />
         </Column>
         <Column lg={8} md={4} sm={4}>

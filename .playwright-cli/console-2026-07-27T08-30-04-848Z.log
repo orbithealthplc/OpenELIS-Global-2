@@ -1,0 +1,8 @@
+[    6492ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   10311ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://localhost:3000/login:0
+[   13416ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[   36758ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   37863ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[   38560ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739469
+[   38563ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739471
+[   42204ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814

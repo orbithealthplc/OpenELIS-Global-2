@@ -4,10 +4,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Formats and parses structured biorepository transfer request notes.
- * Stored as:
- * Project: {projectName}
- * Reason: {transferReason}
+ * Formats and parses structured biorepository transfer request notes. Stored
+ * as: Project: {projectName} Reason: {transferReason}
  */
 public final class SampleTransferNotesHelper {
 

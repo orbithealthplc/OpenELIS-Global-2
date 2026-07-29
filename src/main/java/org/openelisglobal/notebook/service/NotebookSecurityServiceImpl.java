@@ -51,6 +51,9 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
     @Autowired
     private RoleService roleService;
 
+    @Autowired
+    private WorkflowRegistryService workflowRegistryService;
+
     // ========== TEMPLATE ACCESS (Admin Only for Edit) ==========
 
     @Override
@@ -70,7 +73,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
         // Check departments (test sections) first - this is the primary access control
         Set<TestSection> templateDepts = template.getDepartments();
         if (templateDepts != null && !templateDepts.isEmpty()) {
-            // If no lab unit is selected in session, fall back to assigned lab-unit mappings.
+            // If no lab unit is selected in session, fall back to assigned lab-unit
+            // mappings.
             if (isBlank(loginLabUnit)) {
                 return hasDepartmentAccessWithoutLoginLabUnit(sysUserId, templateDepts);
             }
@@ -110,40 +114,41 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
 
             Integer effectiveNotebookId = notebookId;
             if (Boolean.FALSE.equals(notebook.getIsTemplate())) {
-                if (notebook.getParentNotebook() == null && notebook.getEntries() != null && !notebook.getEntries().isEmpty()) {
+                if (notebook.getParentNotebook() == null && notebook.getEntries() != null
+                        && !notebook.getEntries().isEmpty()) {
                     effectiveNotebookId = notebookId;
                 } else {
-                // This is either a child instance or an entry (not a template)
-                // First check if it's a child instance (has parentNotebook)
-                NoteBook parentNotebook = notebook.getParentNotebook();
-                if (parentNotebook != null) {
-                    // This is a child instance - check access via the parent template
-                    effectiveNotebookId = parentNotebook.getId();
-                    LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId=" + notebookId
-                            + " is a child instance, using parent template id=" + effectiveNotebookId);
-                } else {
-                    // Not a child instance - try finding parent via entries collection (legacy)
-                    NoteBook parent = noteBookService.getParentTemplate(notebookId);
-                    if (parent != null) {
-                        effectiveNotebookId = parent.getId();
+                    // This is either a child instance or an entry (not a template)
+                    // First check if it's a child instance (has parentNotebook)
+                    NoteBook parentNotebook = notebook.getParentNotebook();
+                    if (parentNotebook != null) {
+                        // This is a child instance - check access via the parent template
+                        effectiveNotebookId = parentNotebook.getId();
                         LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId=" + notebookId
-                                + " is an entry, using parent template id=" + effectiveNotebookId);
+                                + " is a child instance, using parent template id=" + effectiveNotebookId);
                     } else {
-                        // Orphaned entry - allow if user is creator or technician
-                        if (notebook.getTechnician() != null
-                                && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId)) {
-                            return true;
+                        // Not a child instance - try finding parent via entries collection (legacy)
+                        NoteBook parent = noteBookService.getParentTemplate(notebookId);
+                        if (parent != null) {
+                            effectiveNotebookId = parent.getId();
+                            LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate", "NotebookId="
+                                    + notebookId + " is an entry, using parent template id=" + effectiveNotebookId);
+                        } else {
+                            // Orphaned entry - allow if user is creator or technician
+                            if (notebook.getTechnician() != null
+                                    && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId)) {
+                                return true;
+                            }
+                            if (notebook.getCreator() != null
+                                    && String.valueOf(notebook.getCreator().getId()).equals(sysUserId)) {
+                                return true;
+                            }
+                            // No parent and not creator/technician - deny
+                            LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate",
+                                    "NotebookId=" + notebookId + " is an orphaned entry with no parent, access denied");
+                            return false;
                         }
-                        if (notebook.getCreator() != null
-                                && String.valueOf(notebook.getCreator().getId()).equals(sysUserId)) {
-                            return true;
-                        }
-                        // No parent and not creator/technician - deny
-                        LogEvent.logInfo(this.getClass().getSimpleName(), "canViewTemplate",
-                                "NotebookId=" + notebookId + " is an orphaned entry with no parent, access denied");
-                        return false;
                     }
-                }
                 }
             }
 
@@ -162,7 +167,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                                     + ", localizedName=" + dept.getLocalizedName());
                 }
 
-                // If no lab unit is selected in session, fall back to assigned lab-unit mappings.
+                // If no lab unit is selected in session, fall back to assigned lab-unit
+                // mappings.
                 if (isBlank(loginLabUnit)) {
                     return hasDepartmentAccessWithoutLoginLabUnit(sysUserId, templateDepts);
                 }
@@ -216,8 +222,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
 
     /**
      * Fallback access check when user has no selected login lab unit in session.
-     * This allows department-scoped users to still see templates when their assigned
-     * lab-unit mappings overlap with template departments.
+     * This allows department-scoped users to still see templates when their
+     * assigned lab-unit mappings overlap with template departments.
      */
     private boolean hasDepartmentAccessWithoutLoginLabUnit(String sysUserId, Set<TestSection> templateDepts) {
         if (hasAllLabUnitsAccess(sysUserId)) {
@@ -307,9 +313,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                 String localizedName = mappedSection.getLocalizedName();
                 String testSectionName = mappedSection.getTestSectionName();
 
-                boolean resolvedOrgMatch = templateOrgs.stream()
-                        .anyMatch(org -> matchesLoginLabUnit(org, localizedName)
-                                || matchesLoginLabUnit(org, testSectionName));
+                boolean resolvedOrgMatch = templateOrgs.stream().anyMatch(
+                        org -> matchesLoginLabUnit(org, localizedName) || matchesLoginLabUnit(org, testSectionName));
                 if (resolvedOrgMatch) {
                     return true;
                 }
@@ -393,7 +398,7 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             Set<TestSection> templateDepts = noteBookService.getNoteBookDepartments(notebookId);
             boolean hasRole = hasRequiredRoleForTemplateDepartments(sysUserId, templateDepts, allowedRoles);
             LogEvent.logInfo(this.getClass().getSimpleName(), "canCreateEntry",
-                "hasRequiredRoleForTemplateDepartments result=" + hasRole + " (no loginLabUnit selected)");
+                    "hasRequiredRoleForTemplateDepartments result=" + hasRole + " (no loginLabUnit selected)");
             return hasRole;
         }
 
@@ -450,18 +455,12 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return true;
         }
 
-        // Check if user has allowed role for their lab unit
-        NoteBook template = entry.getNotebook();
-        if (template == null) {
+        NoteBook notebook = entry.getNotebook();
+        if (notebook == null) {
             return false;
         }
 
-        Set<String> allowedRoles = template.getAllowedRoles();
-        if (allowedRoles == null || allowedRoles.isEmpty()) {
-            return true;
-        }
-
-        return hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles);
+        return canEditNotebookByWorkflowOrTemplateRoles(notebook, sysUserId, loginLabUnit);
     }
 
     @Override
@@ -472,6 +471,78 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             return false;
         }
         return canEditEntry(entry, sysUserId, loginLabUnit);
+    }
+
+    /**
+     * Whether the user may open/save a notebook instance or entry for workflow
+     * work. Template allowedRoles OR any SRS persona appearing on the workflow's
+     * stages.
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public boolean canEditNotebookInstance(NoteBook notebook, String sysUserId, String loginLabUnit) {
+        if (notebook == null) {
+            return false;
+        }
+        if (hasGlobalAdminRole(sysUserId)) {
+            return true;
+        }
+        if (notebook.getCreator() != null && String.valueOf(notebook.getCreator().getId()).equals(sysUserId)) {
+            return true;
+        }
+        if (notebook.getTechnician() != null && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId)) {
+            return true;
+        }
+        return canEditNotebookByWorkflowOrTemplateRoles(notebook, sysUserId, loginLabUnit);
+    }
+
+    private boolean canEditNotebookByWorkflowOrTemplateRoles(NoteBook notebook, String sysUserId, String loginLabUnit) {
+        Integer templateId = resolveTemplateIdForRoles(notebook);
+        if (templateId != null) {
+            Set<String> allowedRoles = noteBookService.getNoteBookAllowedRoles(templateId);
+            if (allowedRoles == null || allowedRoles.isEmpty()) {
+                return true;
+            }
+            if (hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles)) {
+                return true;
+            }
+        } else {
+            Set<String> allowedRoles = notebook.getAllowedRoles();
+            if (allowedRoles == null || allowedRoles.isEmpty()) {
+                return true;
+            }
+            if (hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, allowedRoles)) {
+                return true;
+            }
+        }
+
+        String workflowType = noteBookService.getEffectiveWorkflowType(notebook);
+        return hasAnyWorkflowStagePersona(sysUserId, loginLabUnit, workflowType);
+    }
+
+    private Integer resolveTemplateIdForRoles(NoteBook notebook) {
+        if (notebook == null) {
+            return null;
+        }
+        if (Boolean.TRUE.equals(notebook.getIsTemplate()) && notebook.getParentNotebook() == null) {
+            return notebook.getId();
+        }
+        if (notebook.isChildInstance() && notebook.getParentNotebook() != null) {
+            return notebook.getParentNotebook().getId();
+        }
+        NoteBook parent = noteBookService.getParentTemplate(notebook.getId());
+        return parent != null ? parent.getId() : notebook.getId();
+    }
+
+    private boolean hasAnyWorkflowStagePersona(String sysUserId, String loginLabUnit, String workflowType) {
+        if (workflowType == null || workflowType.isBlank()) {
+            return false;
+        }
+        List<String> personas = workflowRegistryService.getAllAllowedPersonas(workflowType);
+        if (personas == null || personas.isEmpty()) {
+            return false;
+        }
+        return hasRequiredRoleForLabUnit(sysUserId, loginLabUnit, new java.util.HashSet<>(personas));
     }
 
     // ========== PAGE ACCESS (Role Based) ==========
@@ -646,10 +717,10 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
                     labUnitMatches = normalizedLoginLabUnit.equalsIgnoreCase(tsLocalizedName)
                             || normalizedLoginLabUnit.equalsIgnoreCase(tsName)
                             || normalizedLoginLabUnit.equals(normalizedLabUnit); // Also match by
-                                                                                                      // ID
+                                                                                 // ID
                     LogEvent.logInfo(this.getClass().getSimpleName(), "hasRequiredRoleForLabUnit",
-                            "TestSection lookup: id=" + normalizedLabUnit + ", localizedName=" + tsLocalizedName + ", name="
-                                    + tsName + ", matches=" + labUnitMatches);
+                            "TestSection lookup: id=" + normalizedLabUnit + ", localizedName=" + tsLocalizedName
+                                    + ", name=" + tsName + ", matches=" + labUnitMatches);
                 }
             }
 
@@ -697,9 +768,8 @@ public class NotebookSecurityServiceImpl implements NotebookSecurityService {
             }
 
             String normalizedMappedLabUnit = mappedLabUnit.trim();
-            boolean departmentMatches = "AllLabUnits".equalsIgnoreCase(normalizedMappedLabUnit)
-                    || templateDepts.stream().anyMatch(
-                            dept -> matchesLoginLabUnitToDepartment(dept, normalizedMappedLabUnit));
+            boolean departmentMatches = "AllLabUnits".equalsIgnoreCase(normalizedMappedLabUnit) || templateDepts
+                    .stream().anyMatch(dept -> matchesLoginLabUnitToDepartment(dept, normalizedMappedLabUnit));
 
             if (!departmentMatches) {
                 TestSection mappedSection = testSectionService.get(normalizedMappedLabUnit);

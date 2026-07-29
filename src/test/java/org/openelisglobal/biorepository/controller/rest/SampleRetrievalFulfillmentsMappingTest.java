@@ -75,10 +75,8 @@ public class SampleRetrievalFulfillmentsMappingTest {
 
         when(retrievalService.get(42)).thenReturn(request);
 
-        mockMvc.perform(get("/rest/biorepository/retrieval/requests/42"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.notebookEntryId").value(6))
-                .andExpect(jsonPath("$.notebookId").doesNotExist());
+        mockMvc.perform(get("/rest/biorepository/retrieval/requests/42")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.notebookEntryId").value(6)).andExpect(jsonPath("$.notebookId").doesNotExist());
     }
 
     @Test
@@ -114,8 +112,7 @@ public class SampleRetrievalFulfillmentsMappingTest {
 
         when(retrievalService.get(42)).thenReturn(request);
 
-        mockMvc.perform(get("/rest/biorepository/retrieval/requests/42"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/biorepository/retrieval/requests/42")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].id").value(1))
                 .andExpect(jsonPath("$.items[0].fulfillments[0].id").value(2))
                 .andExpect(jsonPath("$.items[0].fulfillments[0].fulfillsItemId").value(1));

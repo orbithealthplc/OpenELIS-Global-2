@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet id="080-notebook-user-stage-override-table" author="ahri-rbac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="notebook_user_stage_override" schemaName="clinlims"/>
+            </not>
+        </preConditions>
+        <comment>
+            Per-user notebook workflow stage access overrides by lab unit.
+            mode: DEFAULT (SRS persona matrix), ALL (every stage), ALLOWLIST (selected page keys).
+        </comment>
+        <createTable tableName="notebook_user_stage_override" schemaName="clinlims">
+            <column name="id" type="INTEGER">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_notebook_user_stage_override"/>
+            </column>
+            <column name="system_user_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lab_unit" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mode" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated" type="TIMESTAMP"/>
+            <column name="sys_user_id" type="VARCHAR(20)"/>
+        </createTable>
+        <addUniqueConstraint
+            tableName="notebook_user_stage_override"
+            schemaName="clinlims"
+            columnNames="system_user_id, lab_unit"
+            constraintName="uq_nuso_user_lab"/>
+        <createIndex tableName="notebook_user_stage_override" schemaName="clinlims" indexName="idx_nuso_user">
+            <column name="system_user_id"/>
+        </createIndex>
+        <addForeignKeyConstraint
+            baseTableName="notebook_user_stage_override"
+            baseTableSchemaName="clinlims"
+            baseColumnNames="system_user_id"
+            referencedTableName="system_user"
+            referencedTableSchemaName="clinlims"
+            referencedColumnNames="id"
+            constraintName="fk_nuso_system_user"
+            onDelete="CASCADE"/>
+        <rollback>
+            <dropTable tableName="notebook_user_stage_override" schemaName="clinlims"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="080-notebook-user-stage-override-seq" author="ahri-rbac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <sequenceExists sequenceName="notebook_user_stage_override_seq" schemaName="clinlims"/>
+            </not>
+        </preConditions>
+        <createSequence
+            sequenceName="notebook_user_stage_override_seq"
+            schemaName="clinlims"
+            startValue="1"
+            incrementBy="1"/>
+        <rollback>
+            <dropSequence sequenceName="notebook_user_stage_override_seq" schemaName="clinlims"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="080-notebook-user-stage-override-pages" author="ahri-rbac">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="notebook_user_stage_override_page" schemaName="clinlims"/>
+            </not>
+        </preConditions>
+        <comment>ALLOWLIST page_key values for a user+lab-unit stage override.</comment>
+        <createTable tableName="notebook_user_stage_override_page" schemaName="clinlims">
+            <column name="override_id" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="page_key" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addPrimaryKey
+            tableName="notebook_user_stage_override_page"
+            schemaName="clinlims"
+            columnNames="override_id, page_key"
+            constraintName="pk_nuso_page"/>
+        <addForeignKeyConstraint
+            baseTableName="notebook_user_stage_override_page"
+            baseTableSchemaName="clinlims"
+            baseColumnNames="override_id"
+            referencedTableName="notebook_user_stage_override"
+            referencedTableSchemaName="clinlims"
+            referencedColumnNames="id"
+            constraintName="fk_nuso_page_override"
+            onDelete="CASCADE"/>
+        <rollback>
+            <dropTable tableName="notebook_user_stage_override_page" schemaName="clinlims"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

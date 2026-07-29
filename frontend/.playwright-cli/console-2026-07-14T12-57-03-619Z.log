@@ -1,0 +1,53 @@
+[   16398ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://lims.ahri.gov.et/login?nocache=1:0
+[   16724ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   16792ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   17189ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   17261ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   17262ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   71428ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   71433ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   71495ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   71555ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   72486ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   72494ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   72495ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   76342ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   95380ms] [LOG] reports @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   95380ms] [LOG] reports @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  153303ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  153358ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  153364ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  153564ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  153564ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  154585ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  154609ms] [LOG] reports @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  154610ms] [LOG] reports @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  154680ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  158241ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  216626ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  216629ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  216748ms] [ERROR] The script has an unsupported MIME type ('text/html'). @ :0
+[  216752ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  216758ms] [ERROR] Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/') with script ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/service-worker.js'): The script has an unsupported MIME type ('text/html'). @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  217512ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  217519ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  217519ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  217803ms] [LOG] Loading data {data: Object} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  218822ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/orders:0
+[  218823ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients?all=true:0
+[  218838ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients:0
+[  221521ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272608ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272613ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272626ms] [LOG] [QC Page] Loading samples for entry: 126 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272687ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272688ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272709ms] [LOG] [QC Page] Raw response from backend: [] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272709ms] [LOG] [QC Page] Number of samples received: 0 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272709ms] [LOG] [QC Page] Sample breakdown by pageStatus: {PENDING: 0, COMPLETED: 0, SKIPPED: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272709ms] [LOG] [QC Page] Transformed samples: [] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272709ms] [LOG] [QC Page] Transformed samples count by status: {} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272710ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272711ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272714ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  272715ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1

@@ -18,7 +18,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.openelisglobal.biorepository.controller.rest.dto.BioSampleListDTO;
 import org.openelisglobal.biorepository.dao.BioSampleRetrievalSearchCriteria;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
@@ -119,8 +118,8 @@ public class BioSampleFulfillmentSearchTest {
     @Test
     public void search_exactAccessionIgnoresSampleTypeFilter() {
         BioSample exact = storedSample("BIO-2", "DEV012600000000000050", "CTD", "PROJ", "DNA");
-        when(bioSampleService.searchForRetrieval(argThat((BioSampleRetrievalSearchCriteria criteria) ->
-                criteria != null && criteria.getIdentityPattern() != null && criteria.getSampleTypeIds() == null)))
+        when(bioSampleService.searchForRetrieval(argThat((BioSampleRetrievalSearchCriteria criteria) -> criteria != null
+                && criteria.getIdentityPattern() != null && criteria.getSampleTypeIds() == null)))
                 .thenReturn(List.of(exact));
 
         FulfillmentSearchInput input = new FulfillmentSearchInput();
@@ -159,12 +158,9 @@ public class BioSampleFulfillmentSearchTest {
     @Test
     public void search_exactSampleIdMatchesBarcodeLane() {
         BioSample exact = storedSample("BIO-2026-004", "DEV012600000000000050", "CTD", "PROJ", "DNA");
-        when(bioSampleService.searchForRetrieval(argThat((BioSampleRetrievalSearchCriteria criteria) ->
-                criteria != null
-                        && "%BIO-2026-004%".equals(criteria.getIdentityPattern())
-                        && criteria.getBarcodePattern() == null
-                        && criteria.getAccessionPattern() == null)))
-                .thenReturn(List.of(exact));
+        when(bioSampleService.searchForRetrieval(argThat((BioSampleRetrievalSearchCriteria criteria) -> criteria != null
+                && "%BIO-2026-004%".equals(criteria.getIdentityPattern()) && criteria.getBarcodePattern() == null
+                && criteria.getAccessionPattern() == null))).thenReturn(List.of(exact));
 
         FulfillmentSearchInput input = new FulfillmentSearchInput();
         input.setFilterStatus(WorkflowStatus.STORED);

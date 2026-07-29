@@ -1,7 +1,9 @@
 import React from "react";
 import { render, fireEvent, screen } from "@testing-library/react";
 import { IntlProvider } from "react-intl";
-import AttachSamplePanel, { buildFiltersFromReferenceItem } from "./AttachSamplePanel";
+import AttachSamplePanel, {
+  buildFiltersFromReferenceItem,
+} from "./AttachSamplePanel";
 import { getFromOpenElisServer } from "../../../utils/Utils";
 
 jest.mock("../../../utils/Utils", () => ({
@@ -65,7 +67,9 @@ describe("AttachSamplePanel", () => {
     );
 
     expect(
-      screen.getByText("No exact match or broader suggestion was found for this search."),
+      screen.getByText(
+        "No exact match or broader suggestion was found for this search.",
+      ),
     ).toBeTruthy();
   });
 
@@ -95,7 +99,9 @@ describe("AttachSamplePanel", () => {
   test("shows confirm or refine title in secondary mode", () => {
     renderPanel({
       referenceItem: { id: 1, requestedAccessionNumber: "ACC-1" },
-      initialResults: [{ id: 10, accessionNumber: "ACC-1", exactIdentityMatch: true }],
+      initialResults: [
+        { id: 10, accessionNumber: "ACC-1", exactIdentityMatch: true },
+      ],
       suggestionSummary: { status: "EXACT_MATCH", fallbackUsed: false },
       onAttachSuccess: jest.fn(),
       onCancel: jest.fn(),

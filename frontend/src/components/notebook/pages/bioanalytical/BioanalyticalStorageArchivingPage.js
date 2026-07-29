@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useContext, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useContext,
+  useEffect,
+} from "react";
 import config from "../../../../config.json";
 import {
   Grid,
@@ -251,9 +257,7 @@ function BioanalyticalStorageArchivingPage({ entryId, notebookId, pageData }) {
           sampleType: sample.sampleType || "Bioanalytical Sample",
           collectionDate: sample.collectionDate || sample.data?.collectionDate,
           quantity:
-            sample.quantity ??
-            sample.data?.sampleVolume ??
-            sample.data?.volume,
+            sample.quantity ?? sample.data?.sampleVolume ?? sample.data?.volume,
           type: sample.sampleType || "Bioanalytical Sample",
           volume: sample.data?.sampleVolume || "5.0 mL",
           location: sample.data?.storageLocation || "Not Assigned",
@@ -606,7 +610,9 @@ function BioanalyticalStorageArchivingPage({ entryId, notebookId, pageData }) {
 
       const transferRequest = buildBiorepositoryTransferPayload({
         sourceLab: "Bioanalytical Laboratory",
-        sampleItemIds: Array.from(selectedSamples).map((id) => parseInt(id, 10)),
+        sampleItemIds: Array.from(selectedSamples).map((id) =>
+          parseInt(id, 10),
+        ),
         projectName: biorepositoryProjectName,
         transferReason: biorepositoryTransferReason,
         itemMetadata: transferItemMetadata,

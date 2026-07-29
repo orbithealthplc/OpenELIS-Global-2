@@ -2,11 +2,17 @@ import { getFromOpenElisServer } from "../../utils/Utils";
 import { mapLinkedEquipmentOptions } from "../notebookLinkedEquipment";
 
 /** Pseudo-departments — admin role assignment only, never owning scope. */
-export const OWNERSHIP_PSEUDO_DEPARTMENT_NAMES = ["AllLabUnits", "All Lab Units"];
+export const OWNERSHIP_PSEUDO_DEPARTMENT_NAMES = [
+  "AllLabUnits",
+  "All Lab Units",
+];
 
 export const isOwningDepartment = (department) => {
   const name = String(
-    department?.name ?? department?.shortName ?? department?.testSectionName ?? "",
+    department?.name ??
+      department?.shortName ??
+      department?.testSectionName ??
+      "",
   ).trim();
   if (!name) {
     return true;
@@ -86,8 +92,7 @@ const inferDepartmentIdsFromNotebook = (notebook, candidates = []) => {
 
       return labels.some((label) =>
         haystacks.some(
-          (haystack) =>
-            haystack.includes(label) || label.includes(haystack),
+          (haystack) => haystack.includes(label) || label.includes(haystack),
         ),
       );
     })
@@ -109,7 +114,11 @@ const loadAssignableDepartmentIds = (notebook, callback, signal = null) => {
   );
 };
 
-export const loadNotebookDepartmentIds = (notebookId, callback, signal = null) => {
+export const loadNotebookDepartmentIds = (
+  notebookId,
+  callback,
+  signal = null,
+) => {
   if (!notebookId) {
     callback([], null, {
       scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
@@ -156,13 +165,17 @@ export const loadNotebookDepartmentIds = (notebookId, callback, signal = null) =
           loadAssignableDepartmentIds(
             notebook,
             (matchedIds, matchedError) => {
-              callback(matchedIds, departmentError || notebookError || matchedError, {
-                scopeStatus:
-                  matchedIds.length > 0
-                    ? NOTEBOOK_INVENTORY_SCOPE_STATUS.READY
-                    : NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
-                departmentIds: matchedIds,
-              });
+              callback(
+                matchedIds,
+                departmentError || notebookError || matchedError,
+                {
+                  scopeStatus:
+                    matchedIds.length > 0
+                      ? NOTEBOOK_INVENTORY_SCOPE_STATUS.READY
+                      : NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
+                  departmentIds: matchedIds,
+                },
+              );
             },
             signal,
           );
@@ -230,8 +243,10 @@ export const mergeInventoryOptionsWithLinkedSelections = (
     seenIds.add(id);
     merged.push({
       id: item.id ?? item.value,
-      value: item.value || item.label || item.name || String(item.id ?? item.value),
-      label: item.label || item.value || item.name || String(item.id ?? item.value),
+      value:
+        item.value || item.label || item.name || String(item.id ?? item.value),
+      label:
+        item.label || item.value || item.name || String(item.id ?? item.value),
       itemType: item.itemType,
       unavailableInDepartmentInventory: true,
       availabilityNote: unavailableSuffix,
@@ -241,7 +256,12 @@ export const mergeInventoryOptionsWithLinkedSelections = (
   return merged;
 };
 
-export const loadNotebookEquipmentOptions = (notebookId, buildUrl, callback, signal = null) => {
+export const loadNotebookEquipmentOptions = (
+  notebookId,
+  buildUrl,
+  callback,
+  signal = null,
+) => {
   loadNotebookDepartmentIds(
     notebookId,
     (departmentIds, departmentError, scopeMeta = {}) => {
@@ -261,7 +281,8 @@ export const loadNotebookEquipmentOptions = (notebookId, buildUrl, callback, sig
             callback([], error, {
               ...scopeMeta,
               departmentIds,
-              scopeStatus: scopeMeta.scopeStatus || NOTEBOOK_INVENTORY_SCOPE_STATUS.READY,
+              scopeStatus:
+                scopeMeta.scopeStatus || NOTEBOOK_INVENTORY_SCOPE_STATUS.READY,
             });
             return;
           }

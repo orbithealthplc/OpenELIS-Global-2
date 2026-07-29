@@ -14,7 +14,9 @@ export {
 
 /** @deprecated use buildRequestorSessionDefaults + resolveRequesterLabUnit */
 export function buildSessionFormDefaults(userSessionDetails) {
-  const requesterLabUnit = resolveRequesterLabUnit({ session: userSessionDetails });
+  const requesterLabUnit = resolveRequesterLabUnit({
+    session: userSessionDetails,
+  });
   return buildRequestorSessionDefaults(userSessionDetails, requesterLabUnit);
 }
 
@@ -29,7 +31,10 @@ export function buildRequestorSessionDefaults(
   return {
     requestorName,
     requesterLabUnit,
-    requesterContactInfo: buildContactInfo(userSessionDetails, requesterLabUnit),
+    requesterContactInfo: buildContactInfo(
+      userSessionDetails,
+      requesterLabUnit,
+    ),
   };
 }
 
@@ -85,7 +90,9 @@ export function validateBrf02RequestForm(formData, selectedSamples) {
     formData.samplesWillBeDestroyed === false &&
     !formData.estimatedReturnDate
   ) {
-    errors.push("Estimated return date is required when samples will be returned");
+    errors.push(
+      "Estimated return date is required when samples will be returned",
+    );
   }
 
   errors.push(...validateRequestReferenceRows(selectedSamples));

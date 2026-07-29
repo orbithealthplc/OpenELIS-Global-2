@@ -1,0 +1,54 @@
+- generic [active]:
+  - generic:
+    - generic:
+      - banner [ref=f1e1]:
+        - link [ref=f1e2] [cursor=pointer]:
+          - /url: /
+          - img "AHRI LIMS" [ref=f1e5]
+          - generic [ref=f1e6]:
+            - heading "AHRI LIMS" [level=5] [ref=f1e7]
+            - paragraph [ref=f1e8]: "Version: 3.2.1.2"
+        - generic [ref=f1e9]:
+          - generic [ref=f1e10]:
+            - button "Lang" [ref=f1e11] [cursor=pointer]
+            - tooltip
+          - generic [ref=f1e14]:
+            - button "Help" [ref=f1e15] [cursor=pointer]
+            - tooltip
+          - generic "Help Panel":
+            - list:
+              - listitem:
+                - button "User Manual" [ref=f1e20] [cursor=pointer]
+              - listitem:
+                - button "Video Tutorials" [ref=f1e24] [cursor=pointer]
+              - listitem:
+                - button "Release Notes" [ref=f1e28] [cursor=pointer]
+        - generic "Header Panel":
+          - list:
+            - listitem:
+              - generic [ref=f1e33]:
+                - generic [ref=f1e34]: Select Locale
+                - combobox "Select Locale" [ref=f1e36] [cursor=pointer]:
+                  - option "English" [selected]
+                  - option "English (UK)"
+                  - option "English (Sri Lanka)"
+                  - option "English (US)"
+                  - option "Español"
+                  - option "Français"
+                  - option "Indonesia"
+                  - option "Indonesia (ID)"
+                  - option "Malagasy"
+                  - option "Română"
+                  - option "සිංහල"
+                  - option "සිංහල (Sri Lanka)"
+                  - option "தமிழ்"
+                  - option "தமிழ் (Sri Lanka)"
+                  - option "Swahili"
+                  - option "Amharic"
+            - listitem:
+              - generic [ref=f1e37]: "Version:: 3.2.1.2"
+      - generic:
+        - main:
+          - img "loading" [ref=f1e40]
+      - contentinfo:
+        - paragraph

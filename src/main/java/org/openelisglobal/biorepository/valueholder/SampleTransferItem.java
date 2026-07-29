@@ -1,8 +1,6 @@
 package org.openelisglobal.biorepository.valueholder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -18,6 +16,8 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import org.openelisglobal.common.valueholder.BaseObject;
 import org.openelisglobal.sampleitem.valueholder.SampleItem;
 

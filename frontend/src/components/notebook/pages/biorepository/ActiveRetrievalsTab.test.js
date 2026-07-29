@@ -28,7 +28,9 @@ jest.mock("../../../utils/Utils", () => ({
         id: 42,
         requestNumber: "REQ-42",
         requestStatus: "APPROVED",
-        items: [{ id: 7, status: "AWAITING_FULFILLMENT", sampleNumber: "S-001" }],
+        items: [
+          { id: 7, status: "AWAITING_FULFILLMENT", sampleNumber: "S-001" },
+        ],
       },
     ]);
   }),

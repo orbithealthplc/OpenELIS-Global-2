@@ -1,0 +1,223 @@
+- generic [ref=f5e3]:
+    - banner [ref=f5e4]:
+        - button "Open menu" [ref=f5e5] [cursor=pointer]
+        - link [ref=f5e8] [cursor=pointer]:
+            - /url: /
+            - img "AHRI LIMS" [ref=f5e11]
+            - generic [ref=f5e12]:
+                - heading "AHRI LIMS" [level=5] [ref=f5e13]
+                - paragraph [ref=f5e14]: "Version: 3.2.1.2"
+        - generic [ref=f5e15]:
+            - generic [ref=f5e16]:
+                - button "Search" [ref=f5e17] [cursor=pointer]
+                - tooltip
+            - generic [ref=f5e20]:
+                - button "Notifications" [ref=f5e21] [cursor=pointer]
+                - tooltip
+            - generic [ref=f5e25]:
+                - button "User" [ref=f5e26] [cursor=pointer]
+                - tooltip
+            - generic [ref=f5e30]:
+                - button "Help" [ref=f5e31] [cursor=pointer]
+                - tooltip
+            - generic "Help Panel":
+                - list:
+                    - listitem:
+                        - button "User Manual" [ref=f5e36] [cursor=pointer]
+                    - listitem:
+                        - button "Video Tutorials" [ref=f5e40] [cursor=pointer]
+                    - listitem:
+                        - button "Release Notes" [ref=f5e44] [cursor=pointer]
+        - generic "Header Panel":
+            - list:
+                - listitem: Open ELIS
+                - listitem: Logout
+                - listitem:
+                    - generic [ref=f5e53]:
+                        - generic [ref=f5e54]: Select Locale
+                        - combobox "Select Locale" [ref=f5e56] [cursor=pointer]:
+                            - option "English" [selected]
+                            - option "English (UK)"
+                            - option "English (Sri Lanka)"
+                            - option "English (US)"
+                            - option "Español"
+                            - option "Français"
+                            - option "Indonesia"
+                            - option "Indonesia (ID)"
+                            - option "Malagasy"
+                            - option "Română"
+                            - option "සිංහල"
+                            - option "සිංහල (Sri Lanka)"
+                            - option "தமிழ்"
+                            - option "தமிழ் (Sri Lanka)"
+                            - option "Swahili"
+                            - option "Amharic"
+                - listitem:
+                    - generic [ref=f5e57]: "Version:: 3.2.1.2"
+        - navigation "Side navigation":
+            - list
+    - main [ref=f5e59]:
+        - navigation "Breadcrumb" [ref=f5e62]:
+            - list [ref=f5e63]:
+                - listitem [ref=f5e64]:
+                    - link "Home" [ref=f5e65] [cursor=pointer]:
+                        - /url: /
+                    - text: /
+                - listitem [ref=f5e66]:
+                    - link "Notebook Dashboard" [ref=f5e67] [cursor=pointer]:
+                        - /url: /NoteBookDashboard
+                    - text: /
+        - heading "Notebook Entry Form" [level=3] [ref=f5e72]
+        - generic [ref=f5e73]:
+            - generic [ref=f5e75]:
+                - generic [ref=f5e76]:
+                    - heading "Status & Metadata" [level=2] [ref=f5e77]
+                    - generic "Active" [ref=f5e79]
+                - generic [ref=f5e80]:
+                    - paragraph [ref=f5e82]:
+                        - strong [ref=f5e83]: "Project Title:"
+                        - text: CTD
+                    - paragraph [ref=f5e86]:
+                        - strong [ref=f5e87]: "Experiment Type:"
+                        - text: Not available
+                    - paragraph [ref=f5e90]:
+                        - strong [ref=f5e91]: "Protocol ID:"
+                        - text: Standard CTD Protocol
+                    - paragraph [ref=f5e95]:
+                        - strong [ref=f5e96]: "Project Tags:"
+                        - text: Not available
+                    - generic [ref=f5e102]:
+                        - paragraph [ref=f5e103]: "Date Created: 07/14/2026"
+                        - paragraph [ref=f5e104]: "Author: Birhanu,Endalkachew"
+            - tablist [ref=f5e107]:
+                - tab "Content" [ref=f5e108] [cursor=pointer]
+                - tab "Attachments" [ref=f5e110] [cursor=pointer]
+                - tab "Workflow" [selected] [ref=f5e112] [cursor=pointer]
+                - tab "Comments" [ref=f5e114] [cursor=pointer]
+                - tab "Audit Trail" [ref=f5e116] [cursor=pointer]
+            - generic [ref=f5e120]:
+                - generic [ref=f5e123]:
+                    - heading "CTD - staff screening" [level=2] [ref=f5e124]
+                    - generic [ref=f5e125]:
+                        - generic "MedLab" [ref=f5e127]
+                        - generic "DRAFT" [ref=f5e129]
+                        - generic [ref=f5e130]: 0 samples linked
+                - generic [ref=f5e131]:
+                    - generic [ref=f5e133]:
+                        - heading "Workflow Pages" [level=4] [ref=f5e134]
+                        - generic [ref=f5e135]:
+                            - button "1.Patient Registration 0%" [ref=f5e136] [cursor=pointer]:
+                                - generic [ref=f5e140]:
+                                    - generic [ref=f5e141]: "1."
+                                    - text: Patient Registration
+                                - generic [ref=f5e142]: 0%
+                            - button "2.Sample Collection 0%" [active] [pressed] [ref=f5e145] [cursor=pointer]:
+                                - generic [ref=f5e149]:
+                                    - generic [ref=f5e150]: "2."
+                                    - text: Sample Collection
+                                - generic [ref=f5e151]: 0%
+                            - button "3.Sample Receipt & Quality Assessment 0%" [ref=f5e154] [cursor=pointer]:
+                                - generic [ref=f5e158]:
+                                    - generic [ref=f5e159]: "3."
+                                    - text: Sample Receipt & Quality Assessment
+                                - generic [ref=f5e160]: 0%
+                            - button "4.Sample Routing 0%" [ref=f5e163] [cursor=pointer]:
+                                - generic [ref=f5e167]:
+                                    - generic [ref=f5e168]: "4."
+                                    - text: Sample Routing
+                                - generic [ref=f5e169]: 0%
+                            - button "5.Sample Processing 0%" [ref=f5e172] [cursor=pointer]:
+                                - generic [ref=f5e176]:
+                                    - generic [ref=f5e177]: "5."
+                                    - text: Sample Processing
+                                - generic [ref=f5e178]: 0%
+                            - button "6.Testing & Analyzer 0%" [ref=f5e181] [cursor=pointer]:
+                                - generic [ref=f5e185]:
+                                    - generic [ref=f5e186]: "6."
+                                    - text: Testing & Analyzer
+                                - generic [ref=f5e187]: 0%
+                            - button "7.Result Entry 0%" [ref=f5e190] [cursor=pointer]:
+                                - generic [ref=f5e194]:
+                                    - generic [ref=f5e195]: "7."
+                                    - text: Result Entry
+                                - generic [ref=f5e196]: 0%
+                            - button "8.Validation, Reporting & Performance Monitoring 0%" [ref=f5e199] [cursor=pointer]:
+                                - generic [ref=f5e203]:
+                                    - generic [ref=f5e204]: "8."
+                                    - text: Validation, Reporting & Performance Monitoring
+                                - generic [ref=f5e205]: 0%
+                            - button "9.Disposal, Archiving & Accreditation 0%" [ref=f5e208] [cursor=pointer]:
+                                - generic [ref=f5e212]:
+                                    - generic [ref=f5e213]: "9."
+                                    - text: Disposal, Archiving & Accreditation
+                                - generic [ref=f5e214]: 0%
+                        - generic [ref=f5e217]: 0 of 9 pages completed
+                    - generic [ref=f5e220]:
+                        - generic [ref=f5e221]:
+                            - heading "Sample Collection" [level=3] [ref=f5e354]
+                            - generic [ref=f5e223]: 0/0 samples completed
+                        - generic [ref=f5e225]:
+                            - generic [ref=f5e226]: Collect specimens from patients. Record container type (EDTA vacutainer, plain tube, etc.), apply barcode label, record collector ID and collection time.
+                            - generic [ref=f5e356]:
+                                - generic [ref=f5e357]:
+                                    - heading "Sample Collection" [level=4] [ref=f5e358]
+                                    - paragraph [ref=f5e359]: Collect samples for lab orders. Record sample type, container, and collection details.
+                                - generic [ref=f5e362]:
+                                    - generic [ref=f5e363]:
+                                        - generic [ref=f5e364]: Total Samples
+                                        - generic [ref=f5e365]: "1"
+                                    - generic [ref=f5e366]:
+                                        - generic [ref=f5e367]: Collected
+                                        - generic [ref=f5e368]: "1"
+                                    - generic [ref=f5e369]:
+                                        - generic [ref=f5e370]: Pending
+                                        - generic [ref=f5e371]: "0"
+                                - generic [ref=f5e374]:
+                                    - paragraph [ref=f5e375]: Bulk import samples from a CSV manifest file. Samples will be created with pre-labeled identifiers and can be linked to orders afterward.
+                                    - generic [ref=f5e376]:
+                                        - button "Import from Biorepository" [ref=f5e377] [cursor=pointer]
+                                        - button "Import Manifest" [ref=f5e380] [cursor=pointer]
+                                - generic [ref=f5e383]:
+                                    - heading "Collected Samples" [level=5] [ref=f5e384]
+                                    - table [ref=f5e387]:
+                                        - rowgroup [ref=f5e388]:
+                                            - row [ref=f5e389]:
+                                                - columnheader [ref=f5e390]:
+                                                    - button "Lab Number" [ref=f5e391] [cursor=pointer]
+                                                - columnheader [ref=f5e396]:
+                                                    - button "External ID" [ref=f5e397] [cursor=pointer]
+                                                - columnheader [ref=f5e402]:
+                                                    - button "Sample Type" [ref=f5e403] [cursor=pointer]
+                                                - columnheader [ref=f5e408]:
+                                                    - button "Patient" [ref=f5e409] [cursor=pointer]
+                                                - columnheader [ref=f5e414]:
+                                                    - button "Container" [ref=f5e415] [cursor=pointer]
+                                                - columnheader [ref=f5e420]:
+                                                    - button "Collection Date" [ref=f5e421] [cursor=pointer]
+                                        - rowgroup [ref=f5e426]:
+                                            - row [ref=f5e427]:
+                                                - cell "MEDLAB-2026-014" [ref=f5e428]
+                                                - cell "-" [ref=f5e429]
+                                                - cell "Blood Serum" [ref=f5e430]
+                                                - cell "-, 1234" [ref=f5e431]
+                                                - cell "-" [ref=f5e432]
+                                                - cell "-" [ref=f5e433]
+                                - 'button "Complete & Next: Sample Receipt" [ref=f5e435] [cursor=pointer]'
+        - generic [ref=f5e331]:
+            - generic [ref=f5e333]:
+                - generic [ref=f5e336]:
+                    - generic [ref=f5e337]: Status
+                    - combobox "Status" [ref=f5e339] [cursor=pointer]:
+                        - option
+                        - option "Draft"
+                        - option "Submitted"
+                        - option "Finalized"
+                        - option "Locked"
+                        - option "Archived"
+                        - option "Active" [selected]
+                - generic [ref=f5e341]:
+                    - generic [ref=f5e342]: Technician
+                    - textbox "Technician" [ref=f5e348]: Birhanu,Endalkachew
+            - button "Save" [ref=f5e353] [cursor=pointer]
+    - contentinfo:
+        - paragraph

@@ -10,10 +10,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.openelisglobal.BaseWebContextSensitiveTest;
-import org.openelisglobal.biorepository.util.SampleTransferNotesHelper;
 import org.openelisglobal.biorepository.service.BioSampleService;
 import org.openelisglobal.biorepository.service.SampleTransferService;
 import org.openelisglobal.biorepository.service.TransferItemMetadata;
+import org.openelisglobal.biorepository.util.SampleTransferNotesHelper;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.biorepository.valueholder.BioSample.BiosafetyLevel;
 import org.openelisglobal.biorepository.valueholder.SampleTransferItem;
@@ -99,7 +99,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         String notes = "Test transfer request";
 
         // Act
-        SampleTransferRequest request = createTestTransferRequest(sourceLab, Arrays.asList(sampleItemId), "Test Project", notes);
+        SampleTransferRequest request = createTestTransferRequest(sourceLab, Arrays.asList(sampleItemId),
+                "Test Project", notes);
 
         // Assert - verify specific values, not just existence
         assertNotNull("Request ID should be generated", request.getId());
@@ -136,7 +137,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
                 Integer.valueOf(item3.getId()));
 
         // Act
-        SampleTransferRequest request = createTestTransferRequest(sourceLab, sampleItemIds, "Test Project", "Bulk transfer from Pathology");
+        SampleTransferRequest request = createTestTransferRequest(sourceLab, sampleItemIds, "Test Project",
+                "Bulk transfer from Pathology");
 
         // Assert - verify exact counts
         assertEquals("Item count should be exactly 3", 3, request.getTotalItemCount());
@@ -164,7 +166,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     @Test(expected = IllegalArgumentException.class)
     public void testCreateTransferRequest_EmptySourceLab_ThrowsException() {
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-EMPTY-" + System.currentTimeMillis());
-        createTestTransferRequest("", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Empty source");
+        createTestTransferRequest("", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project",
+                "Empty source");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -177,8 +180,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     @Test(expected = IllegalArgumentException.class)
     public void testCreateTransferRequest_EmptyTransferReason_ThrowsException() {
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-NOREASON-" + System.currentTimeMillis());
-        createTestTransferRequest("Medical Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())),
-                "Test Project", "");
+        createTestTransferRequest("Medical Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project",
+                "");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -203,8 +206,7 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         TransferItemMetadata metadata = defaultMetadata(sampleItemId);
         metadata.setSampleCondition("");
         transferService.createTransferRequest("Medical Lab", Arrays.asList(sampleItemId), "Test Project",
-                "Missing condition", List.of(metadata),
-                testUser.getId().toString());
+                "Missing condition", List.of(metadata), testUser.getId().toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -214,8 +216,7 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         TransferItemMetadata metadata = defaultMetadata(sampleItemId);
         metadata.setPreservationMedium("");
         transferService.createTransferRequest("Medical Lab", Arrays.asList(sampleItemId), "Test Project",
-                "Missing preservative", List.of(metadata),
-                testUser.getId().toString());
+                "Missing preservative", List.of(metadata), testUser.getId().toString());
     }
 
     @Test
@@ -226,9 +227,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         transferMetadata.setSampleCondition("Frozen");
         transferMetadata.setPreservationMedium("DMSO");
         List<TransferItemMetadata> metadata = List.of(transferMetadata);
-        SampleTransferRequest request = transferService.createTransferRequest("Pathology",
-                Arrays.asList(sampleItemId), "Test Project", "Metadata copy test", metadata,
-                testUser.getId().toString());
+        SampleTransferRequest request = transferService.createTransferRequest("Pathology", Arrays.asList(sampleItemId),
+                "Test Project", "Metadata copy test", metadata, testUser.getId().toString());
 
         SampleTransferItem transferItem = request.getItems().get(0);
         BioSample bioSample = new BioSample();
@@ -263,7 +263,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         bioSampleService.createForSampleItem(sampleItem, existingBioSample);
 
         // Act - should throw exception
-        createTestTransferRequest("Medical Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Should fail");
+        createTestTransferRequest("Medical Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project",
+                "Should fail");
     }
 
     // ========== ACCEPT ITEM TESTS ==========
@@ -275,7 +276,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         SampleItem sampleItem = createTestSampleItem(testSample, externalId);
         Integer sampleItemId = Integer.valueOf(sampleItem.getId());
 
-        SampleTransferRequest request = createTestTransferRequest("Hematology", Arrays.asList(sampleItemId), "Test Project", "Transfer for acceptance");
+        SampleTransferRequest request = createTestTransferRequest("Hematology", Arrays.asList(sampleItemId),
+                "Test Project", "Transfer for acceptance");
         Integer itemId = request.getItems().get(0).getId();
 
         // Verify no BioSample exists before acceptance
@@ -324,7 +326,9 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         // Arrange - create request with 2 items
         SampleItem item1 = createTestSampleItem(testSample, "XFER-PART1-" + System.currentTimeMillis());
         SampleItem item2 = createTestSampleItem(testSample, "XFER-PART2-" + System.currentTimeMillis());
-        SampleTransferRequest request = createTestTransferRequest("Chemistry", Arrays.asList(Integer.valueOf(item1.getId()), Integer.valueOf(item2.getId())), "Test Project", "Partial transfer");
+        SampleTransferRequest request = createTestTransferRequest("Chemistry",
+                Arrays.asList(Integer.valueOf(item1.getId()), Integer.valueOf(item2.getId())), "Test Project",
+                "Partial transfer");
 
         Integer itemId1 = request.getItems().get(0).getId();
 
@@ -347,7 +351,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     public void testAcceptItem_AlreadyAccepted_ThrowsException() {
         // Arrange
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-AACC-" + System.currentTimeMillis());
-        SampleTransferRequest request = createTestTransferRequest("Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Already accepted test");
+        SampleTransferRequest request = createTestTransferRequest("Lab",
+                Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Already accepted test");
         Integer itemId = request.getItems().get(0).getId();
 
         BioSample bioSample = new BioSample();
@@ -367,7 +372,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         SampleItem sampleItem = createTestSampleItem(testSample, externalId);
         Integer sampleItemId = Integer.valueOf(sampleItem.getId());
 
-        SampleTransferRequest request = createTestTransferRequest("Microbiology", Arrays.asList(sampleItemId), "Test Project", "Transfer for rejection");
+        SampleTransferRequest request = createTestTransferRequest("Microbiology", Arrays.asList(sampleItemId),
+                "Test Project", "Transfer for rejection");
         Integer itemId = request.getItems().get(0).getId();
         String rejectionReason = "Sample does not meet biosafety requirements";
 
@@ -395,7 +401,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     public void testRejectItem_AlreadyRejected_ThrowsException() {
         // Arrange
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-AREJ-" + System.currentTimeMillis());
-        SampleTransferRequest request = createTestTransferRequest("Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Already rejected test");
+        SampleTransferRequest request = createTestTransferRequest("Lab",
+                Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Already rejected test");
         Integer itemId = request.getItems().get(0).getId();
 
         transferService.rejectItem(itemId, "First rejection", testUser.getId().toString());
@@ -416,7 +423,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         Integer itemId1 = Integer.valueOf(item1.getId());
         Integer itemId2 = Integer.valueOf(item2.getId());
 
-        SampleTransferRequest request = createTestTransferRequest("Immunology", Arrays.asList(itemId1, itemId2), "Test Project", "Bulk accept transfer");
+        SampleTransferRequest request = createTestTransferRequest("Immunology", Arrays.asList(itemId1, itemId2),
+                "Test Project", "Bulk accept transfer");
 
         BioSample template = new BioSample();
         template.setBiosafetyLevel(BiosafetyLevel.BSL_2);
@@ -454,7 +462,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     public void testAcceptAll_NoPendingItems_ThrowsException() {
         // Arrange - create and accept all items first
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-NOPEND-" + System.currentTimeMillis());
-        SampleTransferRequest request = createTestTransferRequest("Lab", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "No pending test");
+        SampleTransferRequest request = createTestTransferRequest("Lab",
+                Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "No pending test");
 
         BioSample bioSample = new BioSample();
         bioSample.setBiosafetyLevel(BiosafetyLevel.BSL_1);
@@ -474,7 +483,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         Integer itemId1 = Integer.valueOf(item1.getId());
         Integer itemId2 = Integer.valueOf(item2.getId());
 
-        SampleTransferRequest request = createTestTransferRequest("Other Lab", Arrays.asList(itemId1, itemId2), "Test Project", "Bulk reject transfer");
+        SampleTransferRequest request = createTestTransferRequest("Other Lab", Arrays.asList(itemId1, itemId2),
+                "Test Project", "Bulk reject transfer");
 
         String rejectionReason = "Insufficient documentation for all samples";
 
@@ -507,7 +517,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         // Arrange
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-CANCEL-" + System.currentTimeMillis());
         Integer sampleItemId = Integer.valueOf(sampleItem.getId());
-        SampleTransferRequest request = createTestTransferRequest("Source Lab", Arrays.asList(sampleItemId), "Test Project", "Transfer to cancel");
+        SampleTransferRequest request = createTestTransferRequest("Source Lab", Arrays.asList(sampleItemId),
+                "Test Project", "Transfer to cancel");
 
         // Verify pending transfer exists
         assertTrue("Should have pending transfer before cancel", transferService.hasPendingTransfer(sampleItemId));
@@ -530,7 +541,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
     public void testCancelRequest_AlreadyAccepted_ThrowsException() {
         // Arrange - create and accept a request
         SampleItem sampleItem = createTestSampleItem(testSample, "XFER-CANCEL2-" + System.currentTimeMillis());
-        SampleTransferRequest request = createTestTransferRequest("Lab X", Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Transfer to accept then cancel");
+        SampleTransferRequest request = createTestTransferRequest("Lab X",
+                Arrays.asList(Integer.valueOf(sampleItem.getId())), "Test Project", "Transfer to accept then cancel");
 
         BioSample bioSample = new BioSample();
         bioSample.setBiosafetyLevel(BiosafetyLevel.BSL_1);
@@ -548,8 +560,10 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         String uniqueLab = "PendingTestLab-" + System.currentTimeMillis();
         SampleItem item1 = createTestSampleItem(testSample, "XFER-PEND1-" + System.currentTimeMillis());
         SampleItem item2 = createTestSampleItem(testSample, "XFER-PEND2-" + System.currentTimeMillis());
-        createTestTransferRequest(uniqueLab, Arrays.asList(Integer.valueOf(item1.getId())), "Test Project", "Pending 1");
-        createTestTransferRequest(uniqueLab, Arrays.asList(Integer.valueOf(item2.getId())), "Test Project", "Pending 2");
+        createTestTransferRequest(uniqueLab, Arrays.asList(Integer.valueOf(item1.getId())), "Test Project",
+                "Pending 1");
+        createTestTransferRequest(uniqueLab, Arrays.asList(Integer.valueOf(item2.getId())), "Test Project",
+                "Pending 2");
 
         // Act
         List<SampleTransferRequest> pending = transferService.getPendingRequests(100);
@@ -574,9 +588,12 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         SampleItem item2 = createTestSampleItem(testSample, "XFER-SRC2-" + System.currentTimeMillis());
         SampleItem item3 = createTestSampleItem(testSample, "XFER-SRC3-" + System.currentTimeMillis());
 
-        createTestTransferRequest(uniqueSourceLab, Arrays.asList(Integer.valueOf(item1.getId())), "Test Project", "From unique lab 1");
-        createTestTransferRequest(uniqueSourceLab, Arrays.asList(Integer.valueOf(item2.getId())), "Test Project", "From unique lab 2");
-        createTestTransferRequest(otherLab, Arrays.asList(Integer.valueOf(item3.getId())), "Test Project", "From other lab");
+        createTestTransferRequest(uniqueSourceLab, Arrays.asList(Integer.valueOf(item1.getId())), "Test Project",
+                "From unique lab 1");
+        createTestTransferRequest(uniqueSourceLab, Arrays.asList(Integer.valueOf(item2.getId())), "Test Project",
+                "From unique lab 2");
+        createTestTransferRequest(otherLab, Arrays.asList(Integer.valueOf(item3.getId())), "Test Project",
+                "From other lab");
 
         // Act
         List<SampleTransferRequest> fromUniqueLab = transferService.getBySourceLab(uniqueSourceLab);
@@ -602,7 +619,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         assertFalse("Should have no pending transfer initially", transferService.hasPendingTransfer(sampleItemId));
 
         // Create pending transfer
-        SampleTransferRequest request = createTestTransferRequest("Test Lab", Arrays.asList(sampleItemId), "Test Project", "Pending transfer");
+        SampleTransferRequest request = createTestTransferRequest("Test Lab", Arrays.asList(sampleItemId),
+                "Test Project", "Pending transfer");
 
         // Assert - now has pending transfer
         assertTrue("Should have pending transfer after creation", transferService.hasPendingTransfer(sampleItemId));
@@ -626,7 +644,8 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
         Integer itemId1 = Integer.valueOf(item1.getId());
         Integer itemId2 = Integer.valueOf(item2.getId());
 
-        SampleTransferRequest request = createTestTransferRequest("Mixed Lab", Arrays.asList(itemId1, itemId2), "Test Project", "Partial acceptance test");
+        SampleTransferRequest request = createTestTransferRequest("Mixed Lab", Arrays.asList(itemId1, itemId2),
+                "Test Project", "Partial acceptance test");
 
         Integer transferItemId1 = request.getItems().get(0).getId();
         Integer transferItemId2 = request.getItems().get(1).getId();
@@ -682,8 +701,7 @@ public class SampleTransferServiceIntegrationTest extends BaseWebContextSensitiv
 
     private SampleTransferRequest createTestTransferRequest(String sourceLab, List<Integer> sampleItemIds,
             String projectName, String notes) {
-        return createTestTransferRequest(sourceLab, sampleItemIds, projectName, notes,
-                defaultMetadata(sampleItemIds));
+        return createTestTransferRequest(sourceLab, sampleItemIds, projectName, notes, defaultMetadata(sampleItemIds));
     }
 
     private SampleTransferRequest createTestTransferRequest(String sourceLab, List<Integer> sampleItemIds,

@@ -33,15 +33,22 @@ describe("biorepoFulfillmentSuggestionHelpers", () => {
         candidates: [{ id: 99 }],
       },
     });
-    expect(lookupSuggestion(map, 7)?.status).toBe(SUGGESTION_STATUS.EXACT_MATCH);
-    expect(lookupSuggestion(map, "7")?.topSuggestion.accessionNumber).toBe("ACC-7");
+    expect(lookupSuggestion(map, 7)?.status).toBe(
+      SUGGESTION_STATUS.EXACT_MATCH,
+    );
+    expect(lookupSuggestion(map, "7")?.topSuggestion.accessionNumber).toBe(
+      "ACC-7",
+    );
     expect(normalizeRetrievalItemId(7)).toBe("7");
   });
 
   it("mergeSuggestionMaps prefers primary entries", () => {
     const merged = mergeSuggestionMaps(
       { 1: { status: SUGGESTION_STATUS.EXACT_MATCH } },
-      { 1: { status: SUGGESTION_STATUS.NO_CANDIDATE }, 2: { status: SUGGESTION_STATUS.REVIEW_SUGGESTIONS } },
+      {
+        1: { status: SUGGESTION_STATUS.NO_CANDIDATE },
+        2: { status: SUGGESTION_STATUS.REVIEW_SUGGESTIONS },
+      },
     );
     expect(merged["1"].status).toBe(SUGGESTION_STATUS.EXACT_MATCH);
     expect(merged["2"].status).toBe(SUGGESTION_STATUS.REVIEW_SUGGESTIONS);
@@ -78,12 +85,17 @@ describe("biorepoFulfillmentSuggestionHelpers", () => {
 
   it("formatTopCandidateIdentity combines accession and barcode", () => {
     expect(
-      formatTopCandidateIdentity({ accessionNumber: "ACC-1", barcode: "BIO-1" }),
+      formatTopCandidateIdentity({
+        accessionNumber: "ACC-1",
+        barcode: "BIO-1",
+      }),
     ).toBe("ACC-1 · BIO-1");
   });
 
   it("getSuggestionTagProps returns green for exact match", () => {
-    expect(getSuggestionTagProps(SUGGESTION_STATUS.EXACT_MATCH)).toEqual({ type: "green" });
+    expect(getSuggestionTagProps(SUGGESTION_STATUS.EXACT_MATCH)).toEqual({
+      type: "green",
+    });
   });
 
   it("hasUsableTopSuggestion accepts accession without id", () => {
@@ -107,7 +119,10 @@ describe("biorepoFulfillmentSuggestionHelpers", () => {
   });
 
   it("validateAttachQuantity caps implicit line default to stored available", () => {
-    const bioSample = { remainingQuantity: 1, hierarchicalPath: "Room > Freezer" };
+    const bioSample = {
+      remainingQuantity: 1,
+      hierarchicalPath: "Room > Freezer",
+    };
     const result = validateAttachQuantity(10, null, "10", { bioSample });
     expect(result.valid).toBe(true);
     expect(result.quantity).toBe(1);

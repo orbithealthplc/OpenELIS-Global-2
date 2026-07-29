@@ -1,20 +1,23 @@
 # AHRI Clean Release — AI Handoff Prompt
 
-Use this when deploying biorepository fixes to **AHRI production** (`192.168.25.25`) via **orbithealthplc/OpenELIS-Global-2** only (not DIGI-UW).
+Use this when deploying biorepository fixes to **AHRI production**
+(`192.168.25.25`) via **orbithealthplc/OpenELIS-Global-2** only (not DIGI-UW).
 
 ## Context
 
-| Item | Value |
-|------|--------|
-| Production fork | `https://github.com/orbithealthplc/OpenELIS-Global-2` |
-| Deploy branch line | `demo/ethiopia` |
-| **Stable production tag** | `v2026.06.18.03` (`be06e50c4`) |
-| GHCR images | `ghcr.io/orbithealthplc/openelis-global-2*` |
-| Do **not** PR to | `orbithealthplc/develop` (Vite migration, no biorepository UI) |
+| Item                      | Value                                                          |
+| ------------------------- | -------------------------------------------------------------- |
+| Production fork           | `https://github.com/orbithealthplc/OpenELIS-Global-2`          |
+| Deploy branch line        | `demo/ethiopia`                                                |
+| **Stable production tag** | `v2026.06.18.03` (`be06e50c4`)                                 |
+| GHCR images               | `ghcr.io/orbithealthplc/openelis-global-2*`                    |
+| Do **not** PR to          | `orbithealthplc/develop` (Vite migration, no biorepository UI) |
 
 ## Problem to avoid
 
-Do **not** release from `demo/ethiopia` HEAD when it includes untested “middle” commits between stable prod and your fix. Those intermediate tags caused bad Excel imports and column shifts:
+Do **not** release from `demo/ethiopia` HEAD when it includes untested “middle”
+commits between stable prod and your fix. Those intermediate tags caused bad
+Excel imports and column shifts:
 
 - `v2026.06.18.04` — manifest import (buggy multi-sheet / column drift)
 - `v2026.06.18.05` — storage visibility
@@ -82,7 +85,8 @@ Hard-refresh browser after deploy (`frontend/build` is baked into image).
 
 ### 5. Smoke test
 
-- Import official `Bac_Sample submission...` template (~3598 rows; `Sample_ID` H-*, `Lab ID` E1JR*)
+- Import official `Bac_Sample submission...` template (~3598 rows; `Sample_ID`
+  H-_, `Lab ID` E1JR_)
 - Import variant with `Coordinate` column (~1499 rows)
 - Received Samples sorted by Sr. no.; View details shows 23 fields
 
@@ -94,8 +98,10 @@ Hard-refresh browser after deploy (`frontend/build` is baked into image).
 
 ## Scope rules
 
-- **Include:** 10 frontend files above only (unless backend `manifest_sno` already in prod DB from Liquibase on that tag).
-- **Exclude:** Full stash, pathology, RBAC, inventory, MNTD, `BioSampleDAOImpl` replacements from WIP branches.
+- **Include:** 10 frontend files above only (unless backend `manifest_sno`
+  already in prod DB from Liquibase on that tag).
+- **Exclude:** Full stash, pathology, RBAC, inventory, MNTD, `BioSampleDAOImpl`
+  replacements from WIP branches.
 - **Remote:** `git push orbithealth` only; `origin` (DIGI-UW) will 403.
 
 ## Excel fix behavior
@@ -103,4 +109,5 @@ Hard-refresh browser after deploy (`frontend/build` is baked into image).
 - First sheet only for full AHRI templates (no multi-sheet concat).
 - `LEGACY_MANIFEST_FIELDS` aligned with `sno` column (no column shift).
 - `Coordinate` accepted as storage location alias.
-- Trust column titles: `Sample_ID` → barcode, `Lab ID` → externalId (no auto-swap).
+- Trust column titles: `Sample_ID` → barcode, `Lab ID` → externalId (no
+  auto-swap).

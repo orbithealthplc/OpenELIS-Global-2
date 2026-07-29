@@ -19,8 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openelisglobal.biorepository.valueholder.BioSample;
-import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
+import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.openelisglobal.common.services.IStatusService;
 import org.openelisglobal.common.services.StatusService.SampleStatus;
 import org.openelisglobal.notebook.service.NoteBookService;
@@ -130,8 +130,8 @@ public class BiorepositoryQcSamplePoolServiceTest {
 
     @Test
     public void listSamplesForQcTable_returnsSampleItemId() {
-        Map<String, Object> row = assignmentRow("11",
-                "Biorepository Laboratory > Freezer-A > Shelf-1 > Rack-1 > Box-1", DEPT_ID, "active");
+        Map<String, Object> row = assignmentRow("11", "Biorepository Laboratory > Freezer-A > Shelf-1 > Rack-1 > Box-1",
+                DEPT_ID, "active");
         when(sampleStorageService.getAllSamplesWithAssignments()).thenReturn(List.of(row));
 
         BioSample existing = new BioSample();
@@ -150,8 +150,8 @@ public class BiorepositoryQcSamplePoolServiceTest {
 
     @Test
     public void listSamplesForQcTable_mapsMostRecentInspectionForImmediateDisplay() {
-        Map<String, Object> row = assignmentRow("12",
-                "Biorepository Laboratory > Freezer-A > Shelf-1 > Rack-1 > Box-1", DEPT_ID, "active");
+        Map<String, Object> row = assignmentRow("12", "Biorepository Laboratory > Freezer-A > Shelf-1 > Rack-1 > Box-1",
+                DEPT_ID, "active");
         when(sampleStorageService.getAllSamplesWithAssignments()).thenReturn(List.of(row));
 
         BioSample existing = new BioSample();

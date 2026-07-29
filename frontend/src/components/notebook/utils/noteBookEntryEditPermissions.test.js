@@ -1,5 +1,8 @@
 import {
   canEditNotebookEntry,
+  canOpenNotebookEntry,
+  getEntryEditPersonasForWorkflow,
+  getEntryOpenPersonasForWorkflow,
   getNotebookEntrySaveDisabledReason,
   isPathologyWorkflowType,
 } from "./noteBookEntryEditPermissions";
@@ -12,6 +15,15 @@ describe("noteBookEntryEditPermissions", () => {
   const pathologyPersonaCheck = (personas) =>
     personas.includes(Roles.LABORATORY_TECHNICIAN);
 
+  const jrResearcherPersonaCheck = (personas) =>
+    personas.includes(Roles.JUNIOR_RESEARCHER);
+
+  const pathologistPersonaCheck = (personas) =>
+    personas.includes(Roles.PATHOLOGIST);
+
+  const biomedicalPersonaCheck = (personas) =>
+    personas.includes(Roles.BIOMEDICAL_STAFF);
+
   test("Laboratory Technician on pathology workflow can edit entry", () => {
     expect(
       canEditNotebookEntry({
@@ -22,6 +34,76 @@ describe("noteBookEntryEditPermissions", () => {
         creatorId: 99,
         technicianId: 88,
         workflowType: "histopathology_biopsy_tissue",
+      }),
+    ).toBe(true);
+  });
+
+  test("Junior Researcher on bacteriology can edit despite narrow template roles", () => {
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: jrResearcherPersonaCheck,
+        templateAllowedRoles: ["Technician"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "bacteriology",
+      }),
+    ).toBe(true);
+  });
+
+  test("Junior Researcher on bioanalytical can edit entry", () => {
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: jrResearcherPersonaCheck,
+        templateAllowedRoles: ["Sample Collector"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "bioanalytical",
+      }),
+    ).toBe(true);
+  });
+
+  test("Pathologist on pathology workflow can edit entry", () => {
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: pathologistPersonaCheck,
+        templateAllowedRoles: ["Technician"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "pathology",
+      }),
+    ).toBe(true);
+  });
+
+  test("Biomedical Staff without registry stages cannot edit bacteriology", () => {
+    expect(
+      canEditNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: biomedicalPersonaCheck,
+        templateAllowedRoles: ["Technician"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "bacteriology",
+      }),
+    ).toBe(false);
+  });
+
+  test("Biomedical Staff can open bacteriology notebook (Restricted stages)", () => {
+    expect(
+      canOpenNotebookEntry({
+        hasRoleForCurrentLabUnit: () => false,
+        hasPersonaForActiveDepartment: biomedicalPersonaCheck,
+        templateAllowedRoles: ["Technician"],
+        userId: 10,
+        creatorId: 99,
+        technicianId: 88,
+        workflowType: "bacteriology",
       }),
     ).toBe(true);
   });
@@ -69,6 +151,26 @@ describe("noteBookEntryEditPermissions", () => {
   test("isPathologyWorkflowType recognizes pathology variants", () => {
     expect(isPathologyWorkflowType("fnac")).toBe(true);
     expect(isPathologyWorkflowType("medlab")).toBe(false);
+  });
+
+  test("getEntryEditPersonasForWorkflow unions stage personas", () => {
+    const personas = getEntryEditPersonasForWorkflow("bacteriology");
+    expect(personas).toEqual(
+      expect.arrayContaining([
+        "Sample Collector",
+        "Laboratory Technician",
+        "Junior Researcher",
+        "Senior Researcher",
+        "Lab Manager",
+      ]),
+    );
+    expect(personas).not.toContain("Biomedical Staff");
+  });
+
+  test("getEntryOpenPersonasForWorkflow includes Biomedical Staff", () => {
+    expect(getEntryOpenPersonasForWorkflow("bacteriology")).toContain(
+      "Biomedical Staff",
+    );
   });
 
   test("getNotebookEntrySaveDisabledReason explains view mode", () => {

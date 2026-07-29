@@ -19,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.openelisglobal.biorepository.controller.rest.dto.SampleLifecycleEventDTO;
 import org.openelisglobal.biorepository.controller.rest.dto.SampleLifecycleResponseDTO;
-import org.openelisglobal.biorepository.controller.rest.dto.SampleTransferSummaryDTO;
 import org.openelisglobal.biorepository.service.BioSampleService;
 import org.openelisglobal.biorepository.service.ChainOfCustodyService;
 import org.openelisglobal.biorepository.service.SampleLifecycleServiceImpl;

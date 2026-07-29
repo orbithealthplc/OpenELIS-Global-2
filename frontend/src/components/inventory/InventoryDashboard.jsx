@@ -35,7 +35,11 @@ import { Add } from "@carbon/icons-react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NotificationContext } from "../layout/Layout";
 import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
-import { InventoryItemAPI, InventoryLotAPI } from "./InventoryService";
+import {
+  InventoryItemAPI,
+  InventoryLotAPI,
+  InventoryManagementAPI,
+} from "./InventoryService";
 import UserSessionDetailsContext from "../../UserSessionDetailsContext";
 import { hasUnrestrictedDepartmentAccess } from "../../security/departmentAccess";
 import LotEntryModal from "./LotEntryModal";
@@ -474,6 +478,12 @@ const InventoryDashboard = () => {
     fetchLots();
   }, [typeFilter, statusFilter, departmentFilter, page, pageSize]);
 
+  // KPI cards follow the same item-type + department filters as the table
+  // (status/search stay table-only). Uses API totalRecords, not page length.
+  useEffect(() => {
+    fetchMetrics();
+  }, [typeFilter, departmentFilter]);
+
   useEffect(() => {
     if (page !== 1) {
       setPage(1);
@@ -538,8 +548,6 @@ const InventoryDashboard = () => {
         }
       });
       setItems(itemsMap);
-
-      calculateMetrics(validLots, itemsMap);
     } catch (error) {
       console.error("Error fetching inventory:", error);
       setLots([]);
@@ -554,47 +562,56 @@ const InventoryDashboard = () => {
     }
   };
 
-  const calculateMetrics = (lotsData, itemsData) => {
-    let lowStockCount = 0;
-    let expiringSoonCount = 0;
-    let expiredCount = 0;
+  const fetchMetrics = async () => {
+    try {
+      const departmentId =
+        unrestrictedDepartmentAccess() && departmentFilter !== "ALL"
+          ? departmentFilter
+          : undefined;
+      const itemType = typeFilter !== "ALL" ? typeFilter : undefined;
 
-    lotsData.forEach((lot) => {
-      const item = itemsData[lot.inventoryItem?.id];
-      if (!item) return;
-
-      const currentQty = lot.currentQuantity || 0;
-      const minStock = item.minimumStockLevel || 0;
-
-      if (lot.expirationDate) {
-        const expiryDate = new Date(lot.expirationDate);
-        const today = new Date();
-        const daysUntilExpiry = Math.floor(
-          (expiryDate - today) / (1000 * 60 * 60 * 24),
-        );
-
-        if (daysUntilExpiry < 0) {
-          expiredCount++;
-          return;
+      const matchesCurrentFilters = (entity) => {
+        const item = entity?.inventoryItem || entity;
+        if (!item) return false;
+        if (itemType && item.itemType !== itemType) return false;
+        if (
+          departmentId &&
+          String(item.departmentTestSectionId ?? "") !== String(departmentId)
+        ) {
+          return false;
         }
+        return true;
+      };
 
-        const alertDays = item.expirationAlertDays || 30;
-        if (daysUntilExpiry <= alertDays) {
-          expiringSoonCount++;
-        }
-      }
+      const [totalResponse, alerts] = await Promise.all([
+        InventoryLotAPI.getPaged({
+          limit: 1,
+          offset: 0,
+          itemType,
+          departmentId,
+        }),
+        InventoryManagementAPI.getAlerts(30),
+      ]);
 
-      if (currentQty > 0 && currentQty <= minStock) {
-        lowStockCount++;
-      }
-    });
+      const lowStockItems = Array.isArray(alerts?.lowStockItems)
+        ? alerts.lowStockItems.filter(matchesCurrentFilters)
+        : [];
+      const expiringLots = Array.isArray(alerts?.expiringLots)
+        ? alerts.expiringLots.filter(matchesCurrentFilters)
+        : [];
+      const expiredLots = Array.isArray(alerts?.expiredLots)
+        ? alerts.expiredLots.filter(matchesCurrentFilters)
+        : [];
 
-    setMetrics({
-      totalLots: lotsData.length,
-      lowStock: lowStockCount,
-      expiringSoon: expiringSoonCount,
-      expired: expiredCount,
-    });
+      setMetrics({
+        totalLots: totalResponse.totalRecords || 0,
+        lowStock: lowStockItems.length,
+        expiringSoon: expiringLots.length,
+        expired: expiredLots.length,
+      });
+    } catch (error) {
+      console.error("Error fetching inventory metrics:", error);
+    }
   };
 
   const getStockStatus = (lot) => {
@@ -748,6 +765,7 @@ const InventoryDashboard = () => {
     setLotModalOpen(false);
     setSelectedLot(null);
     fetchLots();
+    fetchMetrics();
     notify({
       kind: NotificationKinds.success,
       title: intl.formatMessage({ id: "notification.success" }),
@@ -759,6 +777,7 @@ const InventoryDashboard = () => {
     setUsageModalOpen(false);
     setSelectedLot(null);
     fetchLots();
+    fetchMetrics();
     notify({
       kind: NotificationKinds.success,
       title: intl.formatMessage({ id: "notification.success" }),
@@ -770,6 +789,7 @@ const InventoryDashboard = () => {
     setAdjustmentModalOpen(false);
     setSelectedLot(null);
     fetchLots();
+    fetchMetrics();
     notify({
       kind: NotificationKinds.success,
       title: intl.formatMessage({ id: "notification.success" }),
@@ -781,6 +801,7 @@ const InventoryDashboard = () => {
     setDisposalModalOpen(false);
     setSelectedLot(null);
     fetchLots();
+    fetchMetrics();
     notify({
       kind: NotificationKinds.success,
       title: intl.formatMessage({ id: "notification.success" }),
@@ -792,6 +813,7 @@ const InventoryDashboard = () => {
     setQcStatusModalOpen(false);
     setSelectedLot(null);
     fetchLots();
+    fetchMetrics();
     notify({
       kind: NotificationKinds.success,
       title: intl.formatMessage({ id: "notification.success" }),

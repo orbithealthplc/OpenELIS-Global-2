@@ -2,8 +2,14 @@ import { resolvePageAllowedRoles } from "./ahriWorkflowRegistry";
 
 describe("MNTD workflow registry personas", () => {
   it("includes Lab Manager on intake and reception stages", () => {
-    const intake = resolvePageAllowedRoles("mntd", { order: 1, pageKey: "intake" });
-    const reception = resolvePageAllowedRoles("mntd", { order: 2, pageKey: "lab_reception" });
+    const intake = resolvePageAllowedRoles("mntd", {
+      order: 1,
+      pageKey: "intake",
+    });
+    const reception = resolvePageAllowedRoles("mntd", {
+      order: 2,
+      pageKey: "lab_reception",
+    });
     expect(intake).toContain("Sample Collector");
     expect(intake).toContain("Laboratory Technician");
     expect(intake).toContain("Lab Manager");

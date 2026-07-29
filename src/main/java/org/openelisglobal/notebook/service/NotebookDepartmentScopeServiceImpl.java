@@ -87,8 +87,7 @@ public class NotebookDepartmentScopeServiceImpl implements NotebookDepartmentSco
             addDepartmentId(ids, testSectionService.getTestSectionByName("Bacteriology"));
         }
 
-        return applyBiorepositoryFallbackIfNeeded(expandNotebookDepartmentIdsByName(ids), biorepositoryOnly,
-                notebook);
+        return applyBiorepositoryFallbackIfNeeded(expandNotebookDepartmentIdsByName(ids), biorepositoryOnly, notebook);
     }
 
     @Override
@@ -142,8 +141,7 @@ public class NotebookDepartmentScopeServiceImpl implements NotebookDepartmentSco
         }
         addDepartmentId(result, biorepository);
         if (result.isEmpty()) {
-            logger.warn(
-                    "Biorepository department fallback could not resolve test section by name '{}'",
+            logger.warn("Biorepository department fallback could not resolve test section by name '{}'",
                     BIOREPOSITORY_LABORATORY);
         }
         return expandNotebookDepartmentIdsByName(result);
@@ -212,8 +210,8 @@ public class NotebookDepartmentScopeServiceImpl implements NotebookDepartmentSco
         if (template.getDepartments() == null || template.getDepartments().isEmpty()) {
             return null;
         }
-        List<TestSection> linkedDepartments = template.getDepartments().stream().filter(Objects::nonNull)
-                .sorted((left, right) -> resolveTestSectionLabel(left).compareToIgnoreCase(resolveTestSectionLabel(right)))
+        List<TestSection> linkedDepartments = template.getDepartments().stream().filter(Objects::nonNull).sorted(
+                (left, right) -> resolveTestSectionLabel(left).compareToIgnoreCase(resolveTestSectionLabel(right)))
                 .toList();
         for (TestSection department : linkedDepartments) {
             if (templateTitleMatchesDepartment(notebookTitle, department)) {

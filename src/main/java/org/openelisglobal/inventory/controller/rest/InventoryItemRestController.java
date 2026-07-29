@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.openelisglobal.analyzer.service.AnalyzerService;
+import org.openelisglobal.analyzer.valueholder.Analyzer;
 import org.openelisglobal.common.action.IActionConstants;
 import org.openelisglobal.common.log.LogEvent;
 import org.openelisglobal.common.rest.BaseRestController;
 import org.openelisglobal.department.service.DepartmentIsolationService;
-import org.openelisglobal.analyzer.service.AnalyzerService;
-import org.openelisglobal.analyzer.valueholder.Analyzer;
 import org.openelisglobal.inventory.service.InventoryItemService;
 import org.openelisglobal.inventory.valueholder.InventoryEnums.ItemType;
 import org.openelisglobal.inventory.valueholder.InventoryItem;
@@ -65,8 +65,7 @@ public class InventoryItemRestController extends BaseRestController {
     public ResponseEntity<List<Map<String, String>>> getLinkableAnalyzers() {
         try {
             List<Map<String, String>> analyzers = analyzerService.getAll().stream()
-                    .filter(analyzer -> analyzer != null && analyzer.isActive())
-                    .map(this::toAnalyzerSummary)
+                    .filter(analyzer -> analyzer != null && analyzer.isActive()).map(this::toAnalyzerSummary)
                     .collect(Collectors.toList());
             return ResponseEntity.ok(analyzers);
         } catch (Exception e) {
@@ -156,8 +155,7 @@ public class InventoryItemRestController extends BaseRestController {
             @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(required = false) String itemType,
             @RequestParam(required = false) Boolean isActive, @RequestParam(required = false) String search,
-            @RequestParam(required = false) Integer departmentId,
-            HttpServletRequest request) {
+            @RequestParam(required = false) Integer departmentId, HttpServletRequest request) {
         try {
             ItemType type = null;
             if (itemType != null && !itemType.trim().isEmpty() && !itemType.equalsIgnoreCase("ALL")) {
@@ -455,9 +453,8 @@ public class InventoryItemRestController extends BaseRestController {
         }
         Set<Integer> requestedDepartmentIds = Set.copyOf(departmentIds);
         return accessibleItems.stream()
-                .filter(item -> requestedDepartmentIds.stream()
-                        .anyMatch(departmentId -> departmentIsolationService.inventoryBelongsToDepartment(item,
-                                departmentId)))
+                .filter(item -> requestedDepartmentIds.stream().anyMatch(
+                        departmentId -> departmentIsolationService.inventoryBelongsToDepartment(item, departmentId)))
                 .toList();
     }
 

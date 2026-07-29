@@ -157,7 +157,8 @@ function AttachSamplePanel({
   };
 
   const hasExactIdentityInput =
-    Boolean(filters.accessionNumber?.trim()) || Boolean(filters.barcode?.trim());
+    Boolean(filters.accessionNumber?.trim()) ||
+    Boolean(filters.barcode?.trim());
   const hasExactIdentityMatch = searchResults.some(
     (sample) => sample?.exactIdentityMatch,
   );
@@ -166,7 +167,9 @@ function AttachSamplePanel({
     Boolean(suggestionSummary?.fallbackUsed);
   const panelNoExactMatch =
     Boolean(suggestionSummary?.noExactMatch) ||
-    (hasExactIdentityInput && !hasExactIdentityMatch && searchResults.length > 0);
+    (hasExactIdentityInput &&
+      !hasExactIdentityMatch &&
+      searchResults.length > 0);
 
   return (
     <div
@@ -218,7 +221,13 @@ function AttachSamplePanel({
               defaultMessage="Confirm or refine match"
             />
           </strong>
-          <p style={{ margin: "0.25rem 0 0", color: "#525252", fontSize: "0.875rem" }}>
+          <p
+            style={{
+              margin: "0.25rem 0 0",
+              color: "#525252",
+              fontSize: "0.875rem",
+            }}
+          >
             <FormattedMessage
               id="biorepository.retrieval.attach.forReference"
               defaultMessage="Requested:"
@@ -341,7 +350,13 @@ function AttachSamplePanel({
             />
           )}
         </strong>
-        <p style={{ margin: "0.25rem 0 0", color: "#525252", fontSize: "0.875rem" }}>
+        <p
+          style={{
+            margin: "0.25rem 0 0",
+            color: "#525252",
+            fontSize: "0.875rem",
+          }}
+        >
           {hasExactIdentityMatch ? (
             <FormattedMessage
               id="biorepository.retrieval.attach.exactMatchHelp"
@@ -377,7 +392,13 @@ function AttachSamplePanel({
       )}
 
       {!searchLoading && searchRan && searchResults.length === 0 && (
-        <p style={{ marginTop: "0.75rem", color: "#525252", fontSize: "0.875rem" }}>
+        <p
+          style={{
+            marginTop: "0.75rem",
+            color: "#525252",
+            fontSize: "0.875rem",
+          }}
+        >
           {hasExactIdentityInput ? (
             <FormattedMessage
               id="biorepository.retrieval.attach.noExactOrFallbackResults"
@@ -396,12 +417,12 @@ function AttachSamplePanel({
         <Table size="sm" style={{ marginTop: "0.75rem" }}>
           <TableHead>
             <TableRow>
-                <TableHeader>
-                  <FormattedMessage
-                    id="biorepo.import.searchModal.accessionLabNumber"
-                    defaultMessage="Accession / Sample ID / Barcode"
-                  />
-                </TableHeader>
+              <TableHeader>
+                <FormattedMessage
+                  id="biorepo.import.searchModal.accessionLabNumber"
+                  defaultMessage="Accession / Sample ID / Barcode"
+                />
+              </TableHeader>
               <TableHeader>
                 <FormattedMessage
                   id="biorepo.import.field.batchNo"
@@ -447,7 +468,9 @@ function AttachSamplePanel({
                 <TableCell>{sample.accessionNumber || "-"}</TableCell>
                 <TableCell>{sample.barcode || "-"}</TableCell>
                 <TableCell>
-                  {sample.sampleType?.description || sample.sampleTypeName || "-"}
+                  {sample.sampleType?.description ||
+                    sample.sampleTypeName ||
+                    "-"}
                 </TableCell>
                 <TableCell>{sample.originLab || "-"}</TableCell>
                 <TableCell>
@@ -497,14 +520,19 @@ AttachSamplePanel.propTypes = {
     requestedProjectId: PropTypes.string,
     requestedAccessionNumber: PropTypes.string,
     requestedBarcode: PropTypes.string,
-    quantityRequested: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    quantityRequested: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     unitOfMeasure: PropTypes.string,
   }).isRequired,
-  initialResults: PropTypes.arrayOf(PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    exactIdentityMatch: PropTypes.bool,
-    fallbackUsed: PropTypes.bool,
-  })),
+  initialResults: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+      exactIdentityMatch: PropTypes.bool,
+      fallbackUsed: PropTypes.bool,
+    }),
+  ),
   suggestionSummary: PropTypes.shape({
     status: PropTypes.string,
     fallbackUsed: PropTypes.bool,

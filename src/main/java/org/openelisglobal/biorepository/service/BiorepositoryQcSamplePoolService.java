@@ -4,13 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds the biorepository QC eligible sample pool from the same storage-assignment
- * source used by Storage Management ({@code SampleStorageService#getAllSamplesWithAssignments}).
+ * Builds the biorepository QC eligible sample pool from the same
+ * storage-assignment source used by Storage Management
+ * ({@code SampleStorageService#getAllSamplesWithAssignments}).
  */
 public interface BiorepositoryQcSamplePoolService {
 
     /**
-     * Full storage-overview payload for the QC Inspection page (counts, filters, eligible list, scopeStats, diagnostics).
+     * Full storage-overview payload for the QC Inspection page (counts, filters,
+     * eligible list, scopeStats, diagnostics).
      */
     default Map<String, Object> buildStorageOverview(String freezerFilter, String shelfFilter, String rackFilter,
             String boxFilter, boolean includeAllQcVisits, Integer notebookId) {
@@ -19,8 +21,9 @@ public interface BiorepositoryQcSamplePoolService {
     }
 
     /**
-     * Storage overview for QC Inspection. When {@code summaryOnly} is true, counts and
-     * diagnostics are returned without building the full {@code eligibleSamples} list.
+     * Storage overview for QC Inspection. When {@code summaryOnly} is true, counts
+     * and diagnostics are returned without building the full
+     * {@code eligibleSamples} list.
      */
     Map<String, Object> buildStorageOverview(String freezerFilter, String shelfFilter, String rackFilter,
             String boxFilter, boolean includeAllQcVisits, Integer notebookId, boolean summaryOnly,

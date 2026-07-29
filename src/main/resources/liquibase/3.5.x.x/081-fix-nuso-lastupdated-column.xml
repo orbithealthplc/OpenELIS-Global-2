@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Environments that already ran 080 with lastupdated need rename to match BaseObject -->
+    <changeSet id="081-rename-nuso-lastupdated-to-last-updated" author="ahri-rbac">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="notebook_user_stage_override" schemaName="clinlims"/>
+                <columnExists tableName="notebook_user_stage_override" schemaName="clinlims" columnName="lastupdated"/>
+                <not>
+                    <columnExists tableName="notebook_user_stage_override" schemaName="clinlims" columnName="last_updated"/>
+                </not>
+            </and>
+        </preConditions>
+        <comment>Rename notebook_user_stage_override.lastupdated → last_updated (BaseObject mapping)</comment>
+        <renameColumn
+            schemaName="clinlims"
+            tableName="notebook_user_stage_override"
+            oldColumnName="lastupdated"
+            newColumnName="last_updated"
+            columnDataType="TIMESTAMP"/>
+        <rollback>
+            <renameColumn
+                schemaName="clinlims"
+                tableName="notebook_user_stage_override"
+                oldColumnName="last_updated"
+                newColumnName="lastupdated"
+                columnDataType="TIMESTAMP"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

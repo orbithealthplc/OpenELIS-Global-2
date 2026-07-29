@@ -14,8 +14,7 @@ import {
   Loading,
   Modal,
   TextInput,
-  Select,
-  SelectItem,
+  MultiSelect,
   DataTable,
   TableContainer,
   Table,
@@ -52,6 +51,11 @@ import LinkPatientModal from "../workflow/LinkPatientModal";
 import LinkOrderModal from "../workflow/LinkOrderModal";
 import BulkLinkOrderModal from "../workflow/BulkLinkOrderModal";
 import BiorepoSampleImportPage from "./common/BiorepoSampleImportPage";
+import {
+  filterCtdSampleTypes,
+  getSampleTypeId,
+  getSampleTypeLabel,
+} from "./medlab/ctdSampleTypeOptions";
 import "../workflow/NotebookWorkflow.css";
 
 /**
@@ -97,9 +101,10 @@ function SampleCollectionPage({
   const [samplesForCollection, setSamplesForCollection] = useState([]);
   const [collectionDateInput, setCollectionDateInput] = useState("");
   const [collectionTimeInput, setCollectionTimeInput] = useState("");
-  const [collectionSampleTypeId, setCollectionSampleTypeId] = useState("");
+  const [collectionSampleTypeIds, setCollectionSampleTypeIds] = useState([]);
   const [sampleTypeOptions, setSampleTypeOptions] = useState([]);
-  const [needsSampleTypeSelection, setNeedsSampleTypeSelection] = useState(false);
+  const [needsSampleTypeSelection, setNeedsSampleTypeSelection] =
+    useState(false);
   const [isCollecting, setIsCollecting] = useState(false);
 
   // Barcode generation state
@@ -121,24 +126,24 @@ function SampleCollectionPage({
   }, []);
 
   const loadSampleTypeOptions = useCallback(() => {
-    getFromOpenElisServer("/rest/displayList/SAMPLE_TYPE_ACTIVE", (response) => {
-      if (componentMounted.current && response && Array.isArray(response)) {
-        setSampleTypeOptions(response);
-      }
-    });
+    getFromOpenElisServer(
+      "/rest/displayList/SAMPLE_TYPE_ACTIVE",
+      (response) => {
+        if (componentMounted.current && response && Array.isArray(response)) {
+          setSampleTypeOptions(filterCtdSampleTypes(response));
+        }
+      },
+    );
   }, []);
 
-  const resolveSampleTypeId = useCallback(
-    (sample, overrideSampleTypeId) => {
-      return (
-        sample?.sampleTypeId ||
-        sample?.data?.sampleTypeId ||
-        overrideSampleTypeId ||
-        ""
-      );
-    },
-    [],
-  );
+  const resolveSampleTypeId = useCallback((sample, overrideSampleTypeId) => {
+    return (
+      sample?.sampleTypeId ||
+      sample?.data?.sampleTypeId ||
+      overrideSampleTypeId ||
+      ""
+    );
+  }, []);
 
   // Load data on mount
   useEffect(() => {
@@ -281,7 +286,7 @@ function SampleCollectionPage({
       for (const sample of orderLinkedSamples) {
         const sampleTypeId = resolveSampleTypeId(
           sample,
-          collectionOverrides.sampleTypeId,
+          collectionOverrides.sampleTypeIds?.[0],
         );
         if (!sampleTypeId) {
           hadError = true;
@@ -299,6 +304,10 @@ function SampleCollectionPage({
             JSON.stringify({
               labNo: sample.linkedOrderLabNo || sample.labNo,
               sampleTypeId,
+              sampleTypeIds:
+                collectionOverrides.sampleTypeIds?.length > 0
+                  ? collectionOverrides.sampleTypeIds
+                  : [sampleTypeId],
               containerType: sample.containerType || "",
               collectionDate:
                 collectionOverrides.collectionDate ||
@@ -544,7 +553,9 @@ function SampleCollectionPage({
       setCollectionDateInput(formatLocalDate(now));
       setCollectionTimeInput(formatLocalTime(now));
       setNeedsSampleTypeSelection(true);
-      setCollectionSampleTypeId(String(defaultSampleTypeId));
+      setCollectionSampleTypeIds(
+        defaultSampleTypeId ? [String(defaultSampleTypeId)] : [],
+      );
       loadSampleTypeOptions();
       setCollectionModalOpen(true);
     },
@@ -562,14 +573,14 @@ function SampleCollectionPage({
     handleBulkMarkCollected(sampleIds, {
       collectionDate: collectionDateInput,
       collectionTime: collectionTimeInput,
-      sampleTypeId: collectionSampleTypeId,
+      sampleTypeIds: collectionSampleTypeIds,
     });
   }, [
     samplesForCollection,
     handleBulkMarkCollected,
     collectionDateInput,
     collectionTimeInput,
-    collectionSampleTypeId,
+    collectionSampleTypeIds,
   ]);
 
   // Table headers for unlinked samples (no actions column)
@@ -1321,14 +1332,14 @@ function SampleCollectionPage({
         primaryButtonDisabled={
           isCollecting ||
           samplesForCollection.length === 0 ||
-          (needsSampleTypeSelection && !collectionSampleTypeId)
+          (needsSampleTypeSelection && collectionSampleTypeIds.length === 0)
         }
         onRequestClose={() => {
           if (!isCollecting) {
             setCollectionModalOpen(false);
             setSamplesForCollection([]);
             setNeedsSampleTypeSelection(false);
-            setCollectionSampleTypeId("");
+            setCollectionSampleTypeIds([]);
           }
         }}
         onRequestSubmit={handleCollectionSubmit}
@@ -1348,32 +1359,27 @@ function SampleCollectionPage({
         </p>
         {needsSampleTypeSelection && (
           <div style={{ marginBottom: "1rem" }}>
-            <Select
+            <MultiSelect
               id="medlab-collection-sample-type"
-              labelText={intl.formatMessage({
+              titleText={intl.formatMessage({
                 id: "medlab.collection.sampleType.label",
-                defaultMessage: "Sample Type",
+                defaultMessage: "Sample Types",
               })}
-              value={collectionSampleTypeId}
-              onChange={(event) =>
-                setCollectionSampleTypeId(event.target.value)
+              label={intl.formatMessage({
+                id: "medlab.collection.sampleType.help",
+                defaultMessage: "Select one or more sample types",
+              })}
+              items={sampleTypeOptions}
+              itemToString={getSampleTypeLabel}
+              selectedItems={sampleTypeOptions.filter((type) =>
+                collectionSampleTypeIds.includes(getSampleTypeId(type)),
+              )}
+              onChange={({ selectedItems }) =>
+                setCollectionSampleTypeIds(
+                  (selectedItems || []).map(getSampleTypeId),
+                )
               }
-            >
-              <SelectItem
-                value=""
-                text={intl.formatMessage({
-                  id: "medlab.collection.sampleType.placeholder",
-                  defaultMessage: "Select sample type",
-                })}
-              />
-              {sampleTypeOptions.map((type) => (
-                <SelectItem
-                  key={type.id || type.value}
-                  value={String(type.id || type.value)}
-                  text={type.value || type.description || type.id}
-                />
-              ))}
-            </Select>
+            />
           </div>
         )}
         <Grid condensed>

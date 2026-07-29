@@ -809,8 +809,7 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
                     // Prefer this entry's saved order-type filter; fall back to parent
                     // template only when the entry has none configured.
                     Hibernate.initialize(noteBook.getAllowedTestIds());
-                    java.util.Set<Integer> allowedTests = new java.util.HashSet<>(
-                            noteBook.getAllowedTestIds());
+                    java.util.Set<Integer> allowedTests = new java.util.HashSet<>(noteBook.getAllowedTestIds());
                     if (allowedTests.isEmpty()) {
                         Hibernate.initialize(parentTemplate.getAllowedTestIds());
                         allowedTests = new java.util.HashSet<>(parentTemplate.getAllowedTestIds());
@@ -1127,7 +1126,8 @@ public class NoteBookServiceImpl extends AuditableBaseObjectServiceImpl<NoteBook
             noteBook.getAllowedRoles().addAll(form.getAllowedRoles());
         }
 
-        // Handle allowed test IDs (for templates - filters which tests appear in Stage 1 order creation)
+        // Handle allowed test IDs (for templates - filters which tests appear in Stage
+        // 1 order creation)
         if (form.getAllowedTestIds() != null) {
             noteBook.getAllowedTestIds().clear();
             noteBook.getAllowedTestIds().addAll(form.getAllowedTestIds());

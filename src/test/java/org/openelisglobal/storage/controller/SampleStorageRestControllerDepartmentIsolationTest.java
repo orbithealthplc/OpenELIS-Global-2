@@ -26,8 +26,6 @@ import org.openelisglobal.storage.form.SampleAssignmentForm;
 import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.storage.service.StorageDashboardService;
 import org.openelisglobal.storage.service.StorageLocationService;
-import org.openelisglobal.storage.valueholder.SampleStorageAssignment;
-import org.openelisglobal.storage.valueholder.StorageRoom;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -71,36 +69,28 @@ public class SampleStorageRestControllerDepartmentIsolationTest {
         when(departmentIsolationService.canAccessSampleItemIdentifier(anyString(), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(false);
 
-        mockMvc.perform(post("/rest/storage/sample-items/assign")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(form)))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/rest/storage/sample-items/assign").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(form))).andExpect(status().isForbidden());
     }
 
     @Test
     public void getSampleItemsIncludesRowsWhenStorageDepartmentMatches() throws Exception {
-        Map<String, Object> row = Map.of(
-                "sampleItemId", "42",
-                "departmentTestSectionId", 177,
-                "location", "ZN2 > FZ6");
+        Map<String, Object> row = Map.of("sampleItemId", "42", "departmentTestSectionId", 177, "location", "ZN2 > FZ6");
         when(storageDashboardService.filterSamples(null, null)).thenReturn(new ArrayList<>(List.of(row)));
         when(departmentIsolationService.hasUnrestrictedDepartmentAccess(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(false);
         when(departmentIsolationService.canAccessDepartmentScopedLocation(eq(177), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(true);
 
-        mockMvc.perform(get("/rest/storage/sample-items").param("size", "25"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/storage/sample-items").param("size", "25")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.totalItems").value(1))
                 .andExpect(jsonPath("$.items[0].sampleItemId").value("42"));
     }
 
     @Test
     public void getSampleItemsExcludesRowsInForeignDepartmentLocations() throws Exception {
-        Map<String, Object> row = Map.of(
-                "sampleItemId", "42",
-                "departmentTestSectionId", 182,
-                "location", "Foreign Room > Foreign Device");
+        Map<String, Object> row = Map.of("sampleItemId", "42", "departmentTestSectionId", 182, "location",
+                "Foreign Room > Foreign Device");
 
         when(storageDashboardService.filterSamples(null, null)).thenReturn(new ArrayList<>(List.of(row)));
         when(departmentIsolationService.hasUnrestrictedDepartmentAccess(org.mockito.ArgumentMatchers.any()))
@@ -108,10 +98,8 @@ public class SampleStorageRestControllerDepartmentIsolationTest {
         when(departmentIsolationService.canAccessDepartmentScopedLocation(eq(182), org.mockito.ArgumentMatchers.any()))
                 .thenReturn(false);
 
-        mockMvc.perform(get("/rest/storage/sample-items").param("size", "25"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalItems").value(0))
-                .andExpect(jsonPath("$.items").isArray())
+        mockMvc.perform(get("/rest/storage/sample-items").param("size", "25")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalItems").value(0)).andExpect(jsonPath("$.items").isArray())
                 .andExpect(jsonPath("$.items").isEmpty());
     }
 }

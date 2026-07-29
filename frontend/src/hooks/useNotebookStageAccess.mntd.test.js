@@ -39,7 +39,7 @@ describe("MNTD stage access helpers", () => {
         "Malaria and Neglected Tropical Disease (MNTD) Laboratory": [
           Roles.SAMPLE_COLLECTOR,
         ],
-        "Immunology": [Roles.LABORATORY_TECHNICIAN],
+        Immunology: [Roles.LABORATORY_TECHNICIAN],
       },
       roles: [],
     };
@@ -47,7 +47,10 @@ describe("MNTD stage access helpers", () => {
   });
 
   it("allows Senior Researcher on reporting stage 11", () => {
-    const personas = resolvePageAllowedRoles("mntd", { order: 11, pageKey: "reporting" });
+    const personas = resolvePageAllowedRoles("mntd", {
+      order: 11,
+      pageKey: "reporting",
+    });
     const session = mntdSession([Roles.SENIOR_RESEARCHER]);
     expect(sessionHasAnyRole(session, personas)).toBe(true);
   });

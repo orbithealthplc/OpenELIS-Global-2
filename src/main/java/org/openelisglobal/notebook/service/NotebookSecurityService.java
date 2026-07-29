@@ -113,6 +113,18 @@ public interface NotebookSecurityService {
      */
     boolean canEditEntry(Integer entryId, String sysUserId, String loginLabUnit);
 
+    /**
+     * Whether the user may edit a notebook instance (or its workflow content).
+     * Allows template allowedRoles OR any SRS persona on the workflow registry
+     * stages.
+     *
+     * @param notebook     the notebook instance or entry notebook
+     * @param sysUserId    the system user ID
+     * @param loginLabUnit the user's login lab unit
+     * @return true if user can edit
+     */
+    boolean canEditNotebookInstance(NoteBook notebook, String sysUserId, String loginLabUnit);
+
     // ========== PAGE ACCESS (Role Based) ==========
 
     /**

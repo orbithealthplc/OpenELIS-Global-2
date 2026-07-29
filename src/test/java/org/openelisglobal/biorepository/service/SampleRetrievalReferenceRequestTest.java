@@ -66,16 +66,8 @@ public class SampleRetrievalReferenceRequestTest {
         item.setUnitOfMeasure("mL");
         item.setRequestedOriginLab("CTD");
 
-        SampleRetrievalRequest request = retrievalService.createRequest(
-                "Research use",
-                List.of(item),
-                null,
-                null,
-                DestinationType.ANALYSIS_RETURN,
-                null,
-                SampleRetrievalRequest.PriorityLevel.NORMAL,
-                null,
-                "user-1");
+        SampleRetrievalRequest request = retrievalService.createRequest("Research use", List.of(item), null, null,
+                DestinationType.ANALYSIS_RETURN, null, SampleRetrievalRequest.PriorityLevel.NORMAL, null, "user-1");
 
         assertNotNull(request);
         assertEquals(1, request.getItems().size());

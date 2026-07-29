@@ -1,0 +1,218 @@
+cases=85
+browser launched
+== Bacteriology / bac_collector ==
+  PASS nav=True order=True restr=7/7 titles=9
+== Bacteriology / bac_tech ==
+  PASS nav=True order=True restr=2/2 titles=9
+== Bacteriology / bac_manager ==
+  PASS nav=True order=True restr=0/0 titles=9
+== Bacteriology / bac_jr_researcher ==
+  PASS nav=True order=True restr=7/7 titles=9
+== Bacteriology / bac_sr_researcher ==
+  PASS nav=True order=True restr=6/6 titles=9
+== Bacteriology / bac_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=False restr=0/9 titles=0
+== Pathology / path_collector ==
+  PASS nav=True order=None restr=8/8 titles=9
+== Pathology / path_tech ==
+  goto retry 1/3: Page.goto: Timeout 120000ms exceeded.
+Call log:
+  - navigating to "https://lims.ahri.gov.et/NoteBookInstanceEditForm/220?mode=edit&tab=workflow&entryId=96", waiting until "commit"
+
+  goto retry 2/3: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://lims.ahri.gov.et/NoteBookInstanceEditForm/220?mode=edit&tab=workflow&entryId=96
+Call log:
+  - navigating to "https://lims.ahri.gov.et/NoteBookInstanceEditForm/220?mode=edit&tab=workflow&entryId=96", waiting until "commit"
+
+  PASS nav=True order=None restr=3/3 titles=9
+== Pathology / path_manager ==
+  PASS nav=True order=None restr=0/0 titles=9
+== Pathology / path_pathologist ==
+  FAIL nav=True order=None restr=3/0 titles=9
+== Pathology / path_cyto ==
+  FAIL nav=True order=None restr=3/0 titles=9
+== Pathology / path_jr_researcher ==
+  PASS nav=True order=None restr=6/6 titles=9
+== Pathology / path_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=9
+== MNTD / mntd_collector ==
+  PASS nav=True order=None restr=9/9 titles=11
+== MNTD / mntd_technician ==
+  PASS nav=True order=None restr=3/3 titles=11
+== MNTD / mntd_manager ==
+  PASS nav=True order=None restr=0/0 titles=11
+== MNTD / mntd_researcher ==
+  login retry 1/5 for mntd_researcher after 8s (HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7a8c8ee14200>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=60)')))
+  login retry 2/5 for mntd_researcher after 16s (HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7a8c8e6cbb60>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=60)')))
+  PASS nav=True order=None restr=7/7 titles=11
+== MNTD / mntd_senior ==
+  PASS nav=True order=None restr=5/5 titles=11
+== MNTD / mntd_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/11 titles=0
+== Immunology / imm_collector ==
+  PASS nav=True order=None restr=9/9 titles=10
+== Immunology / imm_tech ==
+  PASS nav=True order=None restr=2/2 titles=10
+== Immunology / imm_manager ==
+  goto retry 1/3: Page.goto: Timeout 120000ms exceeded.
+Call log:
+  - navigating to "https://lims.ahri.gov.et/NoteBookInstanceEditForm/233?mode=edit&tab=workflow&entryId=108", waiting until "commit"
+
+  PASS nav=True order=None restr=0/0 titles=10
+== Immunology / imm_jr_researcher ==
+  PASS nav=True order=None restr=5/5 titles=10
+== Immunology / imm_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Immunology / imm_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/10 titles=0
+== Biorepository / bio_collector ==
+  PASS nav=True order=None restr=6/6 titles=7
+== Biorepository / bio_tech ==
+  PASS nav=True order=None restr=2/2 titles=7
+== Biorepository / bio_manager ==
+  PASS nav=True order=None restr=0/0 titles=7
+== Biorepository / bio_jr_researcher ==
+  PASS nav=True order=None restr=7/7 titles=7
+== Biorepository / bio_sr_researcher ==
+  PASS nav=True order=None restr=6/6 titles=7
+== Biorepository / bio_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/7 titles=0
+== TB / tb_collector ==
+  login retry 1/5 for tb_collector after 8s (HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7a8c8e6aaed0>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=60)')))
+  PASS nav=True order=None restr=7/7 titles=8
+== TB / tb_tech ==
+  no .page-navigation — hard reload + Workflow tab
+  cookie weak → UI login
+  PASS nav=True order=None restr=2/2 titles=8
+== TB / tb_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  cookie weak → UI login
+  PASS nav=True order=None restr=0/0 titles=8
+== TB / tb_jr_researcher ==
+  PASS nav=True order=None restr=5/5 titles=8
+== TB / tb_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=8
+== TB / tb_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/8 titles=0
+== Pharma / pharm_collector ==
+  PASS nav=True order=None restr=6/6 titles=7
+== Pharma / pharm_tech ==
+  PASS nav=True order=None restr=2/2 titles=7
+== Pharma / pharm_manager ==
+  PASS nav=True order=None restr=0/0 titles=7
+== Pharma / pharm_jr_researcher ==
+  PASS nav=True order=None restr=5/5 titles=7
+== Pharma / pharm_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=7
+== Pharma / pharm_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/7 titles=0
+== Traditional / trad_collector ==
+  PASS nav=True order=None restr=7/7 titles=8
+== Traditional / trad_tech ==
+  PASS nav=True order=None restr=1/1 titles=8
+== Traditional / trad_manager ==
+  PASS nav=True order=None restr=0/0 titles=8
+== Traditional / trad_jr_researcher ==
+  PASS nav=True order=None restr=3/3 titles=8
+== Traditional / trad_sr_researcher ==
+  PASS nav=True order=None restr=2/2 titles=8
+== Traditional / trad_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/8 titles=0
+== Bioanalytical / banal_collector ==
+  PASS nav=True order=None restr=4/4 titles=5
+== Bioanalytical / banal_tech ==
+  PASS nav=True order=None restr=1/1 titles=5
+== Bioanalytical / banal_manager ==
+  PASS nav=True order=None restr=0/0 titles=5
+== Bioanalytical / banal_jr_researcher ==
+  PASS nav=True order=None restr=3/3 titles=5
+== Bioanalytical / banal_sr_researcher ==
+  PASS nav=True order=None restr=2/2 titles=5
+== Bioanalytical / banal_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/5 titles=0
+== Bioequivalence / beq_collector ==
+  PASS nav=True order=None restr=4/4 titles=5
+== Bioequivalence / beq_tech ==
+  PASS nav=True order=None restr=1/1 titles=5
+== Bioequivalence / beq_manager ==
+  PASS nav=True order=None restr=0/0 titles=5
+== Bioequivalence / beq_jr_researcher ==
+  PASS nav=True order=None restr=3/3 titles=5
+== Bioequivalence / beq_sr_researcher ==
+  PASS nav=True order=None restr=2/2 titles=5
+== Bioequivalence / beq_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/5 titles=0
+== Medlab/CTD / medlab_collector ==
+  PASS nav=True order=None restr=7/8 titles=9
+== Medlab/CTD / medlab_tech ==
+  PASS nav=True order=None restr=1/2 titles=9
+== Medlab/CTD / medlab_manager ==
+  PASS nav=True order=None restr=0/0 titles=9
+== Medlab/CTD / medlab_jr_researcher ==
+  PASS nav=True order=None restr=5/6 titles=9
+== Medlab/CTD / medlab_sr_researcher ==
+  PASS nav=True order=None restr=4/5 titles=9
+== Medlab/CTD / medlab_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/10 titles=0
+== Genomics / gen_collector ==
+  PASS nav=True order=None restr=9/9 titles=10
+== Genomics / gen_tech ==
+  PASS nav=True order=None restr=0/0 titles=10
+== Genomics / gen_manager ==
+  PASS nav=True order=None restr=0/0 titles=10
+== Genomics / gen_jr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Genomics / gen_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Genomics / gen_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/10 titles=0
+== Virology / vir_collector ==
+  PASS nav=True order=None restr=9/9 titles=10
+== Virology / vir_tech ==
+  PASS nav=True order=None restr=0/0 titles=10
+== Virology / vir_manager ==
+  PASS nav=True order=None restr=0/0 titles=10
+== Virology / vir_jr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Virology / vir_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Virology / vir_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/10 titles=0
+== Viral Vaccine / vv_collector ==
+  PASS nav=True order=None restr=13/13 titles=14
+== Viral Vaccine / vv_tech ==
+  PASS nav=True order=None restr=2/2 titles=14
+== Viral Vaccine / vv_manager ==
+  PASS nav=True order=None restr=0/0 titles=14
+== Viral Vaccine / vv_jr_researcher ==
+  PASS nav=True order=None restr=3/3 titles=14
+== Viral Vaccine / vv_sr_researcher ==
+  PASS nav=True order=None restr=2/2 titles=14
+== Viral Vaccine / vv_biomedical ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  FAIL nav=False order=None restr=0/14 titles=0
+DONE 70/85 PASS

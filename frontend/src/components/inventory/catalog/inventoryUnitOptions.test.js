@@ -11,7 +11,11 @@ describe("inventoryUnitOptions", () => {
         { id: "2", value: "each" },
       ],
     });
-    expect(options.map((o) => o.text)).toEqual(["mL", "each", "Add new unit..."]);
+    expect(options.map((o) => o.text)).toEqual([
+      "mL",
+      "each",
+      "Add new unit...",
+    ]);
     expect(options.filter((o) => o.id === "__add_new__")).toHaveLength(1);
   });
 

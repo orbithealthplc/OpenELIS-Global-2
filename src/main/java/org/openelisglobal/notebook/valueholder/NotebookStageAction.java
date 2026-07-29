@@ -7,12 +7,11 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * SRS notebook stage actions (authorization is never inferred from page titles).
+ * SRS notebook stage actions (authorization is never inferred from page
+ * titles).
  */
 public enum NotebookStageAction {
-    VIEW,
-    EDIT,
-    COMPLETE;
+    VIEW, EDIT, COMPLETE;
 
     public static final Set<NotebookStageAction> DEFAULT_STAGE_ACTIONS = Collections
             .unmodifiableSet(EnumSet.of(VIEW, EDIT, COMPLETE));

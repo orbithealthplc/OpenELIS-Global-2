@@ -455,7 +455,9 @@ function MNTDManifestImportModal({ open, onClose, entryId, onImportSuccess }) {
               rowNumber: 0,
               column: "file",
               message:
-                data.message || data.error || `Preview failed (${response.status})`,
+                data.message ||
+                data.error ||
+                `Preview failed (${response.status})`,
             },
           ],
         );
@@ -502,7 +504,9 @@ function MNTDManifestImportModal({ open, onClose, entryId, onImportSuccess }) {
               rowNumber: 0,
               column: "import",
               message:
-                data.message || data.error || `Import failed (${response.status})`,
+                data.message ||
+                data.error ||
+                `Import failed (${response.status})`,
             },
           ],
         );

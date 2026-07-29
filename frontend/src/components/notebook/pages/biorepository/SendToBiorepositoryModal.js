@@ -13,7 +13,10 @@ import {
   validateBiorepositoryTransferRequest,
 } from "./biorepositoryTransferValidation";
 
-export function mapPageSamplesForBiorepositoryTransfer(samples, selectedSampleIds) {
+export function mapPageSamplesForBiorepositoryTransfer(
+  samples,
+  selectedSampleIds,
+) {
   const selectedSet = new Set((selectedSampleIds || []).map(String));
   return (samples || [])
     .filter((sample) => selectedSet.has(String(sample.id)))

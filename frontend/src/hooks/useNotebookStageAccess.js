@@ -7,9 +7,11 @@ import {
   resolvePageAllowedRoles,
   resolvePageKey,
 } from "../constants/ahriWorkflowRegistry";
+import { getFromOpenElisServer } from "../components/utils/Utils";
 
 /**
  * SRS notebook stage access: workflowType + pageKey + requiredAction + allowedPersonas.
+ * Optional per-user override (DEFAULT / ALL / ALLOWLIST) from admin user management.
  * UX only — backend enforces the same rules.
  */
 export function useNotebookStageAccess(
@@ -21,15 +23,60 @@ export function useNotebookStageAccess(
   const { isCreating = false, workflowType = "" } = options;
   const { hasPersonaForActiveDepartment, isGlobalAdmin } = usePermissions();
   const [activePage, setActivePage] = useState(initialActivePage);
+  const [stageOverride, setStageOverride] = useState({
+    mode: "DEFAULT",
+    pageKeys: [],
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    getFromOpenElisServer("/rest/notebook/my-stage-access", (res) => {
+      if (cancelled || !res) {
+        return;
+      }
+      setStageOverride({
+        mode: (res.mode || "DEFAULT").toUpperCase(),
+        pageKeys: Array.isArray(res.pageKeys) ? res.pageKeys : [],
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const overrideAllowsPage = useCallback(
+    (page) => {
+      const mode = stageOverride.mode || "DEFAULT";
+      if (mode === "DEFAULT") {
+        return null; // no override
+      }
+      if (mode === "ALL") {
+        return true;
+      }
+      const key = resolvePageKey(page);
+      if (!key) {
+        return false;
+      }
+      return (stageOverride.pageKeys || []).some(
+        (k) =>
+          String(k).trim().toLowerCase() === String(key).trim().toLowerCase(),
+      );
+    },
+    [stageOverride],
+  );
 
   const resolveRolesForPage = useCallback(
     (page, pageIndex, action = null) => {
-      return resolvePageAllowedRoles(workflowType, {
-        ...page,
-        order: page?.order ?? page?.pageOrder ?? pageIndex + 1,
-        pageOrder: page?.pageOrder ?? page?.order ?? pageIndex + 1,
-        pageKey: page?.pageKey ?? resolvePageKey(page),
-      }, action);
+      return resolvePageAllowedRoles(
+        workflowType,
+        {
+          ...page,
+          order: page?.order ?? page?.pageOrder ?? pageIndex + 1,
+          pageOrder: page?.pageOrder ?? page?.order ?? pageIndex + 1,
+          pageKey: page?.pageKey ?? resolvePageKey(page),
+        },
+        action,
+      );
     },
     [workflowType],
   );
@@ -42,13 +89,28 @@ export function useNotebookStageAccess(
       if (!action || !isActionPermitted(workflowType, page, action)) {
         return false;
       }
+
+      const override = overrideAllowsPage(page);
+      if (override === true) {
+        return true;
+      }
+      if (override === false) {
+        return false;
+      }
+
       const roles = resolveRolesForPage(page, pageIndex, action);
       if (roles.length === 0) {
         return false;
       }
       return hasPersonaForActiveDepartment(roles);
     },
-    [hasPersonaForActiveDepartment, isGlobalAdmin, resolveRolesForPage, workflowType],
+    [
+      hasPersonaForActiveDepartment,
+      isGlobalAdmin,
+      overrideAllowsPage,
+      resolveRolesForPage,
+      workflowType,
+    ],
   );
 
   const hasPageAccess = useCallback(
@@ -56,7 +118,10 @@ export function useNotebookStageAccess(
       const stageOrder = page?.pageOrder ?? page?.order ?? pageIndex + 1;
 
       if (isCreating) {
-        return stageOrder === 1 && canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.VIEW);
+        return (
+          stageOrder === 1 &&
+          canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.VIEW)
+        );
       }
 
       return canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.VIEW);
@@ -65,12 +130,14 @@ export function useNotebookStageAccess(
   );
 
   const canEditPage = useCallback(
-    (page, pageIndex) => canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.EDIT),
+    (page, pageIndex) =>
+      canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.EDIT),
     [canPerformAction],
   );
 
   const canCompletePage = useCallback(
-    (page, pageIndex) => canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.COMPLETE),
+    (page, pageIndex) =>
+      canPerformAction(page, pageIndex, NOTEBOOK_STAGE_ACTIONS.COMPLETE),
     [canPerformAction],
   );
 
@@ -88,7 +155,11 @@ export function useNotebookStageAccess(
       hasAccess: hasPageAccess(page, index),
       canEdit: canEditPage(page, index),
       canComplete: canCompletePage(page, index),
-      requiredRoles: resolveRolesForPage(page, index, NOTEBOOK_STAGE_ACTIONS.EDIT),
+      requiredRoles: resolveRolesForPage(
+        page,
+        index,
+        NOTEBOOK_STAGE_ACTIONS.EDIT,
+      ),
     }));
   }, [
     pages,

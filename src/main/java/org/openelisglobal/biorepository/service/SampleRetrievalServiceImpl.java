@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 import org.openelisglobal.biorepository.dao.SampleRetrievalItemDAO;
 import org.openelisglobal.biorepository.dao.SampleRetrievalRequestDAO;
+import org.openelisglobal.biorepository.util.Brf02SamplePathFormatter;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
 import org.openelisglobal.biorepository.valueholder.ChainOfCustodyLog.CustodyAction;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalItem;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalItem.ItemStatus;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest;
-import org.openelisglobal.biorepository.util.Brf02SamplePathFormatter;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.DestinationType;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.PriorityLevel;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.RequestStatus;
@@ -195,8 +195,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             quantityRequested = available;
         }
         if (quantityRequested.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Quantity requested must be greater than zero for BioSample: "
-                    + bioSampleId);
+            throw new IllegalArgumentException(
+                    "Quantity requested must be greater than zero for BioSample: " + bioSampleId);
         }
         if (quantityRequested.compareTo(available) > 0) {
             throw new IllegalArgumentException("Quantity requested (" + quantityRequested
@@ -242,7 +242,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             throw new IllegalStateException("Reference item has no parent request");
         }
         if (!request.isApproved()) {
-            throw new IllegalStateException("Request must be approved before attaching samples: " + request.getStatus());
+            throw new IllegalStateException(
+                    "Request must be approved before attaching samples: " + request.getStatus());
         }
 
         if (bioSampleId == null) {
@@ -286,8 +287,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             throw new IllegalArgumentException("Quantity requested must be greater than zero");
         }
         if (attachQty.compareTo(available) > 0) {
-            throw new IllegalArgumentException("Quantity requested (" + attachQty
-                    + ") exceeds available quantity (" + available + ")");
+            throw new IllegalArgumentException(
+                    "Quantity requested (" + attachQty + ") exceeds available quantity (" + available + ")");
         }
 
         String unitOfMeasure = referenceItem.getUnitOfMeasure();
@@ -337,9 +338,9 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             if (bioSample == null || bioSample.getSampleItem() == null) {
                 continue;
             }
-            chainOfCustodyService.logCustodyAction(bioSample.getSampleItem(),
-                    CustodyAction.CHECKOUT_REQUESTED, null, request, null, null, null, null, null,
-                    "Request submitted for approval", sysUserId, "SampleRetrievalItem", item.getId(),
+            chainOfCustodyService.logCustodyAction(bioSample.getSampleItem(), CustodyAction.CHECKOUT_REQUESTED, null,
+                    request, null, null, null, null, null, "Request submitted for approval", sysUserId,
+                    "SampleRetrievalItem", item.getId(),
                     bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null,
                     bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null);
         }
@@ -381,8 +382,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             if (bioSample == null || bioSample.getSampleItem() == null) {
                 continue;
             }
-            chainOfCustodyService.logCustodyAction(bioSample.getSampleItem(), CustodyAction.CHECKOUT_APPROVED,
-                    null, request, null, approver, null, null, null, "Request approved: " + approvalNotes, sysUserId,
+            chainOfCustodyService.logCustodyAction(bioSample.getSampleItem(), CustodyAction.CHECKOUT_APPROVED, null,
+                    request, null, approver, null, null, null, "Request approved: " + approvalNotes, sysUserId,
                     "SampleRetrievalItem", item.getId(),
                     bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null,
                     bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null);
@@ -510,7 +511,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
         item.setQuantityReleased(releaseQty);
         item.setSysUserId(sysUserId);
 
-        String workflowStatusBefore = bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null;
+        String workflowStatusBefore = bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name()
+                : null;
         bioSample.setWorkflowStatus(WorkflowStatus.IN_USE);
         bioSample.setSysUserId(sysUserId);
         bioSampleService.update(bioSample);
@@ -551,7 +553,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
 
         item.setStatus(ItemStatus.IN_ANALYSIS);
         item.setReleasedTimestamp(new Timestamp(System.currentTimeMillis()));
-        item.setReceivedByName(receivedByName != null && !receivedByName.trim().isEmpty() ? receivedByName.trim() : null);
+        item.setReceivedByName(
+                receivedByName != null && !receivedByName.trim().isEmpty() ? receivedByName.trim() : null);
         item.setSysUserId(sysUserId);
 
         BioSample bioSample = item.getBioSample();
@@ -610,7 +613,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
 
         BioSample bioSample = item.getBioSample();
         SampleRetrievalRequest request = item.getRetrievalRequest();
-        String workflowStatusBefore = bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name() : null;
+        String workflowStatusBefore = bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name()
+                : null;
         String storageCoords = getStorageCoordinates(bioSample);
 
         if (fullyConsumed) {
@@ -864,25 +868,23 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
                 return null;
             }
 
-            return requests.stream().filter(request -> request.getStatus() != null)
-                    .sorted((left, right) -> {
-                        Timestamp leftTimestamp = left.getProcessedTimestamp() != null ? left.getProcessedTimestamp()
-                                : left.getRequestedTimestamp();
-                        Timestamp rightTimestamp = right.getProcessedTimestamp() != null ? right.getProcessedTimestamp()
-                                : right.getRequestedTimestamp();
-                        if (leftTimestamp == null && rightTimestamp == null) {
-                            return Integer.compare(
-                                    right.getId() != null ? right.getId() : Integer.MIN_VALUE,
-                                    left.getId() != null ? left.getId() : Integer.MIN_VALUE);
-                        }
-                        if (leftTimestamp == null) {
-                            return 1;
-                        }
-                        if (rightTimestamp == null) {
-                            return -1;
-                        }
-                        return rightTimestamp.compareTo(leftTimestamp);
-                    }).findFirst().orElse(null);
+            return requests.stream().filter(request -> request.getStatus() != null).sorted((left, right) -> {
+                Timestamp leftTimestamp = left.getProcessedTimestamp() != null ? left.getProcessedTimestamp()
+                        : left.getRequestedTimestamp();
+                Timestamp rightTimestamp = right.getProcessedTimestamp() != null ? right.getProcessedTimestamp()
+                        : right.getRequestedTimestamp();
+                if (leftTimestamp == null && rightTimestamp == null) {
+                    return Integer.compare(right.getId() != null ? right.getId() : Integer.MIN_VALUE,
+                            left.getId() != null ? left.getId() : Integer.MIN_VALUE);
+                }
+                if (leftTimestamp == null) {
+                    return 1;
+                }
+                if (rightTimestamp == null) {
+                    return -1;
+                }
+                return rightTimestamp.compareTo(leftTimestamp);
+            }).findFirst().orElse(null);
         } catch (NumberFormatException e) {
             return null;
         }
@@ -921,9 +923,9 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
     }
 
     /**
-     * Resolves quantity available for fulfillment attach/retrieve. Stored biorepository
-     * specimens may not have remainingQuantity populated; use requested qty or 1 unit when
-     * the sample has an active storage assignment.
+     * Resolves quantity available for fulfillment attach/retrieve. Stored
+     * biorepository specimens may not have remainingQuantity populated; use
+     * requested qty or 1 unit when the sample has an active storage assignment.
      */
     private BigDecimal resolveFulfillmentAvailableQuantity(SampleItem sampleItem, BigDecimal quantityHint) {
         if (sampleItem == null) {
@@ -940,10 +942,8 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             return BigDecimal.valueOf(sampleItem.getQuantity());
         }
         Map<String, Object> location = sampleStorageService.getSampleItemLocation(sampleItem.getId());
-        boolean hasStorage =
-                location != null
-                        && !location.isEmpty()
-                        && (location.get("location") != null || location.get("hierarchicalPath") != null);
+        boolean hasStorage = location != null && !location.isEmpty()
+                && (location.get("location") != null || location.get("hierarchicalPath") != null);
         if (hasStorage) {
             return BigDecimal.ONE;
         }
@@ -961,8 +961,7 @@ public class SampleRetrievalServiceImpl extends AuditableBaseObjectServiceImpl<S
             return false;
         }
         Map<String, Object> location = sampleStorageService.getSampleItemLocation(bioSample.getSampleItem().getId());
-        return location != null
-                && !location.isEmpty()
+        return location != null && !location.isEmpty()
                 && (location.get("location") != null || location.get("hierarchicalPath") != null);
     }
 }

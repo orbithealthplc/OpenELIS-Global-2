@@ -105,19 +105,22 @@ export function enrichSampleForBiorepositoryTransfer(sample) {
     ...sample,
     collectionDate,
     quantity,
-    sampleCondition: sample.sampleCondition || sample.data?.sampleCondition || "Good",
+    sampleCondition:
+      sample.sampleCondition || sample.data?.sampleCondition || "Good",
     preservationMedium:
       sample.preservative ||
       sample.preservationMedium ||
       sample.data?.preservative ||
       sample.data?.preservationMedium ||
       "None",
-    unitOfMeasure:
-      sample.unitOfMeasure || sample.data?.unitOfMeasure || "mL",
+    unitOfMeasure: sample.unitOfMeasure || sample.data?.unitOfMeasure || "mL",
   };
 }
 
-export function mapMntdSamplesForBiorepositoryTransfer(samples, selectedSampleIds) {
+export function mapMntdSamplesForBiorepositoryTransfer(
+  samples,
+  selectedSampleIds,
+) {
   const selectedSet = new Set((selectedSampleIds || []).map(String));
   return (samples || [])
     .filter((sample) => selectedSet.has(String(sample.id)))

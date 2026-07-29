@@ -16,8 +16,10 @@ import java.util.Map;
 import org.junit.Test;
 
 /**
- * Exercises {@link PathologyDiagnosticReportServiceImpl#buildPdf} with synthetic merged sample maps
- * (same shape as {@code generateDiagnosticReportPdf} produces) so PDF output is asserted without a DB.
+ * Exercises {@link PathologyDiagnosticReportServiceImpl#buildPdf} with
+ * synthetic merged sample maps (same shape as
+ * {@code generateDiagnosticReportPdf} produces) so PDF output is asserted
+ * without a DB.
  */
 public class PathologyDiagnosticReportServiceImplPdfTest {
 
@@ -67,9 +69,7 @@ public class PathologyDiagnosticReportServiceImplPdfTest {
             reader.close();
         }
         String text = extracted.toString();
-        assertFalse(
-                "footer line must not appear",
-                text.contains("This is a computer-generated document."));
+        assertFalse("footer line must not appear", text.contains("This is a computer-generated document."));
         assertFalse("raw ISO instant must not appear in rendered text", text.contains("2026-05-13T21:00:00.000Z"));
         assertTrue("procedure date label", text.contains("Procedure Date"));
         assertTrue("formatted date contains calendar day", text.contains("2026-05-13"));
@@ -108,11 +108,9 @@ public class PathologyDiagnosticReportServiceImplPdfTest {
             reader.close();
         }
         String text = extracted.toString();
-        assertTrue("microscopy findings fallback should render",
-                text.contains("Atypical cells noted in smear."));
+        assertTrue("microscopy findings fallback should render", text.contains("Atypical cells noted in smear."));
         assertTrue("initial impression should render as diagnosis fallback",
                 text.contains("Suspicious for malignancy."));
-        assertFalse("should not show pending when findings present",
-                text.contains("Microscopic examination pending."));
+        assertFalse("should not show pending when findings present", text.contains("Microscopic examination pending."));
     }
 }

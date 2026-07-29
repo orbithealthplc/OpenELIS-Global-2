@@ -1,0 +1,10 @@
+[   25822ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://lims.ahri.gov.et/login:0
+[   27360ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   30698ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  150622ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  150622ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  150626ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  150857ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  150857ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[  150884ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[  150886ms] [LOG] NotSubscribed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1

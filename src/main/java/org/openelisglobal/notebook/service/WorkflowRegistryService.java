@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.openelisglobal.common.constants.Constants;
 import org.openelisglobal.common.constants.rbac.AHRIRoleCatalog;
 import org.openelisglobal.common.constants.rbac.AHRITestSectionCatalog;
 import org.openelisglobal.common.log.LogEvent;
@@ -44,8 +45,8 @@ public class WorkflowRegistryService {
     }
 
     public Optional<WorkflowStageDefinition> getStage(String workflowType, int stageOrder) {
-        return getStagesForWorkflowType(workflowType).stream()
-                .filter(stage -> stage.getStageOrder() == stageOrder).findFirst();
+        return getStagesForWorkflowType(workflowType).stream().filter(stage -> stage.getStageOrder() == stageOrder)
+                .findFirst();
     }
 
     public Optional<WorkflowStageDefinition> getStageByPageKey(String workflowType, String pageKey) {
@@ -61,6 +62,31 @@ public class WorkflowRegistryService {
 
     public List<String> getAllowedPersonas(String workflowType, int stageOrder) {
         return getStage(workflowType, stageOrder).map(WorkflowStageDefinition::getAllowedPersonas).orElse(List.of());
+    }
+
+    /**
+     * Union of all SRS personas appearing on any stage for the workflow type. Used
+     * to decide whether a user may open a notebook entry/instance in edit mode.
+     */
+    public List<String> getAllAllowedPersonas(String workflowType) {
+        List<WorkflowStageDefinition> stages = getStagesForWorkflowType(workflowType);
+        if (stages.isEmpty()) {
+            return List.of();
+        }
+        LinkedHashMap<String, Boolean> personas = new LinkedHashMap<>();
+        for (WorkflowStageDefinition stage : stages) {
+            for (String persona : stage.getAllowedPersonas()) {
+                if (persona != null && !persona.isBlank()) {
+                    personas.putIfAbsent(persona, Boolean.TRUE);
+                }
+            }
+        }
+        personas.putIfAbsent(Constants.ROLE_LAB_MANAGER, Boolean.TRUE);
+        if ("pathology".equals(normalizeWorkflowType(workflowType))) {
+            personas.putIfAbsent(Constants.ROLE_PATHOLOGIST, Boolean.TRUE);
+            personas.putIfAbsent(Constants.ROLE_CYTOPATHOLOGIST, Boolean.TRUE);
+        }
+        return List.copyOf(personas.keySet());
     }
 
     public boolean isActionPermitted(String workflowType, String pageKey, int stageOrder, NotebookStageAction action) {
@@ -109,8 +135,7 @@ public class WorkflowRegistryService {
             }
         }
         if (pageAllowedRoles != null && !pageAllowedRoles.isEmpty()) {
-            return pageAllowedRoles.stream().filter(AHRIRoleCatalog::isDepartmentRoleName)
-                    .collect(Collectors.toList());
+            return pageAllowedRoles.stream().filter(AHRIRoleCatalog::isDepartmentRoleName).collect(Collectors.toList());
         }
         LogEvent.logWarn(this.getClass().getSimpleName(), "resolveAllowedPersonas",
                 "No allowed personas for workflowType=" + workflowType + " pageKey=" + pageKey + " stageOrder="
@@ -138,23 +163,23 @@ public class WorkflowRegistryService {
             return false;
         }
         switch (normalized) {
-            case "pathology":
-            case "histopathology_biopsy_tissue":
-            case "histopathology":
-            case "histopathology/biopsy":
-            case "histopathology_biopsy":
-            case "peripheral_smear_bone_marrow_morphology":
-            case "peripheral_smear":
-            case "bone_marrow":
-            case "peripheral_smear_bone_marrow":
-            case "fnac":
-            case "cytology_liquid_based_pap_smear":
-            case "cytology":
-            case "liquid_based_pap_smear":
-            case "pap_smear":
-                return true;
-            default:
-                return false;
+        case "pathology":
+        case "histopathology_biopsy_tissue":
+        case "histopathology":
+        case "histopathology/biopsy":
+        case "histopathology_biopsy":
+        case "peripheral_smear_bone_marrow_morphology":
+        case "peripheral_smear":
+        case "bone_marrow":
+        case "peripheral_smear_bone_marrow":
+        case "fnac":
+        case "cytology_liquid_based_pap_smear":
+        case "cytology":
+        case "liquid_based_pap_smear":
+        case "pap_smear":
+            return true;
+        default:
+            return false;
         }
     }
 
@@ -175,9 +200,8 @@ public class WorkflowRegistryService {
 
     public static void validateDepartmentName(String departmentName, String fileName, int lineNumber) {
         if (!AHRITestSectionCatalog.contains(departmentName)) {
-            LogEvent.logWarn("WorkflowRegistry", "validate",
-                    fileName + " line " + lineNumber + ": department '" + departmentName
-                            + "' is not in AHRI test section allowlist");
+            LogEvent.logWarn("WorkflowRegistry", "validate", fileName + " line " + lineNumber + ": department '"
+                    + departmentName + "' is not in AHRI test section allowlist");
         }
     }
 }

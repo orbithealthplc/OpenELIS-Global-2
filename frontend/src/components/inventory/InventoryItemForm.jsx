@@ -1,11 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import {
-  Modal,
-  TextInput,
-  Dropdown,
-  NumberInput,
-  Stack,
-} from "@carbon/react";
+import { Modal, TextInput, Dropdown, NumberInput, Stack } from "@carbon/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NotificationContext } from "../layout/Layout";
 import { NotificationKinds } from "../common/CustomNotification";
@@ -304,7 +298,12 @@ const InventoryItemForm = ({ open, onClose, onSave, item = null }) => {
     ];
     let processedValue = value;
     if (numericFields.includes(field)) {
-      if (value === "" || value === null || value === undefined || isNaN(value)) {
+      if (
+        value === "" ||
+        value === null ||
+        value === undefined ||
+        isNaN(value)
+      ) {
         processedValue = 0;
       }
     }
@@ -384,7 +383,9 @@ const InventoryItemForm = ({ open, onClose, onSave, item = null }) => {
         primaryButtonText={intl.formatMessage({ id: "button.save" })}
         secondaryButtonText={intl.formatMessage({ id: "button.cancel" })}
         primaryButtonDisabled={
-          saving || !canSaveInventory || (!isEdit && assignableDepartmentsLoading)
+          saving ||
+          !canSaveInventory ||
+          (!isEdit && assignableDepartmentsLoading)
         }
         size="md"
       >
@@ -521,9 +522,7 @@ const InventoryItemForm = ({ open, onClose, onSave, item = null }) => {
               itemToString={(item) => (item ? item.text : "")}
               selectedItem={
                 unitOptions.find(
-                  (u) =>
-                    u.id === formData.units ||
-                    u.text === formData.units,
+                  (u) => u.id === formData.units || u.text === formData.units,
                 ) || null
               }
               onChange={({ selectedItem }) => {

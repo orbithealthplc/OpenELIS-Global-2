@@ -32,22 +32,26 @@ import "./NotebookWorkflow.css";
  * Gel Electrophoresis → Library Preparation → Bioanalyzer QC → Sequencing → Bioinformatics Analysis →
  * Storage & Environmental Monitoring
  */
+// Placeholder ids MUST use the "default-" prefix so page components skip
+// sample-loading API calls (guarded by startsWith("default-")) until the real
+// numeric notebook page ids load. A non-numeric, non-"default-" id causes the
+// backend samples endpoint (@PathVariable Integer pageId) to return HTTP 400.
 const VIROLOGY_LAB_WORKFLOW_PAGES = [
-  { id: "virologylab-1", order: 1, title: "Sample Intake & Registration" },
-  { id: "virologylab-2", order: 2, title: "DNA/RNA Extraction" },
-  { id: "virologylab-3", order: 3, title: "Quality & Quantity Assessment" },
-  { id: "virologylab-4", order: 4, title: "PCR Amplification" },
-  { id: "virologylab-5", order: 5, title: "Gel Electrophoresis" },
-  { id: "virologylab-6", order: 6, title: "Library Preparation" },
-  { id: "virologylab-7", order: 7, title: "Bioanalyzer QC" },
-  { id: "virologylab-8", order: 8, title: "Sequencing" },
+  { id: "default-1", order: 1, title: "Sample Intake & Registration" },
+  { id: "default-2", order: 2, title: "DNA/RNA Extraction" },
+  { id: "default-3", order: 3, title: "Quality & Quantity Assessment" },
+  { id: "default-4", order: 4, title: "PCR Amplification" },
+  { id: "default-5", order: 5, title: "Gel Electrophoresis" },
+  { id: "default-6", order: 6, title: "Library Preparation" },
+  { id: "default-7", order: 7, title: "Bioanalyzer QC" },
+  { id: "default-8", order: 8, title: "Sequencing" },
   {
-    id: "virologylab-9",
+    id: "default-9",
     order: 9,
     title: "Bioinformatics Analysis & Data Submission",
   },
   {
-    id: "virologylab-10",
+    id: "default-10",
     order: 10,
     title: "Storage & Environmental Monitoring",
   },

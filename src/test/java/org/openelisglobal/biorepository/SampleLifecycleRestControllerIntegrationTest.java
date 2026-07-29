@@ -156,7 +156,8 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         assignToStorage(fixture.sampleItemId, BOX_A_ID, "A1", "Initial storage");
 
         SampleRetrievalRequest request = createApprovedRetrieval(fixture.bioSampleId, "Research analysis");
-        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good", "Released for analysis", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good",
+                "Released for analysis", null, null, approver.getId().toString());
 
         JsonNode response = getLifecycleBySampleItem(fixture.sampleItemId);
 
@@ -176,7 +177,8 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         assignToStorage(fixture.sampleItemId, BOX_A_ID, "A1", "Initial storage");
 
         SampleRetrievalRequest request = createApprovedRetrieval(fixture.bioSampleId, "Temporary analysis");
-        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good", "Released for analysis", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good",
+                "Released for analysis", null, null, approver.getId().toString());
         retrievalService.returnItem(item.getId(), "Good condition", "Returned to custody", false,
                 approver.getId().toString());
 
@@ -195,7 +197,8 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         assignToStorage(fixture.sampleItemId, BOX_A_ID, "A1", "Initial storage");
 
         SampleRetrievalRequest request = createApprovedRetrieval(fixture.bioSampleId, "Temporary analysis");
-        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good", "Released for analysis", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good",
+                "Released for analysis", null, null, approver.getId().toString());
         retrievalService.returnItem(item.getId(), "Good condition", "Returned to custody", false,
                 approver.getId().toString());
         moveInStorage(fixture.sampleItemId, BOX_C_ID, "C3", "Re-storage after return");
@@ -215,7 +218,8 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         assignToStorage(fixture.sampleItemId, BOX_A_ID, "A1", "Initial storage");
 
         SampleRetrievalRequest request = createApprovedRetrieval(fixture.bioSampleId, "Consumptive analysis");
-        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good", "Released for analysis", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good",
+                "Released for analysis", null, null, approver.getId().toString());
         retrievalService.returnItem(item.getId(), "Consumed", "Sample exhausted", true, approver.getId().toString());
 
         JsonNode response = getLifecycleBySampleItem(fixture.sampleItemId);
@@ -234,21 +238,17 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         assignToStorage(fixture.sampleItemId, BOX_A_ID, "A1", "Initial storage");
 
         SampleRetrievalRequest request = createApprovedRetrieval(fixture.bioSampleId, "Search verification");
-        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good", "Released for analysis", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(request.getItems().get(0).getId(), "Good",
+                "Released for analysis", null, null, approver.getId().toString());
         retrievalService.returnItem(item.getId(), "Good condition", "Returned to custody", false,
                 approver.getId().toString());
 
         MvcResult result = mockMvc
-                .perform(get("/rest/biorepository/lifecycle/search")
-                        .param("sampleExternalId", fixture.sampleExternalId)
-                        .param("action", "RETURN_RECEIVED")
-                        .param("startDate", LocalDate.now().minusDays(1).toString())
-                        .param("endDate", LocalDate.now().plusDays(1).toString())
-                        .param("page", "0")
-                        .param("pageSize", "5")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+                .perform(get("/rest/biorepository/lifecycle/search").param("sampleExternalId", fixture.sampleExternalId)
+                        .param("action", "RETURN_RECEIVED").param("startDate", LocalDate.now().minusDays(1).toString())
+                        .param("endDate", LocalDate.now().plusDays(1).toString()).param("page", "0")
+                        .param("pageSize", "5").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
 
         JsonNode response = objectMapper.readTree(result.getResponse().getContentAsString());
 
@@ -260,17 +260,15 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
     }
 
     private JsonNode getLifecycleBySampleItem(Integer sampleItemId) throws Exception {
-        MvcResult result = mockMvc
-                .perform(get("/rest/biorepository/lifecycle/sample-item/" + sampleItemId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andReturn();
+        MvcResult result = mockMvc.perform(get("/rest/biorepository/lifecycle/sample-item/" + sampleItemId)
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString());
     }
 
     private JsonNode getLifecycleByBioSample(Integer bioSampleId) throws Exception {
-        MvcResult result = mockMvc.perform(get("/rest/biorepository/lifecycle/bio-sample/" + bioSampleId)
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(
+                get("/rest/biorepository/lifecycle/bio-sample/" + bioSampleId).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString());
     }
 
@@ -303,8 +301,9 @@ public class SampleLifecycleRestControllerIntegrationTest extends BaseStorageTes
         BioSample bioSampleInput = new BioSample();
         bioSampleInput.setBiosafetyLevel(BiosafetyLevel.BSL_2);
         bioSampleInput.setEthicsApprovalRef("ETH-LC-001");
-        BioSample createdBioSample = transferService.acceptItem(request.getItems().get(0).getId(), bioSampleInput,
-                approver.getId().toString()).getBioSample();
+        BioSample createdBioSample = transferService
+                .acceptItem(request.getItems().get(0).getId(), bioSampleInput, approver.getId().toString())
+                .getBioSample();
 
         return new LifecycleFixture(Integer.valueOf(sampleItem.getId()), createdBioSample.getId(), externalId);
     }

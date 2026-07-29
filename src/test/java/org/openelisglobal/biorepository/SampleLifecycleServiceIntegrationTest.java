@@ -83,42 +83,24 @@ public class SampleLifecycleServiceIntegrationTest extends BaseWebContextSensiti
         BioSample bioSample = createBioSampleWithStatus("LCS-8-" + System.currentTimeMillis(), WorkflowStatus.STORED);
         Integer sampleItemId = Integer.valueOf(bioSample.getSampleItem().getId());
 
-        List<CustodyAction> expectedActions = Arrays.asList(
-                CustodyAction.TRANSFER_INITIATED,
-                CustodyAction.TRANSFER_RECEIVED,
-                CustodyAction.STORAGE_ASSIGNED,
-                CustodyAction.CHECKOUT_REQUESTED,
-                CustodyAction.CHECKOUT_APPROVED,
-                CustodyAction.CHECKOUT_RETRIEVED,
-                CustodyAction.RETURN_RECEIVED,
+        List<CustodyAction> expectedActions = Arrays.asList(CustodyAction.TRANSFER_INITIATED,
+                CustodyAction.TRANSFER_RECEIVED, CustodyAction.STORAGE_ASSIGNED, CustodyAction.CHECKOUT_REQUESTED,
+                CustodyAction.CHECKOUT_APPROVED, CustodyAction.CHECKOUT_RETRIEVED, CustodyAction.RETURN_RECEIVED,
                 CustodyAction.RETURN_STORED);
 
         int sourceRecordId = 100;
         for (CustodyAction action : expectedActions) {
-            custodyService.logCustodyAction(
-                    bioSample.getSampleItem(),
-                    action,
-                    null,
-                    null,
-                    "Freezer-A > Shelf-1 > Rack-A > Box-1 > A1",
-                    testUser,
-                    "From-" + action.name(),
-                    "To-" + action.name(),
-                    null,
-                    "scenario=" + action.name(),
-                    testUser.getId(),
-                    "LifecycleScenario",
-                    sourceRecordId++,
-                    "IN_USE",
-                    "PENDING_STORAGE");
+            custodyService.logCustodyAction(bioSample.getSampleItem(), action, null, null,
+                    "Freezer-A > Shelf-1 > Rack-A > Box-1 > A1", testUser, "From-" + action.name(),
+                    "To-" + action.name(), null, "scenario=" + action.name(), testUser.getId(), "LifecycleScenario",
+                    sourceRecordId++, "IN_USE", "PENDING_STORAGE");
         }
 
         SampleLifecycleResponseDTO response = lifecycleService.getBySampleItemId(sampleItemId);
 
         assertNotNull(response);
         assertNotNull(response.getEvents());
-        List<String> returnedActions = response.getEvents().stream()
-                .map(event -> event.getCustodyAction())
+        List<String> returnedActions = response.getEvents().stream().map(event -> event.getCustodyAction())
                 .collect(Collectors.toList());
 
         for (CustodyAction expectedAction : expectedActions) {
@@ -133,22 +115,10 @@ public class SampleLifecycleServiceIntegrationTest extends BaseWebContextSensiti
                 WorkflowStatus.PENDING_STORAGE);
         Integer sampleItemId = Integer.valueOf(bioSample.getSampleItem().getId());
 
-        custodyService.logCustodyAction(
-                bioSample.getSampleItem(),
-                CustodyAction.RETURN_RECEIVED,
-                null,
-                null,
-                "Biorepository Intake",
-                testUser,
-                "Research Unit",
-                "Biorepository Custody",
-                null,
-                "Returned and awaiting physical re-storage",
-                testUser.getId(),
-                "SampleRetrievalItem",
-                200,
-                WorkflowStatus.IN_USE.name(),
-                WorkflowStatus.PENDING_STORAGE.name());
+        custodyService.logCustodyAction(bioSample.getSampleItem(), CustodyAction.RETURN_RECEIVED, null, null,
+                "Biorepository Intake", testUser, "Research Unit", "Biorepository Custody", null,
+                "Returned and awaiting physical re-storage", testUser.getId(), "SampleRetrievalItem", 200,
+                WorkflowStatus.IN_USE.name(), WorkflowStatus.PENDING_STORAGE.name());
 
         SampleLifecycleResponseDTO response = lifecycleService.getBySampleItemId(sampleItemId);
         SampleLifecycleStateDTO currentState = response.getCurrentState();
@@ -164,22 +134,10 @@ public class SampleLifecycleServiceIntegrationTest extends BaseWebContextSensiti
                 WorkflowStatus.STORED);
         Integer sampleItemId = Integer.valueOf(bioSample.getSampleItem().getId());
 
-        custodyService.logCustodyAction(
-                bioSample.getSampleItem(),
-                CustodyAction.RETURN_STORED,
-                null,
-                null,
-                "Freezer-B > Shelf-2 > Rack-C > Box-4 > B2",
-                testUser,
-                "Biorepository Custody",
-                "Freezer-B > Shelf-2 > Rack-C > Box-4 > B2",
-                null,
-                "Physically re-stored",
-                testUser.getId(),
-                "SampleStorageMovement",
-                300,
-                WorkflowStatus.PENDING_STORAGE.name(),
-                WorkflowStatus.STORED.name());
+        custodyService.logCustodyAction(bioSample.getSampleItem(), CustodyAction.RETURN_STORED, null, null,
+                "Freezer-B > Shelf-2 > Rack-C > Box-4 > B2", testUser, "Biorepository Custody",
+                "Freezer-B > Shelf-2 > Rack-C > Box-4 > B2", null, "Physically re-stored", testUser.getId(),
+                "SampleStorageMovement", 300, WorkflowStatus.PENDING_STORAGE.name(), WorkflowStatus.STORED.name());
 
         SampleLifecycleResponseDTO response = lifecycleService.getBySampleItemId(sampleItemId);
         SampleLifecycleStateDTO currentState = response.getCurrentState();

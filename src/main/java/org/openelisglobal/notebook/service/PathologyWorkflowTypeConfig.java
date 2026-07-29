@@ -42,21 +42,21 @@ public final class PathologyWorkflowTypeConfig {
         }
 
         switch (normalized) {
-            case "histopathology":
-            case "biopsy":
-            case "histopathology/biopsy":
-            case "histopathology_biopsy":
-                return HISTOPATHOLOGY_BIOPSY;
-            case "peripheral_smear":
-            case "bone_marrow":
-            case "peripheral_smear_bone_marrow":
-                return PERIPHERAL_SMEAR_BONE_MARROW;
-            case "cytology":
-            case "liquid_based_pap_smear":
-            case "pap_smear":
-                return CYTOLOGY_LIQUID_PAP;
-            default:
-                return null;
+        case "histopathology":
+        case "biopsy":
+        case "histopathology/biopsy":
+        case "histopathology_biopsy":
+            return HISTOPATHOLOGY_BIOPSY;
+        case "peripheral_smear":
+        case "bone_marrow":
+        case "peripheral_smear_bone_marrow":
+            return PERIPHERAL_SMEAR_BONE_MARROW;
+        case "cytology":
+        case "liquid_based_pap_smear":
+        case "pap_smear":
+            return CYTOLOGY_LIQUID_PAP;
+        default:
+            return null;
         }
     }
 
@@ -135,9 +135,7 @@ public final class PathologyWorkflowTypeConfig {
             return null;
         }
 
-        String normalized = pageTitle.toLowerCase(Locale.ROOT)
-                .replace("&", " and ")
-                .replaceAll("[^a-z0-9]+", " ")
+        String normalized = pageTitle.toLowerCase(Locale.ROOT).replace("&", " and ").replaceAll("[^a-z0-9]+", " ")
                 .trim();
 
         return normalized.isEmpty() ? null : normalized;

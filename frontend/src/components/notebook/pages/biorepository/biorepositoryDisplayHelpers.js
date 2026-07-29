@@ -65,7 +65,72 @@ export function formatBiorepositoryStorageDisplay(sampleOrPath) {
   return null;
 }
 
-/** Physical facility label shown above zone selection (not a StorageRoom record). */
+/**
+ * AHRI Biorepository has 2 physical rooms:
+ * 1) Minus 20 Freezer Room (dedicated -20°C freezers)
+ * 2) Ultra Low Freezer Room (Reception + Zone 1–6)
+ *
+ * In DB, zones are still `storage_room` rows (UI label = Zone).
+ * Physical rooms are a UI grouping layer above zones.
+ */
+export const BIOREPOSITORY_PHYSICAL_ROOMS = [
+  {
+    id: "minus20",
+    label: "Minus 20 Freezer Room",
+    zoneCodes: ["BIO-M20"],
+  },
+  {
+    id: "ultralow",
+    label: "Ultra Low Freezer Room",
+    zoneCodes: [
+      "BIO-REC",
+      "BIO-ZN1",
+      "BIO-ZN2",
+      "BIO-ZN3",
+      "BIO-ZN4",
+      "BIO-ZN5",
+      "BIO-ZN6",
+    ],
+  },
+];
+
+export function resolveBiorepositoryPhysicalRoomByZoneCode(zoneCode) {
+  const code = String(zoneCode || "")
+    .trim()
+    .toUpperCase();
+  if (!code) {
+    return null;
+  }
+  return (
+    BIOREPOSITORY_PHYSICAL_ROOMS.find((room) =>
+      room.zoneCodes.some((zc) => zc.toUpperCase() === code),
+    ) || null
+  );
+}
+
+export function filterZonesForPhysicalRoom(zones = [], physicalRoomId) {
+  if (!physicalRoomId) {
+    return [];
+  }
+  const physicalRoom = BIOREPOSITORY_PHYSICAL_ROOMS.find(
+    (room) => room.id === physicalRoomId,
+  );
+  if (!physicalRoom) {
+    return zones;
+  }
+  const allowed = new Set(physicalRoom.zoneCodes.map((c) => c.toUpperCase()));
+  const matched = zones.filter((zone) => {
+    const code = String(zone?.code || "")
+      .trim()
+      .toUpperCase();
+    return code && allowed.has(code);
+  });
+  // If seeded BIO-* zones are not present yet, fall back to all zones
+  // so legacy/manual setups still work.
+  return matched.length > 0 ? matched : zones;
+}
+
+/** Legacy single-label helper (facility / lab unit name). */
 export function resolveBiorepositoryPhysicalRoomName(
   loginLabUnit,
   overrideName,
@@ -144,7 +209,7 @@ export function getStorageManagementLabels(intl, isBiorepo) {
     createZoneHelper: intl.formatMessage({
       id: "biorepository.storage.management.createZoneHelper",
       defaultMessage:
-        "Zones are areas within the Biorepository storage room.",
+        "Biorepository has 2 physical rooms. The Ultra Low room is divided into Reception + Zone 1–6. The Minus 20 room holds -20°C freezers only.",
     }),
   };
 }

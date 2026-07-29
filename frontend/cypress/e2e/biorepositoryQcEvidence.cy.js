@@ -14,15 +14,19 @@ const shot = (name) =>
 
 /** Carbon Design Dropdown (not a native <select>). */
 const pickCarbonDropdown = (elementId, optionLabel) => {
-  cy.get('[role="dialog"]:visible').last().within(() => {
-    cy.get(`#${elementId}`)
-      .find('[role="combobox"], .cds--list-box__field, button[aria-haspopup="listbox"]')
-      .first()
-      .click({ force: true });
-    cy.get('.cds--list-box__menu:visible [role="option"]', { timeout: 30000 })
-      .contains(optionLabel)
-      .click({ force: true });
-  });
+  cy.get('[role="dialog"]:visible')
+    .last()
+    .within(() => {
+      cy.get(`#${elementId}`)
+        .find(
+          '[role="combobox"], .cds--list-box__field, button[aria-haspopup="listbox"]',
+        )
+        .first()
+        .click({ force: true });
+      cy.get('.cds--list-box__menu:visible [role="option"]', { timeout: 30000 })
+        .contains(optionLabel)
+        .click({ force: true });
+    });
 };
 
 const openQcStage = () => {
@@ -81,9 +85,9 @@ describe("Biorepository QC evidence (data source + workflow)", () => {
     cy.contains(".progress-tile", "Total Stored", { timeout: 120000 })
       .find(".progress-value")
       .should(($el) => {
-        expect(parseInt(String($el.text()).replace(/\D/g, ""), 10)).to.be.greaterThan(
-          0,
-        );
+        expect(
+          parseInt(String($el.text()).replace(/\D/g, ""), 10),
+        ).to.be.greaterThan(0);
       });
     shot("03-qc-overview-nonzero-counts");
 
@@ -128,7 +132,9 @@ describe("Biorepository QC evidence (data source + workflow)", () => {
           correctiveAction: "FAIL in active QC batch",
           remarks: "Batch escalation evidence",
         },
-      }).its("status").should("eq", 200);
+      })
+        .its("status")
+        .should("eq", 200);
     });
 
     cy.get(".sample-table-section table tbody tr", { timeout: 60000 })

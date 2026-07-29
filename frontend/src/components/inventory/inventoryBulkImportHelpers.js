@@ -75,7 +75,10 @@ const parseCsvText = (text) => {
     return row;
   });
 
-  return { headers, rows: rows.filter((row) => Object.values(row).some(Boolean)) };
+  return {
+    headers,
+    rows: rows.filter((row) => Object.values(row).some(Boolean)),
+  };
 };
 
 export const parseImportFile = async (file) => {
@@ -104,7 +107,10 @@ export const parseImportFile = async (file) => {
       });
       return row;
     });
-    return { headers, rows: rows.filter((row) => Object.values(row).some(Boolean)) };
+    return {
+      headers,
+      rows: rows.filter((row) => Object.values(row).some(Boolean)),
+    };
   }
 
   throw new Error("Unsupported file type. Please use CSV or Excel.");
@@ -138,7 +144,9 @@ export const validateCatalogImportLocal = (rows, departmentId) => {
     const rowNumber = index + 2;
     const rowErrors = [];
     const name = findValue(row, "name", "itemname", "item_name");
-    const itemType = (findValue(row, "itemtype", "item_type", "type") || "REAGENT").toUpperCase();
+    const itemType = (
+      findValue(row, "itemtype", "item_type", "type") || "REAGENT"
+    ).toUpperCase();
     const category = findValue(row, "category");
     const units = findValue(row, "units", "unit");
 
@@ -146,20 +154,32 @@ export const validateCatalogImportLocal = (rows, departmentId) => {
       rowErrors.push({ field: "name", message: "Item name is required" });
     }
     if (!ITEM_TYPES.has(itemType)) {
-      rowErrors.push({ field: "itemType", message: `Invalid item type '${itemType}'` });
+      rowErrors.push({
+        field: "itemType",
+        message: `Invalid item type '${itemType}'`,
+      });
     }
     if (itemType !== "EQUIPMENT") {
       if (!category) {
-        rowErrors.push({ field: "category", message: "Category is required for stock items" });
+        rowErrors.push({
+          field: "category",
+          message: "Category is required for stock items",
+        });
       }
       if (!units) {
-        rowErrors.push({ field: "units", message: "Units are required for stock items" });
+        rowErrors.push({
+          field: "units",
+          message: "Units are required for stock items",
+        });
       }
     }
 
     const normalizedName = name.toLowerCase();
     if (name && seenNames.has(normalizedName)) {
-      rowErrors.push({ field: "name", message: `Duplicate item name in file: ${name}` });
+      rowErrors.push({
+        field: "name",
+        message: `Duplicate item name in file: ${name}`,
+      });
     }
     if (name) {
       seenNames.add(normalizedName);
@@ -202,16 +222,27 @@ export const importCatalogLocal = async (rows, departmentId) => {
     try {
       const formData = {
         name: findValue(row, "name", "itemname", "item_name"),
-        itemType: (findValue(row, "itemtype", "item_type", "type") || "REAGENT").toUpperCase(),
+        itemType: (
+          findValue(row, "itemtype", "item_type", "type") || "REAGENT"
+        ).toUpperCase(),
         category: findValue(row, "category"),
         manufacturer: findValue(row, "manufacturer"),
         units: findValue(row, "units", "unit"),
-        lowStockThreshold: Number(findValue(row, "lowstockthreshold", "low_stock_threshold")) || 0,
+        lowStockThreshold:
+          Number(findValue(row, "lowstockthreshold", "low_stock_threshold")) ||
+          0,
         projectName: findValue(row, "projectname", "project_name", "project"),
         concentration: findValue(row, "concentration"),
-        storageRequirements: findValue(row, "storagerequirements", "storage_requirements", "storage"),
+        storageRequirements: findValue(
+          row,
+          "storagerequirements",
+          "storage_requirements",
+          "storage",
+        ),
         stabilityAfterOpening:
-          Number(findValue(row, "stabilityafteropening", "stability_after_opening")) || 0,
+          Number(
+            findValue(row, "stabilityafteropening", "stability_after_opening"),
+          ) || 0,
         dilutionNotes: findValue(row, "dilutionnotes", "dilution_notes"),
       };
       const payload = buildCatalogPayload(formData, departmentId);
@@ -238,11 +269,24 @@ export const validateLotImportLocal = async (rows) => {
     const row = rows[index];
     const rowNumber = index + 2;
     const rowErrors = [];
-    const itemName = findValue(row, "itemname", "item_name", "name", "catalogitem");
+    const itemName = findValue(
+      row,
+      "itemname",
+      "item_name",
+      "name",
+      "catalogitem",
+    );
     const lotNumber = findValue(row, "lotnumber", "lot_number", "lot");
     const quantityValue = findValue(row, "quantity", "currentquantity", "qty");
-    const expirationDate = findValue(row, "expirationdate", "expiration_date", "expiry");
-    const qcStatus = (findValue(row, "qcstatus", "qc_status", "qc") || "PENDING").toUpperCase();
+    const expirationDate = findValue(
+      row,
+      "expirationdate",
+      "expiration_date",
+      "expiry",
+    );
+    const qcStatus = (
+      findValue(row, "qcstatus", "qc_status", "qc") || "PENDING"
+    ).toUpperCase();
 
     if (!itemName) {
       rowErrors.push({ field: "itemName", message: "Item name is required" });
@@ -253,10 +297,16 @@ export const validateLotImportLocal = async (rows) => {
     if (!quantityValue) {
       rowErrors.push({ field: "quantity", message: "Quantity is required" });
     } else if (Number(quantityValue) <= 0) {
-      rowErrors.push({ field: "quantity", message: "Quantity must be greater than 0" });
+      rowErrors.push({
+        field: "quantity",
+        message: "Quantity must be greater than 0",
+      });
     }
     if (qcStatus && !QC_STATUSES.has(qcStatus)) {
-      rowErrors.push({ field: "qcStatus", message: `Invalid QC status '${qcStatus}'` });
+      rowErrors.push({
+        field: "qcStatus",
+        message: `Invalid QC status '${qcStatus}'`,
+      });
     }
 
     let matchedItem = null;
@@ -321,7 +371,13 @@ export const importLotsLocal = async (rows) => {
     const row = rows[index];
     const rowNumber = index + 2;
     try {
-      const itemName = findValue(row, "itemname", "item_name", "name", "catalogitem");
+      const itemName = findValue(
+        row,
+        "itemname",
+        "item_name",
+        "name",
+        "catalogitem",
+      );
       const itemIdValue = findValue(row, "itemid", "item_id");
       let item = null;
 
@@ -330,7 +386,8 @@ export const importLotsLocal = async (rows) => {
       } else {
         const matches = await InventoryItemAPI.search(itemName);
         item = (matches || []).find(
-          (candidate) => candidate.name?.toLowerCase() === itemName.toLowerCase(),
+          (candidate) =>
+            candidate.name?.toLowerCase() === itemName.toLowerCase(),
         );
       }
 
@@ -338,10 +395,19 @@ export const importLotsLocal = async (rows) => {
         throw new Error(`Catalog item not found: ${itemName || itemIdValue}`);
       }
 
-      const quantity = Number(findValue(row, "quantity", "currentquantity", "qty"));
-      const expirationDate = findValue(row, "expirationdate", "expiration_date", "expiry");
+      const quantity = Number(
+        findValue(row, "quantity", "currentquantity", "qty"),
+      );
+      const expirationDate = findValue(
+        row,
+        "expirationdate",
+        "expiration_date",
+        "expiry",
+      );
       const receiptDate = findValue(row, "receiptdate", "receipt_date");
-      const qcStatus = (findValue(row, "qcstatus", "qc_status", "qc") || "PENDING").toUpperCase();
+      const qcStatus = (
+        findValue(row, "qcstatus", "qc_status", "qc") || "PENDING"
+      ).toUpperCase();
 
       const lotPayload = {
         inventoryItem: { id: item.id },

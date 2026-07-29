@@ -24,7 +24,8 @@ import org.openelisglobal.userrole.service.UserRoleService;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Admin, restricted department, no active department, and SRS persona scenarios.
+ * Admin, restricted department, no active department, and SRS persona
+ * scenarios.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class NotebookStageAccessRbacMatrixTest {

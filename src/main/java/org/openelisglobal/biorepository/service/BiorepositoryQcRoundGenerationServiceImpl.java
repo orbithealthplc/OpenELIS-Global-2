@@ -50,8 +50,7 @@ public class BiorepositoryQcRoundGenerationServiceImpl implements BiorepositoryQ
 
         validatePoolCapacity(boxesPerRound, samplesPerBox, eligibleBoxCount, uniqueEligibleSamples, requestedSamples);
 
-        String qcBatchId = "QCBATCH-" + System.currentTimeMillis() + "-"
-                + UUID.randomUUID().toString().substring(0, 8);
+        String qcBatchId = "QCBATCH-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8);
         Random random = seed != null ? new Random(seed) : new Random();
 
         int boxesToSelect = Math.min(boxesPerRound, eligibleBoxCount);

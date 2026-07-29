@@ -35,9 +35,9 @@ function loginAs(username) {
       loginPage.enterUsername(username);
       loginPage.enterPassword(PASSWORD);
       loginPage.signIn();
-      cy.contains("Username or Password are incorrect", { timeout: 5000 }).should(
-        "not.exist",
-      );
+      cy.contains("Username or Password are incorrect", {
+        timeout: 5000,
+      }).should("not.exist");
       cy.url({ timeout: 60000 }).should("not.include", "/login");
     },
     { cacheAcrossSpecs: false },

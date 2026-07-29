@@ -18,18 +18,15 @@ public class WorkflowRegistryServiceTest {
     @Before
     public void setUp() {
         service = new WorkflowRegistryService();
-        service.replaceRegistry(List.of(
-                stage("pathology", 9, "microscopy", "Junior Researcher", "Senior Researcher"),
+        service.replaceRegistry(List.of(stage("pathology", 9, "microscopy", "Junior Researcher", "Senior Researcher"),
                 stage("pathology", 10, "report_print", "Lab Manager", "Senior Researcher")));
     }
 
     @Test
     public void normalizeWorkflowType_mapsPathologySubtypesToPathology() {
         assertEquals("pathology", WorkflowRegistryService.normalizeWorkflowType("fnac"));
-        assertEquals("pathology",
-                WorkflowRegistryService.normalizeWorkflowType("cytology_liquid_based_pap_smear"));
-        assertEquals("pathology",
-                WorkflowRegistryService.normalizeWorkflowType("histopathology_biopsy_tissue"));
+        assertEquals("pathology", WorkflowRegistryService.normalizeWorkflowType("cytology_liquid_based_pap_smear"));
+        assertEquals("pathology", WorkflowRegistryService.normalizeWorkflowType("histopathology_biopsy_tissue"));
     }
 
     @Test
@@ -51,9 +48,8 @@ public class WorkflowRegistryServiceTest {
         assertFalse(service.isKnownWorkflowType("unknown_lab"));
     }
 
-    private static WorkflowStageDefinition stage(String workflowType, int order, String pageKey,
-            String... personas) {
-        return new WorkflowStageDefinition("Pathology Laboratory", workflowType, order, pageKey, pageKey,
-                pageKey, List.of(personas), EnumSet.allOf(NotebookStageAction.class));
+    private static WorkflowStageDefinition stage(String workflowType, int order, String pageKey, String... personas) {
+        return new WorkflowStageDefinition("Pathology Laboratory", workflowType, order, pageKey, pageKey, pageKey,
+                List.of(personas), EnumSet.allOf(NotebookStageAction.class));
     }
 }

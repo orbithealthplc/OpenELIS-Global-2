@@ -14,10 +14,16 @@ describe("biorepoSampleSearchHelpers", () => {
 
   test("hasActiveSearchFilters is true when any filter has value", () => {
     expect(
-      hasActiveSearchFilters({ ...EMPTY_SAMPLE_SEARCH_FILTERS, sampleType: "Plasma" }),
+      hasActiveSearchFilters({
+        ...EMPTY_SAMPLE_SEARCH_FILTERS,
+        sampleType: "Plasma",
+      }),
     ).toBe(true);
     expect(
-      hasActiveSearchFilters({ ...EMPTY_SAMPLE_SEARCH_FILTERS, originLab: "CTD" }),
+      hasActiveSearchFilters({
+        ...EMPTY_SAMPLE_SEARCH_FILTERS,
+        originLab: "CTD",
+      }),
     ).toBe(true);
   });
 

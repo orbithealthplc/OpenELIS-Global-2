@@ -1,9 +1,11 @@
 import {
+  filterZonesForPhysicalRoom,
   formatBiorepositoryLocationLevel,
   formatBiorepositoryPageInstructions,
   formatBiorepositoryUserText,
   getStorageManagementLabels,
   normalizeBiorepositoryHierarchyPath,
+  resolveBiorepositoryPhysicalRoomByZoneCode,
   resolveBiorepositoryPhysicalRoomName,
 } from "./biorepositoryDisplayHelpers";
 
@@ -32,9 +34,9 @@ describe("biorepositoryDisplayHelpers", () => {
   });
 
   test("formatBiorepositoryUserText rewrites common room phrases", () => {
-    expect(formatBiorepositoryUserText("Biorepository room-level storage")).toBe(
-      "Biorepository zone-level storage",
-    );
+    expect(
+      formatBiorepositoryUserText("Biorepository room-level storage"),
+    ).toBe("Biorepository zone-level storage");
     expect(formatBiorepositoryUserText("Room Temperature (15-25°C)")).toBe(
       "Ambient Temperature (15-25°C)",
     );
@@ -47,9 +49,28 @@ describe("biorepositoryDisplayHelpers", () => {
     expect(resolveBiorepositoryPhysicalRoomName(null)).toBe(
       "Biorepository Laboratory",
     );
+    expect(resolveBiorepositoryPhysicalRoomName(null, "Custom Facility")).toBe(
+      "Custom Facility",
+    );
+  });
+
+  test("physical rooms map seeded zone codes", () => {
+    expect(resolveBiorepositoryPhysicalRoomByZoneCode("BIO-M20")?.id).toBe(
+      "minus20",
+    );
+    expect(resolveBiorepositoryPhysicalRoomByZoneCode("BIO-ZN3")?.id).toBe(
+      "ultralow",
+    );
     expect(
-      resolveBiorepositoryPhysicalRoomName(null, "Custom Facility"),
-    ).toBe("Custom Facility");
+      filterZonesForPhysicalRoom(
+        [
+          { id: "1", code: "BIO-M20", label: "Main Storage" },
+          { id: "2", code: "BIO-ZN1", label: "Zone 1" },
+          { id: "3", code: "BIO-REC", label: "Reception" },
+        ],
+        "ultralow",
+      ).map((z) => z.code),
+    ).toEqual(["BIO-ZN1", "BIO-REC"]);
   });
 
   test("getStorageManagementLabels returns zone labels for biorepository users", () => {
@@ -60,6 +81,7 @@ describe("biorepositoryDisplayHelpers", () => {
     expect(biorepoLabels.roomsTab).toBe("Zones");
     expect(biorepoLabels.addRoom).toBe("Add Zone");
     expect(biorepoLabels.roomColumn).toBe("Zone");
+    expect(biorepoLabels.createZoneHelper).toContain("2 physical rooms");
 
     const defaultLabels = getStorageManagementLabels(intl, false);
     expect(defaultLabels.roomsTab).toBe("storage.tab.rooms");

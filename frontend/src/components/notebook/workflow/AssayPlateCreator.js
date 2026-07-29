@@ -195,7 +195,11 @@ function AssayPlateCreator({
   );
 
   const handleAutoAssign = useCallback(() => {
-    if (!interactiveMode || !selectedPlateId || selectedSampleIds.length === 0) {
+    if (
+      !interactiveMode ||
+      !selectedPlateId ||
+      selectedSampleIds.length === 0
+    ) {
       return;
     }
     const plate = plates.find((p) => p.id === selectedPlateId);
@@ -282,15 +286,19 @@ function AssayPlateCreator({
       wells.push(
         <div
           key={coord}
-          role={interactiveMode && plate.id === selectedPlateId ? "button" : undefined}
-          tabIndex={interactiveMode && plate.id === selectedPlateId ? 0 : undefined}
+          role={
+            interactiveMode && plate.id === selectedPlateId
+              ? "button"
+              : undefined
+          }
+          tabIndex={
+            interactiveMode && plate.id === selectedPlateId ? 0 : undefined
+          }
           className={`preview-well ${isAssigned ? "assigned" : "empty"} ${
             interactiveMode && plate.id === selectedPlateId ? "clickable" : ""
           }`}
           title={
-            isAssigned
-              ? `${coord}: sample ${plate.assignments[coord]}`
-              : coord
+            isAssigned ? `${coord}: sample ${plate.assignments[coord]}` : coord
           }
           onClick={(e) => {
             if (interactiveMode) {

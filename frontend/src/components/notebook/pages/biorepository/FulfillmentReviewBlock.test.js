@@ -2,7 +2,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { IntlProvider } from "react-intl";
 import FulfillmentReviewBlock from "./FulfillmentReviewBlock";
-import { SUGGESTION_STATUS, SUGGESTIONS_LOAD_STATE } from "./biorepoFulfillmentSuggestionHelpers";
+import {
+  SUGGESTION_STATUS,
+  SUGGESTIONS_LOAD_STATE,
+} from "./biorepoFulfillmentSuggestionHelpers";
 
 const renderBlock = (props) =>
   render(

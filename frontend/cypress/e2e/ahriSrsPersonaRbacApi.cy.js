@@ -23,7 +23,9 @@ function loginAs(username) {
       url: `${API_BASE}/ValidateLogin?apiCall=true`,
       form: true,
       body: { loginName: username, password: PASSWORD },
-    }).its("status").should("eq", 200);
+    })
+      .its("status")
+      .should("eq", 200);
     cy.visit("/");
     cy.get("body", { timeout: 30000 }).should("be.visible");
   });
@@ -34,7 +36,9 @@ function setActiveLabUnit(sectionId) {
     method: "POST",
     url: `${API_BASE}/rest/setUserLoginLabUnit/${sectionId}`,
     failOnStatusCode: false,
-  }).its("status").should("eq", 200);
+  })
+    .its("status")
+    .should("eq", 200);
 }
 
 /** POST samples/apply enforces the same stage EDIT ACL as /complete. */

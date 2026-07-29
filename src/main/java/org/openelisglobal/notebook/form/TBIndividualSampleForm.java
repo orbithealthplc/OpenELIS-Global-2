@@ -301,8 +301,8 @@ public class TBIndividualSampleForm {
      * service.
      */
     public org.openelisglobal.notebook.service.TBManifestImportService.TBManifestRow toManifestRow() {
-        return new org.openelisglobal.notebook.service.TBManifestImportService.TBManifestRow(
-                1, // rowNumber (single row)
+        return new org.openelisglobal.notebook.service.TBManifestImportService.TBManifestRow(1, // rowNumber (single
+                                                                                                // row)
                 sampleId, specimenType, specimenQuality, documentNumber, referringFacility, patientName, patientAge,
                 patientSex, patientId, studyId, patientAddress, patientPhone, physicianPhone, consentStatus,
                 treatmentHistory, culture ? "Yes" : "No", smearMicroscopy ? "Yes" : "No", genexpert ? "Yes" : "No",

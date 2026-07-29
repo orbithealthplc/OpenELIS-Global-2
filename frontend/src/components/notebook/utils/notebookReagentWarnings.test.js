@@ -15,7 +15,10 @@ describe("notebookReagentWarnings", () => {
       selectionWarnings: ["QC_FAILED", "ZERO_QUANTITY"],
     });
 
-    expect(normalized.selectionWarnings).toEqual(["QC_FAILED", "ZERO_QUANTITY"]);
+    expect(normalized.selectionWarnings).toEqual([
+      "QC_FAILED",
+      "ZERO_QUANTITY",
+    ]);
   });
 
   test("buildReagentOptionLabel appends warning summary for dropdown display", () => {

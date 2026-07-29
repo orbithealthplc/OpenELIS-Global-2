@@ -156,7 +156,8 @@ public class NotebookEntryTemperatureLogServiceImpl
                         checkedDateTime);
                 String temperatureUnit = firstNonBlank(stringValue(row, "temperatureUnit"),
                         stringValue(row, "temperature_unit"), "C");
-                String checkedBy = firstNonBlank(stringValue(row, "checkedBy"), stringValue(row, "checked_by"), sysUserId);
+                String checkedBy = firstNonBlank(stringValue(row, "checkedBy"), stringValue(row, "checked_by"),
+                        sysUserId);
                 String notes = stringValue(row, "notes");
 
                 logTemperature(entryId, deviceCode, checkTime, temperatureValue, temperatureUnit, checkedBy,

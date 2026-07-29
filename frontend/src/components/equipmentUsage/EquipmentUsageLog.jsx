@@ -1,5 +1,11 @@
 import { useState, useEffect, useContext, useCallback } from "react";
-import { Button, Grid, Column, Loading, InlineNotification } from "@carbon/react";
+import {
+  Button,
+  Grid,
+  Column,
+  Loading,
+  InlineNotification,
+} from "@carbon/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import { NotificationContext } from "../layout/Layout";
 import { AlertDialog, NotificationKinds } from "../common/CustomNotification";
@@ -25,9 +31,7 @@ const normalizePermanentEquipment = (items) =>
   });
 
 const getEquipmentSerialLabel = (item) =>
-  item?.serialNumber ||
-  item?.catalogNumber ||
-  "No serial";
+  item?.serialNumber || item?.catalogNumber || "No serial";
 
 /**
  * EquipmentUsageLog Component

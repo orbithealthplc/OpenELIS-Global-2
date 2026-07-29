@@ -1982,7 +1982,8 @@ public class StorageLocationServiceImpl implements StorageLocationService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isRoomNameUniqueWithinDepartment(String name, Integer departmentTestSectionId, Integer excludeRoomId) {
+    public boolean isRoomNameUniqueWithinDepartment(String name, Integer departmentTestSectionId,
+            Integer excludeRoomId) {
         if (name == null || name.trim().isEmpty()) {
             return true;
         }

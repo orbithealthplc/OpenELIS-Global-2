@@ -7,32 +7,23 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.openelisglobal.notebook.service.NoteBookService;
-import org.openelisglobal.notebook.valueholder.NoteBook;
-import org.openelisglobal.test.service.TestSectionService;
-import org.openelisglobal.test.valueholder.TestSection;
 import org.openelisglobal.biorepository.service.BioSampleService;
+import org.openelisglobal.biorepository.service.BiorepositoryQCInspectionService;
 import org.openelisglobal.biorepository.service.BiorepositoryQcRoundGenerationService;
 import org.openelisglobal.biorepository.service.BiorepositoryQcSamplePoolService;
-import org.openelisglobal.biorepository.service.BiorepositoryQCInspectionService;
 import org.openelisglobal.biorepository.valueholder.BioSample;
-import org.openelisglobal.biorepository.valueholder.BioSample.WorkflowStatus;
 import org.openelisglobal.biorepository.valueholder.BiorepositoryQCInspection;
 import org.openelisglobal.common.rest.BaseRestController;
+import org.openelisglobal.notebook.service.NoteBookService;
 import org.openelisglobal.sampleitem.valueholder.SampleItem;
 import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.storage.service.StorageLocationService;
-import org.openelisglobal.storage.valueholder.StorageBox;
-import org.openelisglobal.storage.valueholder.StorageRack;
-import org.openelisglobal.storage.valueholder.StorageShelf;
-import org.openelisglobal.storage.valueholder.StorageDevice;
+import org.openelisglobal.test.service.TestSectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -42,8 +33,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * REST controller for Biorepository QC Inspection operations.
@@ -81,7 +72,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
     private TestSectionService testSectionService;
 
     /**
-     * Active stored sample-items in biorepository scope (same source as Storage Management).
+     * Active stored sample-items in biorepository scope (same source as Storage
+     * Management).
      */
     @GetMapping(value = "/samples", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Map<String, Object>>> getStoredSamplesForQC(
@@ -127,21 +119,21 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
             if (qcBatchId != null) {
                 for (Integer bioSampleId : uniqueBioSampleIds) {
                     if (hasInspectionInBatch(qcBatchId, bioSampleId)) {
-                        return ResponseEntity.status(409).body(Map.of("error",
-                                "Sample already has a QC inspection in batch " + qcBatchId
+                        return ResponseEntity.status(409)
+                                .body(Map.of("error", "Sample already has a QC inspection in batch " + qcBatchId
                                         + ". Re-inspection for the same round is not allowed."));
                     }
                 }
             }
 
             if (requiresCorrectionWorkflow(request) && request.getBioSampleIds().size() != 1) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("error", "Correction workflow currently supports exactly one sample per request"));
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Correction workflow currently supports exactly one sample per request"));
             }
 
             if (requiresCorrectionWorkflow(request) && allChecklistPassed(request)) {
-                return ResponseEntity.badRequest().body(
-                        Map.of("error", "Correction workflow can only be used when QC result is discrepancy"));
+                return ResponseEntity.badRequest()
+                        .body(Map.of("error", "Correction workflow can only be used when QC result is discrepancy"));
             }
             validateCorrectionWorkflowRequest(request);
 
@@ -151,10 +143,10 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
 
             List<BiorepositoryQCInspection> inspections = qcInspectionService.createBulkInspections(
                     new ArrayList<>(uniqueBioSampleIds), request.getInspectorName(), inspectionDate,
-                    request.isSamplePresent(),
-                    request.isLabelIntegrity(), request.isContainerIntegrity(), request.isVolumeAppearanceAcceptable(),
-                    request.isCorrectPosition(), request.getDiscrepancyType(), request.getCorrectiveAction(),
-                    request.getRemarks(), request.getQcBatchId(), request.getExpectedCoordinateSnapshot(), sysUserId);
+                    request.isSamplePresent(), request.isLabelIntegrity(), request.isContainerIntegrity(),
+                    request.isVolumeAppearanceAcceptable(), request.isCorrectPosition(), request.getDiscrepancyType(),
+                    request.getCorrectiveAction(), request.getRemarks(), request.getQcBatchId(),
+                    request.getExpectedCoordinateSnapshot(), sysUserId);
 
             List<Map<String, Object>> result = new ArrayList<>();
             for (BiorepositoryQCInspection inspection : inspections) {
@@ -217,9 +209,9 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
     }
 
     /**
-     * Storage overview for QC filter structure before random generation.
-     * Uses biorepository-scoped storage hierarchy for device/shelf/rack/box options
-     * and counts, plus current STORED biosample assignments for eligible sample scope.
+     * Storage overview for QC filter structure before random generation. Uses
+     * biorepository-scoped storage hierarchy for device/shelf/rack/box options and
+     * counts, plus current STORED biosample assignments for eligible sample scope.
      */
     @GetMapping(value = "/storage-overview", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(readOnly = true)
@@ -237,7 +229,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
     }
 
     /**
-     * Random QC round using the same eligible pool as storage-overview (including quarter rule).
+     * Random QC round using the same eligible pool as storage-overview (including
+     * quarter rule).
      */
     @PostMapping(value = "/generate-round", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(readOnly = true)
@@ -251,7 +244,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
         }
         int boxesPerRound = request.getBoxesPerRound() > 0 ? request.getBoxesPerRound() : 10;
         int samplesPerBox = request.getSamplesPerBox();
-        boolean includeAll = request.getIncludeInspected() == null || Boolean.TRUE.equals(request.getIncludeInspected());
+        boolean includeAll = request.getIncludeInspected() == null
+                || Boolean.TRUE.equals(request.getIncludeInspected());
         String freezerFilter = normalizeFilter(request.getFreezer());
         Map<String, Object> overview = buildStorageOverviewMap(freezerFilter, normalizeFilter(request.getShelf()),
                 normalizeFilter(request.getRack()), normalizeFilter(request.getBox()), includeAll,
@@ -269,7 +263,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
     }
 
     /**
-     * Escalation signals for a single QC batch (fail rate, repeated location failures, critical missing).
+     * Escalation signals for a single QC batch (fail rate, repeated location
+     * failures, critical missing).
      */
     @GetMapping(value = "/batch-escalation", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(readOnly = true)
@@ -294,9 +289,9 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
     }
 
     /**
-     * When true: all STORED samples in scope with valid path are in the pool (including
-     * re-QC the same quarter). When false: exclude samples that already have a QC
-     * inspection in the current calendar quarter.
+     * When true: all STORED samples in scope with valid path are in the pool
+     * (including re-QC the same quarter). When false: exclude samples that already
+     * have a QC inspection in the current calendar quarter.
      */
     private Map<String, Object> buildStorageOverviewMap(String freezerFilter, String shelfFilter, String rackFilter,
             String boxFilter, boolean includeAllQcVisits, Integer notebookId) {
@@ -343,8 +338,7 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
 
         long criticalMissingSamples = inspections.stream()
                 .filter(insp -> BiorepositoryQCInspection.QCResult.DISCREPANCY_FOUND.equals(insp.getQcResult()))
-                .filter(this::isSampleMissingDiscrepancy)
-                .count();
+                .filter(this::isSampleMissingDiscrepancy).count();
 
         List<String> triggeredRules = new ArrayList<>();
         if (batchFailRateExceeded) {
@@ -368,10 +362,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
         signals.put("triggeredRules", triggeredRules);
         signals.put("supervisorNotificationRequired", !triggeredRules.isEmpty());
         if (!triggeredRules.isEmpty()) {
-            signals.put("supervisorNotificationMessage",
-                    "Biorepository QC batch escalation: fail rate "
-                            + String.format("%.1f", batchFailRate)
-                            + "%. Rules: " + String.join(", ", triggeredRules));
+            signals.put("supervisorNotificationMessage", "Biorepository QC batch escalation: fail rate "
+                    + String.format("%.1f", batchFailRate) + "%. Rules: " + String.join(", ", triggeredRules));
         }
         return signals;
     }
@@ -525,8 +517,7 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
                 throw new IllegalArgumentException("MARK_MISSING requires discrepancy type SAMPLE_MISSING");
             }
             if (locationId != null || locationType != null || positionCoordinate != null) {
-                throw new IllegalArgumentException(
-                        "MARK_MISSING does not allow correction location/position fields");
+                throw new IllegalArgumentException("MARK_MISSING does not allow correction location/position fields");
             }
             return;
         }
@@ -555,7 +546,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
         throw new IllegalArgumentException("Unsupported correction action type: " + correctionActionType);
     }
 
-    private Map<String, Object> applyCorrectionWorkflow(BiorepositoryQCInspection inspection, BulkQCInspectionRequest request) {
+    private Map<String, Object> applyCorrectionWorkflow(BiorepositoryQCInspection inspection,
+            BulkQCInspectionRequest request) {
         if (inspection.getQcResult() != BiorepositoryQCInspection.QCResult.DISCREPANCY_FOUND) {
             throw new IllegalArgumentException("Correction workflow requires discrepancy QC result");
         }
@@ -593,8 +585,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
             @SuppressWarnings("unchecked")
             Map<String, Object> updatedLocation = missingUpdate.get("updatedLocation") instanceof Map
                     ? (Map<String, Object>) missingUpdate.get("updatedLocation")
-                    : Map.of("hierarchicalPath", "Missing (not found during QC)", "positionCoordinate", null,
-                            "status", "MISSING");
+                    : Map.of("hierarchicalPath", "Missing (not found during QC)", "positionCoordinate", null, "status",
+                            "MISSING");
 
             Map<String, Object> correction = new HashMap<>();
             correction.put("actionType", "MARK_MISSING");
@@ -780,7 +772,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
 
         String newCoordinate = null;
         String reason = trimToNull(inspection.getCorrectiveAction());
-        String auditTimestamp = inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString() : null;
+        String auditTimestamp = inspection.getInspectionDate() != null ? inspection.getInspectionDate().toString()
+                : null;
         if (correctionDetails != null) {
             reason = trimToNull(asString(correctionDetails.get("reason")));
             String correctionTimestamp = trimToNull(asString(correctionDetails.get("correctionTimestamp")));
@@ -806,7 +799,8 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
             BioSample bioSample = inspection.getBioSample();
             SampleItem sampleItem = bioSample != null ? bioSample.getSampleItem() : null;
             if (sampleItem != null && sampleItem.getId() != null) {
-                Map<String, Object> currentLocation = storageService.getSampleItemLocation(sampleItem.getId().toString());
+                Map<String, Object> currentLocation = storageService
+                        .getSampleItemLocation(sampleItem.getId().toString());
                 if (currentLocation != null) {
                     newCoordinate = composeCoordinate(asString(currentLocation.get("hierarchicalPath")),
                             asString(currentLocation.get("positionCoordinate")));
@@ -865,10 +859,16 @@ public class BiorepositoryQCInspectionRestController extends BaseRestController 
         private String shelf;
         private String rack;
         private String box;
-        /** When true (default), full eligible pool. When false, exclude if inspected this calendar quarter. */
+        /**
+         * When true (default), full eligible pool. When false, exclude if inspected
+         * this calendar quarter.
+         */
         private Boolean includeInspected = Boolean.TRUE;
         private Integer notebookId;
-        /** Lab manager / full-pool QC may generate across all devices without a freezer filter. */
+        /**
+         * Lab manager / full-pool QC may generate across all devices without a freezer
+         * filter.
+         */
         private Boolean allowAllDevices = Boolean.FALSE;
 
         public int getBoxesPerRound() {

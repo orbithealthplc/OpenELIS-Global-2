@@ -6,7 +6,8 @@ import {
 
 jest.mock("./usePermissions", () => ({
   usePermissions: () => ({
-    hasRoleForCurrentLabUnit: (roles) => roles.includes("Laboratory Technician"),
+    hasRoleForCurrentLabUnit: (roles) =>
+      roles.includes("Laboratory Technician"),
   }),
 }));
 
@@ -37,8 +38,12 @@ describe("usePageAccessControl (registry integration)", () => {
 
   it("normalizes pathology subtypes to pathology registry key", () => {
     expect(normalizeWorkflowType("fnac")).toBe("pathology");
-    expect(normalizeWorkflowType("cytology_liquid_based_pap_smear")).toBe("pathology");
-    expect(normalizeWorkflowType("histopathology_biopsy_tissue")).toBe("pathology");
+    expect(normalizeWorkflowType("cytology_liquid_based_pap_smear")).toBe(
+      "pathology",
+    );
+    expect(normalizeWorkflowType("histopathology_biopsy_tissue")).toBe(
+      "pathology",
+    );
   });
 
   it("resolves fnac microscopy personas from pathology registry", () => {

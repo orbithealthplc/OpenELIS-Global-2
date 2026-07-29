@@ -335,25 +335,14 @@ public class BioSampleRestControllerIntegrationTest extends BaseWebContextSensit
         String barcode = "SINGLE-REG-" + timestamp;
         String externalId = "LAB-" + timestamp;
 
-        String requestBody = "{"
-                + "\"barcode\":\"" + barcode + "\","
-                + "\"externalId\":\"" + externalId + "\","
-                + "\"originLab\":\"Bacteriology Unit\","
-                + "\"sampleTypeId\":\"" + testSampleType.getId() + "\","
-                + "\"receiptDate\":\"2026-02-09 08:00:00\","
-                + "\"collectionDate\":\"2026-02-11 00:00:00\","
-                + "\"requiredTempMin\":-80,"
-                + "\"requiredTempMax\":-20,"
-                + "\"biosafetyLevel\":\"BSL_2\","
-                + "\"projectId\":\"HIEPV\","
-                + "\"principalInvestigator\":\"Dr. Test PI\","
-                + "\"consentId\":\"CONSENT-" + timestamp + "\","
-                + "\"ethicsApprovalRef\":\"ETH-" + timestamp + "\","
-                + "\"mtaReference\":\"MTA-" + timestamp + "\","
-                + "\"preservationMedium\":\"EDTA\","
-                + "\"arrivalCondition\":\"thawed once\","
-                + "\"specialHandling\":\"Received by: Abay A. | Approval/Sign: AAA | Volume: insufficient\""
-                + "}";
+        String requestBody = "{" + "\"barcode\":\"" + barcode + "\"," + "\"externalId\":\"" + externalId + "\","
+                + "\"originLab\":\"Bacteriology Unit\"," + "\"sampleTypeId\":\"" + testSampleType.getId() + "\","
+                + "\"receiptDate\":\"2026-02-09 08:00:00\"," + "\"collectionDate\":\"2026-02-11 00:00:00\","
+                + "\"requiredTempMin\":-80," + "\"requiredTempMax\":-20," + "\"biosafetyLevel\":\"BSL_2\","
+                + "\"projectId\":\"HIEPV\"," + "\"principalInvestigator\":\"Dr. Test PI\"," + "\"consentId\":\"CONSENT-"
+                + timestamp + "\"," + "\"ethicsApprovalRef\":\"ETH-" + timestamp + "\"," + "\"mtaReference\":\"MTA-"
+                + timestamp + "\"," + "\"preservationMedium\":\"EDTA\"," + "\"arrivalCondition\":\"thawed once\","
+                + "\"specialHandling\":\"Received by: Abay A. | Approval/Sign: AAA | Volume: insufficient\"" + "}";
 
         MvcResult result = mockMvc
                 .perform(post("/rest/biorepository/sample/register").contentType(MediaType.APPLICATION_JSON)

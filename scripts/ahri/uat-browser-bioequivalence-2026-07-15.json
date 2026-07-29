@@ -1,0 +1,178 @@
+[
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_collector",
+    "persona": "Sample Collector",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 4,
+    "expectedRestrictedCount": 4,
+    "expectedRestricted": [
+      "Test Assignment & Preparation",
+      "Conduct Analysis / Test",
+      "Reporting & Release",
+      "Post-Test Sample & Data Handling"
+    ],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_collector.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\n0%\n2.Test Assignment & Preparation\nRestricted\n3.Conduct Analysis / Test\nRestricted\n4.Reporting & Release\nRestricted\n5.Post-Test Sample & Data Handling\nRestricted\n0 of 5 pages completed"
+  },
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_tech",
+    "persona": "Laboratory Technician",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 1,
+    "expectedRestrictedCount": 1,
+    "expectedRestricted": [
+      "Reporting & Release"
+    ],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_tech.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\n0%\n2.Test Assignment & Preparation\n0%\n3.Conduct Analysis / Test\n0%\n4.Reporting & Release\nRestricted\n5.Post-Test Sample & Data Handling\n0%\n0 of 5 pages completed"
+  },
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_manager",
+    "persona": "Lab Manager",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 0,
+    "expectedRestrictedCount": 0,
+    "expectedRestricted": [],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_manager.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\n0%\n2.Test Assignment & Preparation\n0%\n3.Conduct Analysis / Test\n0%\n4.Reporting & Release\n0%\n5.Post-Test Sample & Data Handling\n0%\n0 of 5 pages completed"
+  },
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_jr_researcher",
+    "persona": "Junior Researcher",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 3,
+    "expectedRestrictedCount": 3,
+    "expectedRestricted": [
+      "Sample Reception & Registration",
+      "Reporting & Release",
+      "Post-Test Sample & Data Handling"
+    ],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_jr_researcher.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\nRestricted\n2.Test Assignment & Preparation\n0%\n3.Conduct Analysis / Test\n0%\n4.Reporting & Release\nRestricted\n5.Post-Test Sample & Data Handling\nRestricted\n0 of 5 pages completed"
+  },
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_sr_researcher",
+    "persona": "Senior Researcher",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 2,
+    "expectedRestrictedCount": 2,
+    "expectedRestricted": [
+      "Sample Reception & Registration",
+      "Post-Test Sample & Data Handling"
+    ],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_sr_researcher.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\nRestricted\n2.Test Assignment & Preparation\n0%\n3.Conduct Analysis / Test\n0%\n4.Reporting & Release\n0%\n5.Post-Test Sample & Data Handling\nRestricted\n0 of 5 pages completed"
+  },
+  {
+    "dept": "Bioequivalence",
+    "workflow": "bioequivalence",
+    "user": "beq_biomedical",
+    "persona": "Biomedical Staff",
+    "notebookId": 239,
+    "entryId": 123,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Reception & Registration",
+      "2.Test Assignment & Preparation",
+      "3.Conduct Analysis / Test",
+      "4.Reporting & Release",
+      "5.Post-Test Sample & Data Handling"
+    ],
+    "restrictedCount": 5,
+    "expectedRestrictedCount": 5,
+    "expectedRestricted": [
+      "Sample Reception & Registration",
+      "Test Assignment & Preparation",
+      "Conduct Analysis / Test",
+      "Reporting & Release",
+      "Post-Test Sample & Data Handling"
+    ],
+    "stageCount": 5,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/239?mode=edit&tab=workflow&entryId=123",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Bioequivalence_beq_biomedical.png",
+    "navText": "Workflow Pages\n1.Sample Reception & Registration\nRestricted\n2.Test Assignment & Preparation\nRestricted\n3.Conduct Analysis / Test\nRestricted\n4.Reporting & Release\nRestricted\n5.Post-Test Sample & Data Handling\nRestricted\n0 of 5 pages completed"
+  }
+]

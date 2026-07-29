@@ -27,16 +27,11 @@ public class MNTDManifestImportControllerTest extends BaseWebContextSensitiveTes
     private static final String CSV_HEADER = "projectName,sampleType,sampleIdTag,numberOfSamples,"
             + "sampleSourceLocation,broughtBy,receivedDateTime,receptionistName";
 
-    private static final String MAPPING_JSON = "{"
-            + "\"projectNameColumn\":\"projectName\","
-            + "\"sampleIdTagColumn\":\"sampleIdTag\","
-            + "\"numberOfSamplesColumn\":\"numberOfSamples\","
-            + "\"sampleSourceLocationColumn\":\"sampleSourceLocation\","
-            + "\"broughtByColumn\":\"broughtBy\","
-            + "\"receivedDateTimeColumn\":\"receivedDateTime\","
-            + "\"receptionistNameColumn\":\"receptionistName\","
-            + "\"sampleTypeColumn\":\"sampleType\""
-            + "}";
+    private static final String MAPPING_JSON = "{" + "\"projectNameColumn\":\"projectName\","
+            + "\"sampleIdTagColumn\":\"sampleIdTag\"," + "\"numberOfSamplesColumn\":\"numberOfSamples\","
+            + "\"sampleSourceLocationColumn\":\"sampleSourceLocation\"," + "\"broughtByColumn\":\"broughtBy\","
+            + "\"receivedDateTimeColumn\":\"receivedDateTime\"," + "\"receptionistNameColumn\":\"receptionistName\","
+            + "\"sampleTypeColumn\":\"sampleType\"" + "}";
 
     private ObjectMapper objectMapper;
     private MockHttpSession mockSession;

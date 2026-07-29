@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.openelisglobal.common.log.LogEvent;
 import org.openelisglobal.common.rest.BaseRestController;
 import org.openelisglobal.login.valueholder.UserSessionData;
@@ -404,8 +405,9 @@ public class MedLabPatientOrderRestController extends BaseRestController {
     }
 
     /**
-     * Gets patients registered on this page. Use {@code all=true} for the full session list;
-     * default returns only patients without a pending order on this page.
+     * Gets patients registered on this page. Use {@code all=true} for the full
+     * session list; default returns only patients without a pending order on this
+     * page.
      */
     @GetMapping(value = "/page/{pageId}/registered-patients", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -876,7 +878,19 @@ public class MedLabPatientOrderRestController extends BaseRestController {
 
         try {
             String labNo = (String) body.get("labNo");
-            String sampleTypeId = (String) body.get("sampleTypeId");
+            String sampleTypeId = body.get("sampleTypeId") == null ? null : body.get("sampleTypeId").toString();
+            List<String> sampleTypeIds = new ArrayList<>();
+            Object sampleTypeIdsValue = body.get("sampleTypeIds");
+            if (sampleTypeIdsValue instanceof List<?>) {
+                for (Object value : (List<?>) sampleTypeIdsValue) {
+                    if (value != null && StringUtils.isNotBlank(value.toString())) {
+                        sampleTypeIds.add(value.toString());
+                    }
+                }
+            }
+            if (sampleTypeIds.isEmpty() && StringUtils.isNotBlank(sampleTypeId)) {
+                sampleTypeIds.add(sampleTypeId);
+            }
             String containerType = (String) body.get("containerType");
             String collectionTime = (String) body.get("collectionTime");
             String collectionDate = (String) body.get("collectionDate");
@@ -898,7 +912,7 @@ public class MedLabPatientOrderRestController extends BaseRestController {
             if (labNo == null || labNo.isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Lab number is required"));
             }
-            Map<String, Object> result = medLabPatientOrderService.recordSampleCollection(labNo, sampleTypeId,
+            Map<String, Object> result = medLabPatientOrderService.recordSampleCollection(labNo, sampleTypeIds,
                     containerType, collectionTime, collectionDate, collectorId, volume, notes, notebookPageId,
                     sysUserId);
 

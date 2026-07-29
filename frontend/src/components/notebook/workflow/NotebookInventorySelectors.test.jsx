@@ -32,13 +32,13 @@ describe("Notebook inventory selectors", () => {
   });
 
   test("equipment multiselect merges department inventory with linked template instruments", async () => {
-    loadNotebookEquipmentOptions.mockImplementation((notebookId, buildUrl, callback) => {
-      callback(
-        [{ id: "1", value: "Centrifuge" }],
-        null,
-        { scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.READY },
-      );
-    });
+    loadNotebookEquipmentOptions.mockImplementation(
+      (notebookId, buildUrl, callback) => {
+        callback([{ id: "1", value: "Centrifuge" }], null, {
+          scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.READY,
+        });
+      },
+    );
 
     renderWithIntl(
       <NotebookDepartmentEquipmentMultiSelect
@@ -50,16 +50,22 @@ describe("Notebook inventory selectors", () => {
 
     expect(loadNotebookEquipmentOptions).toHaveBeenCalled();
 
-    expect(screen.queryByText("No active equipment found in this notebook's departments.")).toBeNull();
+    expect(
+      screen.queryByText(
+        "No active equipment found in this notebook's departments.",
+      ),
+    ).toBeNull();
     expect(screen.getByRole("combobox")).toBeTruthy();
   });
 
   test("reagent selector shows empty helper when scoped department inventory is empty", async () => {
-    loadNotebookScopedInventory.mockImplementation((notebookId, endpoint, callback) => {
-      callback([], null, {
-        scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS,
-      });
-    });
+    loadNotebookScopedInventory.mockImplementation(
+      (notebookId, endpoint, callback) => {
+        callback([], null, {
+          scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS,
+        });
+      },
+    );
 
     renderWithIntl(
       <ReagentUsageSelector
@@ -81,23 +87,25 @@ describe("Notebook inventory selectors", () => {
   });
 
   test("reagent selector surfaces qc-pending warning without hiding the reagent", async () => {
-    loadNotebookScopedInventory.mockImplementation((notebookId, endpoint, callback) => {
-      callback(
-        [
-          {
-            id: "55",
-            name: "Prep Buffer",
-            lotNumber: "LOT-55",
-            units: "mL",
-            currentQuantity: 10,
-            qcStatus: "PENDING",
-            selectionWarnings: ["QC_PENDING"],
-          },
-        ],
-        null,
-        { scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.READY },
-      );
-    });
+    loadNotebookScopedInventory.mockImplementation(
+      (notebookId, endpoint, callback) => {
+        callback(
+          [
+            {
+              id: "55",
+              name: "Prep Buffer",
+              lotNumber: "LOT-55",
+              units: "mL",
+              currentQuantity: 10,
+              qcStatus: "PENDING",
+              selectionWarnings: ["QC_PENDING"],
+            },
+          ],
+          null,
+          { scopeStatus: NOTEBOOK_INVENTORY_SCOPE_STATUS.READY },
+        );
+      },
+    );
 
     renderWithIntl(
       <ReagentUsageSelector

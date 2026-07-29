@@ -82,8 +82,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
                 int rowNumber = i + 2;
                 Map<String, String> row = dataRows.get(i);
                 List<String> rowErrors = new ArrayList<>();
-                CatalogRow catalogRow = parseCatalogRow(row, rowNumber, request, rowErrors, false,
-                        defaultDepartmentId);
+                CatalogRow catalogRow = parseCatalogRow(row, rowNumber, request, rowErrors, false, defaultDepartmentId);
 
                 String normalizedName = catalogRow.name != null ? catalogRow.name.trim().toLowerCase() : null;
                 if (normalizedName != null) {
@@ -145,8 +144,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
                 int rowNumber = i + 2;
                 Map<String, String> row = dataRows.get(i);
                 List<String> rowErrors = new ArrayList<>();
-                CatalogRow catalogRow = parseCatalogRow(row, rowNumber, request, rowErrors, true,
-                        defaultDepartmentId);
+                CatalogRow catalogRow = parseCatalogRow(row, rowNumber, request, rowErrors, true, defaultDepartmentId);
 
                 String normalizedName = catalogRow.name != null ? catalogRow.name.trim().toLowerCase() : null;
                 if (normalizedName != null && !namesInFile.add(normalizedName)) {
@@ -238,8 +236,8 @@ public class InventoryImportServiceImpl implements InventoryImportService {
 
     @Override
     @Transactional
-    public Map<String, Object> importLots(InputStream inputStream, String fileName, String contentType, String sysUserId,
-            HttpServletRequest request) {
+    public Map<String, Object> importLots(InputStream inputStream, String fileName, String contentType,
+            String sysUserId, HttpServletRequest request) {
         Map<String, Object> response = new HashMap<>();
         List<String> errors = new ArrayList<>();
         int created = 0;
@@ -389,8 +387,7 @@ public class InventoryImportServiceImpl implements InventoryImportService {
         if (catalogRow.itemType != null && catalogRow.departmentTestSectionId != null && catalogRow.name != null
                 && checkExisting) {
             List<InventoryItem> existing = inventoryItemService.searchByName(catalogRow.name).stream()
-                    .filter(item -> item.getName() != null
-                            && item.getName().equalsIgnoreCase(catalogRow.name.trim())
+                    .filter(item -> item.getName() != null && item.getName().equalsIgnoreCase(catalogRow.name.trim())
                             && catalogRow.departmentTestSectionId.equals(item.getDepartmentTestSectionId()))
                     .collect(Collectors.toList());
             if (!existing.isEmpty()) {
@@ -438,8 +435,8 @@ public class InventoryImportServiceImpl implements InventoryImportService {
             if (matches.isEmpty()) {
                 rowErrors.add("itemName: No accessible catalog item found with name '" + lotRow.itemName + "'");
             } else if (matches.size() > 1) {
-                rowErrors.add("itemName: Multiple catalog items match name '" + lotRow.itemName
-                        + "'. Use itemId instead.");
+                rowErrors.add(
+                        "itemName: Multiple catalog items match name '" + lotRow.itemName + "'. Use itemId instead.");
             } else {
                 matchedItem = matches.get(0);
             }

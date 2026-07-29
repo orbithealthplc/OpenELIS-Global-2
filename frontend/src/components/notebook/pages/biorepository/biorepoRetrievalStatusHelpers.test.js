@@ -34,7 +34,9 @@ describe("biorepoRetrievalStatusHelpers", () => {
   });
 
   test("getRequestLineCount prefers requestLineCount over totalItemCount", () => {
-    expect(getRequestLineCount({ requestLineCount: 3, totalItemCount: 0 })).toBe(3);
+    expect(
+      getRequestLineCount({ requestLineCount: 3, totalItemCount: 0 }),
+    ).toBe(3);
   });
 
   test("getRequestDisplayStatus maps approved awaiting fulfillment", () => {
@@ -55,9 +57,9 @@ describe("biorepoRetrievalStatusHelpers", () => {
     expect(getRequestDisplayStatus({ status: "DRAFT" }, intl).label).toBe(
       "Draft – Not Submitted",
     );
-    expect(getRequestDisplayStatus({ status: "PENDING_APPROVAL" }, intl).label).toBe(
-      "Pending Approval",
-    );
+    expect(
+      getRequestDisplayStatus({ status: "PENDING_APPROVAL" }, intl).label,
+    ).toBe("Pending Approval");
   });
 
   test("getRequestCompletionBlockReason blocks unmatched reference lines", () => {
@@ -88,7 +90,11 @@ describe("biorepoRetrievalStatusHelpers", () => {
   });
 
   test("findNextAttachTarget returns remaining awaiting fulfillment row", () => {
-    const onlyAwaiting = { id: 10, status: "AWAITING_FULFILLMENT", itemRole: "REFERENCE" };
+    const onlyAwaiting = {
+      id: 10,
+      status: "AWAITING_FULFILLMENT",
+      itemRole: "REFERENCE",
+    };
     const request = { items: [onlyAwaiting] };
     expect(findNextAttachTarget(request, 10)).toEqual(onlyAwaiting);
   });

@@ -198,8 +198,9 @@ public class InventoryReagentRestController extends BaseRestController {
 
     /**
      * Returns all lots for an inventory item in FEFO display order. Unlike
-     * {@link InventoryLotService#getAvailableLotsByItemFEFO()}, this does not filter
-     * by QC passed or available quantity — notebook UIs surface those as warnings.
+     * {@link InventoryLotService#getAvailableLotsByItemFEFO()}, this does not
+     * filter by QC passed or available quantity — notebook UIs surface those as
+     * warnings.
      */
     private List<InventoryLot> getNotebookSelectableLots(Long itemId, boolean requireLots) {
         List<InventoryLot> allLots = inventoryLotService.getByInventoryItemId(itemId);
@@ -208,7 +209,8 @@ public class InventoryReagentRestController extends BaseRestController {
         }
 
         return allLots.stream()
-                .sorted(Comparator.comparing(InventoryLot::getExpirationDate, Comparator.nullsLast(Comparator.naturalOrder()))
+                .sorted(Comparator
+                        .comparing(InventoryLot::getExpirationDate, Comparator.nullsLast(Comparator.naturalOrder()))
                         .thenComparing(InventoryLot::getCalculatedExpiryAfterOpening,
                                 Comparator.nullsLast(Comparator.naturalOrder())))
                 .collect(Collectors.toList());
@@ -315,9 +317,8 @@ public class InventoryReagentRestController extends BaseRestController {
         }
         Set<Integer> requestedDepartmentIds = Set.copyOf(departmentIds);
         return accessibleItems.stream()
-                .filter(item -> requestedDepartmentIds.stream()
-                        .anyMatch(departmentId -> departmentIsolationService.inventoryBelongsToDepartment(item,
-                                departmentId)))
+                .filter(item -> requestedDepartmentIds.stream().anyMatch(
+                        departmentId -> departmentIsolationService.inventoryBelongsToDepartment(item, departmentId)))
                 .toList();
     }
 }

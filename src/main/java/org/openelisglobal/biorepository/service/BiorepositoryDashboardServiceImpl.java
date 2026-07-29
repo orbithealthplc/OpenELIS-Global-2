@@ -532,8 +532,7 @@ public class BiorepositoryDashboardServiceImpl implements BiorepositoryDashboard
         long overdueReturns = 0;
 
         for (SampleRetrievalRequest retrievalReq : filteredRequests) {
-            List<SampleRetrievalItem> items = retrievalReq.getItems() != null ? retrievalReq.getItems()
-                    : List.of();
+            List<SampleRetrievalItem> items = retrievalReq.getItems() != null ? retrievalReq.getItems() : List.of();
             totalItemsRetrieved += items.stream()
                     .filter(item -> item.getStatus() != SampleRetrievalItem.ItemStatus.PENDING).count();
             returnedItems += items.stream()

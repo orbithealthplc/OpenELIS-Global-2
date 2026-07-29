@@ -105,8 +105,8 @@ public class BioSampleLifecycleServiceImpl implements BioSampleLifecycleService 
                 MutableEvent e = new MutableEvent(ts);
                 e.dto.setEventType(TYPE_TRANSFERRED);
                 e.dto.setOccurredAt(toIso(ts));
-                e.dto.setActor(userLabel(request.getProcessedBy() != null ? request.getProcessedBy()
-                        : request.getRequestedBy()));
+                e.dto.setActor(userLabel(
+                        request.getProcessedBy() != null ? request.getProcessedBy() : request.getRequestedBy()));
                 e.dto.setSourceLocation(request.getSourceLab());
                 e.dto.setDestinationLocation(request.getDestinationLab());
                 if (request.getRequestNotes() != null && !request.getRequestNotes().isBlank()) {
@@ -222,8 +222,8 @@ public class BioSampleLifecycleServiceImpl implements BioSampleLifecycleService 
             e.dto.setActor(userLabelForNumericId(m.getMovedByUserId()));
             e.dto.setSourceLocation(formatMovementEndpoint(m.getPreviousLocationType(), m.getPreviousLocationId(),
                     m.getPreviousPositionCoordinate()));
-            e.dto.setDestinationLocation(formatMovementEndpoint(m.getNewLocationType(), m.getNewLocationId(),
-                    m.getNewPositionCoordinate()));
+            e.dto.setDestinationLocation(
+                    formatMovementEndpoint(m.getNewLocationType(), m.getNewLocationId(), m.getNewPositionCoordinate()));
             if (m.getReason() != null && !m.getReason().isBlank()) {
                 e.dto.setStatusOrNotes(m.getReason().trim());
             }

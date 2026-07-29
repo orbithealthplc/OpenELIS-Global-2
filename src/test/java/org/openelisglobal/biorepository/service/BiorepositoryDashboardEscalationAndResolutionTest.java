@@ -143,7 +143,8 @@ public class BiorepositoryDashboardEscalationAndResolutionTest {
         assertTrue(triggeredRules.contains("BATCH_FAIL_RATE_OVER_5_PERCENT"));
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> flaggedFreezers = (List<Map<String, Object>>) escalationSignals.get("flaggedFreezers");
+        List<Map<String, Object>> flaggedFreezers = (List<Map<String, Object>>) escalationSignals
+                .get("flaggedFreezers");
         assertFalse("Freezer should be flagged at exactly 5.0%", flaggedFreezers.isEmpty());
     }
 
@@ -177,7 +178,8 @@ public class BiorepositoryDashboardEscalationAndResolutionTest {
         assertTrue(triggeredRules.contains("BATCH_FAIL_RATE_OVER_5_PERCENT"));
 
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> flaggedFreezers = (List<Map<String, Object>>) escalationSignals.get("flaggedFreezers");
+        List<Map<String, Object>> flaggedFreezers = (List<Map<String, Object>>) escalationSignals
+                .get("flaggedFreezers");
         assertFalse("Freezer should be flagged above 5.0% fail rate", flaggedFreezers.isEmpty());
         assertEquals("Freezer-D", flaggedFreezers.get(0).get("key"));
     }
@@ -212,9 +214,9 @@ public class BiorepositoryDashboardEscalationAndResolutionTest {
         inspection.setCorrectionActionType(correctionActionType);
         if (correctionActionType != null) {
             inspection.setCorrectionOldCoordinate(locationPath + " > " + position);
-            inspection.setCorrectionNewCoordinate("MARK_MISSING".equals(correctionActionType)
-                    ? "Missing (not found during QC)"
-                    : locationPath + " > Z9");
+            inspection.setCorrectionNewCoordinate(
+                    "MARK_MISSING".equals(correctionActionType) ? "Missing (not found during QC)"
+                            : locationPath + " > Z9");
             inspection.setCorrectionReason(correctionActionType + ": corrected");
             inspection.setCorrectionByUser("7");
             inspection.setCorrectionTimestamp(new Timestamp(System.currentTimeMillis()));

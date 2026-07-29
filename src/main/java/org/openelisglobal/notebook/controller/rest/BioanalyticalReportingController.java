@@ -707,7 +707,8 @@ public class BioanalyticalReportingController extends BaseRestController {
 
     /**
      * Resolves sample IDs for Stage 4 exports: prefers {@code sampleIds}, then
-     * {@code groupedResults[*].sampleIds}, then {@code individualResults[*].sampleId}.
+     * {@code groupedResults[*].sampleIds}, then
+     * {@code individualResults[*].sampleId}.
      */
     private List<Integer> resolveBioanalyticalExportSampleIds(BioanalyticalREDCapExportRequest request) {
         if (request == null) {
@@ -858,8 +859,8 @@ public class BioanalyticalReportingController extends BaseRestController {
 
         try {
             LogEvent.logInfo(this.getClass().getSimpleName(), "exportToCSV",
-                    "Bioanalytical CSV export request: pageId=" + pageId + ", sampleIds="
-                            + sampleIds.size() + ", groupedResults="
+                    "Bioanalytical CSV export request: pageId=" + pageId + ", sampleIds=" + sampleIds.size()
+                            + ", groupedResults="
                             + (request.getGroupedResults() == null ? 0 : request.getGroupedResults().size())
                             + ", individualResults="
                             + (request.getIndividualResults() == null ? 0 : request.getIndividualResults().size()));
@@ -915,8 +916,8 @@ public class BioanalyticalReportingController extends BaseRestController {
 
         try {
             LogEvent.logInfo(this.getClass().getSimpleName(), "exportToLMIS",
-                    "Bioanalytical LMIS export request: pageId=" + pageId + ", sampleIds="
-                            + sampleIds.size() + ", groupedResults="
+                    "Bioanalytical LMIS export request: pageId=" + pageId + ", sampleIds=" + sampleIds.size()
+                            + ", groupedResults="
                             + (request.getGroupedResults() == null ? 0 : request.getGroupedResults().size())
                             + ", individualResults="
                             + (request.getIndividualResults() == null ? 0 : request.getIndividualResults().size()));
@@ -972,8 +973,8 @@ public class BioanalyticalReportingController extends BaseRestController {
 
         try {
             LogEvent.logInfo(this.getClass().getSimpleName(), "exportToSDTM",
-                    "Bioanalytical SDTM export request: pageId=" + pageId + ", sampleIds="
-                            + sampleIds.size() + ", groupedResults="
+                    "Bioanalytical SDTM export request: pageId=" + pageId + ", sampleIds=" + sampleIds.size()
+                            + ", groupedResults="
                             + (request.getGroupedResults() == null ? 0 : request.getGroupedResults().size())
                             + ", individualResults="
                             + (request.getIndividualResults() == null ? 0 : request.getIndividualResults().size()));
@@ -1031,8 +1032,8 @@ public class BioanalyticalReportingController extends BaseRestController {
 
         try {
             LogEvent.logInfo(this.getClass().getSimpleName(), "exportToPDF",
-                    "Bioanalytical PDF export request: pageId=" + pageId + ", sampleIds="
-                            + sampleIds.size() + ", groupedResults="
+                    "Bioanalytical PDF export request: pageId=" + pageId + ", sampleIds=" + sampleIds.size()
+                            + ", groupedResults="
                             + (request.getGroupedResults() == null ? 0 : request.getGroupedResults().size())
                             + ", individualResults="
                             + (request.getIndividualResults() == null ? 0 : request.getIndividualResults().size()));

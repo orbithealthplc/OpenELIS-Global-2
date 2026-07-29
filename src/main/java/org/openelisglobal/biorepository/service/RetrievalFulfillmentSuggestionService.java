@@ -10,6 +10,6 @@ import org.openelisglobal.biorepository.controller.rest.dto.RetrievalItemSuggest
  */
 public interface RetrievalFulfillmentSuggestionService {
 
-    Map<String, RetrievalItemSuggestionDTO> getSuggestions(
-            RetrievalItemSuggestionsRequestDTO request, HttpServletRequest httpRequest);
+    Map<String, RetrievalItemSuggestionDTO> getSuggestions(RetrievalItemSuggestionsRequestDTO request,
+            HttpServletRequest httpRequest);
 }

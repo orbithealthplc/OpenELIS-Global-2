@@ -27,8 +27,7 @@ public class InventoryImportRestController extends BaseRestController {
 
     @PostMapping(value = "/catalog/validate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> validateCatalogImport(@RequestParam("file") MultipartFile file,
-            @RequestParam(value = "departmentId", required = false) Integer departmentId,
-            HttpServletRequest request) {
+            @RequestParam(value = "departmentId", required = false) Integer departmentId, HttpServletRequest request) {
         try {
             if (file.isEmpty()) {
                 return badRequest("File is empty");

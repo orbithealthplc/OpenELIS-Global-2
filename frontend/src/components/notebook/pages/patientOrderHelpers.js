@@ -49,18 +49,19 @@ export function normalizePatientForOrder(patient) {
 export function isRegistrationFormValid(form, mode = REGISTER_MODE.PATIENT) {
   const firstOk = (form.firstName || "").trim() !== "";
   const lastOk =
-    mode === REGISTER_MODE.PARTICIPANT ||
-    (form.lastName || "").trim() !== "";
+    mode === REGISTER_MODE.PARTICIPANT || (form.lastName || "").trim() !== "";
   const genderOk = (form.gender || "").trim() !== "";
   return firstOk && lastOk && genderOk;
 }
 
-export function buildPatientManagementPayload(form, mode = REGISTER_MODE.PATIENT) {
+export function buildPatientManagementPayload(
+  form,
+  mode = REGISTER_MODE.PATIENT,
+) {
   const birthDateForDisplay = (form.dateOfBirth ?? "").toString().trim();
 
   const lastName =
-    mode === REGISTER_MODE.PARTICIPANT &&
-    (form.lastName || "").trim() === ""
+    mode === REGISTER_MODE.PARTICIPANT && (form.lastName || "").trim() === ""
       ? "-"
       : form.lastName;
 

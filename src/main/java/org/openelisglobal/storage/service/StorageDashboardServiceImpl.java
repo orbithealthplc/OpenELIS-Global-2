@@ -39,8 +39,8 @@ public class StorageDashboardServiceImpl implements StorageDashboardService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Map<String, Object>> filterSamples(
-            String location, String status, Integer departmentId, Integer roomId, Integer deviceId) {
+    public List<Map<String, Object>> filterSamples(String location, String status, Integer departmentId, Integer roomId,
+            Integer deviceId) {
         List<Map<String, Object>> allSamples = sampleStorageService.getAllSamplesWithAssignments();
         List<Map<String, Object>> filtered = new ArrayList<>();
 

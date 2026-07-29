@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.openelisglobal.biorepository.service.BioSampleService;
 import org.openelisglobal.notebook.valueholder.NotebookPageSample;
 import org.openelisglobal.notebook.valueholder.NotebookPageSample.Status;
-import org.openelisglobal.biorepository.service.BioSampleService;
 import org.openelisglobal.sampleitem.service.SampleItemService;
 import org.openelisglobal.storage.service.SampleStorageService;
 
@@ -147,11 +147,11 @@ public class NotebookBulkOperationServiceTest {
 
         when(notebookPageSampleService.getByPageIdAndSampleItemId(testPageId, 1)).thenReturn(pendingSample);
         when(sampleStorageService.assignSampleItemWithLocation("1", "200", "box", "A1", null)).thenReturn(
-            Map.of("assignmentId", "9001", "hierarchicalPath", "Room A > Freezer 1 > Shelf B > Rack C > Box"));
+                Map.of("assignmentId", "9001", "hierarchicalPath", "Room A > Freezer 1 > Shelf B > Rack C > Box"));
 
         // Act
         Map<String, Object> result = bulkOperationService.assignSamplesToStorage(testPageId, Arrays.asList(1), 200,
-            "A1", new HashMap<>(), testUserId, false);
+                "A1", new HashMap<>(), testUserId, false);
 
         // Assert
         assertEquals("Assignment should succeed", true, result.get("success"));
@@ -163,7 +163,7 @@ public class NotebookBulkOperationServiceTest {
 
         assertEquals("Status should advance to IN_PROGRESS", Status.IN_PROGRESS, updatedSample.getStatus());
         assertEquals("Storage assignment ID should be tracked", "9001",
-            String.valueOf(updatedSample.getData().get("storageAssignmentId")));
+                String.valueOf(updatedSample.getData().get("storageAssignmentId")));
         assertEquals("Well coordinate should be tracked", "A1", updatedSample.getData().get("storageWell"));
     }
 
@@ -177,11 +177,11 @@ public class NotebookBulkOperationServiceTest {
 
         when(notebookPageSampleService.getByPageIdAndSampleItemId(testPageId, 1)).thenReturn(pendingSample);
         when(sampleStorageService.assignSampleItemWithLocation("1", "200", "box", "A1", null))
-            .thenReturn(new HashMap<>());
+                .thenReturn(new HashMap<>());
 
         Map<String, String> wellAssignments = Map.of("1", "A1");
         Map<String, Object> result = bulkOperationService.assignSamplesToStorageWithWellMap(testPageId,
-            Arrays.asList(1), 200, wellAssignments, new HashMap<>(), testUserId, false);
+                Arrays.asList(1), 200, wellAssignments, new HashMap<>(), testUserId, false);
 
         assertEquals(false, result.get("success"));
         assertEquals(0, result.get("assignedCount"));
@@ -201,20 +201,19 @@ public class NotebookBulkOperationServiceTest {
         pendingSample.setData(new HashMap<>());
 
         when(notebookPageSampleService.getByPageIdAndSampleItemId(testPageId, 1)).thenReturn(pendingSample);
-        when(sampleStorageService.assignSampleItemWithLocation("1", "200", "box", "A1", null)).thenReturn(
-            Map.of("assignmentId", "9001", "hierarchicalPath", "Unknown"));
+        when(sampleStorageService.assignSampleItemWithLocation("1", "200", "box", "A1", null))
+                .thenReturn(Map.of("assignmentId", "9001", "hierarchicalPath", "Unknown"));
 
         Map<String, Object> storageData = new HashMap<>();
         storageData.put("storagePath", "Bio Room > Freezer 1 > Box 3");
 
         Map<String, Object> result = bulkOperationService.assignSamplesToStorageWithWellMap(testPageId,
-            Arrays.asList(1), 200, Map.of("1", "A1"), storageData, testUserId, false);
+                Arrays.asList(1), 200, Map.of("1", "A1"), storageData, testUserId, false);
 
         assertEquals(true, result.get("success"));
         ArgumentCaptor<NotebookPageSample> updatedSampleCaptor = ArgumentCaptor.forClass(NotebookPageSample.class);
         verify(notebookPageSampleService).update(updatedSampleCaptor.capture());
-        assertEquals("Bio Room > Freezer 1 > Box 3",
-            updatedSampleCaptor.getValue().getData().get("storagePath"));
+        assertEquals("Bio Room > Freezer 1 > Box 3", updatedSampleCaptor.getValue().getData().get("storagePath"));
     }
 
     @Test
@@ -225,30 +224,28 @@ public class NotebookBulkOperationServiceTest {
         pendingSample.setStatus(Status.IN_PROGRESS);
         pendingSample.setData(new HashMap<>());
 
-        org.openelisglobal.sampleitem.valueholder.SampleItem sampleItem =
-            new org.openelisglobal.sampleitem.valueholder.SampleItem();
+        org.openelisglobal.sampleitem.valueholder.SampleItem sampleItem = new org.openelisglobal.sampleitem.valueholder.SampleItem();
         sampleItem.setId("1");
 
-        org.openelisglobal.storage.valueholder.SampleStorageAssignment assignment =
-            new org.openelisglobal.storage.valueholder.SampleStorageAssignment();
+        org.openelisglobal.storage.valueholder.SampleStorageAssignment assignment = new org.openelisglobal.storage.valueholder.SampleStorageAssignment();
         assignment.setId(9001);
 
         when(notebookPageSampleService.getByPageIdAndSampleItemId(testPageId, 1)).thenReturn(pendingSample);
         when(sampleStorageService.getSampleItemLocation("1"))
-            .thenReturn(Map.of("sampleItemId", "1", "hierarchicalPath", "Room A > Freezer 1"));
-        when(sampleStorageService.moveSampleItemWithLocation(eq("1"), eq("200"), eq("box"), eq("B2"),
-            any(), any(), eq(testUserId))).thenReturn("5001");
+                .thenReturn(Map.of("sampleItemId", "1", "hierarchicalPath", "Room A > Freezer 1"));
+        when(sampleStorageService.moveSampleItemWithLocation(eq("1"), eq("200"), eq("box"), eq("B2"), any(), any(),
+                eq(testUserId))).thenReturn("5001");
         when(sampleItemService.get("1")).thenReturn(sampleItem);
         when(sampleStorageService.getSampleStorageAssignmentsBySampleItem(sampleItem))
-            .thenReturn(Arrays.asList(assignment));
+                .thenReturn(Arrays.asList(assignment));
 
         Map<String, Object> result = bulkOperationService.assignSamplesToStorage(testPageId, Arrays.asList(1), 200,
-            "B2", new HashMap<>(), testUserId, true);
+                "B2", new HashMap<>(), testUserId, true);
 
         assertEquals(true, result.get("success"));
         assertEquals(1, result.get("assignedCount"));
-        verify(sampleStorageService).moveSampleItemWithLocation(eq("1"), eq("200"), eq("box"), eq("B2"),
-            any(), any(), eq(testUserId));
+        verify(sampleStorageService).moveSampleItemWithLocation(eq("1"), eq("200"), eq("box"), eq("B2"), any(), any(),
+                eq(testUserId));
         verify(sampleStorageService, never()).assignSampleItemWithLocation(any(), any(), any(), any(), any());
     }
 

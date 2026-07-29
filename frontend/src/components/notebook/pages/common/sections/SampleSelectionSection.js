@@ -21,7 +21,11 @@ import { createEmptyRequestRow } from "../biorepoRequestReferenceHelpers";
  * Section B: Requested sample reference rows (AHRI BR-F-02)
  * Requesters describe samples; Biorepository matches inventory at fulfillment.
  */
-function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) {
+function SampleSelectionSection({
+  selectedSamples,
+  onSamplesChange,
+  readOnly,
+}) {
   const intl = useIntl();
 
   const handleAddRow = useCallback(() => {
@@ -30,7 +34,9 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
 
   const handleRemoveRow = useCallback(
     (rowId) => {
-      onSamplesChange((selectedSamples || []).filter((row) => row.id !== rowId));
+      onSamplesChange(
+        (selectedSamples || []).filter((row) => row.id !== rowId),
+      );
     },
     [selectedSamples, onSamplesChange],
   );
@@ -148,7 +154,12 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
 
       {!readOnly && (
         <div style={{ marginBottom: "0.75rem" }}>
-          <Button kind="secondary" size="sm" renderIcon={Add} onClick={handleAddRow}>
+          <Button
+            kind="secondary"
+            size="sm"
+            renderIcon={Add}
+            onClick={handleAddRow}
+          >
             <FormattedMessage
               id="biorepo.import.reference.addRow"
               defaultMessage="Add Requested Sample"
@@ -159,13 +170,22 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
 
       {rows.length > 0 ? (
         <DataTable rows={rows} headers={headers} size="sm">
-          {({ rows: tableRows, headers: tableHeaders, getTableProps, getHeaderProps, getRowProps }) => (
+          {({
+            rows: tableRows,
+            headers: tableHeaders,
+            getTableProps,
+            getHeaderProps,
+            getRowProps,
+          }) => (
             <TableContainer>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {tableHeaders.map((header) => (
-                      <TableHeader key={header.key} {...getHeaderProps({ header })}>
+                      <TableHeader
+                        key={header.key}
+                        {...getHeaderProps({ header })}
+                      >
                         {header.header}
                       </TableHeader>
                     ))}
@@ -173,7 +193,9 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                 </TableHead>
                 <TableBody>
                   {tableRows.map((row) => {
-                    const source = (selectedSamples || []).find((item) => item.id === row.id);
+                    const source = (selectedSamples || []).find(
+                      (item) => item.id === row.id,
+                    );
                     return (
                       <TableRow key={row.id} {...getRowProps({ row })}>
                         <TableCell>
@@ -187,7 +209,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.requestedAccessionNumber || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "requestedAccessionNumber", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "requestedAccessionNumber",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
@@ -203,7 +229,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.requestedBarcode || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "requestedBarcode", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "requestedBarcode",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
@@ -219,7 +249,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.requestedSampleType || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "requestedSampleType", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "requestedSampleType",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
@@ -235,7 +269,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.requestedOriginLab || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "requestedOriginLab", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "requestedOriginLab",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
@@ -251,14 +289,18 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.requestedProjectId || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "requestedProjectId", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "requestedProjectId",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
                         </TableCell>
                         <TableCell>
                           {readOnly ? (
-                            source?.quantityRequested ?? "-"
+                            (source?.quantityRequested ?? "-")
                           ) : (
                             <NumberInput
                               id={`quantity-${row.id}`}
@@ -268,7 +310,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               min={0}
                               value={source?.quantityRequested ?? ""}
                               onChange={(e, { value }) =>
-                                handleFieldChange(row.id, "quantityRequested", value)
+                                handleFieldChange(
+                                  row.id,
+                                  "quantityRequested",
+                                  value,
+                                )
                               }
                             />
                           )}
@@ -284,7 +330,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.unitOfMeasure || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "unitOfMeasure", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "unitOfMeasure",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}
@@ -300,7 +350,11 @@ function SampleSelectionSection({ selectedSamples, onSamplesChange, readOnly }) 
                               size="sm"
                               value={source?.remark || ""}
                               onChange={(e) =>
-                                handleFieldChange(row.id, "remark", e.target.value)
+                                handleFieldChange(
+                                  row.id,
+                                  "remark",
+                                  e.target.value,
+                                )
                               }
                             />
                           )}

@@ -89,8 +89,7 @@ public class InventoryLotRestController extends BaseRestController {
             @RequestParam(defaultValue = "0") int offset, @RequestParam(defaultValue = "expirationDate") String sortBy,
             @RequestParam(defaultValue = "asc") String sortOrder, @RequestParam(required = false) String itemType,
             @RequestParam(required = false) String status, @RequestParam(required = false) String search,
-            @RequestParam(required = false) List<Integer> departmentIds,
-            HttpServletRequest request) {
+            @RequestParam(required = false) List<Integer> departmentIds, HttpServletRequest request) {
         try {
             // Parse status parameter
             LotStatus lotStatus = null;
@@ -686,9 +685,8 @@ public class InventoryLotRestController extends BaseRestController {
         }
         Set<Integer> requestedDepartmentIds = Set.copyOf(departmentIds);
         return accessibleLots.stream()
-                .filter(lot -> requestedDepartmentIds.stream()
-                        .anyMatch(departmentId -> departmentIsolationService
-                                .inventoryBelongsToDepartment(lot.getInventoryItem(), departmentId)))
+                .filter(lot -> requestedDepartmentIds.stream().anyMatch(departmentId -> departmentIsolationService
+                        .inventoryBelongsToDepartment(lot.getInventoryItem(), departmentId)))
                 .toList();
     }
 
@@ -701,7 +699,8 @@ public class InventoryLotRestController extends BaseRestController {
     }
 
     private RbacAction inventoryActionFor(InventoryItem item) {
-        if (item != null && item.getItemType() == org.openelisglobal.inventory.valueholder.InventoryEnums.ItemType.EQUIPMENT) {
+        if (item != null
+                && item.getItemType() == org.openelisglobal.inventory.valueholder.InventoryEnums.ItemType.EQUIPMENT) {
             return RbacAction.MANAGE_EQUIPMENT;
         }
         return RbacAction.UPDATE_SAMPLES;

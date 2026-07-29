@@ -2,8 +2,8 @@ package org.openelisglobal.department.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,7 +13,6 @@ import java.util.Objects;
 import java.util.Set;
 import org.openelisglobal.biorepository.valueholder.BioSample;
 import org.openelisglobal.common.action.IActionConstants;
-import org.openelisglobal.common.constants.Constants;
 import org.openelisglobal.inventory.valueholder.InventoryItem;
 import org.openelisglobal.login.valueholder.UserSessionData;
 import org.openelisglobal.notebook.service.NoteBookService;
@@ -110,7 +109,8 @@ public class DepartmentIsolationService {
     }
 
     /**
-     * Ensures the notebook belongs to the user's active department (or user has unrestricted access).
+     * Ensures the notebook belongs to the user's active department (or user has
+     * unrestricted access).
      */
     @Transactional(readOnly = true)
     public void assertNotebookDepartmentAccess(HttpServletRequest request, NoteBook notebook) {
@@ -145,8 +145,9 @@ public class DepartmentIsolationService {
 
     /**
      * Lab departments ({@code test_section}) the user may assign when creating
-     * department-owned records (storage rooms, inventory catalog items, etc.).
-     * Same notebook-linked set as {@link #getAssignableWorkflowDepartments(HttpServletRequest)}.
+     * department-owned records (storage rooms, inventory catalog items, etc.). Same
+     * notebook-linked set as
+     * {@link #getAssignableWorkflowDepartments(HttpServletRequest)}.
      */
     @Transactional(readOnly = true)
     public List<Map<String, String>> getAssignableLabDepartments(HttpServletRequest request) {
@@ -326,8 +327,9 @@ public class DepartmentIsolationService {
     }
 
     /**
-     * All departments a user may select as active login context.
-     * This is NOT data scope; data scope uses {@link #getRestrictedUserTestSectionIds(HttpServletRequest)}.
+     * All departments a user may select as active login context. This is NOT data
+     * scope; data scope uses
+     * {@link #getRestrictedUserTestSectionIds(HttpServletRequest)}.
      */
     @Transactional(readOnly = true)
     public Set<Integer> getSelectableUserTestSectionIds(HttpServletRequest request) {
@@ -686,7 +688,8 @@ public class DepartmentIsolationService {
                 return localizedName;
             }
         } catch (Exception ignored) {
-            // Fall through to the raw localization value when Spring localization is unavailable.
+            // Fall through to the raw localization value when Spring localization is
+            // unavailable.
         }
         try {
             return section.getLocalization() != null ? section.getLocalization().getLocalizedValue() : null;
@@ -777,8 +780,8 @@ public class DepartmentIsolationService {
         if (activeSections == null || activeSections.isEmpty()) {
             return null;
         }
-        return activeSections.stream().filter(section -> notebookTitleMatchesDepartment(notebookTitle, section)).findFirst()
-                .orElse(null);
+        return activeSections.stream().filter(section -> notebookTitleMatchesDepartment(notebookTitle, section))
+                .findFirst().orElse(null);
     }
 
     private boolean notebookTitleMatchesDepartment(String notebookTitle, TestSection department) {

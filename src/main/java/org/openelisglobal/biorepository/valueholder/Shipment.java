@@ -1,5 +1,7 @@
 package org.openelisglobal.biorepository.valueholder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -81,6 +83,7 @@ public class Shipment extends BaseObject<Integer> {
     @NotNull(message = "Receiver is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "receiver_user_id", nullable = false)
+    @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
     private SystemUser receiver;
 
     @NotNull(message = "Reception timestamp is required")
@@ -121,6 +124,7 @@ public class Shipment extends BaseObject<Integer> {
     private String sysUserId;
 
     @OneToMany(mappedBy = "shipment", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<BioSample> samples = new ArrayList<>();
 
     // Default constructor required by JPA

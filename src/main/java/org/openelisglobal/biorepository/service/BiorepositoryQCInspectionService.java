@@ -31,8 +31,7 @@ public interface BiorepositoryQCInspectionService extends BaseObjectService<Bior
     BiorepositoryQCInspection getMostRecentByBioSampleId(Integer bioSampleId);
 
     /**
-     * Find the most recent QC inspections for multiple biosamples in a single
-     * call.
+     * Find the most recent QC inspections for multiple biosamples in a single call.
      *
      * @param bioSampleIds list of biosample IDs
      * @return map keyed by biosample ID containing the latest inspection
@@ -99,7 +98,8 @@ public interface BiorepositoryQCInspectionService extends BaseObjectService<Bior
     Set<Integer> getBioSampleIdsWithAnyInspection(List<Integer> bioSampleIds);
 
     /**
-     * Biosample IDs from {@code bioSampleIds} with an inspection in {@code [start, end]}.
+     * Biosample IDs from {@code bioSampleIds} with an inspection in
+     * {@code [start, end]}.
      */
     Set<Integer> getBioSampleIdsInspectedBetween(List<Integer> bioSampleIds, java.sql.Timestamp start,
             java.sql.Timestamp end);
@@ -229,16 +229,16 @@ public interface BiorepositoryQCInspectionService extends BaseObjectService<Bior
     /**
      * Apply mandatory correction workflow for a failed QC inspection.
      *
-     * Supports UPDATE_LOCATION, REASSIGN_POSITION, and MARK_MISSING.
-     * Persists correction audit details onto the inspection record.
+     * Supports UPDATE_LOCATION, REASSIGN_POSITION, and MARK_MISSING. Persists
+     * correction audit details onto the inspection record.
      *
      * @return correction details suitable for API response
      */
-        default Map<String, Object> applyCorrectionWorkflow(BiorepositoryQCInspection inspection,
+    default Map<String, Object> applyCorrectionWorkflow(BiorepositoryQCInspection inspection,
             String correctionActionType, String correctionLocationId, String correctionLocationType,
             String correctionPositionCoordinate, String correctionReason, String correctiveAction, String remarks,
             String correctedByUserId) {
         throw new UnsupportedOperationException(
-            "Correction workflow is handled at controller/service integration level in this branch");
-        }
+                "Correction workflow is handled at controller/service integration level in this branch");
+    }
 }

@@ -171,13 +171,13 @@ public class NotebookEntryRoomEnvironmentLogServiceImpl
                     continue;
                 }
 
-                String roomName = firstNonBlank(stringValue(row, "roomName"), stringValue(row, "room_name"),
-                        roomCode);
-                String checkedBy = firstNonBlank(stringValue(row, "checkedBy"), stringValue(row, "checked_by"), sysUserId);
+                String roomName = firstNonBlank(stringValue(row, "roomName"), stringValue(row, "room_name"), roomCode);
+                String checkedBy = firstNonBlank(stringValue(row, "checkedBy"), stringValue(row, "checked_by"),
+                        sysUserId);
                 String notes = stringValue(row, "notes");
 
-                logRoomEnvironment(entryId, roomCode, roomName, oxygenLevel, humidity, checkedBy, checkedDateTime, notes,
-                        sysUserId);
+                logRoomEnvironment(entryId, roomCode, roomName, oxygenLevel, humidity, checkedBy, checkedDateTime,
+                        notes, sysUserId);
                 existingKeys.add(duplicateKey);
                 importedCount++;
             } catch (Exception e) {

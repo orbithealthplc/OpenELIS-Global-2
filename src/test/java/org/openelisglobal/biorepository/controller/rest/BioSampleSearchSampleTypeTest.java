@@ -80,18 +80,15 @@ public class BioSampleSearchSampleTypeTest {
         when(typeOfSampleService.getAllTypeOfSamples()).thenReturn(List.of(plasma));
         when(bioSampleService.searchForRetrieval(any())).thenReturn(List.of(bioSample));
 
-        mockMvc.perform(get("/rest/biorepository/sample/search")
-                .param("sampleType", "Plasma")
-                .param("status", "STORED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].barcode").value("BIO-PLASMA-1"))
+        mockMvc.perform(
+                get("/rest/biorepository/sample/search").param("sampleType", "Plasma").param("status", "STORED"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].barcode").value("BIO-PLASMA-1"))
                 .andExpect(jsonPath("$[0].originLab").value("CTD"));
     }
 
     @Test
     public void searchSamples_returnsEmpty_whenNoSearchParams() throws Exception {
-        mockMvc.perform(get("/rest/biorepository/sample/search"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/biorepository/sample/search")).andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
 }

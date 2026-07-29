@@ -78,8 +78,8 @@ public class UnifiedSystemUserMenuRestController extends BaseMenuController<Unif
         UnifiedSystemUserMenuForm form = new UnifiedSystemUserMenuForm();
 
         form.setFormAction("UnifiedSystemUserMenu");
-        List<IdValuePair> testSections = ahriUserManagementCatalogService.filterLabUnitTestSections(
-                DisplayListService.getInstance().getList(ListType.TEST_SECTION_ACTIVE));
+        List<IdValuePair> testSections = ahriUserManagementCatalogService
+                .filterLabUnitTestSections(DisplayListService.getInstance().getList(ListType.TEST_SECTION_ACTIVE));
         form.setTestSections(testSections);
         String forward = performMenuAction(form, request);
         // request.setAttribute(IActionConstants.FORM_NAME, "unifiedSystemUserMenu");

@@ -33,7 +33,12 @@ export const lookupSuggestion = (suggestionsByItemId, itemId) => {
 };
 
 export const isValidSuggestionApiMap = (data) => {
-  if (data == null || typeof data !== "object" || Array.isArray(data) || data.error) {
+  if (
+    data == null ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    data.error
+  ) {
     return false;
   }
   const status = data.status ?? data.statusCode;
@@ -61,7 +66,9 @@ export const buildBulkSuggestionRequest = (itemIds, identityLookups) => ({
 
 export const buildSuggestionSummaryFromResults = (results) => {
   const normalized = Array.isArray(results) ? results : [];
-  const exactMatches = normalized.filter((sample) => sample?.exactIdentityMatch);
+  const exactMatches = normalized.filter(
+    (sample) => sample?.exactIdentityMatch,
+  );
   if (exactMatches.length > 0) {
     const topSuggestion = exactMatches[0];
     const hasMismatch =
@@ -84,7 +91,8 @@ export const buildSuggestionSummaryFromResults = (results) => {
         samplePath: formatSamplePath(topSuggestion),
         matchReason: topSuggestion?.matchReason || null,
         matchScore: topSuggestion?.matchScore ?? null,
-        sampleTypeMatchesRequested: topSuggestion?.sampleTypeMatchesRequested ?? null,
+        sampleTypeMatchesRequested:
+          topSuggestion?.sampleTypeMatchesRequested ?? null,
         mismatchReason: topSuggestion?.mismatchReason || null,
       },
     };
@@ -107,7 +115,8 @@ export const buildSuggestionSummaryFromResults = (results) => {
         samplePath: formatSamplePath(topSuggestion),
         matchReason: topSuggestion?.matchReason || null,
         matchScore: topSuggestion?.matchScore ?? null,
-        sampleTypeMatchesRequested: topSuggestion?.sampleTypeMatchesRequested ?? null,
+        sampleTypeMatchesRequested:
+          topSuggestion?.sampleTypeMatchesRequested ?? null,
         mismatchReason: topSuggestion?.mismatchReason || null,
       },
     };
@@ -137,7 +146,9 @@ export const mapApiSuggestionEntry = (apiEntry) => {
   }
 
   const status = apiEntry.suggestionStatus || SUGGESTION_STATUS.NO_CANDIDATE;
-  const candidates = Array.isArray(apiEntry.candidates) ? apiEntry.candidates : [];
+  const candidates = Array.isArray(apiEntry.candidates)
+    ? apiEntry.candidates
+    : [];
   const topSuggestion = apiEntry.topCandidate || candidates[0] || null;
 
   if (status === SUGGESTION_STATUS.NO_CRITERIA) {
@@ -157,7 +168,12 @@ export const mapApiSuggestionEntry = (apiEntry) => {
   ) {
     return {
       status,
-      results: candidates.length > 0 ? candidates : topSuggestion ? [topSuggestion] : [],
+      results:
+        candidates.length > 0
+          ? candidates
+          : topSuggestion
+            ? [topSuggestion]
+            : [],
       topSuggestion,
       exactMatchFound: true,
       fallbackUsed: Boolean(apiEntry.fallbackUsed),
@@ -216,49 +232,49 @@ export const formatTopCandidateIdentity = (sample) => {
 
 export const getSuggestionTagProps = (status) => {
   switch (status) {
-  case SUGGESTION_STATUS.EXACT_MATCH:
-    return { type: "green" };
-  case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
-    return { type: "magenta" };
-  case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
-    return { type: "blue" };
-  case SUGGESTION_STATUS.NO_CRITERIA:
-    return { type: "purple" };
-  case SUGGESTION_STATUS.NO_CANDIDATE:
-  default:
-    return { type: "gray" };
+    case SUGGESTION_STATUS.EXACT_MATCH:
+      return { type: "green" };
+    case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
+      return { type: "magenta" };
+    case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
+      return { type: "blue" };
+    case SUGGESTION_STATUS.NO_CRITERIA:
+      return { type: "purple" };
+    case SUGGESTION_STATUS.NO_CANDIDATE:
+    default:
+      return { type: "gray" };
   }
 };
 
 export const getSuggestionStatusMessageId = (status) => {
   switch (status) {
-  case SUGGESTION_STATUS.EXACT_MATCH:
-    return "biorepository.retrieval.workbench.suggestionState.exact";
-  case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
-    return "biorepository.retrieval.workbench.suggestionState.exactMismatch";
-  case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
-    return "biorepository.retrieval.workbench.suggestionState.review";
-  case SUGGESTION_STATUS.NO_CRITERIA:
-    return "biorepository.retrieval.workbench.suggestionState.noCriteria";
-  case SUGGESTION_STATUS.NO_CANDIDATE:
-  default:
-    return "biorepository.retrieval.workbench.suggestionState.noCandidate";
+    case SUGGESTION_STATUS.EXACT_MATCH:
+      return "biorepository.retrieval.workbench.suggestionState.exact";
+    case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
+      return "biorepository.retrieval.workbench.suggestionState.exactMismatch";
+    case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
+      return "biorepository.retrieval.workbench.suggestionState.review";
+    case SUGGESTION_STATUS.NO_CRITERIA:
+      return "biorepository.retrieval.workbench.suggestionState.noCriteria";
+    case SUGGESTION_STATUS.NO_CANDIDATE:
+    default:
+      return "biorepository.retrieval.workbench.suggestionState.noCandidate";
   }
 };
 
 export const getSuggestionStatusDefaultMessage = (status, count) => {
   switch (status) {
-  case SUGGESTION_STATUS.EXACT_MATCH:
-    return "Exact match found";
-  case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
-    return "Exact match with type mismatch";
-  case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
-    return count > 1 ? `Review suggestions (${count})` : "Review suggestions";
-  case SUGGESTION_STATUS.NO_CRITERIA:
-    return "Add accession, barcode, type, origin, or project";
-  case SUGGESTION_STATUS.NO_CANDIDATE:
-  default:
-    return "No candidate found";
+    case SUGGESTION_STATUS.EXACT_MATCH:
+      return "Exact match found";
+    case SUGGESTION_STATUS.EXACT_MATCH_TYPE_MISMATCH:
+      return "Exact match with type mismatch";
+    case SUGGESTION_STATUS.REVIEW_SUGGESTIONS:
+      return count > 1 ? `Review suggestions (${count})` : "Review suggestions";
+    case SUGGESTION_STATUS.NO_CRITERIA:
+      return "Add accession, barcode, type, origin, or project";
+    case SUGGESTION_STATUS.NO_CANDIDATE:
+    default:
+      return "No candidate found";
   }
 };
 
@@ -273,12 +289,18 @@ const hasStoredSampleLocation = (bioSample) =>
 /**
  * Mirrors backend {@code resolveFulfillmentAvailableQuantity} for client-side attach checks.
  */
-export const resolveAttachAvailableQuantity = (bioSample, quantityHint = null) => {
+export const resolveAttachAvailableQuantity = (
+  bioSample,
+  quantityHint = null,
+) => {
   const hint =
-    quantityHint != null && !Number.isNaN(Number(quantityHint)) ? Number(quantityHint) : null;
+    quantityHint != null && !Number.isNaN(Number(quantityHint))
+      ? Number(quantityHint)
+      : null;
 
   if (bioSample) {
-    const remaining = bioSample.remainingQuantity ?? bioSample.availableQuantity;
+    const remaining =
+      bioSample.remainingQuantity ?? bioSample.availableQuantity;
     if (remaining != null && Number(remaining) > 0) {
       return Number(remaining);
     }
@@ -321,11 +343,19 @@ export const resolveDefaultAttachQuantity = (referenceItem, bioSample) => {
   return null;
 };
 
-export const validateAttachQuantity = (requested, available, entered, options = {}) => {
+export const validateAttachQuantity = (
+  requested,
+  available,
+  entered,
+  options = {},
+) => {
   const { bioSample } = options;
   const requestedNum =
-    requested != null && !Number.isNaN(Number(requested)) ? Number(requested) : null;
-  const enteredProvided = entered !== "" && entered != null && !Number.isNaN(Number(entered));
+    requested != null && !Number.isNaN(Number(requested))
+      ? Number(requested)
+      : null;
+  const enteredProvided =
+    entered !== "" && entered != null && !Number.isNaN(Number(entered));
   const parsed = enteredProvided
     ? Number(entered)
     : requestedNum != null
@@ -333,7 +363,10 @@ export const validateAttachQuantity = (requested, available, entered, options = 
       : null;
 
   if (parsed == null || parsed <= 0) {
-    return { valid: false, errorKey: "biorepository.retrieval.workbench.attach.invalidQuantity" };
+    return {
+      valid: false,
+      errorKey: "biorepository.retrieval.workbench.attach.invalidQuantity",
+    };
   }
 
   const effectiveAvailable =
@@ -350,17 +383,24 @@ export const validateAttachQuantity = (requested, available, entered, options = 
     if (!enteredProvided || usedImplicitLineDefault) {
       return { valid: true, quantity: effectiveAvailable };
     }
-    return { valid: false, errorKey: "biorepository.retrieval.workbench.attach.exceedsAvailable" };
+    return {
+      valid: false,
+      errorKey: "biorepository.retrieval.workbench.attach.exceedsAvailable",
+    };
   }
 
   if (requestedNum != null && parsed > requestedNum) {
-    return { valid: false, errorKey: "biorepository.retrieval.workbench.attach.exceedsRequested" };
+    return {
+      valid: false,
+      errorKey: "biorepository.retrieval.workbench.attach.exceedsRequested",
+    };
   }
 
   return { valid: true, quantity: parsed };
 };
 
-export const getTopCandidate = (suggestion) => suggestion?.topSuggestion ?? null;
+export const getTopCandidate = (suggestion) =>
+  suggestion?.topSuggestion ?? null;
 
 export const hasTypeMismatch = (suggestion) =>
   suggestion?.summary?.sampleTypeMatchesRequested === false ||
@@ -415,17 +455,13 @@ export const getSuggestionSummary = (suggestion) => {
       null,
     availableUnitOfMeasure:
       summary.availableUnitOfMeasure || top?.unitOfMeasure || null,
-    samplePath:
-      summary.samplePath || formatSamplePath(top) || null,
-    matchReason:
-      summary.matchReason || top?.matchReason || null,
-    matchScore:
-      summary.matchScore ?? top?.matchScore ?? null,
+    samplePath: summary.samplePath || formatSamplePath(top) || null,
+    matchReason: summary.matchReason || top?.matchReason || null,
+    matchScore: summary.matchScore ?? top?.matchScore ?? null,
     sampleTypeMatchesRequested:
       summary.sampleTypeMatchesRequested ??
       top?.sampleTypeMatchesRequested ??
       null,
-    mismatchReason:
-      summary.mismatchReason || top?.mismatchReason || null,
+    mismatchReason: summary.mismatchReason || top?.mismatchReason || null,
   };
 };

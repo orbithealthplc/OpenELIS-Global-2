@@ -87,7 +87,10 @@ export const usePermissions = () => {
     if (userSessionDetails?.loginName === "admin") {
       return true;
     }
-    if (!userSessionDetails?.roles || !Array.isArray(userSessionDetails.roles)) {
+    if (
+      !userSessionDetails?.roles ||
+      !Array.isArray(userSessionDetails.roles)
+    ) {
       return false;
     }
     return userSessionDetails.roles.includes(Roles.GLOBAL_ADMIN);
@@ -194,7 +197,8 @@ export const usePermissions = () => {
       if (roleList.some((r) => allLabRoles.includes(r))) {
         return true;
       }
-      const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+      const activeLabUnit =
+        getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
       if (!activeLabUnit) {
         return false;
       }
@@ -213,7 +217,8 @@ export const usePermissions = () => {
     if (allLabRoles.includes(Roles.LAB_MANAGER)) {
       return true;
     }
-    const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+    const activeLabUnit =
+      getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
     if (!activeLabUnit) {
       return false;
     }
@@ -245,7 +250,8 @@ export const usePermissions = () => {
       if (roleList.some((r) => allLabRoles.includes(r))) {
         return true;
       }
-      const activeLabUnit = getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
+      const activeLabUnit =
+        getEffectiveLabUnitNameForRoleCheck(userSessionDetails);
       if (!activeLabUnit) {
         return false;
       }

@@ -79,7 +79,8 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
             return List.of();
         }
 
-        // Microscopy & Diagnosis: order 9 in 13-stage workflow; order 8 in legacy templates
+        // Microscopy & Diagnosis: order 9 in 13-stage workflow; order 8 in legacy
+        // templates
         NoteBookPage microscopyPage = findMicroscopyDiagnosisPage(pages);
 
         List<NotebookPageSample> page1Samples = notebookPageSampleService.getByPageId(page1.getId());
@@ -283,11 +284,9 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
             }
             specimenCol.append("Accession: ").append(getString(sd, "accessionNumber")).append("\n");
             specimenCol.append("Sample ID: ").append(getString(sd, "externalId")).append("\n");
-            specimenCol.append("Procedure Date: ")
-                    .append(formatDisplayDateTime(dateFieldRaw(sd, "collectionDateTime")))
+            specimenCol.append("Procedure Date: ").append(formatDisplayDateTime(dateFieldRaw(sd, "collectionDateTime")))
                     .append("\n");
-            specimenCol.append("Received Date: ")
-                    .append(formatDisplayDateTime(dateFieldRaw(sd, "receivedDateTime")))
+            specimenCol.append("Received Date: ").append(formatDisplayDateTime(dateFieldRaw(sd, "receivedDateTime")))
                     .append("\n");
             specimenCol.append("Reported Date: ")
                     .append(formatDisplayDateTime(dateFieldRaw(sd, "diag_verificationDate")));
@@ -337,7 +336,8 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
             addGrossContent(document, sd, valueFont);
         }
 
-        // 7. Pathologist signature block (prefer verifying pathologist from any finalized/specimen row)
+        // 7. Pathologist signature block (prefer verifying pathologist from any
+        // finalized/specimen row)
         document.add(Chunk.NEWLINE);
         String[] pathologistTriple = resolvePathologistAttestation(sampleDataList);
         String pathologistName = pathologistTriple[0];
@@ -713,7 +713,8 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
     }
 
     /**
-     * Normalizes JSON date fields that may arrive as String, epoch number, or legacy {@code Date}.
+     * Normalizes JSON date fields that may arrive as String, epoch number, or
+     * legacy {@code Date}.
      */
     private String dateFieldRaw(Map<String, Object> data, String key) {
         if (data == null) {
@@ -751,8 +752,9 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
     }
 
     /**
-     * Pathologist line for the letter: prefer verifying pathologist on a finalized report row, then any
-     * verifying name, then diagnosing pathologist; credentials and signature follow the chosen row.
+     * Pathologist line for the letter: prefer verifying pathologist on a finalized
+     * report row, then any verifying name, then diagnosing pathologist; credentials
+     * and signature follow the chosen row.
      */
     private String[] resolvePathologistAttestation(List<Map<String, Object>> sampleDataList) {
         for (Map<String, Object> sd : sampleDataList) {
@@ -849,7 +851,8 @@ public class PathologyDiagnosticReportServiceImpl implements PathologyDiagnostic
         left.setBorder(Rectangle.NO_BORDER);
         left.setVerticalAlignment(Element.ALIGN_MIDDLE);
         boolean logoAdded = false;
-        try (InputStream in = PathologyDiagnosticReportServiceImpl.class.getResourceAsStream("/images/ahri-pathology-header.png")) {
+        try (InputStream in = PathologyDiagnosticReportServiceImpl.class
+                .getResourceAsStream("/images/ahri-pathology-header.png")) {
             if (in != null) {
                 byte[] bytes = in.readAllBytes();
                 if (bytes.length > 0) {

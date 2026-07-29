@@ -40,11 +40,13 @@ public class BiorepositoryDashboardQCHistoryAuditMappingTest {
 
     @Test
     public void qcHistory_UsesPersistedCorrectionCoordinatesWhenCorrectionApplied() {
-        BiorepositoryQCInspection inspection = buildInspection("UPDATE_LOCATION", "Freezer-A > Shelf-1 > Rack-2 > Box-3 > B7");
+        BiorepositoryQCInspection inspection = buildInspection("UPDATE_LOCATION",
+                "Freezer-A > Shelf-1 > Rack-2 > Box-3 > B7");
 
-        // Simulate current location drift after correction; history should still show persisted correction coordinate.
-        when(storageService.getSampleItemLocation(anyString()))
-                .thenReturn(Map.of("hierarchicalPath", "Freezer-Z > Shelf-9 > Rack-9 > Box-9", "positionCoordinate", "Z1"));
+        // Simulate current location drift after correction; history should still show
+        // persisted correction coordinate.
+        when(storageService.getSampleItemLocation(anyString())).thenReturn(
+                Map.of("hierarchicalPath", "Freezer-Z > Shelf-9 > Rack-9 > Box-9", "positionCoordinate", "Z1"));
         when(qcInspectionService.getAll()).thenReturn(new ArrayList<>(List.of(inspection)));
 
         Map<String, Object> history = dashboardService.getQCHistory(10);
@@ -62,8 +64,8 @@ public class BiorepositoryDashboardQCHistoryAuditMappingTest {
     public void qcHistory_UsesCurrentLocationFallbackWhenNoCorrectionApplied() {
         BiorepositoryQCInspection inspection = buildInspection(null, null);
 
-        when(storageService.getSampleItemLocation(anyString()))
-                .thenReturn(Map.of("hierarchicalPath", "Freezer-B > Shelf-2 > Rack-1 > Box-4", "positionCoordinate", "C2"));
+        when(storageService.getSampleItemLocation(anyString())).thenReturn(
+                Map.of("hierarchicalPath", "Freezer-B > Shelf-2 > Rack-1 > Box-4", "positionCoordinate", "C2"));
         when(qcInspectionService.getAll()).thenReturn(new ArrayList<>(List.of(inspection)));
 
         Map<String, Object> history = dashboardService.getQCHistory(10);
@@ -99,7 +101,8 @@ public class BiorepositoryDashboardQCHistoryAuditMappingTest {
         inspection.setCorrectionNewCoordinate(correctionNewCoordinate);
         inspection.setCorrectionReason(correctionActionType != null ? correctionActionType + ": corrected" : null);
         inspection.setCorrectionByUser(correctionActionType != null ? "7" : null);
-        inspection.setCorrectionTimestamp(correctionActionType != null ? new Timestamp(System.currentTimeMillis()) : null);
+        inspection.setCorrectionTimestamp(
+                correctionActionType != null ? new Timestamp(System.currentTimeMillis()) : null);
         return inspection;
     }
 }

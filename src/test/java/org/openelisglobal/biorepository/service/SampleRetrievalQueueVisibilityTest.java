@@ -2,7 +2,6 @@ package org.openelisglobal.biorepository.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -70,16 +69,8 @@ public class SampleRetrievalQueueVisibilityTest {
         item.setRequestedSampleType("Plasma");
         item.setQuantityRequested(BigDecimal.valueOf(2));
 
-        SampleRetrievalRequest created = retrievalService.createRequest(
-                "Research use",
-                List.of(item),
-                null,
-                null,
-                DestinationType.ANALYSIS_RETURN,
-                null,
-                SampleRetrievalRequest.PriorityLevel.NORMAL,
-                null,
-                "user-1");
+        SampleRetrievalRequest created = retrievalService.createRequest("Research use", List.of(item), null, null,
+                DestinationType.ANALYSIS_RETURN, null, SampleRetrievalRequest.PriorityLevel.NORMAL, null, "user-1");
 
         assertEquals(RequestStatus.DRAFT, created.getStatus());
         assertEquals(1, created.getRequestLineCount());
@@ -100,16 +91,8 @@ public class SampleRetrievalQueueVisibilityTest {
         item.setRequestedSampleType("Serum");
         item.setQuantityRequested(BigDecimal.ONE);
 
-        SampleRetrievalRequest created = retrievalService.createRequest(
-                "Diagnostics",
-                List.of(item),
-                null,
-                null,
-                DestinationType.ANALYSIS_RETURN,
-                null,
-                SampleRetrievalRequest.PriorityLevel.NORMAL,
-                null,
-                "user-1");
+        SampleRetrievalRequest created = retrievalService.createRequest("Diagnostics", List.of(item), null, null,
+                DestinationType.ANALYSIS_RETURN, null, SampleRetrievalRequest.PriorityLevel.NORMAL, null, "user-1");
         retrievalService.submitForApproval(created.getId(), "user-1");
 
         SampleRetrievalRequest approved = retrievalService.approveRequest(100, "Approved", "approver-1");
@@ -118,8 +101,7 @@ public class SampleRetrievalQueueVisibilityTest {
         assertEquals(1, approved.getRequestLineCount());
         assertEquals(0, approved.getTotalItemCount());
         assertEquals(1L, approved.getAwaitingFulfillmentItemCount());
-        assertEquals(SampleRetrievalItem.ItemStatus.AWAITING_FULFILLMENT,
-                approved.getItems().get(0).getStatus());
+        assertEquals(SampleRetrievalItem.ItemStatus.AWAITING_FULFILLMENT, approved.getItems().get(0).getStatus());
     }
 
     @Test
@@ -128,21 +110,12 @@ public class SampleRetrievalQueueVisibilityTest {
         item.setRequestedSampleType("Whole Blood");
         item.setQuantityRequested(BigDecimal.ONE);
 
-        SampleRetrievalRequest created = retrievalService.createRequest(
-                "Testing",
-                List.of(item),
-                null,
-                null,
-                DestinationType.ANALYSIS_RETURN,
-                null,
-                SampleRetrievalRequest.PriorityLevel.NORMAL,
-                null,
-                "user-1");
+        SampleRetrievalRequest created = retrievalService.createRequest("Testing", List.of(item), null, null,
+                DestinationType.ANALYSIS_RETURN, null, SampleRetrievalRequest.PriorityLevel.NORMAL, null, "user-1");
         retrievalService.submitForApproval(created.getId(), "user-1");
         SampleRetrievalRequest approved = retrievalService.approveRequest(100, "Approved", "approver-1");
 
         assertNotNull(approved.getCompletionBlockReason());
-        org.junit.Assert.assertTrue(
-                approved.getCompletionBlockReason().contains("awaiting sample attachment"));
+        org.junit.Assert.assertTrue(approved.getCompletionBlockReason().contains("awaiting sample attachment"));
     }
 }

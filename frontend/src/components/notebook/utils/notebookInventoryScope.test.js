@@ -68,14 +68,18 @@ describe("notebookInventoryScope owning departments", () => {
       callback(undefined, new Error("boom"));
     });
 
-    loadNotebookScopedInventory(77, "/rest/inventory/instruments?status=active", (items, error, meta) => {
-      expect(items).toEqual([]);
-      expect(error).toBeTruthy();
-      expect(meta.scopeStatus).toBe(
-        NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
-      );
-      done();
-    });
+    loadNotebookScopedInventory(
+      77,
+      "/rest/inventory/instruments?status=active",
+      (items, error, meta) => {
+        expect(items).toEqual([]);
+        expect(error).toBeTruthy();
+        expect(meta.scopeStatus).toBe(
+          NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
+        );
+        done();
+      },
+    );
   });
 
   it("marks empty scoped stock results as noInventoryLots", (done) => {
@@ -88,12 +92,18 @@ describe("notebookInventoryScope owning departments", () => {
       callback([]);
     });
 
-    loadNotebookScopedInventory(88, "/rest/inventory/instruments?status=active&requireLots=true", (items, error, meta) => {
-      expect(error).toBeUndefined();
-      expect(items).toEqual([]);
-      expect(meta.scopeStatus).toBe(NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS);
-      done();
-    });
+    loadNotebookScopedInventory(
+      88,
+      "/rest/inventory/instruments?status=active&requireLots=true",
+      (items, error, meta) => {
+        expect(error).toBeUndefined();
+        expect(items).toEqual([]);
+        expect(meta.scopeStatus).toBe(
+          NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS,
+        );
+        done();
+      },
+    );
   });
 
   it("marks empty equipment results as noInventoryEquipment", (done) => {

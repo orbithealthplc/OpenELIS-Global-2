@@ -1,5 +1,11 @@
 import React from "react";
-import { Button, Tag, InlineLoading, NumberInput, InlineNotification } from "@carbon/react";
+import {
+  Button,
+  Tag,
+  InlineLoading,
+  NumberInput,
+  InlineNotification,
+} from "@carbon/react";
 import { FormattedMessage, useIntl } from "react-intl";
 import PropTypes from "prop-types";
 import { formatRequestedReferenceSummary } from "../common/biorepoRequestReferenceHelpers";
@@ -93,8 +99,11 @@ function FulfillmentReviewBlock({
           const summary = getSuggestionSummary(suggestion);
           const status = suggestion?.status;
           const rowPending =
-            suggestionsLoadState === SUGGESTIONS_LOAD_STATE.LOADING && !suggestion;
-          const tagProps = status ? getSuggestionTagProps(status) : { type: "gray" };
+            suggestionsLoadState === SUGGESTIONS_LOAD_STATE.LOADING &&
+            !suggestion;
+          const tagProps = status
+            ? getSuggestionTagProps(status)
+            : { type: "gray" };
           const isHighlighted = String(highlightedItemId) === String(item.id);
           const rowQuickAttach =
             String(quickAttachTarget?.referenceItem?.id) === String(item.id);
@@ -104,7 +113,9 @@ function FulfillmentReviewBlock({
               key={item.id}
               data-testid={`fulfillment-review-row-${item.id}`}
               style={{
-                border: isHighlighted ? "2px solid #0f62fe" : "1px solid #e0e0e0",
+                border: isHighlighted
+                  ? "2px solid #0f62fe"
+                  : "1px solid #e0e0e0",
                 borderRadius: "4px",
                 padding: "0.75rem",
                 backgroundColor: isHighlighted ? "#edf5ff" : "#f4f4f4",
@@ -139,7 +150,13 @@ function FulfillmentReviewBlock({
                   )}
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                  }}
+                >
                   {rowPending ? (
                     <InlineLoading
                       description={intl.formatMessage({
@@ -172,7 +189,13 @@ function FulfillmentReviewBlock({
               </div>
 
               {status === SUGGESTION_STATUS.NO_CRITERIA && (
-                <p style={{ margin: "0.5rem 0 0", color: "#525252", fontSize: "0.875rem" }}>
+                <p
+                  style={{
+                    margin: "0.5rem 0 0",
+                    color: "#525252",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   <FormattedMessage
                     id="biorepository.retrieval.workbench.suggestionState.noCriteria"
                     defaultMessage="Add accession, barcode, type, origin, or project to search"
@@ -181,7 +204,13 @@ function FulfillmentReviewBlock({
               )}
 
               {status === SUGGESTION_STATUS.NO_CANDIDATE && (
-                <p style={{ margin: "0.5rem 0 0", color: "#525252", fontSize: "0.875rem" }}>
+                <p
+                  style={{
+                    margin: "0.5rem 0 0",
+                    color: "#525252",
+                    fontSize: "0.875rem",
+                  }}
+                >
                   <FormattedMessage
                     id="biorepository.retrieval.workbench.noStoredSample"
                     defaultMessage="No stored sample found for this request line."
@@ -211,13 +240,20 @@ function FulfillmentReviewBlock({
                 style={{
                   marginTop: "0.75rem",
                   display: "grid",
-                  gridTemplateColumns: "minmax(0, 1.3fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 0.9fr)",
+                  gridTemplateColumns:
+                    "minmax(0, 1.3fr) minmax(0, 0.8fr) minmax(0, 1.2fr) minmax(0, 0.9fr)",
                   gap: "0.75rem",
                   alignItems: "start",
                 }}
               >
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "#525252", marginBottom: "0.2rem" }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#525252",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
                     <FormattedMessage
                       id="biorepository.retrieval.workbench.topSuggestion"
                       defaultMessage="Best match"
@@ -233,7 +269,13 @@ function FulfillmentReviewBlock({
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "#525252", marginBottom: "0.2rem" }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#525252",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
                     <FormattedMessage
                       id="biorepository.retrieval.workbench.availableQty"
                       defaultMessage="Available"
@@ -254,13 +296,25 @@ function FulfillmentReviewBlock({
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "#525252", marginBottom: "0.2rem" }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#525252",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
                     <FormattedMessage
                       id="biorepo.import.field.samplePath"
                       defaultMessage="Sample Path (Storage Location)"
                     />
                   </div>
-                  <div style={{ fontWeight: 500, fontSize: "0.875rem", wordBreak: "break-word" }}>
+                  <div
+                    style={{
+                      fontWeight: 500,
+                      fontSize: "0.875rem",
+                      wordBreak: "break-word",
+                    }}
+                  >
                     {rowPending
                       ? intl.formatMessage({
                           id: "biorepository.retrieval.workbench.searching",
@@ -270,7 +324,13 @@ function FulfillmentReviewBlock({
                   </div>
                 </div>
                 <div>
-                  <div style={{ fontSize: "0.75rem", color: "#525252", marginBottom: "0.2rem" }}>
+                  <div
+                    style={{
+                      fontSize: "0.75rem",
+                      color: "#525252",
+                      marginBottom: "0.2rem",
+                    }}
+                  >
                     <FormattedMessage
                       id="biorepository.retrieval.workbench.matchState"
                       defaultMessage="Match"
@@ -304,18 +364,36 @@ function FulfillmentReviewBlock({
                 </div>
               </div>
 
-              {status === SUGGESTION_STATUS.REVIEW_SUGGESTIONS && suggestion?.noExactMatch && (
-                <p style={{ margin: "0.35rem 0 0", color: "#8a3ffc", fontSize: "0.8125rem" }}>
-                  <FormattedMessage
-                    id="biorepository.retrieval.workbench.suggestionState.noExactMatch"
-                    defaultMessage="No exact match — broader suggestions to review"
-                  />
-                </p>
-              )}
+              {status === SUGGESTION_STATUS.REVIEW_SUGGESTIONS &&
+                suggestion?.noExactMatch && (
+                  <p
+                    style={{
+                      margin: "0.35rem 0 0",
+                      color: "#8a3ffc",
+                      fontSize: "0.8125rem",
+                    }}
+                  >
+                    <FormattedMessage
+                      id="biorepository.retrieval.workbench.suggestionState.noExactMatch"
+                      defaultMessage="No exact match — broader suggestions to review"
+                    />
+                  </p>
+                )}
 
-              <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div
+                style={{
+                  marginTop: "0.5rem",
+                  display: "flex",
+                  gap: "0.5rem",
+                  flexWrap: "wrap",
+                }}
+              >
                 {hasUsableTopSuggestion(suggestion) && (
-                  <Button kind="primary" size="sm" onClick={() => onUseSample(item, top)}>
+                  <Button
+                    kind="primary"
+                    size="sm"
+                    onClick={() => onUseSample(item, top)}
+                  >
                     <FormattedMessage
                       id="biorepository.retrieval.workbench.row.useThisSample"
                       defaultMessage="Use this sample"
@@ -325,7 +403,11 @@ function FulfillmentReviewBlock({
                 {(hasUsableTopSuggestion(suggestion) ||
                   (suggestion?.results?.length || 0) > 0 ||
                   status === SUGGESTION_STATUS.NO_CRITERIA) && (
-                  <Button kind="tertiary" size="sm" onClick={() => onReviewAlternatives(item)}>
+                  <Button
+                    kind="tertiary"
+                    size="sm"
+                    onClick={() => onReviewAlternatives(item)}
+                  >
                     <FormattedMessage
                       id="biorepository.retrieval.workbench.row.reviewAlternatives"
                       defaultMessage="Review alternatives"
@@ -363,7 +445,14 @@ function FulfillmentReviewBlock({
                       style={{ marginBottom: "0.5rem" }}
                     />
                   )}
-                  <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-end", flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "0.75rem",
+                      alignItems: "flex-end",
+                      flexWrap: "wrap",
+                    }}
+                  >
                     <NumberInput
                       id={`quick-attach-quantity-${item.id}`}
                       label={intl.formatMessage({
@@ -375,7 +464,9 @@ function FulfillmentReviewBlock({
                       min={0}
                       step={0.0001}
                       value={quickAttachQuantity}
-                      onChange={(e, { value }) => onQuickAttachQuantityChange(value)}
+                      onChange={(e, { value }) =>
+                        onQuickAttachQuantityChange(value)
+                      }
                     />
                     <Button
                       kind="primary"
@@ -388,8 +479,15 @@ function FulfillmentReviewBlock({
                         defaultMessage="Confirm attach"
                       />
                     </Button>
-                    <Button kind="ghost" size="sm" onClick={onQuickAttachCancel}>
-                      <FormattedMessage id="label.cancel" defaultMessage="Cancel" />
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      onClick={onQuickAttachCancel}
+                    >
+                      <FormattedMessage
+                        id="label.cancel"
+                        defaultMessage="Cancel"
+                      />
                     </Button>
                   </div>
                 </div>
@@ -411,7 +509,10 @@ FulfillmentReviewBlock.propTypes = {
     referenceItem: PropTypes.object,
     bioSample: PropTypes.object,
   }),
-  quickAttachQuantity: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  quickAttachQuantity: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+  ]),
   quickAttachError: PropTypes.string,
   quickAttachLoading: PropTypes.bool,
   onQuickAttachQuantityChange: PropTypes.func,

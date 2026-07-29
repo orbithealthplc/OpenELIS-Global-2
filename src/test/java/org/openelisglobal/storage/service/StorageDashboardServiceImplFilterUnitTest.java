@@ -36,13 +36,11 @@ public class StorageDashboardServiceImplFilterUnitTest {
         Map<String, Object> roomTwo = sampleRow(2, 20, 200, "Room B > Fridge");
         when(sampleStorageService.getAllSamplesWithAssignments()).thenReturn(Arrays.asList(roomOne, roomTwo));
 
-        List<Map<String, Object>> byRoom =
-                storageDashboardService.filterSamples(null, null, null, 1, null);
+        List<Map<String, Object>> byRoom = storageDashboardService.filterSamples(null, null, null, 1, null);
         assertEquals(1, byRoom.size());
         assertEquals(1, ((Number) byRoom.get(0).get("roomId")).intValue());
 
-        List<Map<String, Object>> byDevice =
-                storageDashboardService.filterSamples(null, null, 20, 2, 200);
+        List<Map<String, Object>> byDevice = storageDashboardService.filterSamples(null, null, 20, 2, 200);
         assertEquals(1, byDevice.size());
         assertEquals(200, ((Number) byDevice.get(0).get("deviceId")).intValue());
         assertEquals(20, ((Number) byDevice.get(0).get("departmentTestSectionId")).intValue());
@@ -60,7 +58,8 @@ public class StorageDashboardServiceImplFilterUnitTest {
         when(statusService.matches("active", org.openelisglobal.common.services.StatusService.SampleStatus.Disposed))
                 .thenReturn(false);
 
-        List<Map<String, Object>> filtered = storageDashboardService.filterSamples("room a", "active", null, null, null);
+        List<Map<String, Object>> filtered = storageDashboardService.filterSamples("room a", "active", null, null,
+                null);
         assertEquals(1, filtered.size());
         assertTrue(((String) filtered.get(0).get("location")).toLowerCase().contains("room a"));
     }

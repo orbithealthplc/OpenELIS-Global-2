@@ -3,7 +3,8 @@ package org.openelisglobal.storage.util;
 import org.apache.commons.validator.GenericValidator;
 
 /**
- * Normalizes storage position coordinates to match a box's position schema hint.
+ * Normalizes storage position coordinates to match a box's position schema
+ * hint.
  */
 public final class StorageCoordinateNormalizer {
 

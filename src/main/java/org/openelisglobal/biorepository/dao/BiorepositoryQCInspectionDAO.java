@@ -99,7 +99,8 @@ public interface BiorepositoryQCInspectionDAO extends BaseDAO<BiorepositoryQCIns
     Set<Integer> getBioSampleIdsWithAnyInspection(List<Integer> bioSampleIds);
 
     /**
-     * Biosample IDs from {@code bioSampleIds} with an inspection in {@code [startDate, endDate]}.
+     * Biosample IDs from {@code bioSampleIds} with an inspection in
+     * {@code [startDate, endDate]}.
      */
     Set<Integer> getBioSampleIdsInspectedBetween(List<Integer> bioSampleIds, java.sql.Timestamp startDate,
             java.sql.Timestamp endDate);

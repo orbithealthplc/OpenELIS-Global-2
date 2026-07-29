@@ -276,9 +276,8 @@ public class LabEnvironmentalLogController extends BaseRestController {
         Map<String, Object> stats = new HashMap<>();
         long totalLogs = logs.size();
         long todaysLogs = logs.stream().filter(this::isToday).count();
-        long outOfRangeLogs = logs.stream()
-                .filter(log -> !labEnvironmentalLogService.isTemperatureInRange(log.getStorageUnitType(),
-                        log.getTemperatureValue(), log.getTemperatureUnit()))
+        long outOfRangeLogs = logs.stream().filter(log -> !labEnvironmentalLogService
+                .isTemperatureInRange(log.getStorageUnitType(), log.getTemperatureValue(), log.getTemperatureUnit()))
                 .count();
 
         for (LabEnvironmentalLog.StorageUnitType type : LabEnvironmentalLog.StorageUnitType.values()) {

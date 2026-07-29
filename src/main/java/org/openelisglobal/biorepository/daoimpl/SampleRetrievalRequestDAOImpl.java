@@ -33,10 +33,8 @@ public class SampleRetrievalRequestDAOImpl extends BaseDAOImpl<SampleRetrievalRe
     @Override
     public List<SampleRetrievalRequest> getPendingApproval(int limit) {
         Session session = entityManager.unwrap(Session.class);
-        String hql = "SELECT DISTINCT r FROM SampleRetrievalRequest r "
-                + "LEFT JOIN FETCH r.notebookEntry "
-                + "LEFT JOIN FETCH r.requestedBy "
-                + "WHERE r.status = :status ORDER BY r.requestedTimestamp ASC";
+        String hql = "SELECT DISTINCT r FROM SampleRetrievalRequest r " + "LEFT JOIN FETCH r.notebookEntry "
+                + "LEFT JOIN FETCH r.requestedBy " + "WHERE r.status = :status ORDER BY r.requestedTimestamp ASC";
         return session.createQuery(hql, SampleRetrievalRequest.class)
                 .setParameter("status", RequestStatus.PENDING_APPROVAL.name()).setMaxResults(limit).getResultList();
     }

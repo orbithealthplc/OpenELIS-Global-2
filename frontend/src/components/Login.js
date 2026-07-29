@@ -119,9 +119,12 @@ function Login(props) {
         // Legacy behavior: backend may return 302 for login POST.
         // Verify current session before deciding it is an error.
         if (response.status === 302 || response.redirected || !responseData) {
-          const sessionResponse = await fetch(config.serverBaseUrl + "/session", {
-            credentials: "include",
-          });
+          const sessionResponse = await fetch(
+            config.serverBaseUrl + "/session",
+            {
+              credentials: "include",
+            },
+          );
 
           if (sessionResponse.status === 200) {
             const sessionData = await sessionResponse.json();

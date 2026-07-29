@@ -1,0 +1,16 @@
+cases=6
+browser launched
+== Bioanalytical / banal_collector ==
+  PASS nav=True order=None restr=4/4 titles=5
+== Bioanalytical / banal_tech ==
+  PASS nav=True order=None restr=1/1 titles=5
+== Bioanalytical / banal_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=0/0 titles=5
+== Bioanalytical / banal_jr_researcher ==
+  PASS nav=True order=None restr=3/3 titles=5
+== Bioanalytical / banal_sr_researcher ==
+  PASS nav=True order=None restr=2/2 titles=5
+== Bioanalytical / banal_biomedical ==
+  PASS nav=True order=None restr=5/5 titles=5
+DONE 6/6 PASS

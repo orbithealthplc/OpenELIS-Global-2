@@ -1,0 +1,303 @@
+- generic [active] [ref=f5e1]:
+    - generic [ref=f5e3]:
+        - banner [ref=f5e4]:
+            - button "Open menu" [ref=f5e5] [cursor=pointer]
+            - link [ref=f5e8] [cursor=pointer]:
+                - /url: /
+                - img "AHRI LIMS" [ref=f5e11]
+                - generic [ref=f5e12]:
+                    - heading "AHRI LIMS" [level=5] [ref=f5e13]
+                    - paragraph [ref=f5e14]: "Version: 3.2.1.2"
+            - generic [ref=f5e15]:
+                - generic [ref=f5e16]:
+                    - button "Search" [ref=f5e17] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f5e20]:
+                    - button "Notifications" [ref=f5e21] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f5e25]:
+                    - button "User" [ref=f5e26] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f5e30]:
+                    - button "Help" [ref=f5e31] [cursor=pointer]
+                    - tooltip
+                - generic "Help Panel":
+                    - list:
+                        - listitem:
+                            - button "User Manual" [ref=f5e36] [cursor=pointer]
+                        - listitem:
+                            - button "Video Tutorials" [ref=f5e40] [cursor=pointer]
+                        - listitem:
+                            - button "Release Notes" [ref=f5e44] [cursor=pointer]
+            - generic "Header Panel":
+                - list:
+                    - listitem: Open ELIS
+                    - listitem: Logout
+                    - listitem:
+                        - generic [ref=f5e53]:
+                            - generic [ref=f5e54]: Select Locale
+                            - combobox "Select Locale" [ref=f5e56] [cursor=pointer]:
+                                - option "English" [selected]
+                                - option "English (UK)"
+                                - option "English (Sri Lanka)"
+                                - option "English (US)"
+                                - option "Español"
+                                - option "Français"
+                                - option "Indonesia"
+                                - option "Indonesia (ID)"
+                                - option "Malagasy"
+                                - option "Română"
+                                - option "සිංහල"
+                                - option "සිංහල (Sri Lanka)"
+                                - option "தமிழ்"
+                                - option "தமிழ் (Sri Lanka)"
+                                - option "Swahili"
+                                - option "Amharic"
+                    - listitem:
+                        - generic [ref=f5e57]: "Version:: 3.2.1.2"
+            - navigation "Side navigation":
+                - list
+        - main [ref=f5e59]:
+            - navigation "Breadcrumb" [ref=f5e62]:
+                - list [ref=f5e63]:
+                    - listitem [ref=f5e64]:
+                        - link "Home" [ref=f5e65] [cursor=pointer]:
+                            - /url: /
+                        - text: /
+                    - listitem [ref=f5e66]:
+                        - link "Notebook Dashboard" [ref=f5e67] [cursor=pointer]:
+                            - /url: /NoteBookDashboard
+                        - text: /
+            - heading "Notebook Entry Form" [level=3] [ref=f5e72]
+            - generic [ref=f5e73]:
+                - generic [ref=f5e75]:
+                    - generic [ref=f5e76]:
+                        - heading "Status & Metadata" [level=2] [ref=f5e77]
+                        - generic "Active" [ref=f5e79]
+                    - generic [ref=f5e80]:
+                        - paragraph [ref=f5e82]:
+                            - strong [ref=f5e83]: "Project Title:"
+                            - text: CTD
+                        - paragraph [ref=f5e86]:
+                            - strong [ref=f5e87]: "Experiment Type:"
+                            - text: Not available
+                        - paragraph [ref=f5e90]:
+                            - strong [ref=f5e91]: "Protocol ID:"
+                            - text: Standard CTD Protocol
+                        - paragraph [ref=f5e95]:
+                            - strong [ref=f5e96]: "Project Tags:"
+                            - text: Not available
+                        - generic [ref=f5e102]:
+                            - paragraph [ref=f5e103]: "Date Created: 07/14/2026"
+                            - paragraph [ref=f5e104]: "Author: Birhanu,Endalkachew"
+                - tablist [ref=f5e107]:
+                    - tab "Content" [ref=f5e108] [cursor=pointer]
+                    - tab "Attachments" [ref=f5e110] [cursor=pointer]
+                    - tab "Workflow" [selected] [ref=f5e112] [cursor=pointer]
+                    - tab "Comments" [ref=f5e114] [cursor=pointer]
+                    - tab "Audit Trail" [ref=f5e116] [cursor=pointer]
+                - generic [ref=f5e120]:
+                    - generic [ref=f5e123]:
+                        - heading "CTD - staff screening" [level=2] [ref=f5e124]
+                        - generic [ref=f5e125]:
+                            - generic "MedLab" [ref=f5e127]
+                            - generic "DRAFT" [ref=f5e129]
+                            - generic [ref=f5e130]: 0 samples linked
+                    - generic [ref=f5e131]:
+                        - generic [ref=f5e133]:
+                            - heading "Workflow Pages" [level=4] [ref=f5e134]
+                            - generic [ref=f5e135]:
+                                - button "1.Patient Registration 0%" [ref=f5e136] [cursor=pointer]:
+                                    - generic [ref=f5e140]:
+                                        - generic [ref=f5e141]: "1."
+                                        - text: Patient Registration
+                                    - generic [ref=f5e142]: 0%
+                                - button "2.Sample Collection 0%" [ref=f5e145] [cursor=pointer]:
+                                    - generic [ref=f5e149]:
+                                        - generic [ref=f5e150]: "2."
+                                        - text: Sample Collection
+                                    - generic [ref=f5e151]: 0%
+                                - button "3.Sample Receipt & Quality Assessment 0%" [pressed] [ref=f5e154] [cursor=pointer]:
+                                    - generic [ref=f5e158]:
+                                        - generic [ref=f5e159]: "3."
+                                        - text: Sample Receipt & Quality Assessment
+                                    - generic [ref=f5e160]: 0%
+                                - button "4.Sample Routing 0%" [ref=f5e163] [cursor=pointer]:
+                                    - generic [ref=f5e167]:
+                                        - generic [ref=f5e168]: "4."
+                                        - text: Sample Routing
+                                    - generic [ref=f5e169]: 0%
+                                - button "5.Sample Processing 0%" [ref=f5e172] [cursor=pointer]:
+                                    - generic [ref=f5e176]:
+                                        - generic [ref=f5e177]: "5."
+                                        - text: Sample Processing
+                                    - generic [ref=f5e178]: 0%
+                                - button "6.Testing & Analyzer 0%" [ref=f5e181] [cursor=pointer]:
+                                    - generic [ref=f5e185]:
+                                        - generic [ref=f5e186]: "6."
+                                        - text: Testing & Analyzer
+                                    - generic [ref=f5e187]: 0%
+                                - button "7.Result Entry 0%" [ref=f5e190] [cursor=pointer]:
+                                    - generic [ref=f5e194]:
+                                        - generic [ref=f5e195]: "7."
+                                        - text: Result Entry
+                                    - generic [ref=f5e196]: 0%
+                                - button "8.Validation, Reporting & Performance Monitoring 0%" [ref=f5e199] [cursor=pointer]:
+                                    - generic [ref=f5e203]:
+                                        - generic [ref=f5e204]: "8."
+                                        - text: Validation, Reporting & Performance Monitoring
+                                    - generic [ref=f5e205]: 0%
+                                - button "9.Disposal, Archiving & Accreditation 0%" [ref=f5e208] [cursor=pointer]:
+                                    - generic [ref=f5e212]:
+                                        - generic [ref=f5e213]: "9."
+                                        - text: Disposal, Archiving & Accreditation
+                                    - generic [ref=f5e214]: 0%
+                            - generic [ref=f5e217]: 0 of 9 pages completed
+                        - generic [ref=f5e220]:
+                            - generic [ref=f5e221]:
+                                - heading "Sample Receipt & Quality Assessment" [level=3] [ref=f5e436]
+                                - generic [ref=f5e223]: 0/0 samples completed
+                            - generic [ref=f5e225]:
+                                - generic [ref=f5e226]: Receive samples and perform quality checks. Verify labeling, container integrity, order matching, temperature compliance. Check for hemolysis, lipemia, icterus. Record acceptance or rejection with reasons.
+                                - generic [ref=f5e438]:
+                                    - generic [ref=f5e439]:
+                                        - heading "Sample Receipt & Quality Assessment" [level=4] [ref=f5e440]
+                                        - paragraph [ref=f5e441]: Confirm physical receipt and validate sample quality. Use the QC checklist to assess labeling, container type, volume adequacy, order matching, hemolysis, contamination, and temperature. Samples that pass QC proceed to Sample Routing.
+                                    - generic [ref=f5e444]:
+                                        - generic [ref=f5e445]:
+                                            - generic [ref=f5e446]: Total Samples
+                                            - generic [ref=f5e447]: "0"
+                                        - generic [ref=f5e448]:
+                                            - generic [ref=f5e449]: QC Passed
+                                            - generic [ref=f5e450]: "0"
+                                        - generic [ref=f5e451]:
+                                            - generic [ref=f5e452]: QC Failed
+                                            - generic [ref=f5e453]: "0"
+                                        - generic [ref=f5e454]:
+                                            - generic [ref=f5e455]: QC Pending
+                                            - generic [ref=f5e456]: "0"
+                                        - generic [ref=f5e457]:
+                                            - generic [ref=f5e458]: Verified
+                                            - generic [ref=f5e459]: "0"
+                                    - button "Bulk Apply QC (0)" [disabled] [ref=f5e461]
+                                    - generic [ref=f5e464]:
+                                        - generic [ref=f5e465]:
+                                            - heading "Samples Pending Verification 0" [level=5] [ref=f5e466]:
+                                                - text: Samples Pending Verification
+                                                - generic [ref=f5e467]: "0"
+                                            - paragraph [ref=f5e469]: Select samples and use 'Bulk Apply QC' to perform quality assessment. Samples with QC result can be marked as done.
+                                        - generic [ref=f5e472]:
+                                            - region "data table toolbar" [ref=f5e473]:
+                                                - generic [ref=f5e474]:
+                                                    - search "Filter table" [ref=f5e475] [cursor=pointer]:
+                                                        - searchbox "Filter table" [ref=f5e476]
+                                                    - generic [ref=f5e478] [cursor=pointer]:
+                                                        - button "All Open menu" [ref=f5e479]:
+                                                            - generic [ref=f5e480]: All
+                                                            - img "Open menu" [ref=f5e482]
+                                                        - listbox
+                                            - table [ref=f5e485]:
+                                                - rowgroup [ref=f5e486]:
+                                                    - row [ref=f5e487]:
+                                                        - columnheader [ref=f5e488]:
+                                                            - checkbox [ref=f5e491]
+                                                        - columnheader "Lab Number" [ref=f5e493]
+                                                        - columnheader "Patient" [ref=f5e495]
+                                                        - columnheader "Sample Type" [ref=f5e497]
+                                                        - columnheader "Linked Order" [ref=f5e499]
+                                                        - columnheader "QC Result" [ref=f5e501]
+                                                        - columnheader "Rejection Reason" [ref=f5e503]
+                                                        - columnheader "Action Taken" [ref=f5e505]
+                                                        - columnheader [ref=f5e507]
+                                                - rowgroup [ref=f5e508]:
+                                                    - row [ref=f5e509]:
+                                                        - cell "No samples found" [ref=f5e510]
+                                            - generic [ref=f5e511]:
+                                                - generic [ref=f5e512]:
+                                                    - generic [ref=f5e513]: "Items per page:"
+                                                    - combobox "Items per page:" [ref=f5e518] [cursor=pointer]:
+                                                        - option "10" [selected]
+                                                        - option "25"
+                                                        - option "50"
+                                                        - option "100"
+                                                    - generic [ref=f5e519]: 0–0 of 0 items
+                                                - generic [ref=f5e520]:
+                                                    - generic [ref=f5e522]:
+                                                        - generic [ref=f5e523]: Page number, of 1 pages
+                                                        - combobox "Page number, of 1 pages" [ref=f5e526] [cursor=pointer]:
+                                                            - option "1" [selected]
+                                                    - generic [ref=f5e527]: of 1 page
+                                                    - generic [ref=f5e528]:
+                                                        - generic [ref=f5e529]:
+                                                            - button "Previous page" [disabled] [ref=f5e530]
+                                                            - tooltip
+                                                        - generic [ref=f5e533]:
+                                                            - button "Next page" [disabled] [ref=f5e534]
+                                                            - tooltip
+                                        - paragraph [ref=f5e538]: No samples pending verification. All samples have been processed.
+                                    - generic [ref=f5e539]:
+                                        - generic [ref=f5e540]:
+                                            - heading "Verified Samples 0" [level=5] [ref=f5e541]:
+                                                - text: Verified Samples
+                                                - generic [ref=f5e542]: "0"
+                                            - paragraph [ref=f5e544]: Samples that have completed verification. Passed samples can proceed to Sample Routing.
+                                        - generic [ref=f5e547]:
+                                            - region "data table toolbar" [ref=f5e548]:
+                                                - search "Filter table" [ref=f5e550] [cursor=pointer]:
+                                                    - searchbox "Filter table" [ref=f5e551]
+                                            - table [ref=f5e553]:
+                                                - rowgroup [ref=f5e554]:
+                                                    - row [ref=f5e555]:
+                                                        - columnheader "Lab Number" [ref=f5e556]
+                                                        - columnheader "Patient" [ref=f5e558]
+                                                        - columnheader "Sample Type" [ref=f5e560]
+                                                        - columnheader "QC Result" [ref=f5e562]
+                                                        - columnheader "Rejection Reason" [ref=f5e564]
+                                                        - columnheader "Disposition" [ref=f5e566]
+                                                        - columnheader [ref=f5e568]
+                                                - rowgroup [ref=f5e569]:
+                                                    - row [ref=f5e570]:
+                                                        - cell "No samples found" [ref=f5e571]
+                                            - generic [ref=f5e572]:
+                                                - generic [ref=f5e573]:
+                                                    - generic [ref=f5e574]: "Items per page:"
+                                                    - combobox "Items per page:" [ref=f5e579] [cursor=pointer]:
+                                                        - option "10" [selected]
+                                                        - option "25"
+                                                        - option "50"
+                                                        - option "100"
+                                                    - generic [ref=f5e580]: 0–0 of 0 items
+                                                - generic [ref=f5e581]:
+                                                    - generic [ref=f5e583]:
+                                                        - generic [ref=f5e584]: Page number, of 1 pages
+                                                        - combobox "Page number, of 1 pages" [ref=f5e587] [cursor=pointer]:
+                                                            - option "1" [selected]
+                                                    - generic [ref=f5e588]: of 1 page
+                                                    - generic [ref=f5e589]:
+                                                        - generic [ref=f5e590]:
+                                                            - button "Previous page" [disabled] [ref=f5e591]
+                                                            - tooltip
+                                                        - generic [ref=f5e594]:
+                                                            - button "Next page" [disabled] [ref=f5e595]
+                                                            - tooltip
+                                        - paragraph [ref=f5e599]: No samples have been verified yet.
+                                    - paragraph [ref=f5e601]: No samples available for verification. Samples must be collected in the Sample Collection page first.
+            - generic [ref=f5e331]:
+                - generic [ref=f5e333]:
+                    - generic [ref=f5e336]:
+                        - generic [ref=f5e337]: Status
+                        - combobox "Status" [ref=f5e339] [cursor=pointer]:
+                            - option
+                            - option "Draft"
+                            - option "Submitted"
+                            - option "Finalized"
+                            - option "Locked"
+                            - option "Archived"
+                            - option "Active" [selected]
+                    - generic [ref=f5e341]:
+                        - generic [ref=f5e342]: Technician
+                        - textbox "Technician" [ref=f5e348]: Birhanu,Endalkachew
+                - button "Save" [ref=f5e353] [cursor=pointer]
+        - contentinfo:
+            - paragraph
+    - status [ref=f5e602]

@@ -5,8 +5,8 @@ import org.openelisglobal.systemuser.service.SystemUserService;
 import org.openelisglobal.systemuser.valueholder.SystemUser;
 
 /**
- * Builds pathologist attestation fields from the logged-in system user
- * (given name + father's name stored in {@link SystemUser#getLastName()}).
+ * Builds pathologist attestation fields from the logged-in system user (given
+ * name + father's name stored in {@link SystemUser#getLastName()}).
  */
 public final class PathologyUserAttestationUtil {
 

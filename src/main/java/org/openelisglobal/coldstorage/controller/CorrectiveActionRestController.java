@@ -102,8 +102,7 @@ public class CorrectiveActionRestController extends BaseRestController {
             }
 
             List<CorrectiveActionDTO> actionDTOs = actions.stream().filter(action -> canAccessAction(action, request))
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+                    .map(this::convertToDTO).collect(Collectors.toList());
 
             return ResponseEntity.ok(actionDTOs);
         } catch (IllegalArgumentException e) {

@@ -126,6 +126,12 @@ public class ShipmentServiceImpl extends AuditableBaseObjectServiceImpl<Shipment
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Shipment getWithReceiver(Integer id) {
+        return baseObjectDAO.getWithReceiver(id);
+    }
+
+    @Override
     @Transactional
     public Shipment updateDocumentationStatus(Integer shipmentId, DocumentationStatus status) {
         Shipment shipment = get(shipmentId);

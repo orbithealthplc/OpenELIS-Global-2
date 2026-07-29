@@ -179,8 +179,7 @@ const normalizeDateTimeForApi = (value) => {
 
 export const buildDeviceTemplateCsv = () => {
   const headers = DEVICE_IMPORT_FIELDS.join(",");
-  const example =
-    "FREEZER-01,2026-06-11T08:00,-80,C,AM,AB,Auto logger export";
+  const example = "FREEZER-01,2026-06-11T08:00,-80,C,AM,AB,Auto logger export";
   return `${headers}\n${example}`;
 };
 
@@ -203,10 +202,18 @@ export const downloadCsvTemplate = (filename, content) => {
   URL.revokeObjectURL(url);
 };
 
-export const parseDeviceImportCsv = (text, devices = [], scopeDevice = null) => {
+export const parseDeviceImportCsv = (
+  text,
+  devices = [],
+  scopeDevice = null,
+) => {
   const { headers, rows } = parseCsvText(text);
   if (headers.length === 0) {
-    return { validRows: [], previewRows: [], errors: [{ row: 0, message: "CSV is empty" }] };
+    return {
+      validRows: [],
+      previewRows: [],
+      errors: [{ row: 0, message: "CSV is empty" }],
+    };
   }
 
   const mappedHeaders = mapHeaders(headers, DEVICE_HEADER_ALIASES);
@@ -228,7 +235,10 @@ export const parseDeviceImportCsv = (text, devices = [], scopeDevice = null) => 
     const rowErrors = [];
     if (!deviceCode) {
       rowErrors.push("device_code is required");
-    } else if (knownCodes.size > 0 && !knownCodes.has(deviceCode.toLowerCase())) {
+    } else if (
+      knownCodes.size > 0 &&
+      !knownCodes.has(deviceCode.toLowerCase())
+    ) {
       rowErrors.push(`Unknown device_code: ${deviceCode}`);
     }
     if (temperatureValue == null) {
@@ -281,7 +291,11 @@ export const parseDeviceImportCsv = (text, devices = [], scopeDevice = null) => 
 export const parseRoomImportCsv = (text, rooms = [], scopeRoom = null) => {
   const { headers, rows } = parseCsvText(text);
   if (headers.length === 0) {
-    return { validRows: [], previewRows: [], errors: [{ row: 0, message: "CSV is empty" }] };
+    return {
+      validRows: [],
+      previewRows: [],
+      errors: [{ row: 0, message: "CSV is empty" }],
+    };
   }
 
   const mappedHeaders = mapHeaders(headers, ROOM_HEADER_ALIASES);

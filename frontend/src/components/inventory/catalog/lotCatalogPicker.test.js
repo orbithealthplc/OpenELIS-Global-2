@@ -25,16 +25,31 @@ describe("lot catalog picker", () => {
 
   it("filters options by name, type label, and category", () => {
     const options = buildLotCatalogOptions(catalog);
-    expect(filterCatalogOptions(options, "genexpert").map((o) => o.id)).toEqual([3]);
-    expect(filterCatalogOptions(options, "cepheid").map((o) => o.id)).toEqual([3]);
-    expect(filterCatalogOptions(options, "reagent").map((o) => o.id)).toEqual([1]);
-    expect(filterCatalogOptions(options, "supplies").map((o) => o.id)).toEqual([4]);
-    expect(filterCatalogOptions(options, "centrifuge").map((o) => o.id)).toEqual([2]);
+    expect(filterCatalogOptions(options, "genexpert").map((o) => o.id)).toEqual(
+      [3],
+    );
+    expect(filterCatalogOptions(options, "cepheid").map((o) => o.id)).toEqual([
+      3,
+    ]);
+    expect(filterCatalogOptions(options, "reagent").map((o) => o.id)).toEqual([
+      1,
+    ]);
+    expect(filterCatalogOptions(options, "supplies").map((o) => o.id)).toEqual([
+      4,
+    ]);
+    expect(
+      filterCatalogOptions(options, "centrifuge").map((o) => o.id),
+    ).toEqual([2]);
   });
 
   it("includes equipment when only equipment exists", () => {
     const options = buildLotCatalogOptions([
-      { id: 2, name: "Alpha Centrifuge", itemType: "EQUIPMENT", category: "Lab" },
+      {
+        id: 2,
+        name: "Alpha Centrifuge",
+        itemType: "EQUIPMENT",
+        category: "Lab",
+      },
     ]);
     expect(options).toHaveLength(1);
     expect(options[0].item.itemType).toBe("EQUIPMENT");

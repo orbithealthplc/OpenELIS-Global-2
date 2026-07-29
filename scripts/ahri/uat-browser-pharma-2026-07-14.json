@@ -1,0 +1,141 @@
+[
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_collector",
+    "persona": "Sample Collector",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Creation & Full Metadata Capture",
+      "2.Raw Sample Quality Check (QC)",
+      "3.Sample Processing & Aliquoting",
+      "4.Assay & Test Execution",
+      "5.Storage & Inventory Management",
+      "6.Reporting & Performance Monitoring",
+      "7.Disposal & Archiving"
+    ],
+    "restrictedCount": 6,
+    "expectedRestrictedCount": 6,
+    "expectedRestricted": [
+      "Raw Sample Quality Check (QC)",
+      "Sample Processing & Aliquoting",
+      "Assay & Test Execution",
+      "Storage & Inventory Management",
+      "Reporting & Performance Monitoring",
+      "Disposal & Archiving"
+    ],
+    "stageCount": 7,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/236?mode=edit&tab=workflow&entryId=120",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Pharma_pharm_collector.png",
+    "navText": "Workflow Pages\n1.Sample Creation & Full Metadata Capture\n0%\n2.Raw Sample Quality Check (QC)\nRestricted\n3.Sample Processing & Aliquoting\nRestricted\n4.Assay & Test Execution\nRestricted\n5.Storage & Inventory Management\nRestricted\n6.Reporting & Performance Monitoring\nRestricted\n7.Disposal & Archiving\nRestricted\n0 of 7 pages completed"
+  },
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_tech",
+    "persona": "Laboratory Technician",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Creation & Full Metadata Capture",
+      "2.Raw Sample Quality Check (QC)",
+      "3.Sample Processing & Aliquoting",
+      "4.Assay & Test Execution",
+      "5.Storage & Inventory Management",
+      "6.Reporting & Performance Monitoring",
+      "7.Disposal & Archiving"
+    ],
+    "restrictedCount": 2,
+    "expectedRestrictedCount": 2,
+    "expectedRestricted": [
+      "Reporting & Performance Monitoring",
+      "Disposal & Archiving"
+    ],
+    "stageCount": 7,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/236?mode=edit&tab=workflow&entryId=120",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Pharma_pharm_tech.png",
+    "navText": "Workflow Pages\n1.Sample Creation & Full Metadata Capture\n0%\n2.Raw Sample Quality Check (QC)\n0%\n3.Sample Processing & Aliquoting\n0%\n4.Assay & Test Execution\n0%\n5.Storage & Inventory Management\n0%\n6.Reporting & Performance Monitoring\nRestricted\n7.Disposal & Archiving\nRestricted\n0 of 7 pages completed"
+  },
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_manager",
+    "persona": "Lab Manager",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "FAIL",
+    "hasNav": false,
+    "order_ok": null,
+    "access_ok": false,
+    "titles": [],
+    "restrictedCount": 0,
+    "expectedRestrictedCount": 0,
+    "expectedRestricted": [],
+    "stageCount": 7,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/236?mode=edit&tab=workflow&entryId=120",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Pharma_pharm_manager.png",
+    "navText": ""
+  },
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_jr_researcher",
+    "persona": "Junior Researcher",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 120000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/236?mode=edit&tab=workflow&entryId=120\", waiting until \"commit\"\n"
+  },
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_sr_researcher",
+    "persona": "Senior Researcher",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Creation & Full Metadata Capture",
+      "2.Raw Sample Quality Check (QC)",
+      "3.Sample Processing & Aliquoting",
+      "4.Assay & Test Execution",
+      "5.Storage & Inventory Management",
+      "6.Reporting & Performance Monitoring",
+      "7.Disposal & Archiving"
+    ],
+    "restrictedCount": 4,
+    "expectedRestrictedCount": 4,
+    "expectedRestricted": [
+      "Sample Creation & Full Metadata Capture",
+      "Raw Sample Quality Check (QC)",
+      "Storage & Inventory Management",
+      "Disposal & Archiving"
+    ],
+    "stageCount": 7,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/236?mode=edit&tab=workflow&entryId=120",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Pharma_pharm_sr_researcher.png",
+    "navText": "Workflow Pages\n1.Sample Creation & Full Metadata Capture\nRestricted\n2.Raw Sample Quality Check (QC)\nRestricted\n3.Sample Processing & Aliquoting\n0%\n4.Assay & Test Execution\n0%\n5.Storage & Inventory Management\nRestricted\n6.Reporting & Performance Monitoring\n0%\n7.Disposal & Archiving\nRestricted\n0 of 7 pages completed"
+  },
+  {
+    "dept": "Pharma",
+    "workflow": "pharmaceutical",
+    "user": "pharm_biomedical",
+    "persona": "Biomedical Staff",
+    "notebookId": 236,
+    "entryId": 120,
+    "result": "FAIL",
+    "error": "login failed for pharm_biomedical: HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7a40c92436e0>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=45)'))"
+  }
+]

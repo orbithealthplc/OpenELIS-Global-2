@@ -1,0 +1,19 @@
+cases=7
+browser launched
+== Pathology / path_collector ==
+  PASS nav=True order=None restr=8/8 titles=9
+== Pathology / path_tech ==
+  PASS nav=True order=None restr=3/3 titles=9
+== Pathology / path_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  no nav yet → retry Workflow tab
+  PASS nav=True order=None restr=0/0 titles=9
+== Pathology / path_pathologist ==
+  PASS nav=True order=None restr=0/0 titles=9
+== Pathology / path_cyto ==
+  PASS nav=True order=None restr=0/0 titles=9
+== Pathology / path_jr_researcher ==
+  PASS nav=True order=None restr=6/6 titles=9
+== Pathology / path_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=9
+DONE 7/7 PASS

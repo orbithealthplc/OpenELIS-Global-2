@@ -27,12 +27,10 @@ public class BiorepositoryQcHierarchyParserTest {
 
     @Test
     public void parseHierarchyLevels_supportsStandardFreezerPath() {
-        String[] levels = BiorepositoryQcHierarchyParser.parseHierarchyLevels(
-                "Ultra-Low Freezer 1 > Shelf-A > Rack-1 > Box-3 > B7");
+        String[] levels = BiorepositoryQcHierarchyParser
+                .parseHierarchyLevels("Ultra-Low Freezer 1 > Shelf-A > Rack-1 > Box-3 > B7");
 
-        assertArrayEquals(
-                new String[] { "Ultra-Low Freezer 1", "Shelf-A", "Rack-1", "Box-3" },
-                levels);
+        assertArrayEquals(new String[] { "Ultra-Low Freezer 1", "Shelf-A", "Rack-1", "Box-3" }, levels);
     }
 
     @Test

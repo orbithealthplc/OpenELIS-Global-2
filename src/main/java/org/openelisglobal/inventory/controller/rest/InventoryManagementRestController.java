@@ -81,9 +81,8 @@ public class InventoryManagementRestController extends BaseRestController {
             UserSessionData usd = (UserSessionData) httpRequest.getSession().getAttribute(USER_SESSION_DATA);
             String sysUserId = String.valueOf(usd.getSystemUserId());
             if (lot.getInventoryItem() == null || lot.getInventoryItem().getId() == null
-                    || !departmentIsolationService
-                            .canAccessInventoryItemStrictIntersection(
-                                    inventoryItemService.get(lot.getInventoryItem().getId()), httpRequest)) {
+                    || !departmentIsolationService.canAccessInventoryItemStrictIntersection(
+                            inventoryItemService.get(lot.getInventoryItem().getId()), httpRequest)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
 
@@ -103,8 +102,8 @@ public class InventoryManagementRestController extends BaseRestController {
     public ResponseEntity<AvailabilityResponse> checkAvailability(@RequestParam String itemId,
             @RequestParam Double quantity, HttpServletRequest request) {
         try {
-            if (!departmentIsolationService
-                    .canAccessInventoryItemStrictIntersection(inventoryItemService.get(Long.valueOf(itemId)), request)) {
+            if (!departmentIsolationService.canAccessInventoryItemStrictIntersection(
+                    inventoryItemService.get(Long.valueOf(itemId)), request)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
             boolean isAvailable = inventoryManagementService.isSufficientInventoryAvailable(Long.valueOf(itemId),

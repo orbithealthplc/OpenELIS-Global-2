@@ -49,8 +49,7 @@ public class BiorepositoryDashboardStorageUtilizationTest {
         StorageRack rackB = buildRack(31, shelfB, true);
         StorageBox boxB = buildBox(41, rackB, true, 4, 10); // derived capacity = 40
 
-        when(bioSampleService.getAll()).thenReturn(List.of(
-                buildBioSample(101, BioSample.WorkflowStatus.STORED),
+        when(bioSampleService.getAll()).thenReturn(List.of(buildBioSample(101, BioSample.WorkflowStatus.STORED),
                 buildBioSample(102, BioSample.WorkflowStatus.STORED),
                 buildBioSample(103, BioSample.WorkflowStatus.PENDING_STORAGE)));
         when(storageLocationService.getAllDevices()).thenReturn(List.of(freezerA, freezerB, inactive));

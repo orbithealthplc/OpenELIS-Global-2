@@ -74,11 +74,8 @@ public class BioSampleSearchFulfillmentContextTest {
 
         when(fulfillmentSearchService.search(any(), any())).thenReturn(outcome);
 
-        mockMvc.perform(get("/rest/biorepository/sample/search")
-                .param("accessionNumber", "ACC-9")
-                .param("status", "STORED")
-                .param("context", "fulfillment"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/biorepository/sample/search").param("accessionNumber", "ACC-9")
+                .param("status", "STORED").param("context", "fulfillment")).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].accessionNumber").value("ACC-9"))
                 .andExpect(jsonPath("$[0].exactIdentityMatch").value(true))
                 .andExpect(jsonPath("$[0].matchReason").value("EXACT_ACCESSION"));

@@ -944,7 +944,8 @@ public class AnalyzerResultImportServiceImpl extends AuditableBaseObjectServiceI
             if (valueColumn != null && previewRow.data().containsKey(valueColumn)) {
                 String valValue = previewRow.data().get(valueColumn);
                 entry.put("value", valValue);
-                if (resValue == null) resValue = valValue;
+                if (resValue == null)
+                    resValue = valValue;
             }
 
             // Determine the type (standard, control, QC, blank)
@@ -958,50 +959,54 @@ public class AnalyzerResultImportServiceImpl extends AuditableBaseObjectServiceI
                 if (resValue != null && !resValue.isEmpty()) {
                     org.openelisglobal.medlab.valueholder.QCResult qc = new org.openelisglobal.medlab.valueholder.QCResult();
                     qc.setTestId(page.getNotebook().getId()); // Use notebook ID as proxy for test ID if not specific
-                    
+
                     // Try to get analyzer ID from page data or record
                     Integer analyzerId = null;
                     if (targetRun.get("analyzerId") != null) {
-                        try { analyzerId = Integer.parseInt(targetRun.get("analyzerId").toString()); } catch (Exception e) {}
+                        try {
+                            analyzerId = Integer.parseInt(targetRun.get("analyzerId").toString());
+                        } catch (Exception e) {
+                        }
                     }
                     qc.setAnalyzerId(analyzerId);
-                    
+
                     // Map entry type to QCLevel
                     if (entryType.contains("NORMAL") || entryType.contains("QC")) {
                         qc.setQcLevel(org.openelisglobal.medlab.valueholder.QCResult.QCLevel.NORMAL);
                     } else {
                         qc.setQcLevel(org.openelisglobal.medlab.valueholder.QCResult.QCLevel.PATHOLOGIC);
                     }
-                    
+
                     qc.setLotNumber(assayRunId); // Use assay run ID as lot number if not specified
-                    
+
                     java.math.BigDecimal val = new java.math.BigDecimal(resValue.replaceAll("[^0-9.]", ""));
                     qc.setResultValue(val);
                     qc.setResultDate(sqlDate);
                     qc.setResultTime(sqlTime);
-                    
+
                     // Default values for target/SD if not available in row
                     qc.setTargetValue(new java.math.BigDecimal("100.0"));
                     qc.setSdValue(new java.math.BigDecimal("5.0"));
                     qc.setAcceptableRangeLow(new java.math.BigDecimal("85.0"));
                     qc.setAcceptableRangeHigh(new java.math.BigDecimal("115.0"));
-                    
+
                     qc.setPerformedBy(Integer.parseInt(userId));
-                    
+
                     // Set pass/fail
-                    if (val.compareTo(qc.getAcceptableRangeLow()) >= 0 && val.compareTo(qc.getAcceptableRangeHigh()) <= 0) {
+                    if (val.compareTo(qc.getAcceptableRangeLow()) >= 0
+                            && val.compareTo(qc.getAcceptableRangeHigh()) <= 0) {
                         qc.setPassFail(org.openelisglobal.medlab.valueholder.QCResult.PassFail.PASS);
                     } else {
                         qc.setPassFail(org.openelisglobal.medlab.valueholder.QCResult.PassFail.FAIL);
                     }
-                    
+
                     qc.setIsCalibration(entryType.equals("CALIBRATOR") || entryType.equals("STANDARD"));
-                    
+
                     qcResultDAO.insert(qc);
                 }
             } catch (Exception e) {
-                LogEvent.logWarn(this.getClass().getName(), "storeAllStandardControlData", 
-                    "Could not create QCResult entity for standard/control row: " + e.getMessage());
+                LogEvent.logWarn(this.getClass().getName(), "storeAllStandardControlData",
+                        "Could not create QCResult entity for standard/control row: " + e.getMessage());
             }
         }
 

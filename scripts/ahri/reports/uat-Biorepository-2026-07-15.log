@@ -1,0 +1,17 @@
+cases=6
+browser launched
+== Biorepository / bio_collector ==
+  PASS nav=True order=None restr=6/6 titles=7
+== Biorepository / bio_tech ==
+  PASS nav=True order=None restr=2/2 titles=7
+== Biorepository / bio_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=0/0 titles=7
+== Biorepository / bio_jr_researcher ==
+  PASS nav=True order=None restr=7/7 titles=7
+== Biorepository / bio_sr_researcher ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=6/6 titles=7
+== Biorepository / bio_biomedical ==
+  PASS nav=True order=None restr=7/7 titles=7
+DONE 6/6 PASS

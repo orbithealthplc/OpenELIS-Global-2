@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 import org.openelisglobal.common.action.IActionConstants;
 import org.openelisglobal.common.constants.Constants;
 import org.openelisglobal.common.controller.BaseController;
-import org.openelisglobal.common.util.ConfigurationProperties;
-import org.openelisglobal.common.util.ConfigurationProperties.Property;
 import org.openelisglobal.localization.service.LocalizationService;
 import org.openelisglobal.login.bean.UserSession;
 import org.openelisglobal.login.bean.UserSession.LoginMethod;
@@ -32,8 +30,8 @@ import org.openelisglobal.userrole.valueholder.UserLabUnitRoles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ResolvableType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -269,8 +267,8 @@ public class LoginPageController extends BaseController {
         usd.setLoginLabUnit(loginLabUnit);
         request.setAttribute(IActionConstants.USER_SESSION_DATA, usd);
         request.getSession().setAttribute(IActionConstants.USER_SESSION_DATA, usd);
-        return ResponseEntity.ok(Map.of("success", true, "loginLabUnitId", String.valueOf(loginLabUnit),
-                "loginLabUnit", testSection.getLocalizedName() != null ? testSection.getLocalizedName()
+        return ResponseEntity.ok(Map.of("success", true, "loginLabUnitId", String.valueOf(loginLabUnit), "loginLabUnit",
+                testSection.getLocalizedName() != null ? testSection.getLocalizedName()
                         : testSection.getTestSectionName()));
     }
 
@@ -283,8 +281,8 @@ public class LoginPageController extends BaseController {
                 if (map == null || map.getLabUnit() == null) {
                     continue;
                 }
-                List<String> roleNames = map.getRoles().stream()
-                        .map(r -> roleService.getRoleById(r).getName().trim()).collect(Collectors.toList());
+                List<String> roleNames = map.getRoles().stream().map(r -> roleService.getRoleById(r).getName().trim())
+                        .collect(Collectors.toList());
                 if (ALL_LAB_UNITS.equalsIgnoreCase(map.getLabUnit().trim())) {
                     userLabRolesMap.put(ALL_LAB_UNITS, roleNames);
                     continue;
@@ -301,8 +299,8 @@ public class LoginPageController extends BaseController {
     }
 
     /**
-     * Expose roles under every common test-section label so loginLabUnit matches session keys
-     * (e.g. CTD vs CTD Department vs Medical Laboratory).
+     * Expose roles under every common test-section label so loginLabUnit matches
+     * session keys (e.g. CTD vs CTD Department vs Medical Laboratory).
      */
     private void putLabUnitRoleAliases(Map<String, List<String>> userLabRolesMap, TestSection testSection,
             List<String> roleNames) {

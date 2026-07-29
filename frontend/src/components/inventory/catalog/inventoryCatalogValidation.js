@@ -3,8 +3,11 @@ import { DEFAULT_EQUIPMENT_UNIT } from "./inventoryUnitOptions";
 import { isPermanentEquipment } from "./inventoryBehavior";
 
 export const validateCatalogForm = (formData, context = {}) => {
-  const { inventoryDepartmentId, assignableDepartmentsLoading, assignableDepartments } =
-    context;
+  const {
+    inventoryDepartmentId,
+    assignableDepartmentsLoading,
+    assignableDepartments,
+  } = context;
 
   if (!formData.name?.trim()) {
     return "Item name is required";
@@ -41,10 +44,7 @@ export const buildCatalogPayload = (formData, inventoryDepartmentId) => {
     itemType: formData.itemType,
     category: formData.category,
     manufacturer: formData.manufacturer,
-    units:
-      permanentEquipment
-        ? DEFAULT_EQUIPMENT_UNIT
-        : formData.units,
+    units: permanentEquipment ? DEFAULT_EQUIPMENT_UNIT : formData.units,
     lowStockThreshold: Number(formData.lowStockThreshold) || 0,
     projectName: formData.projectName || null,
   };

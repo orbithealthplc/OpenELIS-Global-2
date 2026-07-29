@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -23,8 +22,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.openelisglobal.department.service.DepartmentIsolationService;
 import org.openelisglobal.BaseWebContextSensitiveTest;
+import org.openelisglobal.department.service.DepartmentIsolationService;
 import org.openelisglobal.login.dao.UserModuleService;
 import org.openelisglobal.login.valueholder.UserSessionData;
 import org.openelisglobal.storage.service.StorageLocationService;
@@ -36,9 +35,9 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MvcResult;
 
 /**
- * Controller integration tests for Storage Location CRUD endpoints.
- * Requires Testcontainers with Docker API &gt;= 1.40. CI runs this suite; local runs
- * may fail on older Docker clients (upgrade Docker or run in CI).
+ * Controller integration tests for Storage Location CRUD endpoints. Requires
+ * Testcontainers with Docker API &gt;= 1.40. CI runs this suite; local runs may
+ * fail on older Docker clients (upgrade Docker or run in CI).
  */
 @RunWith(SpringRunner.class)
 public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTest {
@@ -137,19 +136,13 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
 
     @Test
     public void testCreateRoom_WithDepartmentTestSectionId_Returns201() throws Exception {
-        String roomJson = "{"
-                + "\"name\":\"Bacteriology Scoped Room\","
-                + "\"code\":\"BACT-R1\","
-                + "\"description\":\"Scoped room\","
-                + "\"active\":true,"
-                + "\"departmentTestSectionId\":196"
-                + "}";
+        String roomJson = "{" + "\"name\":\"Bacteriology Scoped Room\"," + "\"code\":\"BACT-R1\","
+                + "\"description\":\"Scoped room\"," + "\"active\":true," + "\"departmentTestSectionId\":196" + "}";
 
         this.mockMvc
                 .perform(post("/rest/storage/rooms").contentType(MediaType.APPLICATION_JSON).content(roomJson)
                         .sessionAttr("userSessionData", usd))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Bacteriology Scoped Room"))
+                .andExpect(status().isCreated()).andExpect(jsonPath("$.name").value("Bacteriology Scoped Room"))
                 .andExpect(jsonPath("$.departmentTestSectionId").value(196));
     }
 
@@ -193,16 +186,14 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
     public void testGetRooms_WithBiorepositoryOnly_ReturnsAllDepartmentRooms() throws Exception {
         jdbcTemplate.execute("UPDATE clinlims.storage_device SET biorepository_storage = true WHERE id = 20001");
 
-        MvcResult allRoomsResult = this.mockMvc
-                .perform(get("/rest/storage/rooms").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
+        MvcResult allRoomsResult = this.mockMvc.perform(
+                get("/rest/storage/rooms").contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd))
                 .andExpect(status().isOk()).andReturn();
         List<Map<String, Object>> allRooms = readMapList(allRoomsResult.getResponse().getContentAsString());
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/rooms?biorepositoryOnly=true").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/rooms?biorepositoryOnly=true")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> rooms = readMapList(mvcResult.getResponse().getContentAsString());
         assertFalse("Expected at least one room", rooms.isEmpty());
@@ -215,10 +206,9 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
     public void testGetDevices_WithBiorepositoryOnly_ReturnsOnlyBiorepositoryDevices() throws Exception {
         jdbcTemplate.execute("UPDATE clinlims.storage_device SET biorepository_storage = true WHERE id = 20001");
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/devices?biorepositoryOnly=true").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/devices?biorepositoryOnly=true")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> devices = readMapList(mvcResult.getResponse().getContentAsString());
         assertFalse("Expected at least one biorepository device", devices.isEmpty());
@@ -231,20 +221,18 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
         // Shelf 20001 and rack 20000 belong to device 20003
         jdbcTemplate.execute("UPDATE clinlims.storage_device SET biorepository_storage = true WHERE id = 20003");
 
-        MvcResult shelvesResult = this.mockMvc
-                .perform(get("/rest/storage/shelves?biorepositoryOnly=true").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult shelvesResult = this.mockMvc.perform(get("/rest/storage/shelves?biorepositoryOnly=true")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> shelves = readMapList(shelvesResult.getResponse().getContentAsString());
         assertFalse("Expected at least one biorepository shelf", shelves.isEmpty());
         assertTrue("All returned shelves must inherit biorepository storage flag",
                 shelves.stream().allMatch(shelf -> Boolean.TRUE.equals(shelf.get("biorepositoryStorage"))));
 
-        MvcResult racksResult = this.mockMvc
-                .perform(get("/rest/storage/racks?biorepositoryOnly=true").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult racksResult = this.mockMvc.perform(get("/rest/storage/racks?biorepositoryOnly=true")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> racks = readMapList(racksResult.getResponse().getContentAsString());
         assertFalse("Expected at least one biorepository rack", racks.isEmpty());
@@ -255,18 +243,15 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
     @Test
     public void testGetRoomAssignableDepartments_UsesLabTestSections() throws Exception {
         DepartmentIsolationService departmentIsolationServiceMock = Mockito.mock(DepartmentIsolationService.class);
-        List<Map<String, String>> assignable = List.of(
-                Map.of("id", "168", "value", "Bacteriology"),
-                Map.of("id", "59", "value", "Immunology"),
-                Map.of("id", "76", "value", "Virologie"));
+        List<Map<String, String>> assignable = List.of(Map.of("id", "168", "value", "Bacteriology"),
+                Map.of("id", "59", "value", "Immunology"), Map.of("id", "76", "value", "Virologie"));
         when(departmentIsolationServiceMock.getAssignableLabDepartments(any())).thenReturn(assignable);
         ReflectionTestUtils.setField(storageLocationRestController, "departmentIsolationService",
                 departmentIsolationServiceMock);
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/room-assignable-departments").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/room-assignable-departments")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, String>> departments = objectMapper.readValue(mvcResult.getResponse().getContentAsString(),
                 new TypeReference<List<Map<String, String>>>() {
@@ -282,13 +267,13 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
     public void testGetBoxes_WithBiorepositoryOnly_ReturnsOnlyBoxesUnderBiorepositoryDevices() throws Exception {
         // Rack 20000 -> Shelf 20001 -> Device 20003
         jdbcTemplate.execute("UPDATE clinlims.storage_device SET biorepository_storage = true WHERE id = 20003");
-        jdbcTemplate.execute("INSERT INTO clinlims.storage_box (id, label, code, type, rows, columns, parent_rack_id, active, fhir_uuid, sys_user_id, last_updated) "
-                + "VALUES (20999, 'Bio Box', 'BIO-BOX-1', 'plate', 8, 12, 20000, true, '40000000-0000-0000-0000-000000020999', '1', CURRENT_TIMESTAMP)");
+        jdbcTemplate.execute(
+                "INSERT INTO clinlims.storage_box (id, label, code, type, rows, columns, parent_rack_id, active, fhir_uuid, sys_user_id, last_updated) "
+                        + "VALUES (20999, 'Bio Box', 'BIO-BOX-1', 'plate', 8, 12, 20000, true, '40000000-0000-0000-0000-000000020999', '1', CURRENT_TIMESTAMP)");
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/boxes?biorepositoryOnly=true").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/boxes?biorepositoryOnly=true")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> boxes = readMapList(mvcResult.getResponse().getContentAsString());
         assertFalse("Expected at least one biorepository box", boxes.isEmpty());
@@ -314,40 +299,39 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
 
     @Test
     public void testGetRooms_WithBacteriologyNotebookDepartmentLink_ReturnsScopedRooms() throws Exception {
-        Integer bacteriologyDeptId = jdbcTemplate.query(
-                "SELECT id FROM clinlims.test_section WHERE name = 'Bacteriology' LIMIT 1",
-                (rs, rowNum) -> rs.getInt(1)).stream().findFirst().orElse(null);
+        Integer bacteriologyDeptId = jdbcTemplate
+                .query("SELECT id FROM clinlims.test_section WHERE name = 'Bacteriology' LIMIT 1",
+                        (rs, rowNum) -> rs.getInt(1))
+                .stream().findFirst().orElse(null);
         Assume.assumeTrue("Bacteriology test section required for this test", bacteriologyDeptId != null);
 
         jdbcTemplate.update(
                 "UPDATE clinlims.notebook SET title = 'Bacteriology Laboratory', workflow_type = 'bacteriology' WHERE id = 1");
         jdbcTemplate.update("DELETE FROM clinlims.notebook_departments WHERE notebook_id = 1");
-        jdbcTemplate.update(
-                "INSERT INTO clinlims.notebook_departments (notebook_id, test_section_id) VALUES (1, ?)",
+        jdbcTemplate.update("INSERT INTO clinlims.notebook_departments (notebook_id, test_section_id) VALUES (1, ?)",
                 bacteriologyDeptId);
         jdbcTemplate.update(
                 "UPDATE clinlims.storage_room SET department_test_section_id = ?, active = true WHERE id = 20005",
                 bacteriologyDeptId);
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/rooms?status=active&notebookId=1").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/rooms?status=active&notebookId=1")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> rooms = readMapList(mvcResult.getResponse().getContentAsString());
         assertTrue("Expected Bacteriology-scoped active room in notebook-filtered results",
                 rooms.stream().anyMatch(room -> Integer.valueOf(20005).equals(asInteger(room.get("id")))));
-        assertTrue("All returned rooms must belong to the Bacteriology department",
-                rooms.stream().allMatch(
-                        room -> bacteriologyDeptId.equals(asInteger(room.get("departmentTestSectionId")))));
+        assertTrue("All returned rooms must belong to the Bacteriology department", rooms.stream()
+                .allMatch(room -> bacteriologyDeptId.equals(asInteger(room.get("departmentTestSectionId")))));
     }
 
     @Test
     public void testGetRooms_WithBacteriologyWorkflowType_ResolvesDepartmentWithoutNotebookDepartmentsLink()
             throws Exception {
-        Integer bacteriologyDeptId = jdbcTemplate.query(
-                "SELECT id FROM clinlims.test_section WHERE name = 'Bacteriology' LIMIT 1",
-                (rs, rowNum) -> rs.getInt(1)).stream().findFirst().orElse(null);
+        Integer bacteriologyDeptId = jdbcTemplate
+                .query("SELECT id FROM clinlims.test_section WHERE name = 'Bacteriology' LIMIT 1",
+                        (rs, rowNum) -> rs.getInt(1))
+                .stream().findFirst().orElse(null);
         Assume.assumeTrue("Bacteriology test section required for this test", bacteriologyDeptId != null);
 
         jdbcTemplate.update(
@@ -357,10 +341,9 @@ public class StorageLocationRestControllerTest extends BaseWebContextSensitiveTe
                 "UPDATE clinlims.storage_room SET department_test_section_id = ?, active = true WHERE id = 20005",
                 bacteriologyDeptId);
 
-        MvcResult mvcResult = this.mockMvc
-                .perform(get("/rest/storage/rooms?status=active&notebookId=1").contentType(MediaType.APPLICATION_JSON)
-                        .sessionAttr("userSessionData", usd))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult mvcResult = this.mockMvc.perform(get("/rest/storage/rooms?status=active&notebookId=1")
+                .contentType(MediaType.APPLICATION_JSON).sessionAttr("userSessionData", usd)).andExpect(status().isOk())
+                .andReturn();
 
         List<Map<String, Object>> rooms = readMapList(mvcResult.getResponse().getContentAsString());
         assertTrue(

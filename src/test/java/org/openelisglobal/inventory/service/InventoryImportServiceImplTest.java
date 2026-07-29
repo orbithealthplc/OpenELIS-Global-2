@@ -59,11 +59,9 @@ public class InventoryImportServiceImplTest {
 
     @Test
     public void validateCatalogImport_acceptsValidReagentRow() {
-        String csv = "name,itemType,category,manufacturer,units\n"
-                + "Ethanol 70%,REAGENT,Solvent,Merck,mL\n";
+        String csv = "name,itemType,category,manufacturer,units\n" + "Ethanol 70%,REAGENT,Solvent,Merck,mL\n";
         InventoryImportResult result = inventoryImportService.validateCatalogImport(
-                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request,
-                7);
+                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request, 7);
 
         assertTrue(result.isValid());
         assertEquals(1, result.getTotalRows());
@@ -77,8 +75,7 @@ public class InventoryImportServiceImplTest {
     public void validateCatalogImport_rejectsMissingName() {
         String csv = "name,itemType,category,units\n" + ",REAGENT,Solvent,mL\n";
         InventoryImportResult result = inventoryImportService.validateCatalogImport(
-                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request,
-                7);
+                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request, 7);
 
         assertFalse(result.isValid());
         assertEquals(1, result.getInvalidRows());
@@ -89,8 +86,7 @@ public class InventoryImportServiceImplTest {
     public void validateCatalogImport_rejectsInvalidItemType() {
         String csv = "name,itemType,category,units\n" + "Bad Item,NOT_A_TYPE,Solvent,mL\n";
         InventoryImportResult result = inventoryImportService.validateCatalogImport(
-                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request,
-                7);
+                new ByteArrayInputStream(csv.getBytes(StandardCharsets.UTF_8)), "catalog.csv", "text/csv", request, 7);
 
         assertFalse(result.isValid());
         assertTrue(result.getErrors().stream().anyMatch(error -> "itemType".equals(error.getField())));

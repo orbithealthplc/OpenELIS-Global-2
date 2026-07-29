@@ -1,0 +1,334 @@
+- generic [ref=f4e1]:
+    - generic [ref=f4e3]:
+        - banner [ref=f4e4]:
+            - button "Open menu" [ref=f4e5] [cursor=pointer]
+            - link [ref=f4e8] [cursor=pointer]:
+                - /url: /
+                - img "AHRI LIMS" [ref=f4e11]
+                - generic [ref=f4e12]:
+                    - heading "AHRI LIMS" [level=5] [ref=f4e13]
+                    - paragraph [ref=f4e14]: "Version: 3.2.1.2"
+            - generic [ref=f4e15]:
+                - generic [ref=f4e16]:
+                    - button "Search" [ref=f4e17] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f4e20]:
+                    - button "Notifications" [ref=f4e21] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f4e25]:
+                    - button "User" [ref=f4e26] [cursor=pointer]
+                    - tooltip
+                - generic [ref=f4e30]:
+                    - button "Help" [ref=f4e31] [cursor=pointer]
+                    - tooltip
+                - generic "Help Panel":
+                    - list:
+                        - listitem:
+                            - button "User Manual" [ref=f4e36] [cursor=pointer]
+                        - listitem:
+                            - button "Video Tutorials" [ref=f4e40] [cursor=pointer]
+                        - listitem:
+                            - button "Release Notes" [ref=f4e44] [cursor=pointer]
+            - generic "Header Panel":
+                - list:
+                    - listitem: Open ELIS
+                    - listitem: Logout
+                    - listitem:
+                        - generic [ref=f4e53]:
+                            - generic [ref=f4e54]: Select Locale
+                            - combobox "Select Locale" [ref=f4e56] [cursor=pointer]:
+                                - option "English" [selected]
+                                - option "English (UK)"
+                                - option "English (Sri Lanka)"
+                                - option "English (US)"
+                                - option "Español"
+                                - option "Français"
+                                - option "Indonesia"
+                                - option "Indonesia (ID)"
+                                - option "Malagasy"
+                                - option "Română"
+                                - option "සිංහල"
+                                - option "සිංහල (Sri Lanka)"
+                                - option "தமிழ்"
+                                - option "தமிழ் (Sri Lanka)"
+                                - option "Swahili"
+                                - option "Amharic"
+                    - listitem:
+                        - generic [ref=f4e57]: "Version:: 3.2.1.2"
+            - navigation "Side navigation":
+                - list:
+                    - generic:
+                        - listitem:
+                            - link "Home" [ref=f4e58] [cursor=pointer]:
+                                - /url: /Dashboard
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e61] [cursor=pointer]
+                                - button "Storage Management" [ref=f4e65] [cursor=pointer]
+                                - button "Cold Storage Monitoring" [ref=f4e67] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e69] [cursor=pointer]
+                                - button "Report Non-Conforming Event" [ref=f4e73] [cursor=pointer]
+                                - button "View New Non-Conforming Events" [ref=f4e75] [cursor=pointer]
+                                - button "Corrective actions" [ref=f4e77] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e79] [cursor=pointer]
+                                - button "By Test Type" [ref=f4e83] [cursor=pointer]
+                                - button "By Panel" [ref=f4e85] [cursor=pointer]
+                                - button "By Unit" [ref=f4e87] [cursor=pointer]
+                                - button "By Priority" [ref=f4e89] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e91] [cursor=pointer]
+                                - button "By Unit" [ref=f4e95] [cursor=pointer]
+                                - button "By Order" [ref=f4e97] [cursor=pointer]
+                                - button "Referred Out" [ref=f4e99] [cursor=pointer]
+                                - button "By Range of Order numbers" [ref=f4e101] [cursor=pointer]
+                                - button "By Test, Date or Status" [ref=f4e103] [cursor=pointer]
+                                - button "Order Programs" [ref=f4e105] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e107] [cursor=pointer]
+                                - button "Routine" [ref=f4e111] [cursor=pointer]
+                                - button "Study" [ref=f4e113] [cursor=pointer]
+                                - button "By Order" [ref=f4e118] [cursor=pointer]
+                                - button "By Range of Order Numbers" [ref=f4e120] [cursor=pointer]
+                                - button "By Date" [ref=f4e122] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e124] [cursor=pointer]
+                                - button "Routine" [ref=f4e128] [cursor=pointer]
+                                - button [ref=f4e130] [cursor=pointer]
+                                - button "Study" [ref=f4e134] [cursor=pointer]
+                                - button [ref=f4e136] [cursor=pointer]
+                                - button "WHONET Report" [ref=f4e140] [cursor=pointer]
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e142] [cursor=pointer]
+                                - button "Inventory Management" [ref=f4e146] [cursor=pointer]
+                                - button "Equipment Usage" [ref=f4e148] [cursor=pointer]
+                    - generic:
+                        - listitem:
+                            - link "Admin" [ref=f4e150] [cursor=pointer]:
+                                - /url: /MasterListsPage
+                    - generic:
+                        - listitem:
+                            - link "Aliquot" [ref=f4e153] [cursor=pointer]:
+                                - /url: /Aliquot
+                    - generic:
+                        - listitem:
+                            - link "NoteBook" [ref=f4e156] [cursor=pointer]:
+                                - /url: /NotebookDashboard
+                    - generic:
+                        - generic:
+                            - listitem:
+                                - button [ref=f4e159] [cursor=pointer]
+                                - button "User Manual" [ref=f4e163] [cursor=pointer]
+        - main [ref=f4e166]:
+            - navigation "Breadcrumb" [ref=f4e169]:
+                - list [ref=f4e170]:
+                    - listitem [ref=f4e171]:
+                        - link "Home" [ref=f4e172] [cursor=pointer]:
+                            - /url: /
+                        - text: /
+                    - listitem [ref=f4e173]:
+                        - link "New Entry" [ref=f4e174] [cursor=pointer]:
+                            - /url: /NoteBookEntryForm
+                        - text: /
+            - heading "Notebook" [level=3] [ref=f4e179]
+            - generic [ref=f4e180]:
+                - generic [ref=f4e181]:
+                    - button "All Entries" [ref=f4e185] [cursor=pointer]
+                    - generic [ref=f4e189]:
+                        - heading "Projects" [level=4] [ref=f4e191]
+                        - generic [ref=f4e193]:
+                            - generic [ref=f4e467]: Notebooks
+                            - tree "Notebooks" [ref=f4e195]:
+                                - treeitem "Edit Bacteriology Laboratory (2)" [ref=f4e196]:
+                                    - generic [ref=f4e202] [cursor=pointer]:
+                                        - generic [ref=f4e203]:
+                                            - button "Edit" [ref=f4e204]
+                                            - tooltip
+                                        - generic [ref=f4e209]: Bacteriology Laboratory
+                                        - generic [ref=f4e210]: (2)
+                                - treeitem "Edit Bioanalytical Laboratory (1)" [ref=f4e211]:
+                                    - generic [ref=f4e217] [cursor=pointer]:
+                                        - generic [ref=f4e218]:
+                                            - button "Edit" [ref=f4e219]
+                                            - tooltip
+                                        - generic [ref=f4e224]: Bioanalytical Laboratory
+                                        - generic [ref=f4e225]: (1)
+                                - treeitem "Edit Bioequivalence Laboratory (1)" [ref=f4e226]:
+                                    - generic [ref=f4e232] [cursor=pointer]:
+                                        - generic [ref=f4e233]:
+                                            - button "Edit" [ref=f4e234]
+                                            - tooltip
+                                        - generic [ref=f4e239]: Bioequivalence Laboratory
+                                        - generic [ref=f4e240]: (1)
+                                - treeitem "Edit Biorepository Laboratory (2)" [ref=f4e241]:
+                                    - generic [ref=f4e247] [cursor=pointer]:
+                                        - generic [ref=f4e248]:
+                                            - button "Edit" [ref=f4e249]
+                                            - tooltip
+                                        - generic [ref=f4e254]: Biorepository Laboratory
+                                        - generic [ref=f4e255]: (2)
+                                - treeitem "Edit CTD (2)" [expanded] [active] [selected] [ref=f4e256]:
+                                    - generic [ref=f4e262] [cursor=pointer]:
+                                        - generic [ref=f4e263]:
+                                            - button "Edit" [ref=f4e264]
+                                            - tooltip
+                                        - generic [ref=f4e269]: CTD
+                                        - generic [ref=f4e270]: (2)
+                                    - group [ref=f4e468]:
+                                        - treeitem "Edit CTD - Lab 1 (1)" [ref=f4e469]:
+                                            - generic [ref=f4e471] [cursor=pointer]:
+                                                - generic [ref=f4e472]:
+                                                    - button "Edit" [ref=f4e473]
+                                                    - tooltip
+                                                - generic [ref=f4e479]: CTD - Lab 1
+                                                - generic [ref=f4e480]: (1)
+                                        - treeitem "Edit CTD - staff screening (1)" [ref=f4e481]:
+                                            - generic [ref=f4e483] [cursor=pointer]:
+                                                - generic [ref=f4e484]:
+                                                    - button "Edit" [ref=f4e485]
+                                                    - tooltip
+                                                - generic [ref=f4e491]: CTD - staff screening
+                                                - generic [ref=f4e492]: (1)
+                                - treeitem "Edit Genomics & Bioinformatics Laboratory (1)" [ref=f4e271]:
+                                    - generic [ref=f4e277] [cursor=pointer]:
+                                        - generic [ref=f4e278]:
+                                            - button "Edit" [ref=f4e279]
+                                            - tooltip
+                                        - generic [ref=f4e284]: Genomics & Bioinformatics Laboratory
+                                        - generic [ref=f4e285]: (1)
+                                - treeitem "Edit Immunology Laboratory (1)" [ref=f4e286]:
+                                    - generic [ref=f4e292] [cursor=pointer]:
+                                        - generic [ref=f4e293]:
+                                            - button "Edit" [ref=f4e294]
+                                            - tooltip
+                                        - generic [ref=f4e299]: Immunology Laboratory
+                                        - generic [ref=f4e300]: (1)
+                                - treeitem "Edit Malaria and Neglected Tropical Disease (MNTD) Laboratory (2)" [ref=f4e301]:
+                                    - generic [ref=f4e307] [cursor=pointer]:
+                                        - generic [ref=f4e308]:
+                                            - button "Edit" [ref=f4e309]
+                                            - tooltip
+                                        - generic [ref=f4e314]: Malaria and Neglected Tropical Disease (MNTD) Laboratory
+                                        - generic [ref=f4e315]: (2)
+                                - treeitem "Edit Pathology Laboratory (2)" [ref=f4e316]:
+                                    - generic [ref=f4e322] [cursor=pointer]:
+                                        - generic [ref=f4e323]:
+                                            - button "Edit" [ref=f4e324]
+                                            - tooltip
+                                        - generic [ref=f4e329]: Pathology Laboratory
+                                        - generic [ref=f4e330]: (2)
+                                - treeitem "Edit Pharmaceuticals Laboratory (1)" [ref=f4e331]:
+                                    - generic [ref=f4e337] [cursor=pointer]:
+                                        - generic [ref=f4e338]:
+                                            - button "Edit" [ref=f4e339]
+                                            - tooltip
+                                        - generic [ref=f4e344]: Pharmaceuticals Laboratory
+                                        - generic [ref=f4e345]: (1)
+                                - treeitem "Edit Traditional & Modern Medicine Research Lab (1)" [ref=f4e346]:
+                                    - generic [ref=f4e352] [cursor=pointer]:
+                                        - generic [ref=f4e353]:
+                                            - button "Edit" [ref=f4e354]
+                                            - tooltip
+                                        - generic [ref=f4e359]: Traditional & Modern Medicine Research Lab
+                                        - generic [ref=f4e360]: (1)
+                                - treeitem "Edit Tuberculosis Laboratory (1)" [ref=f4e361]:
+                                    - generic [ref=f4e367] [cursor=pointer]:
+                                        - generic [ref=f4e368]:
+                                            - button "Edit" [ref=f4e369]
+                                            - tooltip
+                                        - generic [ref=f4e374]: Tuberculosis Laboratory
+                                        - generic [ref=f4e375]: (1)
+                                - treeitem "Edit Viral Vaccine (1)" [ref=f4e376]:
+                                    - generic [ref=f4e382] [cursor=pointer]:
+                                        - generic [ref=f4e383]:
+                                            - button "Edit" [ref=f4e384]
+                                            - tooltip
+                                        - generic [ref=f4e389]: Viral Vaccine
+                                        - generic [ref=f4e390]: (1)
+                                - treeitem "Edit Virology Laboratory (1)" [ref=f4e391]:
+                                    - generic [ref=f4e397] [cursor=pointer]:
+                                        - generic [ref=f4e398]:
+                                            - button "Edit" [ref=f4e399]
+                                            - tooltip
+                                        - generic [ref=f4e404]: Virology Laboratory
+                                        - generic [ref=f4e405]: (1)
+                - generic [ref=f4e406]:
+                    - generic [ref=f4e407]:
+                        - generic [ref=f4e408]:
+                            - heading "Total Entries" [level=3] [ref=f4e409]
+                            - paragraph [ref=f4e410]: "0"
+                        - generic [ref=f4e411]:
+                            - heading "Drafts" [level=3] [ref=f4e412]
+                            - paragraph [ref=f4e413]: "0"
+                        - generic [ref=f4e414]:
+                            - heading "Pending Review" [level=3] [ref=f4e415]
+                            - paragraph [ref=f4e416]: "0"
+                        - generic [ref=f4e417]:
+                            - heading "Finalized This Week" [level=3] [ref=f4e418]
+                            - paragraph [ref=f4e419]: "0"
+                    - generic [ref=f4e420]:
+                        - generic [ref=f4e493]:
+                            - generic [ref=f4e494]:
+                                - heading "CTD" [level=4] [ref=f4e496]
+                                - button "Create Instance" [ref=f4e498] [cursor=pointer]
+                            - paragraph [ref=f4e500]: This is a project template. Create a new project or use an existing one to add entries.
+                        - generic [ref=f4e425]:
+                            - generic [ref=f4e426]: "Filters :"
+                            - generic [ref=f4e428]:
+                                - generic [ref=f4e429]: Status
+                                - generic [ref=f4e431] [cursor=pointer]:
+                                    - combobox "Status" [ref=f4e432]
+                                    - button "Open" [ref=f4e433]
+                            - generic [ref=f4e437]:
+                                - generic [ref=f4e438]: Experiment Types
+                                - generic [ref=f4e440] [cursor=pointer]:
+                                    - combobox "Experiment Types" [ref=f4e441]
+                                    - button "Open" [ref=f4e442]
+                            - generic [ref=f4e446]:
+                                - generic [ref=f4e447]: Tag
+                                - textbox "Tag" [ref=f4e451]:
+                                    - /placeholder: Enter Tags
+                            - generic [ref=f4e455]:
+                                - generic [ref=f4e456]: Start Date
+                                - textbox "mm/dd/yyyy" [ref=f4e458]
+                            - generic [ref=f4e462]:
+                                - generic [ref=f4e463]: End Date
+                                - textbox "mm/dd/yyyy" [ref=f4e465]
+                        - generic [ref=f4e503]:
+                            - generic [ref=f4e504]:
+                                - generic [ref=f4e506]:
+                                    - generic [ref=f4e507]:
+                                        - 'heading "CTD - Lab 1 - Entry #1" [level=3] [ref=f4e508]'
+                                        - separator [ref=f4e509]
+                                    - generic "DRAFT" [ref=f4e514]
+                                    - generic [ref=f4e522]: 07/14/2026
+                                - generic [ref=f4e529]:
+                                    - button "View" [ref=f4e531] [cursor=pointer]
+                                    - button "Edit" [ref=f4e536] [cursor=pointer]
+                            - generic [ref=f4e539]:
+                                - generic [ref=f4e541]:
+                                    - generic [ref=f4e542]:
+                                        - 'heading "CTD - staff screening - Entry #1" [level=3] [ref=f4e543]'
+                                        - separator [ref=f4e544]
+                                    - generic "DRAFT" [ref=f4e549]
+                                    - generic [ref=f4e557]: 07/14/2026
+                                - generic [ref=f4e564]:
+                                    - button "View" [ref=f4e566] [cursor=pointer]
+                                    - button "Edit" [ref=f4e571] [cursor=pointer]
+        - contentinfo:
+            - paragraph
+    - status [ref=f4e466]

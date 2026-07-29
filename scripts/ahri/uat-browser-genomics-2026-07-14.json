@@ -1,0 +1,63 @@
+[
+  {
+    "dept": "Genomics",
+    "workflow": "gbd",
+    "user": "gen_collector",
+    "persona": "Sample Collector",
+    "notebookId": 231,
+    "entryId": 106,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Intake & Registration",
+      "2.DNA/RNA Extraction",
+      "3.Quality & Quantity Assessment",
+      "4.PCR Amplification",
+      "5.Gel Electrophoresis",
+      "6.Library Preparation",
+      "7.Bioanalyzer QC",
+      "8.Sequencing",
+      "9.Bioinformatics Analysis & Data Submission",
+      "10.Storage & Environmental Monitoring"
+    ],
+    "restrictedCount": 9,
+    "expectedRestrictedCount": 9,
+    "expectedRestricted": [
+      "DNA/RNA Extraction",
+      "Quality & Quantity Assessment",
+      "PCR Amplification",
+      "Gel Electrophoresis",
+      "Library Preparation",
+      "Bioanalyzer QC",
+      "Sequencing",
+      "Bioinformatics Analysis & Data Submission",
+      "Storage & Environmental Monitoring"
+    ],
+    "stageCount": 10,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/231?mode=edit&tab=workflow&entryId=106",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Genomics_gen_collector.png",
+    "navText": "Workflow Pages\n1.Sample Intake & Registration\n0%\n2.DNA/RNA Extraction\nRestricted\n3.Quality & Quantity Assessment\nRestricted\n4.PCR Amplification\nRestricted\n5.Gel Electrophoresis\nRestricted\n6.Library Preparation\nRestricted\n7.Bioanalyzer QC\nRestricted\n8.Sequencing\nRestricted\n9.Bioinformatics Analysis & Data Submission\nRestricted\n10.Storage & Environmental Monitoring\nRestricted\n0 of 10 pages completed"
+  },
+  {
+    "dept": "Genomics",
+    "workflow": "gbd",
+    "user": "gen_tech",
+    "persona": "Laboratory Technician",
+    "notebookId": 231,
+    "entryId": 106,
+    "result": "FAIL",
+    "hasNav": false,
+    "order_ok": null,
+    "access_ok": false,
+    "titles": [],
+    "restrictedCount": 0,
+    "expectedRestrictedCount": 0,
+    "expectedRestricted": [],
+    "stageCount": 10,
+    "url": "https://lims.ahri.gov.et/login",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Genomics_gen_tech.png",
+    "navText": ""
+  }
+]

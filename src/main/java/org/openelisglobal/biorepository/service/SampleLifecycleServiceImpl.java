@@ -91,17 +91,19 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
 
         BioSample bioSample = bioSampleService.getBySampleItemId(sampleItemId);
         List<ChainOfCustodyLog> custodyLogs = chainOfCustodyService.getBySampleItemId(sampleItemId);
-        List<SampleStorageMovement> storageMovements = sampleStorageMovementDAO.findBySampleItemId(String.valueOf(sampleItemId));
+        List<SampleStorageMovement> storageMovements = sampleStorageMovementDAO
+                .findBySampleItemId(String.valueOf(sampleItemId));
         List<SampleTransferRequest> transferRequests = new ArrayList<>(
                 safeCollection(sampleTransferService.getBySampleItemId(sampleItemId)));
-        List<SampleLifecycleEventDTO> events = mergeLifecycleEvents(sampleItem, bioSample, custodyLogs, storageMovements,
-                transferRequests);
+        List<SampleLifecycleEventDTO> events = mergeLifecycleEvents(sampleItem, bioSample, custodyLogs,
+                storageMovements, transferRequests);
 
         SampleLifecycleResponseDTO response = new SampleLifecycleResponseDTO();
         response.setSampleItemId(sampleItemId);
         response.setBioSampleId(bioSample != null ? bioSample.getId() : null);
         response.setSampleExternalId(sampleItem.getExternalId());
-        response.setAccessionNumber(sampleItem.getSample() != null ? sampleItem.getSample().getAccessionNumber() : null);
+        response.setAccessionNumber(
+                sampleItem.getSample() != null ? sampleItem.getSample().getAccessionNumber() : null);
         response.setCurrentState(buildCurrentState(sampleItem, bioSample, custodyLogs, events));
         response.setTransferSummary(buildTransferSummary(sampleItem, bioSample, transferRequests));
         response.setRetrievalSummary(buildRetrievalSummary(bioSample));
@@ -139,8 +141,8 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
         } else {
             List<ChainOfCustodyLog> logs = chainOfCustodyService.searchCustodyLogs(sampleExternalId, action, null,
                     startDate, endDate, 0, Math.max(pageSize * 3, 200));
-            Set<Integer> idsFromLogs = logs.stream().map(ChainOfCustodyLog::getSampleItemId)
-                    .filter(id -> id != null).collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<Integer> idsFromLogs = logs.stream().map(ChainOfCustodyLog::getSampleItemId).filter(id -> id != null)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
             for (Integer sampleItemId : idsFromLogs) {
                 SampleLifecycleResponseDTO lifecycle = getBySampleItemId(sampleItemId);
                 if (lifecycle != null && lifecycle.getEvents() != null) {
@@ -166,9 +168,9 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
     private SampleLifecycleStateDTO buildCurrentState(SampleItem sampleItem, BioSample bioSample,
             List<ChainOfCustodyLog> custodyLogs, List<SampleLifecycleEventDTO> lifecycleEvents) {
         SampleLifecycleStateDTO state = new SampleLifecycleStateDTO();
-        state.setWorkflowStatus(bioSample != null && bioSample.getWorkflowStatus() != null
-                ? bioSample.getWorkflowStatus().name()
-                : null);
+        state.setWorkflowStatus(
+                bioSample != null && bioSample.getWorkflowStatus() != null ? bioSample.getWorkflowStatus().name()
+                        : null);
 
         Map<String, Object> location = sampleStorageService.getSampleItemLocation(sampleItem.getId());
         String locationPath = extractLocationPath(location);
@@ -197,13 +199,14 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
 
         if (bioSample != null) {
             List<SampleRetrievalRequest> retrievalRequests = safeCollection(
-                    sampleRetrievalService.getByBioSampleId(bioSample.getId())).stream()
+                    sampleRetrievalService.getByBioSampleId(bioSample.getId()))
+                    .stream()
                     .filter(request -> request.getStatus() != SampleRetrievalRequest.RequestStatus.COMPLETED
                             && request.getStatus() != SampleRetrievalRequest.RequestStatus.CANCELLED
                             && request.getStatus() != SampleRetrievalRequest.RequestStatus.REJECTED)
                     .toList();
-            state.setActiveRetrievalRequestId(retrievalRequests.stream().map(SampleRetrievalRequest::getId).findFirst()
-                    .orElse(null));
+            state.setActiveRetrievalRequestId(
+                    retrievalRequests.stream().map(SampleRetrievalRequest::getId).findFirst().orElse(null));
             retrievalRequests.stream().flatMap(request -> safeCollection(request.getItems()).stream())
                     .filter(item -> item.getBioSample() != null && item.getBioSample().getId() != null
                             && item.getBioSample().getId().equals(bioSample.getId()))
@@ -298,8 +301,7 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
         summary.setRejectionReason(item.getRejectionReason());
 
         summary.setSampleExternalId(sampleItem.getExternalId());
-        summary.setAccessionNumber(
-                sampleItem.getSample() != null ? sampleItem.getSample().getAccessionNumber() : null);
+        summary.setAccessionNumber(sampleItem.getSample() != null ? sampleItem.getSample().getAccessionNumber() : null);
         if (sampleItem.getTypeOfSample() != null) {
             summary.setSampleType(sampleItem.getTypeOfSample().getDescription());
         }
@@ -414,7 +416,8 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
         return new RetrievalContext(latestRequest, latestItem);
     }
 
-    private TransferContext findLatestTransferContext(SampleItem sampleItem, List<SampleTransferRequest> transferRequests) {
+    private TransferContext findLatestTransferContext(SampleItem sampleItem,
+            List<SampleTransferRequest> transferRequests) {
         if (sampleItem == null || sampleItem.getId() == null || transferRequests.isEmpty()) {
             return null;
         }
@@ -527,8 +530,10 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
     private SampleLifecycleEventDTO mapMovementEvent(SampleItem sampleItem, BioSample bioSample,
             SampleStorageMovement movement) {
         SampleLifecycleEventDTO event = baseEvent(sampleItem, bioSample);
-        boolean initialAssignment = movement.getPreviousLocationId() == null && movement.getPreviousLocationType() == null;
-        String eventType = initialAssignment ? CustodyAction.STORAGE_ASSIGNED.name() : CustodyAction.STORAGE_MOVED.name();
+        boolean initialAssignment = movement.getPreviousLocationId() == null
+                && movement.getPreviousLocationType() == null;
+        String eventType = initialAssignment ? CustodyAction.STORAGE_ASSIGNED.name()
+                : CustodyAction.STORAGE_MOVED.name();
         event.setEventType(eventType);
         event.setCustodyAction(eventType);
         event.setEventTimestamp(movement.getMovementDate());
@@ -543,8 +548,8 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
                 event.setActorUserId(String.valueOf(movement.getMovedByUserId()));
             }
         }
-        event.setFromLocationDisplay(buildPathFromLocation(movement.getPreviousLocationId(), movement.getPreviousLocationType(),
-                movement.getPreviousPositionCoordinate()));
+        event.setFromLocationDisplay(buildPathFromLocation(movement.getPreviousLocationId(),
+                movement.getPreviousLocationType(), movement.getPreviousPositionCoordinate()));
         event.setToLocationDisplay(buildPathFromLocation(movement.getNewLocationId(), movement.getNewLocationType(),
                 movement.getNewPositionCoordinate()));
         event.setStorageCoordinates(movement.getNewPositionCoordinate());
@@ -556,25 +561,26 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
 
     private SampleLifecycleEventDTO baseEvent(SampleItem sampleItem, BioSample bioSample) {
         SampleLifecycleEventDTO event = new SampleLifecycleEventDTO();
-        event.setSampleItemId(sampleItem != null && sampleItem.getId() != null ? Integer.valueOf(sampleItem.getId()) : null);
+        event.setSampleItemId(
+                sampleItem != null && sampleItem.getId() != null ? Integer.valueOf(sampleItem.getId()) : null);
         event.setBioSampleId(bioSample != null ? bioSample.getId() : null);
         event.setSampleExternalId(sampleItem != null ? sampleItem.getExternalId() : null);
-        event.setAccessionNumber(sampleItem != null && sampleItem.getSample() != null
-                ? sampleItem.getSample().getAccessionNumber()
-                : null);
+        event.setAccessionNumber(
+                sampleItem != null && sampleItem.getSample() != null ? sampleItem.getSample().getAccessionNumber()
+                        : null);
         return event;
     }
 
     private Comparator<SampleLifecycleEventDTO> lifecycleComparator() {
-        return Comparator.comparing(SampleLifecycleEventDTO::getEventTimestamp,
-                Comparator.nullsLast(Comparator.naturalOrder()))
+        return Comparator
+                .comparing(SampleLifecycleEventDTO::getEventTimestamp, Comparator.nullsLast(Comparator.naturalOrder()))
                 .thenComparing(SampleLifecycleEventDTO::getSourceRecordType, Comparator.nullsLast(String::compareTo))
                 .thenComparing(SampleLifecycleEventDTO::getSourceRecordId, Comparator.nullsLast(Integer::compareTo));
     }
 
     private Comparator<SampleLifecycleEventDTO> searchComparator() {
-        return Comparator.comparing(SampleLifecycleEventDTO::getEventTimestamp,
-                Comparator.nullsLast(Comparator.reverseOrder()))
+        return Comparator
+                .comparing(SampleLifecycleEventDTO::getEventTimestamp, Comparator.nullsLast(Comparator.reverseOrder()))
                 .thenComparing(SampleLifecycleEventDTO::getSourceRecordType, Comparator.nullsLast(String::compareTo))
                 .thenComparing(SampleLifecycleEventDTO::getSourceRecordId, Comparator.nullsLast(Integer::compareTo));
     }
@@ -673,7 +679,8 @@ public class SampleLifecycleServiceImpl implements SampleLifecycleService {
             }
 
             if (event.getToLocationDisplay() != null && !event.getToLocationDisplay().isBlank()
-                    && ("STORAGE".equals(event.getStage()) || CustodyAction.RETURN_STORED.name().equals(event.getEventType())
+                    && ("STORAGE".equals(event.getStage())
+                            || CustodyAction.RETURN_STORED.name().equals(event.getEventType())
                             || CustodyAction.RETURN_RECEIVED.name().equals(event.getEventType())
                             || CustodyAction.RETURN_INSPECTED.name().equals(event.getEventType()))) {
                 return event.getToLocationDisplay();

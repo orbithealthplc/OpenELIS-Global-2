@@ -65,10 +65,9 @@ public class InventoryReagentRestControllerInstrumentsTest {
         when(inventoryLotService.getByInventoryItemId(any())).thenReturn(List.of(new InventoryLot()));
         when(departmentIsolationService.canAccessInventoryItem(any(), any())).thenReturn(true);
 
-        MvcResult result = mockMvc
-                .perform(get("/rest/inventory/instruments").param("status", "active").param("requireLots", "false")
-                        .param("itemTypes", "EQUIPMENT").session(buildSession()).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult result = mockMvc.perform(get("/rest/inventory/instruments").param("status", "active")
+                .param("requireLots", "false").param("itemTypes", "EQUIPMENT").session(buildSession())
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk()).andReturn();
 
         JsonNode body = objectMapper.readTree(result.getResponse().getContentAsString());
         assertEquals(1, body.size());
@@ -107,18 +106,16 @@ public class InventoryReagentRestControllerInstrumentsTest {
         when(departmentIsolationService.inventoryBelongsToDepartment(eq(equipment), eq(7))).thenReturn(true);
         when(departmentIsolationService.inventoryBelongsToDepartment(eq(equipment), eq(99))).thenReturn(false);
 
-        MvcResult allowed = mockMvc
-                .perform(get("/rest/inventory/instruments").param("status", "active").param("requireLots", "false")
-                        .param("itemTypes", "EQUIPMENT").param("departmentIds", "7").session(buildSession())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult allowed = mockMvc.perform(get("/rest/inventory/instruments").param("status", "active")
+                .param("requireLots", "false").param("itemTypes", "EQUIPMENT").param("departmentIds", "7")
+                .session(buildSession()).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andReturn();
         assertEquals(1, objectMapper.readTree(allowed.getResponse().getContentAsString()).size());
 
-        MvcResult denied = mockMvc
-                .perform(get("/rest/inventory/instruments").param("status", "active").param("requireLots", "false")
-                        .param("itemTypes", "EQUIPMENT").param("departmentIds", "99").session(buildSession())
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk()).andReturn();
+        MvcResult denied = mockMvc.perform(get("/rest/inventory/instruments").param("status", "active")
+                .param("requireLots", "false").param("itemTypes", "EQUIPMENT").param("departmentIds", "99")
+                .session(buildSession()).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+                .andReturn();
         assertEquals(0, objectMapper.readTree(denied.getResponse().getContentAsString()).size());
     }
 

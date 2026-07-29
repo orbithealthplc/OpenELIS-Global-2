@@ -28,7 +28,8 @@ import org.openelisglobal.test.service.TestSectionService;
 import org.openelisglobal.test.valueholder.TestSection;
 
 /**
- * QC pool active-in-scope count should align with Storage Management active filter for the same department.
+ * QC pool active-in-scope count should align with Storage Management active
+ * filter for the same department.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class BiorepositoryQcSamplePoolVsStorageDashboardTest {
@@ -95,17 +96,14 @@ public class BiorepositoryQcSamplePoolVsStorageDashboardTest {
         }
         when(sampleStorageService.getAllSamplesWithAssignments()).thenReturn(rows);
 
-        List<Map<String, Object>> storageActive = rows.stream()
-                .filter(row -> {
-                    String location = String.valueOf(row.get("location"));
-                    if (location.isBlank()) {
-                        return false;
-                    }
-                    String status = String.valueOf(row.get("status"));
-                    return !statusService.matches(status, SampleStatus.Disposed);
-                })
-                .filter(row -> DEPT_ID == ((Number) row.get("departmentTestSectionId")).intValue())
-                .toList();
+        List<Map<String, Object>> storageActive = rows.stream().filter(row -> {
+            String location = String.valueOf(row.get("location"));
+            if (location.isBlank()) {
+                return false;
+            }
+            String status = String.valueOf(row.get("status"));
+            return !statusService.matches(status, SampleStatus.Disposed);
+        }).filter(row -> DEPT_ID == ((Number) row.get("departmentTestSectionId")).intValue()).toList();
 
         for (int i = 1; i <= 4; i++) {
             SampleItem sampleItem = new SampleItem();

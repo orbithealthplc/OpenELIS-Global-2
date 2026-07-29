@@ -44,7 +44,9 @@ function NotebookDepartmentStockPicker({
   useEffect(() => {
     if (!notebookId) {
       setItems([]);
-      setScopeStatus(NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE);
+      setScopeStatus(
+        NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
+      );
       return undefined;
     }
 
@@ -77,7 +79,8 @@ function NotebookDepartmentStockPicker({
       return null;
     }
     return (
-      items.find((item) => String(item.id) === String(selectedItem.id)) || selectedItem
+      items.find((item) => String(item.id) === String(selectedItem.id)) ||
+      selectedItem
     );
   }, [items, selectedItem]);
 

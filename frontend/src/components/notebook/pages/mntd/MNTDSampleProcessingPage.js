@@ -423,8 +423,7 @@ function MNTDSampleProcessingPage({
           }
         } else {
           setError(
-            response?.error ||
-              "Failed to add sample. Please try again.",
+            response?.error || "Failed to add sample. Please try again.",
           );
         }
       },

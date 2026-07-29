@@ -104,9 +104,8 @@ public class TBSampleCreationServiceImpl implements TBSampleCreationService {
                 List<String> linkedTypeIds = departmentSampleTypeService
                         .getSampleTypeIdsForDepartment(String.valueOf(tbSection.getId()));
                 if (!linkedTypeIds.isEmpty() && !linkedTypeIds.contains(specimenType.getId())) {
-                    return new RowCreationResult(false, createdSamples, accessionNumbers,
-                            "Specimen type '" + row.specimenType()
-                                    + "' is not supported for the Tuberculosis Laboratory");
+                    return new RowCreationResult(false, createdSamples, accessionNumbers, "Specimen type '"
+                            + row.specimenType() + "' is not supported for the Tuberculosis Laboratory");
                 }
             }
 

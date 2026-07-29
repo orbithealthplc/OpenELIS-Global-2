@@ -1,0 +1,41 @@
+[   11114ms] [ERROR] Failed to load resource: the server responded with a status of 404 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/notification/pnconfig:0
+[   11160ms] [ERROR] The script has an unsupported MIME type ('text/html'). @ :0
+[   11160ms] [INFO] Authenticated @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   11160ms] [INFO] Access Allowed @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   11193ms] [ERROR] Service Worker registration failed: SecurityError: Failed to register a ServiceWorker for scope ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/') with script ('https://lims.ahri.gov.et/NoteBookInstanceEditForm/service-worker.js'): The script has an unsupported MIME type ('text/html'). @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   12201ms] [LOG] Loading data {data: Object} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   12624ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/orders:0
+[   12638ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients?all=true:0
+[   12663ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://lims.ahri.gov.et/OpenELIS-Global/rest/medlab/page/default-1/registered-patients:0
+[   16021ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31399ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31408ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31420ms] [LOG] [QC Page] Loading samples for entry: 126 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31472ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31473ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31548ms] [LOG] [QC Page] Raw response from backend: [Object] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31548ms] [LOG] [QC Page] Number of samples received: 1 @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31549ms] [LOG] [QC Page] Sample breakdown by pageStatus: {PENDING: 1, COMPLETED: 0, SKIPPED: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31549ms] [LOG] [QC Page] First sample complete structure: {
+  "patientName": "1234 -",
+  "orderLabNo": "MEDLAB-2026-014",
+  "qcStatus": "PENDING_QC",
+  "patientId": "34",
+  "orderId": "262",
+  "sampleType": "Blood Serum",
+  "sampleTypeId": "164",
+  "collectionDate": 1783995060000,
+  "accessionNumber": "MEDLAB-2026-014",
+  "labNo": "MEDLAB-2026-014",
+  "pageStatus": "PENDING",
+  "isRejected": false,
+  "id": "96318",
+  "sampleItemId": "452473",
+  "receivedDate": 1783995060000
+} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31549ms] [LOG] [QC Page] Transformed samples: [Object] @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31549ms] [LOG] [QC Page] Transformed samples count by status: {PENDING: 1} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31551ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 1} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31553ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31558ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: pending-verification, selectedIds: Array(0), onSelectionChange: true, showSelection: true, samplesCount: 1} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1
+[   31562ms] [LOG] 🔧 SampleGrid VERSION: 2026-01-20-v2 {gridId: verified-samples, selectedIds: Array(0), onSelectionChange: false, showSelection: false, samplesCount: 0} @ https://lims.ahri.gov.et/static/js/main.a7067efa.js:1

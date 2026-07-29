@@ -23,21 +23,27 @@ import "./NotebookWorkflow.css";
  * Bioanalytical workflow pages for bioequivalence laboratory.
  * Per spec: Sample Reception → Test Assignment → Analytical Execution → Reporting & Release → Post-Test Storage & Archiving
  */
+// NOTE: Placeholder ids MUST use the "default-" prefix. Page components guard
+// their sample-loading API calls with String(pageData.id).startsWith("default-")
+// to avoid hitting /rest/notebook/page/{pageId}/samples (which expects a numeric
+// pageId) before the real notebook pages load. Using a non-numeric, non-"default-"
+// id here caused HTTP 400 (MethodArgumentTypeMismatchException) and the
+// "Failed to load samples" error toast.
 const BIOANALYTICAL_WORKFLOW_PAGES = [
   {
-    id: "bioanalytical-1",
+    id: "default-1",
     order: 1,
     title: "Sample Reception & Registration",
   },
   {
-    id: "bioanalytical-2",
+    id: "default-2",
     order: 2,
     title: "Test Assignment & Preparation",
   },
-  { id: "bioanalytical-3", order: 3, title: "Conduct Analysis / Test" },
-  { id: "bioanalytical-4", order: 4, title: "Reporting & Release" },
+  { id: "default-3", order: 3, title: "Conduct Analysis / Test" },
+  { id: "default-4", order: 4, title: "Reporting & Release" },
   {
-    id: "bioanalytical-5",
+    id: "default-5",
     order: 5,
     title: "Post-Test Sample & Data Handling",
   },

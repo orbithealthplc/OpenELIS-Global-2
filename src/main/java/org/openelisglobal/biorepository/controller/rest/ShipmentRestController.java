@@ -63,7 +63,7 @@ public class ShipmentRestController extends BaseRestController {
      */
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Shipment> getShipment(@PathVariable("id") Integer id) {
-        Shipment shipment = shipmentService.get(id);
+        Shipment shipment = shipmentService.getWithReceiver(id);
         if (shipment == null) {
             return ResponseEntity.notFound().build();
         }
@@ -111,9 +111,17 @@ public class ShipmentRestController extends BaseRestController {
             shipment.setSysUserId(sysUserId);
             Shipment received = shipmentService.receiveShipment(shipment);
 
-            return ResponseEntity.ok(Map.of("id", received.getId(), "deliveryReference",
-                    received.getDeliveryReference() != null ? received.getDeliveryReference() : "", "status",
-                    received.getStatus().name()));
+            // Return fields the intake UI needs to route next steps (docs vs registration)
+            java.util.Map<String, Object> body = new java.util.LinkedHashMap<>();
+            body.put("id", received.getId());
+            body.put("deliveryReference",
+                    received.getDeliveryReference() != null ? received.getDeliveryReference() : "");
+            body.put("senderName", received.getSenderName() != null ? received.getSenderName() : "");
+            body.put("status", received.getStatus() != null ? received.getStatus().name() : "RECEIVED");
+            body.put("documentationStatus",
+                    received.getDocumentationStatus() != null ? received.getDocumentationStatus().name() : "PENDING");
+            body.put("expectedSampleCount", received.getExpectedSampleCount());
+            return ResponseEntity.ok(body);
 
         } catch (LIMSDuplicateRecordException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));

@@ -13,11 +13,13 @@ export const getRequestLineCount = (request) =>
     ? request.items.filter(
         (item) => item.itemRole !== "FULFILLMENT" && !item.fulfillsItemId,
       ).length
-    : request?.totalItemCount ?? 0);
+    : (request?.totalItemCount ?? 0));
 
 export const getRequestDisplayStatus = (request, intl) => {
   const status = request?.status || request?.requestStatus;
-  const awaitingFulfillment = Number(request?.awaitingFulfillmentItemCount ?? 0);
+  const awaitingFulfillment = Number(
+    request?.awaitingFulfillmentItemCount ?? 0,
+  );
   const totalWorkflow = Number(request?.totalItemCount ?? 0);
   const retrieved = Number(request?.retrievedItemCount ?? 0);
 
@@ -338,7 +340,8 @@ export const getRequestCompletionBlockReason = (items) => {
 
   const unmatchedReferences = topLevelItems.filter(
     (item) =>
-      (item.itemRole === "REFERENCE" || item.status === "AWAITING_FULFILLMENT") &&
+      (item.itemRole === "REFERENCE" ||
+        item.status === "AWAITING_FULFILLMENT") &&
       !(item.fulfillments?.length > 0),
   );
   if (unmatchedReferences.length > 0) {

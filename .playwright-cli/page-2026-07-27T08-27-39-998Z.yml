@@ -1,0 +1,70 @@
+- generic [ref=f1e3]:
+  - banner [ref=f1e4]:
+    - link [ref=f1e5] [cursor=pointer]:
+      - /url: /
+      - img "AHRI LIMS" [ref=f1e8]
+      - generic [ref=f1e9]:
+        - heading "AHRI LIMS" [level=5] [ref=f1e10]
+        - paragraph [ref=f1e11]: "Version: 3.2.1.2"
+    - generic [ref=f1e12]:
+      - generic [ref=f1e13]:
+        - button "Lang" [ref=f1e14] [cursor=pointer]
+        - tooltip
+      - generic [ref=f1e17]:
+        - button "Help" [ref=f1e18] [cursor=pointer]
+        - tooltip
+      - generic "Help Panel":
+        - list:
+          - listitem:
+            - button "User Manual" [ref=f1e23] [cursor=pointer]
+          - listitem:
+            - button "Video Tutorials" [ref=f1e27] [cursor=pointer]
+          - listitem:
+            - button "Release Notes" [ref=f1e31] [cursor=pointer]
+    - generic "Header Panel":
+      - list:
+        - listitem:
+          - generic [ref=f1e36]:
+            - generic [ref=f1e37]: Select Locale
+            - combobox "Select Locale" [ref=f1e39] [cursor=pointer]:
+              - option "English" [selected]
+              - option "English (UK)"
+              - option "English (Sri Lanka)"
+              - option "English (US)"
+              - option "Español"
+              - option "Français"
+              - option "Indonesia"
+              - option "Indonesia (ID)"
+              - option "Malagasy"
+              - option "Română"
+              - option "සිංහල"
+              - option "සිංහල (Sri Lanka)"
+              - option "தமிழ்"
+              - option "தமிழ் (Sri Lanka)"
+              - option "Swahili"
+              - option "Amharic"
+        - listitem:
+          - generic [ref=f1e40]: "Version:: 3.2.1.2"
+  - main [ref=f1e42]:
+    - generic [ref=f1e43]:
+      - img "AHRI LIMS" [ref=f1e44]
+      - generic [ref=f1e45]: AHRI LIMS
+    - generic [ref=f1e46]:
+      - generic [ref=f1e47]:
+        - img "AHRI LIMS" [ref=f1e51]
+        - generic [ref=f1e54]: "Notice: Access to this service is for authorized personnel only. If you do not have the expressed authorization of the administrator, you must exit now. This organization prohibits unauthorized access, disclosure, duplication, modification, diversion, destruction, loss, misuse, or theft of its information."
+      - generic [ref=f1e62]:
+        - heading "Login" [level=2] [ref=f1e64]
+        - generic [ref=f1e65]:
+          - generic: Username
+          - textbox "Username" [active] [ref=f1e69]
+        - generic [ref=f1e70]:
+          - generic [ref=f1e71]: Password
+          - generic [ref=f1e73]:
+            - textbox "Password" [ref=f1e74]
+            - button "Show password" [ref=f1e75] [cursor=pointer]
+        - generic [ref=f1e80]:
+          - button "Login" [ref=f1e81] [cursor=pointer]
+          - button "Change Password" [ref=f1e82] [cursor=pointer]
+  - contentinfo:
+    - paragraph

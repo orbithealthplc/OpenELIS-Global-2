@@ -35,8 +35,8 @@ import org.openelisglobal.storage.valueholder.StorageBox;
 import org.openelisglobal.storage.valueholder.StorageDevice;
 import org.openelisglobal.storage.valueholder.StorageRack;
 import org.openelisglobal.storage.valueholder.StorageShelf;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 @RunWith(MockitoJUnitRunner.Silent.class)
 public class BiorepositoryQCInspectionRestControllerFlowTest {
@@ -74,8 +74,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
 
     @Test
     public void bulkApply_ReassignPosition_ReturnsCorrectedOutcomeAndAuditFields() {
-        runCorrectionFlowAssertion("REASSIGN_POSITION", BiorepositoryQCInspection.DiscrepancyType.MISPLACED_SAMPLE_FOUND,
-                "FAILED_CORRECTED", "QC_FAILED");
+        runCorrectionFlowAssertion("REASSIGN_POSITION",
+                BiorepositoryQCInspection.DiscrepancyType.MISPLACED_SAMPLE_FOUND, "FAILED_CORRECTED", "QC_FAILED");
     }
 
     @Test
@@ -91,11 +91,11 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         BiorepositoryQCInspectionRestController.BulkQCInspectionRequest request = buildRequest(null,
                 BiorepositoryQCInspection.DiscrepancyType.MISPLACED_SAMPLE_FOUND.name());
 
-        when(qcInspectionService.createBulkInspections(any(), any(), any(), anyBoolean(), anyBoolean(),
-                anyBoolean(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), eq("7")))
-                        .thenReturn(List.of(inspection));
-        when(storageService.getSampleItemLocation("101")).thenReturn(Map.of("hierarchicalPath",
-                "Freezer-A > Shelf-1 > Rack-1 > Box-9", "positionCoordinate", "D2"));
+        when(qcInspectionService.createBulkInspections(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), eq("7")))
+                .thenReturn(List.of(inspection));
+        when(storageService.getSampleItemLocation("101")).thenReturn(
+                Map.of("hierarchicalPath", "Freezer-A > Shelf-1 > Rack-1 > Box-9", "positionCoordinate", "D2"));
 
         ResponseEntity<?> response = controller.bulkApplyQC(request, requestWithUser);
         assertEquals(200, response.getStatusCode().value());
@@ -114,14 +114,15 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
     }
 
     private void runCorrectionFlowAssertion(String correctionActionType,
-            BiorepositoryQCInspection.DiscrepancyType discrepancyType, String expectedLifecycle, String expectedStatus) {
+            BiorepositoryQCInspection.DiscrepancyType discrepancyType, String expectedLifecycle,
+            String expectedStatus) {
         BiorepositoryQCInspection inspection = buildInspection(discrepancyType, correctionActionType, expectedStatus);
         BiorepositoryQCInspectionRestController.BulkQCInspectionRequest request = buildRequest(correctionActionType,
                 discrepancyType.name());
 
-        when(qcInspectionService.createBulkInspections(any(), any(), any(), anyBoolean(), anyBoolean(),
-                anyBoolean(), anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), eq("7")))
-                        .thenReturn(List.of(inspection));
+        when(qcInspectionService.createBulkInspections(any(), any(), any(), anyBoolean(), anyBoolean(), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(), any(), any(), any(), any(), eq("7")))
+                .thenReturn(List.of(inspection));
         if ("MARK_MISSING".equals(correctionActionType)) {
             java.util.HashMap<String, Object> missingLocation = new java.util.HashMap<>();
             missingLocation.put("hierarchicalPath", "Missing (not found during QC)");
@@ -135,9 +136,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         } else {
             when(storageService.moveSampleItemWithLocation(eq("101"), eq("301"), eq("rack"), eq("B5"), any(), any()))
                     .thenReturn("mv-1");
-            when(storageService.getSampleItemLocation("101")).thenReturn(Map.of(
-                    "hierarchicalPath", "Freezer-A > Shelf-1 > Rack-1 > Box-2",
-                    "positionCoordinate", "B5"));
+            when(storageService.getSampleItemLocation("101")).thenReturn(
+                    Map.of("hierarchicalPath", "Freezer-A > Shelf-1 > Rack-1 > Box-2", "positionCoordinate", "B5"));
         }
 
         ResponseEntity<?> response = controller.bulkApplyQC(request, requestWithUser);
@@ -176,7 +176,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> errorBody = (Map<String, Object>) response.getBody();
         assertNotNull(errorBody);
-        assertTrue(String.valueOf(errorBody.get("error")).contains("MARK_MISSING requires discrepancy type SAMPLE_MISSING"));
+        assertTrue(String.valueOf(errorBody.get("error"))
+                .contains("MARK_MISSING requires discrepancy type SAMPLE_MISSING"));
         verifyZeroInteractions(qcInspectionService);
     }
 
@@ -229,7 +230,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         @SuppressWarnings("unchecked")
         Map<String, Object> errorBody = (Map<String, Object>) response.getBody();
         assertNotNull(errorBody);
-        assertTrue(String.valueOf(errorBody.get("error")).contains("REASSIGN_POSITION requires correctionPositionCoordinate"));
+        assertTrue(String.valueOf(errorBody.get("error"))
+                .contains("REASSIGN_POSITION requires correctionPositionCoordinate"));
         verifyZeroInteractions(qcInspectionService);
     }
 
@@ -427,8 +429,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         Map<String, Object> overview = new HashMap<>();
         overview.put("counts", Map.of("freezers", 1, "shelves", 1, "racks", 1, "boxes", 1));
         overview.put("filters", Map.of("freezers", List.of("Bio-Device")));
-        overview.put("biorepositoryScope",
-                Map.of("deviceHierarchyBiorepositoryOnly", Boolean.TRUE, "includesAllActiveDeviceTypes", Boolean.FALSE));
+        overview.put("biorepositoryScope", Map.of("deviceHierarchyBiorepositoryOnly", Boolean.TRUE,
+                "includesAllActiveDeviceTypes", Boolean.FALSE));
         overview.put("eligibleSamples", List.of());
         stubStorageOverviewFromPool(true, null, overview);
 
@@ -479,8 +481,8 @@ public class BiorepositoryQCInspectionRestControllerFlowTest {
         overview.put("eligibleSamples", List.of());
         overview.put("counts", Map.of("eligibleSamples", 19));
         overview.put("diagnostics", Map.of("qcPoolTotal", 19));
-        when(qcSamplePoolService.buildStorageOverview(isNull(), isNull(), isNull(), isNull(), eq(true),
-                isNull(), eq(true), isNull(), isNull())).thenReturn(overview);
+        when(qcSamplePoolService.buildStorageOverview(isNull(), isNull(), isNull(), isNull(), eq(true), isNull(),
+                eq(true), isNull(), isNull())).thenReturn(overview);
 
         ResponseEntity<Map<String, Object>> response = controller.getQCStorageOverview(null, null, null, null, true,
                 null, true, null, null);

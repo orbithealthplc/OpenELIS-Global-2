@@ -431,13 +431,13 @@ public class MedLabManifestImportServiceImpl implements MedLabManifestImportServ
 
     /**
      * Find a patient by structured identifier (external ID or national ID). For
-     * manifest imports, patients should ONLY be referenced by
-     * structured identifiers, NOT by internal database PK. Attempting to look up by
-     * PK with an alphanumeric structured ID causes exceptions that mark the
-     * transaction for rollback.
+     * manifest imports, patients should ONLY be referenced by structured
+     * identifiers, NOT by internal database PK. Attempting to look up by PK with an
+     * alphanumeric structured ID causes exceptions that mark the transaction for
+     * rollback.
      *
-     * @param patientId the patient structured identifier to search for
-     *                  (external_id or national_id)
+     * @param patientId the patient structured identifier to search for (external_id
+     *                  or national_id)
      * @return the Patient if found, null otherwise
      */
     private Patient findPatient(String patientId) {
@@ -544,7 +544,8 @@ public class MedLabManifestImportServiceImpl implements MedLabManifestImportServ
                 sample.setSysUserId(String.valueOf(createdBy));
 
                 // SAMPLE.received_date is mandatory in the database.
-                // When collection timestamp is not provided in the manifest, default receipt to now.
+                // When collection timestamp is not provided in the manifest, default receipt to
+                // now.
                 Date collectionDateTime = null;
                 try {
                     if ((row.collectionDate() != null && !row.collectionDate().isBlank())

@@ -40,6 +40,7 @@ import {
   filterAhriLabUnitRoles,
   filterAhriProjectRoles,
 } from "../../../constants/ahriUserManagementRoles.js";
+import LabUnitStageAccessEditor from "./LabUnitStageAccessEditor.js";
 
 const breadcrumbs = [
   { label: "home.label", link: "/" },
@@ -85,6 +86,9 @@ function UserAddModify() {
   );
   const [selectedTestSectionLabUnits, setSelectedTestSectionLabUnits] =
     useState({});
+  const [selectedLabUnitStageAccess, setSelectedLabUnitStageAccess] = useState(
+    {},
+  );
   const [selectedTestSectionList, setSelectedTestSectionList] = useState([]);
   const [passwordTouched, setPasswordTouched] = useState({
     userPassword: false,
@@ -297,8 +301,22 @@ function UserAddModify() {
           setSelectedTestSectionList([]);
         }
       }
+      if (userData.selectedLabUnitStageAccess && ID !== "0") {
+        setSelectedLabUnitStageAccess(userData.selectedLabUnitStageAccess);
+      } else if (ID === "0") {
+        setSelectedLabUnitStageAccess({});
+      }
     }
   }, [userData, ID]);
+
+  useEffect(() => {
+    if (selectedLabUnitStageAccess) {
+      setUserDataPost((prevUserDataPost) => ({
+        ...prevUserDataPost,
+        selectedLabUnitStageAccess: selectedLabUnitStageAccess,
+      }));
+    }
+  }, [selectedLabUnitStageAccess]);
 
   useEffect(() => {
     if (userDataShow) {
@@ -790,6 +808,11 @@ function UserAddModify() {
     const updatedSections = { ...selectedTestSectionLabUnits };
     delete updatedSections[keyToRemove];
     setSelectedTestSectionLabUnits(updatedSections);
+    setSelectedLabUnitStageAccess((prev) => {
+      const next = { ...prev };
+      delete next[keyToRemove];
+      return next;
+    });
     const index = selectedTestSectionList.indexOf(keyToRemove);
     if (index != -1) {
       const testSectionList = [...selectedTestSectionList];
@@ -1479,6 +1502,38 @@ function UserAddModify() {
                             />
                           )}
                         </FormGroup>
+                        <LabUnitStageAccessEditor
+                          labUnitId={key}
+                          labUnitName={
+                            userDataShow?.testSections?.find(
+                              (section) => section.id === key,
+                            )?.value || ""
+                          }
+                          selectedPersonaNames={(
+                            userDataShow?.labUnitRoles || []
+                          )
+                            .filter(
+                              (section) =>
+                                selectedTestSectionLabUnits[key] &&
+                                selectedTestSectionLabUnits[key].includes(
+                                  section.roleId,
+                                ),
+                            )
+                            .map((section) => section.roleName)}
+                          value={
+                            selectedLabUnitStageAccess[key] || {
+                              mode: "DEFAULT",
+                              pageKeys: [],
+                            }
+                          }
+                          onChange={(next) => {
+                            setSelectedLabUnitStageAccess((prev) => ({
+                              ...prev,
+                              [key]: next,
+                            }));
+                            setSaveButton(false);
+                          }}
+                        />
                       </Column>
                       <Column lg={4} md={4} sm={4}>
                         <Button

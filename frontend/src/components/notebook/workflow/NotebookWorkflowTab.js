@@ -295,8 +295,7 @@ function NotebookWorkflowTab({ notebookId, entryId: propEntryId }) {
   }, [entryId]);
 
   const workflowType = useMemo(() => {
-    const raw =
-      notebook?.workflowType || entry?.notebook?.workflowType || "";
+    const raw = notebook?.workflowType || entry?.notebook?.workflowType || "";
     if (!raw) {
       return "generic";
     }

@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.openelisglobal.common.rest.BaseRestController;
 import org.openelisglobal.common.services.IStatusService;
 import org.openelisglobal.common.services.StatusService.SampleStatus;
@@ -15,7 +14,6 @@ import org.openelisglobal.department.service.DepartmentIsolationService;
 import org.openelisglobal.rbac.RbacAction;
 import org.openelisglobal.rbac.RbacPermissionService;
 import org.openelisglobal.sampleitem.dao.SampleItemDAO;
-import org.openelisglobal.sampleitem.valueholder.SampleItem;
 import org.openelisglobal.storage.dao.SampleStorageAssignmentDAO;
 import org.openelisglobal.storage.form.SampleAssignmentForm;
 import org.openelisglobal.storage.form.SampleDisposalForm;
@@ -26,8 +24,8 @@ import org.openelisglobal.storage.service.StorageLocationService;
 import org.openelisglobal.storage.valueholder.SampleStorageAssignment;
 import org.openelisglobal.storage.valueholder.StorageBox;
 import org.openelisglobal.storage.valueholder.StorageDevice;
-import org.openelisglobal.storage.valueholder.StorageRoom;
 import org.openelisglobal.storage.valueholder.StorageRack;
+import org.openelisglobal.storage.valueholder.StorageRoom;
 import org.openelisglobal.storage.valueholder.StorageShelf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,10 +145,11 @@ public class SampleStorageRestController extends BaseRestController {
                 // Count unique storage locations (rooms, devices, shelves, racks)
                 long storageLocations = departmentIsolationService.hasUnrestrictedDepartmentAccess(request)
                         ? storageLocationService.getRooms().size() + storageLocationService.getAllDevices().size()
-                                + storageLocationService.getAllShelves().size() + storageLocationService.getAllRacks().size()
+                                + storageLocationService.getAllShelves().size()
+                                + storageLocationService.getAllRacks().size()
                         : storageLocationService.getRoomsForAPI().stream()
-                                .filter(room -> departmentIsolationService
-                                        .canAccessDepartmentScopedLocation((Integer) room.get("departmentTestSectionId"), request))
+                                .filter(room -> departmentIsolationService.canAccessDepartmentScopedLocation(
+                                        (Integer) room.get("departmentTestSectionId"), request))
                                 .count()
                                 + storageLocationService.getDevicesForAPI(null).stream()
                                         .filter(device -> departmentIsolationService.canAccessDepartmentScopedLocation(
@@ -179,8 +178,8 @@ public class SampleStorageRestController extends BaseRestController {
                 // Filter branch: wrap filtered results with pagination metadata to keep
                 // response
                 // consistent
-                List<Map<String, Object>> filtered =
-                        storageDashboardService.filterSamples(location, status, departmentId, roomId, deviceId);
+                List<Map<String, Object>> filtered = storageDashboardService.filterSamples(location, status,
+                        departmentId, roomId, deviceId);
 
                 filtered.removeIf(row -> !canAccessSampleRow(row, request));
                 int total = filtered.size();
@@ -641,7 +640,8 @@ public class SampleStorageRestController extends BaseRestController {
             return false;
         }
 
-        SampleStorageAssignment assignment = sampleStorageAssignmentDAO.findBySampleItemId(String.valueOf(sampleItemId));
+        SampleStorageAssignment assignment = sampleStorageAssignmentDAO
+                .findBySampleItemId(String.valueOf(sampleItemId));
         if (assignment == null || assignment.getLocationId() == null || assignment.getLocationType() == null) {
             return true;
         }
@@ -666,14 +666,14 @@ public class SampleStorageRestController extends BaseRestController {
             }
             if ("shelf".equalsIgnoreCase(locationType)) {
                 StorageShelf shelf = (StorageShelf) storageLocationService.get(id, StorageShelf.class);
-                return shelf != null && shelf.getParentDevice() != null && shelf.getParentDevice().getParentRoom() != null
-                        && departmentIsolationService.canAccessStorageRoom(shelf.getParentDevice().getParentRoom(), request);
+                return shelf != null && shelf.getParentDevice() != null
+                        && shelf.getParentDevice().getParentRoom() != null && departmentIsolationService
+                                .canAccessStorageRoom(shelf.getParentDevice().getParentRoom(), request);
             }
             if ("rack".equalsIgnoreCase(locationType)) {
                 StorageRack rack = (StorageRack) storageLocationService.get(id, StorageRack.class);
                 return rack != null && rack.getParentShelf() != null && rack.getParentShelf().getParentDevice() != null
-                        && rack.getParentShelf().getParentDevice().getParentRoom() != null
-                        && departmentIsolationService
+                        && rack.getParentShelf().getParentDevice().getParentRoom() != null && departmentIsolationService
                                 .canAccessStorageRoom(rack.getParentShelf().getParentDevice().getParentRoom(), request);
             }
             if ("box".equalsIgnoreCase(locationType)) {
@@ -681,9 +681,8 @@ public class SampleStorageRestController extends BaseRestController {
                 return box != null && box.getParentRack() != null && box.getParentRack().getParentShelf() != null
                         && box.getParentRack().getParentShelf().getParentDevice() != null
                         && box.getParentRack().getParentShelf().getParentDevice().getParentRoom() != null
-                        && departmentIsolationService
-                                .canAccessStorageRoom(box.getParentRack().getParentShelf().getParentDevice()
-                                        .getParentRoom(), request);
+                        && departmentIsolationService.canAccessStorageRoom(
+                                box.getParentRack().getParentShelf().getParentDevice().getParentRoom(), request);
             }
         } catch (Exception e) {
             logger.debug("Failed location access check for {}:{} - {}", locationType, locationId, e.getMessage());

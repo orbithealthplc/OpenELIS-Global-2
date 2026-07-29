@@ -29,7 +29,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
 
 /**
- * Integration tests for BiorepositoryQCInspectionRestController input validation.
+ * Integration tests for BiorepositoryQCInspectionRestController input
+ * validation.
  */
 public class BiorepositoryQCInspectionRestControllerIntegrationTest extends BaseWebContextSensitiveTest {
 

@@ -63,11 +63,9 @@ public class BioSampleSearchDiscoveryTest {
         when(typeOfSampleService.getAllTypeOfSamples()).thenReturn(List.of(plasmaType()));
         when(bioSampleService.searchForRetrieval(any())).thenReturn(List.of(bioSample));
 
-        mockMvc.perform(get("/rest/biorepository/sample/search")
-                .param("sampleType", "Plasma")
-                .param("status", "STORED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].barcode").value("BIO-PLASMA-1"))
+        mockMvc.perform(
+                get("/rest/biorepository/sample/search").param("sampleType", "Plasma").param("status", "STORED"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].barcode").value("BIO-PLASMA-1"))
                 .andExpect(jsonPath("$[0].originLab").value("CTD"));
     }
 
@@ -77,11 +75,8 @@ public class BioSampleSearchDiscoveryTest {
 
         when(bioSampleService.searchForRetrieval(any())).thenReturn(List.of(bioSample));
 
-        mockMvc.perform(get("/rest/biorepository/sample/search")
-                .param("originLab", "CTD")
-                .param("status", "STORED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].originLab").value("CTD Laboratory"));
+        mockMvc.perform(get("/rest/biorepository/sample/search").param("originLab", "CTD").param("status", "STORED"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].originLab").value("CTD Laboratory"));
     }
 
     @Test
@@ -90,11 +85,8 @@ public class BioSampleSearchDiscoveryTest {
 
         when(bioSampleService.searchForRetrieval(any())).thenReturn(List.of(bioSample));
 
-        mockMvc.perform(get("/rest/biorepository/sample/search")
-                .param("projectId", "COVID")
-                .param("status", "STORED"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].projectId").value("COVID-2026"));
+        mockMvc.perform(get("/rest/biorepository/sample/search").param("projectId", "COVID").param("status", "STORED"))
+                .andExpect(status().isOk()).andExpect(jsonPath("$[0].projectId").value("COVID-2026"));
     }
 
     @Test
@@ -103,20 +95,18 @@ public class BioSampleSearchDiscoveryTest {
 
         when(bioSampleService.searchForRetrieval(any())).thenReturn(List.of(bioSample));
 
-        mockMvc.perform(get("/rest/biorepository/sample/search").param("browse", "true"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/biorepository/sample/search").param("browse", "true")).andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].barcode").value("BIO-BROWSE-1"));
 
-        ArgumentCaptor<BioSampleRetrievalSearchCriteria> captor =
-                ArgumentCaptor.forClass(BioSampleRetrievalSearchCriteria.class);
+        ArgumentCaptor<BioSampleRetrievalSearchCriteria> captor = ArgumentCaptor
+                .forClass(BioSampleRetrievalSearchCriteria.class);
         verify(bioSampleService).searchForRetrieval(captor.capture());
         org.junit.Assert.assertEquals(WorkflowStatus.STORED, captor.getValue().getWorkflowStatus());
     }
 
     @Test
     public void searchSamples_returnsEmpty_whenNoSearchParams() throws Exception {
-        mockMvc.perform(get("/rest/biorepository/sample/search"))
-                .andExpect(status().isOk())
+        mockMvc.perform(get("/rest/biorepository/sample/search")).andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
 

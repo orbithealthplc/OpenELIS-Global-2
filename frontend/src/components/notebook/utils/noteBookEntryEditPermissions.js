@@ -1,45 +1,115 @@
 import { Permissions } from "../../../constants/roles";
 import {
-  sampleProcessingPersonas,
-  sampleRegistrationPersonas,
-} from "../../../constants/ahriSrsPersonas";
+  getRegistryStages,
+  normalizeWorkflowType,
+} from "../../../constants/ahriWorkflowRegistry";
 
-const PATHOLOGY_WORKFLOW_TYPE_IDS = new Set([
-  "pathology",
-  "histopathology_biopsy_tissue",
-  "peripheral_smear_bone_marrow_morphology",
-  "fnac",
-  "cytology_liquid_based_pap_smear",
-]);
-
-/** SRS lab personas allowed to edit pathology notebook entries (workflow registry). */
-export const PATHOLOGY_ENTRY_EDIT_PERSONAS = [
-  ...new Set([...sampleRegistrationPersonas, ...sampleProcessingPersonas]),
-];
+/** Pathology specialty titles used at AHRI (in addition to SRS lab personas). */
+export const PATHOLOGY_SPECIALTY_PERSONAS = ["Pathologist", "Cytopathologist"];
 
 export const normalizeWorkflowTypeKey = (workflowType) =>
-  String(workflowType || "")
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, "_");
+  normalizeWorkflowType(workflowType);
 
 export const isPathologyWorkflowType = (workflowType) =>
-  PATHOLOGY_WORKFLOW_TYPE_IDS.has(normalizeWorkflowTypeKey(workflowType));
+  normalizeWorkflowTypeKey(workflowType) === "pathology";
+
+/**
+ * Personas allowed to open a notebook entry/instance in edit mode for a workflow.
+ * Union of all SRS stage personas for that workflow (+ Lab Manager).
+ * Stage Restricted still applies inside the workflow tab.
+ */
+export const getEntryEditPersonasForWorkflow = (workflowType) => {
+  const stages = getRegistryStages(workflowType);
+  const personas = new Set();
+  for (const stage of stages) {
+    for (const persona of stage.allowedPersonas || []) {
+      if (persona) {
+        personas.add(persona);
+      }
+    }
+  }
+  // Supervisor override — always present even if CSV omits a stage
+  personas.add("Lab Manager");
+  if (isPathologyWorkflowType(workflowType)) {
+    for (const persona of PATHOLOGY_SPECIALTY_PERSONAS) {
+      personas.add(persona);
+    }
+  }
+  return [...personas];
+};
+
+/**
+ * Personas allowed to open a notebook instance (view workflow / Restricted tags).
+ * Includes Biomedical Staff even when they have no editable SRS stages — equipment
+ * persona may open the notebook; stage Restricted still blocks page edits.
+ */
+export const getEntryOpenPersonasForWorkflow = (workflowType) => {
+  const personas = new Set(getEntryEditPersonasForWorkflow(workflowType));
+  personas.add("Biomedical Staff");
+  return [...personas];
+};
+
+/** @deprecated Prefer getEntryEditPersonasForWorkflow — kept for existing tests/imports */
+export const PATHOLOGY_ENTRY_EDIT_PERSONAS =
+  getEntryEditPersonasForWorkflow("pathology");
 
 const idsMatch = (left, right) =>
   left != null && right != null && String(left) === String(right);
 
+const hasRegistryPersonaAccess = ({
+  hasPersonaForActiveDepartment,
+  workflowType,
+  personas,
+}) =>
+  personas.length > 0 &&
+  typeof hasPersonaForActiveDepartment === "function" &&
+  hasPersonaForActiveDepartment(personas);
+
+/**
+ * Whether the current user may open a notebook entry (dashboard / deep link).
+ * Broader than {@link canEditNotebookEntry} — Biomedical Staff can open.
+ */
+export const canOpenNotebookEntry = ({
+  hasRoleForCurrentLabUnit,
+  hasPersonaForActiveDepartment,
+  templateAllowedRoles = [],
+  fallbackRoles = Permissions.CREATE_OR_EDIT_NOTEBOOK_ENTRY,
+  userId,
+  creatorId,
+  technicianId,
+  workflowType,
+}) => {
+  if (
+    canEditNotebookEntry({
+      hasRoleForCurrentLabUnit,
+      hasPersonaForActiveDepartment,
+      templateAllowedRoles,
+      fallbackRoles,
+      userId,
+      creatorId,
+      technicianId,
+      workflowType,
+    })
+  ) {
+    return true;
+  }
+  return hasRegistryPersonaAccess({
+    hasPersonaForActiveDepartment,
+    workflowType,
+    personas: getEntryOpenPersonasForWorkflow(workflowType),
+  });
+};
+
 /**
  * Whether the current user may edit a notebook entry (Save button / dashboard Edit).
- * Mirrors backend entry-update rules: template roles, fallback roles, creator/technician,
- * and AHRI pathology personas on the active department.
+ * If a persona is allowed on ANY stage of the workflow, they can open edit mode;
+ * stage-level Restricted still limits which pages they can change.
  */
 export const canEditNotebookEntry = ({
   hasRoleForCurrentLabUnit,
   hasPersonaForActiveDepartment,
   templateAllowedRoles = [],
   fallbackRoles = Permissions.CREATE_OR_EDIT_NOTEBOOK_ENTRY,
-  pathologyPersonas = PATHOLOGY_ENTRY_EDIT_PERSONAS,
   userId,
   creatorId,
   technicianId,
@@ -59,15 +129,11 @@ export const canEditNotebookEntry = ({
     return true;
   }
 
-  if (
-    isPathologyWorkflowType(workflowType) &&
-    typeof hasPersonaForActiveDepartment === "function" &&
-    hasPersonaForActiveDepartment(pathologyPersonas)
-  ) {
-    return true;
-  }
-
-  return false;
+  return hasRegistryPersonaAccess({
+    hasPersonaForActiveDepartment,
+    workflowType,
+    personas: getEntryEditPersonasForWorkflow(workflowType),
+  });
 };
 
 export const getNotebookEntrySaveDisabledReason = ({

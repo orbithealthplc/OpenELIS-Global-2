@@ -1,0 +1,1871 @@
+
+> openelis-global-react-app@0.1.0 start
+> GENERATE_SOURCEMAP=false HTTPS=true FAST_REFRESH=false react-scripts start
+
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Attempting to bind to HOST environment variable: 0.0.0.0
+If this was unintentional, check that you haven't mistakenly set it in your shell.
+Learn more here: https://cra.link/advanced-config
+
+(node:40080) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+(node:40080) [DEP_WEBPACK_DEV_SERVER_HTTPS] DeprecationWarning: 'https' option is deprecated. Please use the 'server' option.
+[HPM] Proxy created: /  -> https://127.0.0.1:8443
+[HPM] Proxy created: /  -> https://127.0.0.1:8443
+(node:40080) [DEP_WEBPACK_DEV_SERVER_ON_AFTER_SETUP_MIDDLEWARE] DeprecationWarning: 'onAfterSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+(node:40080) [DEP_WEBPACK_DEV_SERVER_ON_BEFORE_SETUP_MIDDLEWARE] DeprecationWarning: 'onBeforeSetupMiddleware' option is deprecated. Please use the 'setupMiddlewares' option.
+Starting the development server...
+
+(node:40080) [DEP0060] DeprecationWarning: The `util._extend` API is deprecated. Please use Object.assign() instead.
+Compiled successfully!
+
+You can now view openelis-global-react-app in the browser.
+
+  Local:            https://localhost:3000
+  On Your Network:  https://192.168.1.127:3000
+
+Note that the development build is not optimized.
+To create a production build, use npm run build.
+
+webpack compiled successfully
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+webpack compiled with 1 warning
+Compiling...
+No issues found.
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 46:3:    'allowedTestIds' is defined but never used  no-unused-vars
+  Line 418:43:  Unexpected empty arrow function             @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 46:3:    'allowedTestIds' is defined but never used  no-unused-vars
+  Line 418:43:  Unexpected empty arrow function             @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+webpack compiled with 1 warning
+Compiling...
+No issues found.
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 343:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 365:13:  'name' is assigned a value but never used                     no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 343:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 365:13:  'name' is assigned a value but never used                     no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notifications to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notifications to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notifications to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notifications to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/notification/pnconfig to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/session to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/open-configuration-properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+[HPM] Error occurred while proxying request localhost:3000/OpenELIS-Global/rest/properties to https://127.0.0.1:8443/ [ECONNREFUSED] (https://nodejs.org/api/errors.html#errors_common_system_errors)
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 343:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 365:13:  'name' is assigned a value but never used                     no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 343:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 365:13:  'name' is assigned a value but never used                     no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used     no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used            no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used             no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                      no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                   no-unused-vars
+  Line 216:10:  'selectedAllowedTests' is assigned a value but never used        no-unused-vars
+  Line 216:32:  'setSelectedAllowedTests' is assigned a value but never used     no-unused-vars
+  Line 217:10:  'availableOrderableTests' is assigned a value but never used     no-unused-vars
+  Line 217:35:  'setAvailableOrderableTests' is assigned a value but never used  no-unused-vars
+  Line 218:10:  'pendingSelectedTestIds' is assigned a value but never used      no-unused-vars
+  Line 218:34:  'setPendingSelectedTestIds' is assigned a value but never used   no-unused-vars
+  Line 346:9:   'showAlertMessage' is assigned a value but never used            no-unused-vars
+  Line 368:13:  'name' is assigned a value but never used                        no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used     no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used            no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used             no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                      no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                   no-unused-vars
+  Line 216:10:  'selectedAllowedTests' is assigned a value but never used        no-unused-vars
+  Line 216:32:  'setSelectedAllowedTests' is assigned a value but never used     no-unused-vars
+  Line 217:10:  'availableOrderableTests' is assigned a value but never used     no-unused-vars
+  Line 217:35:  'setAvailableOrderableTests' is assigned a value but never used  no-unused-vars
+  Line 218:10:  'pendingSelectedTestIds' is assigned a value but never used      no-unused-vars
+  Line 218:34:  'setPendingSelectedTestIds' is assigned a value but never used   no-unused-vars
+  Line 346:9:   'showAlertMessage' is assigned a value but never used            no-unused-vars
+  Line 368:13:  'name' is assigned a value but never used                        no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+Compiling...
+No issues found.
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used     no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used            no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used             no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                      no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                   no-unused-vars
+  Line 216:32:  'setSelectedAllowedTests' is assigned a value but never used     no-unused-vars
+  Line 217:10:  'availableOrderableTests' is assigned a value but never used     no-unused-vars
+  Line 217:35:  'setAvailableOrderableTests' is assigned a value but never used  no-unused-vars
+  Line 218:10:  'pendingSelectedTestIds' is assigned a value but never used      no-unused-vars
+  Line 218:34:  'setPendingSelectedTestIds' is assigned a value but never used   no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used            no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                        no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used     no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used            no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used             no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                      no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                   no-unused-vars
+  Line 216:32:  'setSelectedAllowedTests' is assigned a value but never used     no-unused-vars
+  Line 217:10:  'availableOrderableTests' is assigned a value but never used     no-unused-vars
+  Line 217:35:  'setAvailableOrderableTests' is assigned a value but never used  no-unused-vars
+  Line 218:10:  'pendingSelectedTestIds' is assigned a value but never used      no-unused-vars
+  Line 218:34:  'setPendingSelectedTestIds' is assigned a value but never used   no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used            no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                        no-unused-vars
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+Compiling...
+No issues found.
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.
+Compiling...
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+Compiling...
+No issues found.
+Compiled with warnings.
+
+[eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+Search for the keywords to learn more about each warning.
+To ignore, add // eslint-disable-next-line to the line before.
+
+WARNING in [eslint] 
+src/components/notebook/NoteBookEntryForm.js
+  Line 16:3:     'MultiSelect' is defined but never used                          no-unused-vars
+  Line 17:3:     'FileUploader' is defined but never used                         no-unused-vars
+  Line 21:3:     'InlineLoading' is defined but never used                        no-unused-vars
+  Line 31:3:     'Tabs' is defined but never used                                 no-unused-vars
+  Line 32:3:     'TabList' is defined but never used                              no-unused-vars
+  Line 33:3:     'Tab' is defined but never used                                  no-unused-vars
+  Line 38:3:     'DataTable' is defined but never used                            no-unused-vars
+  Line 39:3:     'Table' is defined but never used                                no-unused-vars
+  Line 40:3:     'TableBody' is defined but never used                            no-unused-vars
+  Line 41:3:     'TableCell' is defined but never used                            no-unused-vars
+  Line 42:3:     'TableContainer' is defined but never used                       no-unused-vars
+  Line 43:3:     'TableHead' is defined but never used                            no-unused-vars
+  Line 44:3:     'TableHeader' is defined but never used                          no-unused-vars
+  Line 45:3:     'TableRow' is defined but never used                             no-unused-vars
+  Line 46:3:     'Pagination' is defined but never used                           no-unused-vars
+  Line 54:3:     'Subtract' is defined but never used                             no-unused-vars
+  Line 55:3:     'ArrowLeft' is defined but never used                            no-unused-vars
+  Line 56:3:     'ArrowRight' is defined but never used                           no-unused-vars
+  Line 57:3:     'Checkmark' is defined but never used                            no-unused-vars
+  Line 73:3:     'hasRole' is defined but never used                              no-unused-vars
+  Line 76:15:    'Json' is defined but never used                                 no-unused-vars
+  Line 149:24:   'setNoteBookForm' is assigned a value but never used             no-unused-vars
+  Line 452:13:   'name' is assigned a value but never used                        no-unused-vars
+  Line 2004:37:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2004:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:38:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  Line 2100:59:  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+src/components/notebook/NoteBookInstanceEntryForm.js
+  Line 52:3:    'postToOpenElisServerJsonResponse' is defined but never used  no-unused-vars
+  Line 94:7:    'isMedLabNotebook' is assigned a value but never used         no-unused-vars
+  Line 195:10:  'technicianUsers' is assigned a value but never used          no-unused-vars
+  Line 199:24:  'setNoteBookForm' is assigned a value but never used          no-unused-vars
+  Line 209:10:  'errors' is assigned a value but never used                   no-unused-vars
+  Line 209:18:  'setErrors' is assigned a value but never used                no-unused-vars
+  Line 347:9:   'showAlertMessage' is assigned a value but never used         no-unused-vars
+  Line 369:13:  'name' is assigned a value but never used                     no-unused-vars
+  Line 517:43:  Replace `⏎········?·response⏎·······` with `·?·response`      prettier/prettier
+
+src/components/notebook/pages/PatientOrderEntryPage.js
+  Line 64:3:  'progress' is defined but never used          no-unused-vars
+  Line 67:3:  'onNavigateToPage' is defined but never used  no-unused-vars
+
+src/components/notebook/pages/biorepository/BiorepositoryStorageAssignmentPage.js
+  Line 1047:9:  'getBiosafetyBadgeType' is assigned a value but never used  no-unused-vars
+
+src/components/notebook/workflow/BioanalyticalWorkflowTab.js
+  Line 70:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 71:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 71:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 79:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 89:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BioequivalenceWorkflowTab.js
+  Line 56:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 57:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 57:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 65:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 75:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+
+src/components/notebook/workflow/BulkOrderModal.js
+  Line 432:43:  Unexpected empty arrow function  @typescript-eslint/no-empty-function
+
+src/components/notebook/workflow/GBDWorkflowTab.js
+  Line 76:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 77:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 77:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 85:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 116:39:  'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 320:11:  'progress' is assigned a value but never used                no-unused-vars
+
+src/components/notebook/workflow/MedLabWorkflowTab.js
+  Line 71:9:   'intl' is assigned a value but never used                    no-unused-vars
+  Line 72:11:  'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 72:32:  'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 80:24:  'setPageProgress' is assigned a value but never used         no-unused-vars
+
+src/components/notebook/workflow/VirologyLabWorkflowTab.js
+  Line 78:9:    'intl' is assigned a value but never used                    no-unused-vars
+  Line 79:11:   'notificationVisible' is assigned a value but never used     no-unused-vars
+  Line 79:32:   'setNotificationVisible' is assigned a value but never used  no-unused-vars
+  Line 87:24:   'setPageProgress' is assigned a value but never used         no-unused-vars
+  Line 97:39:   'setActivePage' is assigned a value but never used           no-unused-vars
+  Line 301:11:  'progress' is assigned a value but never used                no-unused-vars
+
+webpack compiled with 1 warning
+No issues found.

@@ -612,9 +612,7 @@ const StorageLocationModal = ({
     }
 
     if (locationType === "room" && isBiorepoLabUser) {
-      return mode === "create"
-        ? storageLabels.addRoom
-        : storageLabels.editRoom;
+      return mode === "create" ? storageLabels.addRoom : storageLabels.editRoom;
     }
 
     const typeKey = `storage.${action}.${locationType}`;
@@ -709,11 +707,13 @@ const StorageLocationModal = ({
                 toggled={formData.active === true}
                 onToggle={(checked) => handleFieldChange("active", checked)}
               />
-              {mode === "create" && isBiorepoLabUser && storageLabels.createZoneHelper && (
-                <p className="storage-zone-create-helper">
-                  {storageLabels.createZoneHelper}
-                </p>
-              )}
+              {mode === "create" &&
+                isBiorepoLabUser &&
+                storageLabels.createZoneHelper && (
+                  <p className="storage-zone-create-helper">
+                    {storageLabels.createZoneHelper}
+                  </p>
+                )}
               {mode === "create" && (
                 <>
                   {roomDepartmentSelectLoading ? (

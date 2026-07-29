@@ -22,7 +22,8 @@ public class ShipmentDAOImpl extends BaseDAOImpl<Shipment, Integer> implements S
     @Override
     public Shipment getByDeliveryReference(String deliveryReference) {
         Session session = entityManager.unwrap(Session.class);
-        String hql = "FROM Shipment s WHERE s.deliveryReference = :deliveryReference";
+        String hql = "SELECT s FROM Shipment s LEFT JOIN FETCH s.receiver "
+                + "WHERE s.deliveryReference = :deliveryReference";
         List<Shipment> results = session.createQuery(hql, Shipment.class)
                 .setParameter("deliveryReference", deliveryReference).getResultList();
         return results.isEmpty() ? null : results.get(0);
@@ -31,8 +32,9 @@ public class ShipmentDAOImpl extends BaseDAOImpl<Shipment, Integer> implements S
     @Override
     public List<Shipment> getByStatus(ShipmentStatus status) {
         Session session = entityManager.unwrap(Session.class);
-        String hql = "FROM Shipment s WHERE s.status = :status ORDER BY s.receptionTimestamp DESC";
-        return session.createQuery(hql, Shipment.class).setParameter("status", status.name()).getResultList();
+        String hql = "SELECT DISTINCT s FROM Shipment s LEFT JOIN FETCH s.receiver "
+                + "WHERE s.status = :status ORDER BY s.receptionTimestamp DESC";
+        return session.createQuery(hql, Shipment.class).setParameter("status", status).getResultList();
     }
 
     @Override
@@ -54,7 +56,9 @@ public class ShipmentDAOImpl extends BaseDAOImpl<Shipment, Integer> implements S
     @Override
     public List<Shipment> getRecentShipments(int offset, int limit) {
         Session session = entityManager.unwrap(Session.class);
-        String hql = "FROM Shipment s ORDER BY s.receptionTimestamp DESC";
+        // JOIN FETCH receiver so Jackson serialization does not hit a closed session
+        String hql = "SELECT DISTINCT s FROM Shipment s LEFT JOIN FETCH s.receiver "
+                + "ORDER BY s.receptionTimestamp DESC";
         return session.createQuery(hql, Shipment.class).setFirstResult(offset).setMaxResults(limit).getResultList();
     }
 
@@ -62,14 +66,29 @@ public class ShipmentDAOImpl extends BaseDAOImpl<Shipment, Integer> implements S
     public long countByStatus(ShipmentStatus status) {
         Session session = entityManager.unwrap(Session.class);
         String hql = "SELECT COUNT(s) FROM Shipment s WHERE s.status = :status";
-        return session.createQuery(hql, Long.class).setParameter("status", status.name()).getSingleResult();
+        return session.createQuery(hql, Long.class).setParameter("status", status).getSingleResult();
+    }
+
+    /**
+     * Load a shipment with receiver initialized for safe JSON serialization.
+     */
+    @Override
+    public Shipment getWithReceiver(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "SELECT s FROM Shipment s LEFT JOIN FETCH s.receiver WHERE s.id = :id";
+        List<Shipment> results = session.createQuery(hql, Shipment.class).setParameter("id", id).getResultList();
+        return results.isEmpty() ? null : results.get(0);
     }
 
     @Override
     public List<Shipment> search(String searchTerm, int limit) {
         Session session = entityManager.unwrap(Session.class);
-        String hql = "FROM Shipment s WHERE LOWER(s.senderName) LIKE :searchTerm "
-                + "OR LOWER(s.deliveryReference) LIKE :searchTerm " + "OR LOWER(s.senderOrganization) LIKE :searchTerm "
+        String hql = "SELECT DISTINCT s FROM Shipment s LEFT JOIN FETCH s.receiver "
+                + "WHERE LOWER(s.senderName) LIKE :searchTerm "
+                + "OR LOWER(s.deliveryReference) LIKE :searchTerm OR LOWER(s.senderOrganization) LIKE :searchTerm "
                 + "ORDER BY s.receptionTimestamp DESC";
         return session.createQuery(hql, Shipment.class).setParameter("searchTerm", "%" + searchTerm.toLowerCase() + "%")
                 .setMaxResults(limit).getResultList();

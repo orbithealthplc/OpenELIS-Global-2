@@ -14,9 +14,7 @@ describe("biorepositorySamplePathHelpers", () => {
         boxLabel: "BX078",
         positionCoordinate: "B3",
       }),
-    ).toBe(
-      "Zn Room-A / FRZ Freezer-1 / SH S2 / RK R15 / Box BX078 / Pos B3",
-    );
+    ).toBe("Zn Room-A / FRZ Freezer-1 / SH S2 / RK R15 / Box BX078 / Pos B3");
   });
 
   test("formatBrf02SamplePath omits missing levels", () => {
@@ -34,9 +32,7 @@ describe("biorepositorySamplePathHelpers", () => {
         "Room-A > Freezer-1 > S2 > R15 > BX078",
         "B3",
       ),
-    ).toBe(
-      "Zn Room-A / FRZ Freezer-1 / SH S2 / RK R15 / Box BX078 / Pos B3",
-    );
+    ).toBe("Zn Room-A / FRZ Freezer-1 / SH S2 / RK R15 / Box BX078 / Pos B3");
   });
 
   test("formatBrf02SamplePath uses existing samplePath when present", () => {

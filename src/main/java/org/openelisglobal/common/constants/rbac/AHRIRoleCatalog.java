@@ -38,6 +38,9 @@ public final class AHRIRoleCatalog {
         departments.add(Constants.ROLE_SENIOR_RESEARCHER);
         departments.add(Constants.ROLE_LAB_MANAGER);
         departments.add(Constants.ROLE_BIOMEDICAL_STAFF);
+        // Pathology specialty titles used at AHRI (SRS stage personas for diagnosis)
+        departments.add(Constants.ROLE_PATHOLOGIST);
+        departments.add(Constants.ROLE_CYTOPATHOLOGIST);
         DEPARTMENT_ROLE_NAMES = normalizeAll(departments);
 
         Set<String> projects = new HashSet<>();
@@ -52,7 +55,7 @@ public final class AHRIRoleCatalog {
 
         DEPARTMENT_ROLE_ORDER = List.of(Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
                 Constants.ROLE_JUNIOR_RESEARCHER, Constants.ROLE_SENIOR_RESEARCHER, Constants.ROLE_LAB_MANAGER,
-                Constants.ROLE_BIOMEDICAL_STAFF);
+                Constants.ROLE_BIOMEDICAL_STAFF, Constants.ROLE_PATHOLOGIST, Constants.ROLE_CYTOPATHOLOGIST);
 
         PROJECT_ROLE_ORDER = List.of(Constants.ROLE_PRINCIPAL_INVESTIGATOR, Constants.ROLE_PROJECT_COORDINATOR,
                 Constants.ROLE_DATA_MANAGER);

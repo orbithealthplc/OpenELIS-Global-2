@@ -59,10 +59,10 @@ public interface NotebookEntryRoomEnvironmentLogService
     /**
      * Bulk import room environment readings for a notebook entry.
      *
-     * @param entryId      notebook entry ID
-     * @param rows         import rows (roomCode, checkedDateTime, etc.)
+     * @param entryId       notebook entry ID
+     * @param rows          import rows (roomCode, checkedDateTime, etc.)
      * @param scopeRoomCode when set, all rows apply to this room code
-     * @param sysUserId    current user
+     * @param sysUserId     current user
      * @return map with importedCount, skippedCount, errors
      */
     Map<String, Object> importRoomEnvironmentLogs(Integer entryId, List<Map<String, Object>> rows, String scopeRoomCode,

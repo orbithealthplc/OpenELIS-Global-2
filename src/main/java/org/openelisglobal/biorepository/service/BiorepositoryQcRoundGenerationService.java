@@ -16,16 +16,20 @@ public interface BiorepositoryQcRoundGenerationService {
     int MIN_SAMPLES_PER_BOX = 1;
 
     /**
-     * Validates round parameters and selects unique samples across distributed boxes.
+     * Validates round parameters and selects unique samples across distributed
+     * boxes.
      *
-     * @param storageOverview   output of storage overview (counts, filters, eligibleSamples)
-     * @param boxesPerRound     requested box count
-     * @param samplesPerBox     requested samples per box
-     * @param seed              optional random seed
-     * @param freezerFilter     normalized freezer/device filter (null = all devices)
-     * @param allowAllDevices   when true, multi-device sites may generate without a device filter
+     * @param storageOverview output of storage overview (counts, filters,
+     *                        eligibleSamples)
+     * @param boxesPerRound   requested box count
+     * @param samplesPerBox   requested samples per box
+     * @param seed            optional random seed
+     * @param freezerFilter   normalized freezer/device filter (null = all devices)
+     * @param allowAllDevices when true, multi-device sites may generate without a
+     *                        device filter
      * @return round payload including qcBatchId and samples
-     * @throws IllegalArgumentException when validation fails; use {@link #toErrorBody} for API mapping
+     * @throws IllegalArgumentException when validation fails; use
+     *                                  {@link #toErrorBody} for API mapping
      */
     Map<String, Object> generateRound(Map<String, Object> storageOverview, int boxesPerRound, int samplesPerBox,
             Long seed, String freezerFilter, boolean allowAllDevices);

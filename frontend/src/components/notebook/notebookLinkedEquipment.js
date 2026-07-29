@@ -4,7 +4,14 @@
  */
 
 export const LINKED_EQUIPMENT_ITEM_TYPE = "EQUIPMENT";
-export const LINKED_STOCK_ITEM_TYPES = ["REAGENT", "CARTRIDGE", "CONSUMABLE", "RDT", "HIV_KIT", "SYPHILIS_KIT"];
+export const LINKED_STOCK_ITEM_TYPES = [
+  "REAGENT",
+  "CARTRIDGE",
+  "CONSUMABLE",
+  "RDT",
+  "HIV_KIT",
+  "SYPHILIS_KIT",
+];
 
 export function buildLinkedEquipmentInstrumentsUrl(departmentIds = []) {
   const params = new URLSearchParams({

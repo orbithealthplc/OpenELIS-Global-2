@@ -28,12 +28,12 @@ public class InventoryCartridgeEquipmentMigrationTest {
     @Test
     public void migratesCartridgeWithMaintenanceDates() {
         var date = new GregorianCalendar(2024, Calendar.JANUARY, 1).getTime();
-        assertTrue(InventoryCartridgeEquipmentMigration
-                .shouldMigrateCartridgeToEquipmentByMaintenanceDates(date, null, null));
-        assertTrue(InventoryCartridgeEquipmentMigration
-                .shouldMigrateCartridgeToEquipmentByMaintenanceDates(null, date, null));
-        assertTrue(InventoryCartridgeEquipmentMigration
-                .shouldMigrateCartridgeToEquipmentByMaintenanceDates(null, null, date));
+        assertTrue(InventoryCartridgeEquipmentMigration.shouldMigrateCartridgeToEquipmentByMaintenanceDates(date, null,
+                null));
+        assertTrue(InventoryCartridgeEquipmentMigration.shouldMigrateCartridgeToEquipmentByMaintenanceDates(null, date,
+                null));
+        assertTrue(InventoryCartridgeEquipmentMigration.shouldMigrateCartridgeToEquipmentByMaintenanceDates(null, null,
+                date));
     }
 
     @Test

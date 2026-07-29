@@ -95,6 +95,14 @@ public interface ShipmentService extends BaseObjectService<Shipment, Integer> {
     boolean existsByDeliveryReference(String deliveryReference);
 
     /**
+     * Get a shipment by ID with receiver loaded for serialization.
+     *
+     * @param id shipment id
+     * @return shipment or null
+     */
+    Shipment getWithReceiver(Integer id);
+
+    /**
      * Update the documentation status for a shipment.
      *
      * @param shipmentId the shipment ID

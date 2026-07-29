@@ -29,7 +29,8 @@ import org.openelisglobal.userrole.valueholder.UserLabUnitRoles;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * MNTD SRS persona matrix: intake registration, lab manager override, biomedical denial.
+ * MNTD SRS persona matrix: intake registration, lab manager override,
+ * biomedical denial.
  */
 @RunWith(MockitoJUnitRunner.class)
 public class MNTDStageAccessMatrixTest {
@@ -74,8 +75,7 @@ public class MNTDStageAccessMatrixTest {
     public void sampleCollector_allowedOnMntdIntake() {
         stubRestrictedUser("177", "r-sc");
         when(roleService.getRoleById("r-sc")).thenReturn(role(Constants.ROLE_SAMPLE_COLLECTOR));
-        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT))
-                .thenReturn(true);
+        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT)).thenReturn(true);
         when(workflowRegistryService.resolveAllowedPersonasForAction(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
                         Constants.ROLE_LAB_MANAGER));
@@ -87,8 +87,7 @@ public class MNTDStageAccessMatrixTest {
     public void labManagerOnly_allowedOnMntdIntakeViaSupervisorOverride() {
         stubRestrictedUser("177", "r-lm");
         when(roleService.getRoleById("r-lm")).thenReturn(role(Constants.ROLE_LAB_MANAGER));
-        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT))
-                .thenReturn(true);
+        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT)).thenReturn(true);
         when(workflowRegistryService.resolveAllowedPersonasForAction(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN));
 
@@ -99,8 +98,7 @@ public class MNTDStageAccessMatrixTest {
     public void juniorResearcher_deniedOnMntdIntake() {
         stubRestrictedUser("177", "r-jr");
         when(roleService.getRoleById("r-jr")).thenReturn(role(Constants.ROLE_JUNIOR_RESEARCHER));
-        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT))
-                .thenReturn(true);
+        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT)).thenReturn(true);
         when(workflowRegistryService.resolveAllowedPersonasForAction(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN));
 
@@ -112,8 +110,7 @@ public class MNTDStageAccessMatrixTest {
     public void biomedicalStaff_deniedOnMntdIntake() {
         stubRestrictedUser("177", "r-bio");
         when(roleService.getRoleById("r-bio")).thenReturn(role(Constants.ROLE_BIOMEDICAL_STAFF));
-        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT))
-                .thenReturn(true);
+        when(workflowRegistryService.isActionPermitted("mntd", "intake", 1, NotebookStageAction.EDIT)).thenReturn(true);
         when(workflowRegistryService.resolveAllowedPersonasForAction(any(), any(), any(), any(), any(), any()))
                 .thenReturn(List.of(Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN));
 
@@ -157,8 +154,7 @@ public class MNTDStageAccessMatrixTest {
         NotebookEntry entry = new NotebookEntry();
         entry.setNotebook(notebook);
 
-        assertThrows(ResponseStatusException.class,
-                () -> service.assertMntdManifestIntakeEdit(request, entry));
+        assertThrows(ResponseStatusException.class, () -> service.assertMntdManifestIntakeEdit(request, entry));
     }
 
     @Test

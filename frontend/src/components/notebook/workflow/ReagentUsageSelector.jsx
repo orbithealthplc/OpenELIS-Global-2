@@ -105,7 +105,9 @@ function ReagentUsageSelector({
             };
           }),
         );
-        setScopeStatus(meta.scopeStatus || NOTEBOOK_INVENTORY_SCOPE_STATUS.READY);
+        setScopeStatus(
+          meta.scopeStatus || NOTEBOOK_INVENTORY_SCOPE_STATUS.READY,
+        );
       },
       controller.signal,
     );
@@ -137,13 +139,15 @@ function ReagentUsageSelector({
         disabled={disabled}
         selectionFeedback="top-after-reopen"
         helperText={
-          scopeStatus === NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE ? (
+          scopeStatus ===
+          NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE ? (
             <FormattedMessage
               id="notebook.stock.picker.noDepartmentScope"
               defaultMessage="Notebook departments could not be resolved for inventory-scoped reagents."
             />
           ) : reagents.length === 0 &&
-            scopeStatus === NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS ? (
+            scopeStatus ===
+              NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_LOTS ? (
             <FormattedMessage
               id="notebook.stock.picker.noLots"
               defaultMessage="No reagents or consumables were found for this notebook's departments."

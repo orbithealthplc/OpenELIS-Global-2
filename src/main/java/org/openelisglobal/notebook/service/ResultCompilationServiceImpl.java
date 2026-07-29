@@ -1139,7 +1139,8 @@ public class ResultCompilationServiceImpl implements ResultCompilationService {
 
         java.io.ByteArrayOutputStream pdfOutputStream = new java.io.ByteArrayOutputStream();
         try {
-            com.itextpdf.text.Document document = new com.itextpdf.text.Document(com.itextpdf.text.PageSize.A4.rotate());
+            com.itextpdf.text.Document document = new com.itextpdf.text.Document(
+                    com.itextpdf.text.PageSize.A4.rotate());
             com.itextpdf.text.pdf.PdfWriter.getInstance(document, pdfOutputStream);
             document.open();
 
@@ -1157,8 +1158,8 @@ public class ResultCompilationServiceImpl implements ResultCompilationService {
 
                 for (int i = 0; i < cols; i++) {
                     com.itextpdf.text.pdf.PdfPCell cell = new com.itextpdf.text.pdf.PdfPCell(
-                            new com.itextpdf.text.Phrase(headers[i].replace("\"", ""), 
-                                    com.itextpdf.text.FontFactory.getFont(com.itextpdf.text.FontFactory.HELVETICA_BOLD, 8)));
+                            new com.itextpdf.text.Phrase(headers[i].replace("\"", ""), com.itextpdf.text.FontFactory
+                                    .getFont(com.itextpdf.text.FontFactory.HELVETICA_BOLD, 8)));
                     cell.setBackgroundColor(com.itextpdf.text.BaseColor.LIGHT_GRAY);
                     table.addCell(cell);
                 }
@@ -1167,16 +1168,16 @@ public class ResultCompilationServiceImpl implements ResultCompilationService {
                     String[] cells = lines[r].split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
                     for (int i = 0; i < cols; i++) {
                         String cellValue = i < cells.length ? cells[i].replace("\"", "") : "";
-                        table.addCell(new com.itextpdf.text.pdf.PdfPCell(
-                                new com.itextpdf.text.Phrase(cellValue, 
-                                        com.itextpdf.text.FontFactory.getFont(com.itextpdf.text.FontFactory.HELVETICA, 8))));
+                        table.addCell(new com.itextpdf.text.pdf.PdfPCell(new com.itextpdf.text.Phrase(cellValue,
+                                com.itextpdf.text.FontFactory.getFont(com.itextpdf.text.FontFactory.HELVETICA, 8))));
                     }
                 }
                 document.add(table);
             }
             document.close();
         } catch (Exception e) {
-            org.openelisglobal.common.log.LogEvent.logError(this.getClass().getName(), "generatePdfReport", "Error generating PDF: " + e.getMessage());
+            org.openelisglobal.common.log.LogEvent.logError(this.getClass().getName(), "generatePdfReport",
+                    "Error generating PDF: " + e.getMessage());
             throw new RuntimeException("Failed to generate PDF: " + e.getMessage(), e);
         }
 

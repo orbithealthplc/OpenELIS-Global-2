@@ -335,6 +335,24 @@ public class MedLabPatientOrderServiceIntegrationTest extends BaseWebContextSens
     }
 
     @Test
+    public void testRecordSampleCollection_WithMultipleTypes_PreservesEveryType() {
+        String labNo = "TEST-COLLECT-MULTI-001";
+        medLabPatientOrderService.createPatientOrder(TEST_PATIENT_ID, labNo, "2026-01-09", "2026-01-09", "ROUTINE",
+                List.of(TEST_TEST_ID_1), null, TEST_NOTEBOOK_PAGE_ID, TEST_USER_ID);
+
+        Map<String, Object> result = medLabPatientOrderService.recordSampleCollection(labNo, List.of("8001", "8002"),
+                "tube", "10:30", "2026-01-09", "2", "5.0", null, TEST_NOTEBOOK_PAGE_ID, TEST_USER_ID);
+
+        assertTrue("Multi-type collection should succeed: " + result.get("error"), (Boolean) result.get("success"));
+        Sample sample = sampleService.getSampleByAccessionNumber(labNo);
+        List<SampleItem> sampleItems = sampleItemService.getSampleItemsBySampleId(sample.getId());
+
+        assertEquals("Each selected specimen type should create one sample item", 2, sampleItems.size());
+        assertTrue(sampleItems.stream().anyMatch(item -> "8001".equals(item.getTypeOfSampleId())));
+        assertTrue(sampleItems.stream().anyMatch(item -> "8002".equals(item.getTypeOfSampleId())));
+    }
+
+    @Test
     public void testRecordSampleCollection_CreatesOrderSampleLink() {
         // Given - First create an order
         String labNo = "TEST-COLLECT-002";

@@ -23,12 +23,16 @@ import "./NotebookWorkflow.css";
  * Bioequivalence workflow pages for bioequivalence laboratory.
  * Per spec: Sample Reception → Test Assignment → Analytical Execution → Reporting & Release → Post-Test Storage & Archiving
  */
+// Placeholder ids MUST use the "default-" prefix so page components skip
+// sample-loading API calls (guarded by startsWith("default-")) until the real
+// numeric notebook page ids load. A non-numeric, non-"default-" id causes the
+// backend samples endpoint (@PathVariable Integer pageId) to return HTTP 400.
 const BIOEQUIVALENCE_WORKFLOW_PAGES = [
-  { id: "bioequivalence-1", order: 1, title: "Sample Reception" },
-  { id: "bioequivalence-2", order: 2, title: "Test Assignment" },
-  { id: "bioequivalence-3", order: 3, title: "Analytical Execution" },
-  { id: "bioequivalence-4", order: 4, title: "Reporting & Release" },
-  { id: "bioequivalence-5", order: 5, title: "Post-Test Storage & Archiving" },
+  { id: "default-1", order: 1, title: "Sample Reception" },
+  { id: "default-2", order: 2, title: "Test Assignment" },
+  { id: "default-3", order: 3, title: "Analytical Execution" },
+  { id: "default-4", order: 4, title: "Reporting & Release" },
+  { id: "default-5", order: 5, title: "Post-Test Storage & Archiving" },
 ];
 
 /**

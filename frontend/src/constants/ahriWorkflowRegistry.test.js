@@ -26,7 +26,9 @@ describe("ahriWorkflowRegistry", () => {
   });
 
   it("enriches pages without explicit allowedRoles", () => {
-    const pages = enrichPagesWithRegistryRoles("immunology", [{ order: 2, title: "Initial Processing" }]);
+    const pages = enrichPagesWithRegistryRoles("immunology", [
+      { order: 2, title: "Initial Processing" },
+    ]);
     expect(pages[0].allowedRoles.length).toBeGreaterThan(0);
   });
 
@@ -74,14 +76,26 @@ describe("ahriWorkflowRegistry", () => {
 
   it("uses pageKey for stage lookup", () => {
     expect(resolvePageKey({ pageId: "reception", order: 1 })).toBe("reception");
-    expect(isActionPermitted("immunology", { pageId: "reception", order: 1 }, "EDIT")).toBe(true);
+    expect(
+      isActionPermitted(
+        "immunology",
+        { pageId: "reception", order: 1 },
+        "EDIT",
+      ),
+    ).toBe(true);
   });
 
   it("normalizes pathology subtype workflow types to pathology", () => {
-    expect(normalizeWorkflowType("histopathology_biopsy_tissue")).toBe("pathology");
-    expect(normalizeWorkflowType("peripheral_smear_bone_marrow_morphology")).toBe("pathology");
+    expect(normalizeWorkflowType("histopathology_biopsy_tissue")).toBe(
+      "pathology",
+    );
+    expect(
+      normalizeWorkflowType("peripheral_smear_bone_marrow_morphology"),
+    ).toBe("pathology");
     expect(normalizeWorkflowType("peripheral_smear")).toBe("pathology");
     expect(normalizeWorkflowType("bone_marrow")).toBe("pathology");
-    expect(normalizeWorkflowType("peripheral_smear_bone_marrow")).toBe("pathology");
+    expect(normalizeWorkflowType("peripheral_smear_bone_marrow")).toBe(
+      "pathology",
+    );
   });
 });

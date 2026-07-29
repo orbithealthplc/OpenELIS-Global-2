@@ -149,5 +149,8 @@
     <include file="liquibase/3.5.x.x/077-biorepository-storage-zone-labels.xml"/>
     <include file="liquibase/3.5.x.x/078-add-biosample-manifest-sno.xml"/>
     <include file="liquibase/3.5.x.x/079-reorder-bacteriology-isolate-creation-page.xml"/>
+    <include file="liquibase/3.5.x.x/080-notebook-user-stage-override.xml"/>
+    <include file="liquibase/3.5.x.x/081-fix-nuso-lastupdated-column.xml"/>
+    <include file="liquibase/3.5.x.x/082-notebook-allowed-tests.xml"/>
 
 </databaseChangeLog>

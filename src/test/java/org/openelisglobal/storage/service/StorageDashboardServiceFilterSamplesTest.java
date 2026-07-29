@@ -37,22 +37,18 @@ public class StorageDashboardServiceFilterSamplesTest {
         when(sampleStorageService.getAllSamplesWithAssignments())
                 .thenReturn(Arrays.asList(roomOneDeviceOne, roomTwoDeviceThree));
 
-        List<Map<String, Object>> byRoom =
-                storageDashboardService.filterSamples(null, null, null, 1, null);
+        List<Map<String, Object>> byRoom = storageDashboardService.filterSamples(null, null, null, 1, null);
         assertEquals(1, byRoom.size());
         assertEquals(1, ((Number) byRoom.get(0).get("roomId")).intValue());
 
-        List<Map<String, Object>> byDevice =
-                storageDashboardService.filterSamples(null, null, null, 1, 1);
+        List<Map<String, Object>> byDevice = storageDashboardService.filterSamples(null, null, null, 1, 1);
         assertEquals(1, byDevice.size());
         assertEquals(1, ((Number) byDevice.get(0).get("deviceId")).intValue());
 
-        List<Map<String, Object>> byDepartment =
-                storageDashboardService.filterSamples(null, null, 10, null, null);
+        List<Map<String, Object>> byDepartment = storageDashboardService.filterSamples(null, null, 10, null, null);
         assertEquals(2, byDepartment.size());
         assertTrue(
-                byDepartment.stream()
-                        .allMatch(row -> "10".equals(String.valueOf(row.get("departmentTestSectionId")))));
+                byDepartment.stream().allMatch(row -> "10".equals(String.valueOf(row.get("departmentTestSectionId")))));
     }
 
     private Map<String, Object> sampleRow(int roomId, int deviceId, int departmentId, String location) {

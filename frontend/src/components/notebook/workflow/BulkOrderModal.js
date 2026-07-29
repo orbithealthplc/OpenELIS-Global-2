@@ -43,6 +43,7 @@ function BulkOrderModal({
   notebookPageId,
   sampleCollectionPageId,
   tests: testsFromParent,
+  allowedTestIds,
   onSuccess,
 }) {
   const intl = useIntl();
@@ -67,22 +68,44 @@ function BulkOrderModal({
   const [error, setError] = useState(null);
   const [validationErrors, setValidationErrors] = useState([]);
 
+  const applyAllowedTestFilter = useCallback(
+    (tests) => {
+      const ids = allowedTestIds;
+      // MedLab Stage 1: empty filter means "not configured" → show none (not full catalog)
+      if (!ids || ids.length === 0) {
+        return [];
+      }
+      const idSet = new Set(ids.map((id) => Number(id)));
+      return tests.filter((t) => idSet.has(Number(t.id || t.value)));
+    },
+    [allowedTestIds],
+  );
+
+  const orderTypesConfigured = Boolean(
+    allowedTestIds && allowedTestIds.length > 0,
+  );
+
   const loadAvailableTests = useCallback(() => {
     setLoadingTests(true);
+    if (!orderTypesConfigured) {
+      setAvailableTests([]);
+      setLoadingTests(false);
+      return;
+    }
     getFromOpenElisServer("/rest/medlab/orderable-tests", (response) => {
-      let tests = normalizeOrderableTestList(response);
-      if (tests.length > 0) {
+      let tests = applyAllowedTestFilter(normalizeOrderableTestList(response));
+      if (tests.length > 0 || orderTypesConfigured) {
         setAvailableTests(tests);
         setLoadingTests(false);
         return;
       }
       getFromOpenElisServer("/rest/test-list", (fallback) => {
-        tests = normalizeOrderableTestList(fallback);
+        tests = applyAllowedTestFilter(normalizeOrderableTestList(fallback));
         setAvailableTests(tests);
         setLoadingTests(false);
       });
     });
-  }, []);
+  }, [applyAllowedTestFilter, orderTypesConfigured]);
 
   const loadLabNumberPreview = useCallback(() => {
     if (!labNumberPrefix.trim()) {
@@ -113,17 +136,30 @@ function BulkOrderModal({
       setError(null);
       setValidationErrors([]);
       setSelectedTests([]);
-      const preloaded = normalizeOrderableTestList(testsFromParent);
-      if (preloaded.length > 0) {
-        setAvailableTests(preloaded);
+      if (!orderTypesConfigured) {
+        setAvailableTests([]);
+        setLoadingTests(false);
       } else {
-        loadAvailableTests();
+        const preloaded = applyAllowedTestFilter(
+          normalizeOrderableTestList(testsFromParent),
+        );
+        if (preloaded.length > 0) {
+          setAvailableTests(preloaded);
+        } else {
+          loadAvailableTests();
+        }
       }
       // Generate default prefix with current year
       const year = new Date().getFullYear();
       setLabNumberPrefix(`MEDLAB-${year}-`);
     }
-  }, [open, testsFromParent, loadAvailableTests]);
+  }, [
+    open,
+    testsFromParent,
+    loadAvailableTests,
+    applyAllowedTestFilter,
+    orderTypesConfigured,
+  ]);
 
   // Load preview of lab numbers when prefix changes or patients change
   useEffect(() => {
@@ -270,6 +306,24 @@ function BulkOrderModal({
           </Tag>
         </div>
 
+        {!orderTypesConfigured && (
+          <InlineNotification
+            kind="warning"
+            lowContrast
+            hideCloseButton
+            title={intl.formatMessage({
+              id: "medlab.bulkOrder.orderTypesMissing.title",
+              defaultMessage: "Order types not configured",
+            })}
+            subtitle={intl.formatMessage({
+              id: "medlab.bulkOrder.orderTypesMissing.subtitle",
+              defaultMessage:
+                "Go to the Content tab, select Order types for this project, then Save. Only those tests will appear here.",
+            })}
+            style={{ marginBottom: "1rem" }}
+          />
+        )}
+
         {/* Patient list preview */}
         <div className="bulk-order-patients-preview">
           <p className="section-label">
@@ -392,32 +446,40 @@ function BulkOrderModal({
                   {availableTests.length === 0 ? (
                     <p className="empty-state-message">
                       <FormattedMessage
-                        id="medlab.order.noTestsAvailable"
-                        defaultMessage="No tests available"
+                        id={
+                          orderTypesConfigured
+                            ? "medlab.order.noTestsAvailable"
+                            : "medlab.bulkOrder.orderTypesMissing.empty"
+                        }
+                        defaultMessage={
+                          orderTypesConfigured
+                            ? "No tests available"
+                            : "No order types configured for this notebook yet"
+                        }
                       />
                     </p>
                   ) : (
                     availableTests.map((test) => (
-                    <div
-                      key={test.id}
-                      className="test-checkbox-item"
-                      onClick={() => handleTestToggle(test.id)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <Checkbox
-                        id={`test-${test.id}`}
-                        labelText={
-                          test.value ||
-                          test.localizedTestName ||
-                          test.testName ||
-                          test.name ||
-                          "Unknown Test"
-                        }
-                        checked={selectedTests.includes(String(test.id))}
-                        onChange={() => {}}
-                      />
-                    </div>
-                  ))
+                      <div
+                        key={test.id}
+                        className="test-checkbox-item"
+                        onClick={() => handleTestToggle(test.id)}
+                        style={{ cursor: "pointer" }}
+                      >
+                        <Checkbox
+                          id={`test-${test.id}`}
+                          labelText={
+                            test.value ||
+                            test.localizedTestName ||
+                            test.testName ||
+                            test.name ||
+                            "Unknown Test"
+                          }
+                          checked={selectedTests.includes(String(test.id))}
+                          onChange={() => {}}
+                        />
+                      </div>
+                    ))
                   )}
                 </div>
               )}

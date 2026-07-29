@@ -96,7 +96,9 @@ public class SampleRetrievalItem extends BaseObject<Integer> {
     @JoinColumn(name = "fulfills_item_id")
     private SampleRetrievalItem fulfillsItem;
 
-    /** Read-only FK for API mapping when {@link #fulfillsItem} is not initialized. */
+    /**
+     * Read-only FK for API mapping when {@link #fulfillsItem} is not initialized.
+     */
     @Column(name = "fulfills_item_id", insertable = false, updatable = false)
     private Integer fulfillsItemIdColumn;
 

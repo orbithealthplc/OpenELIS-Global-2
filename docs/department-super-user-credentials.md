@@ -1,27 +1,32 @@
 # AHRI Department Super-User Credentials
 
-One super-user per research lab with **all six SRS lab-unit roles** (Sample Collector, Laboratory Technician, Junior Researcher, Senior Researcher, Lab Manager, Biomedical Staff) on that department.
+One super-user per research lab with **all six SRS lab-unit roles** (Sample
+Collector, Laboratory Technician, Junior Researcher, Senior Researcher, Lab
+Manager, Biomedical Staff) on that department.
 
-Seeded by [`scripts/populate-department-super-users.sh`](../scripts/populate-department-super-users.sh) (user IDs **1120–1133**).
+Seeded by
+[`scripts/populate-department-super-users.sh`](../scripts/populate-department-super-users.sh)
+(user IDs **1120–1133**).
 
-**After seeding:** restart `openelisglobal-webapp` and each user must **log out and log back in**.
+**After seeding:** restart `openelisglobal-webapp` and each user must **log out
+and log back in**.
 
-| Lab | Username | Password | Department (test_section) |
-|-----|----------|----------|---------------------------|
-| MNTD | `newmntd` | `newmntdMNTD!` | Malaria and Neglected Tropical Disease (MNTD) Laboratory |
-| Biorepository | `biorepository` | `biorepositoryBIO!` | Biorepository Laboratory |
-| TB | `tblab` | `tblabTB!` | Tuberculosis Laboratory |
-| Bacteriology | `bacteriology` | `bacteriologyBACTERIOLOGY!` | Bacteriology |
-| Bioanalytical | `bioanalytical` | `bioanalyticalBIOANALYTICAL!` | Bioanalytical Laboratory |
-| Immunology | `immunology` | `immunologyIMMUNOLOGY!` | Immunology |
-| Pathology | `pathology` | `pathologyPATHOLOGY!` | Pathology Laboratory |
-| Pharmaceutical | `pharma` | `pharmaPHARMA!` | Pharmaceuticals Laboratory |
-| Traditional Medicine | `tmmd` | `tmmdTMMD!` | Traditional & Modern Medicine Research Lab |
-| Viral Vaccine | `viralvaccine` | `viralvaccineVIRAL!` | Viral Vaccine |
-| CTD | `ctd` | `ctdCTD!` | CTD |
-| Bioequivalence | `bioequivalence` | `bioequivalenceBIOEQ!` | Bioequivalence Laboratory |
-| Genomics | `genomics` | `genomicsGENOMICS!` | Genomics & Bioinformatics Laboratory |
-| Virology | `virology` | `virologyVIROLOGY!` | Virology Laboratory |
+| Lab                  | Username         | Password                      | Department (test_section)                                |
+| -------------------- | ---------------- | ----------------------------- | -------------------------------------------------------- |
+| MNTD                 | `newmntd`        | `newmntdMNTD!`                | Malaria and Neglected Tropical Disease (MNTD) Laboratory |
+| Biorepository        | `biorepository`  | `biorepositoryBIO!`           | Biorepository Laboratory                                 |
+| TB                   | `tblab`          | `tblabTB!`                    | Tuberculosis Laboratory                                  |
+| Bacteriology         | `bacteriology`   | `bacteriologyBACTERIOLOGY!`   | Bacteriology                                             |
+| Bioanalytical        | `bioanalytical`  | `bioanalyticalBIOANALYTICAL!` | Bioanalytical Laboratory                                 |
+| Immunology           | `immunology`     | `immunologyIMMUNOLOGY!`       | Immunology                                               |
+| Pathology            | `pathology`      | `pathologyPATHOLOGY!`         | Pathology Laboratory                                     |
+| Pharmaceutical       | `pharma`         | `pharmaPHARMA!`               | Pharmaceuticals Laboratory                               |
+| Traditional Medicine | `tmmd`           | `tmmdTMMD!`                   | Traditional & Modern Medicine Research Lab               |
+| Viral Vaccine        | `viralvaccine`   | `viralvaccineVIRAL!`          | Viral Vaccine                                            |
+| CTD                  | `ctd`            | `ctdCTD!`                     | CTD                                                      |
+| Bioequivalence       | `bioequivalence` | `bioequivalenceBIOEQ!`        | Bioequivalence Laboratory                                |
+| Genomics             | `genomics`       | `genomicsGENOMICS!`           | Genomics & Bioinformatics Laboratory                     |
+| Virology             | `virology`       | `virologyVIROLOGY!`           | Virology Laboratory                                      |
 
 ## Local setup
 
@@ -57,4 +62,7 @@ UAT_BASE_URL=https://192.168.25.25 python3 scripts/verify-department-super-users
 
 ## Automated verification
 
-[`scripts/verify-department-super-users.py`](../scripts/verify-department-super-users.py) checks login, lab unit selection, notebook hierarchy visibility, and CTD/MNTD API spot-checks. Results: [`department-super-user-uat-results.json`](department-super-user-uat-results.json).
+[`scripts/verify-department-super-users.py`](../scripts/verify-department-super-users.py)
+checks login, lab unit selection, notebook hierarchy visibility, and CTD/MNTD
+API spot-checks. Results:
+[`department-super-user-uat-results.json`](department-super-user-uat-results.json).

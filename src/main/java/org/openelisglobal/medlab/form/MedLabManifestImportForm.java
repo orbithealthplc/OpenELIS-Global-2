@@ -23,8 +23,8 @@ import jakarta.validation.constraints.NotBlank;
  * <ul>
  * <li>Required: sampleId, sampleType, containerType, quantity, unitOfMeasure,
  * collectionSource, collector
- * <li>Optional: collectionDate, collectionTime, customLabel, orderId, patientId,
- * notes
+ * <li>Optional: collectionDate, collectionTime, customLabel, orderId,
+ * patientId, notes
  * </ul>
  */
 public class MedLabManifestImportForm {

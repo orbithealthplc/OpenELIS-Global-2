@@ -1,0 +1,4 @@
+[  134036ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_TIMED_OUT @ https://lims.ahri.gov.et/static/css/main.acde5a71.css:0
+[  170783ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://lims.ahri.gov.et/login:0
+[  175731ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://lims.ahri.gov.et/static/js/main.32e871f0.js:1
+[  184847ms] [LOG] Service Worker registered with scope: https://lims.ahri.gov.et/ @ https://lims.ahri.gov.et/static/js/main.32e871f0.js:1

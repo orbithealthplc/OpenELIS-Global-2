@@ -34,7 +34,9 @@ function NotebookDepartmentEquipmentMultiSelect({
   useEffect(() => {
     if (!notebookId) {
       setItems([]);
-      setScopeStatus(NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE);
+      setScopeStatus(
+        NOTEBOOK_INVENTORY_SCOPE_STATUS.DEPARTMENT_SCOPE_UNAVAILABLE,
+      );
       return undefined;
     }
 
@@ -121,7 +123,8 @@ function NotebookDepartmentEquipmentMultiSelect({
             defaultMessage="Notebook departments could not be resolved for inventory-scoped equipment."
           />
         ) : items.length === 0 ||
-          scopeStatus === NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_EQUIPMENT ? (
+          scopeStatus ===
+            NOTEBOOK_INVENTORY_SCOPE_STATUS.NO_INVENTORY_EQUIPMENT ? (
           <FormattedMessage
             id="notebook.equipment.picker.empty"
             defaultMessage="No active equipment found in this notebook's departments."

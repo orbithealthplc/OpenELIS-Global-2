@@ -203,8 +203,7 @@ public class InventoryReportServiceImpl implements InventoryReportService {
             boolean groupByLocation, HttpServletRequest request) {
         List<List<String>> rows = filterLots(loadLots(), includeInactive, includeExpired, request).stream()
                 .filter(lot -> lot.getEffectiveExpirationDate() != null)
-                .sorted(Comparator.comparing(InventoryLot::getEffectiveExpirationDate))
-                .map(lot -> {
+                .sorted(Comparator.comparing(InventoryLot::getEffectiveExpirationDate)).map(lot -> {
                     LocalDate expirationDate = toLocalDate(lot.getEffectiveExpirationDate());
                     long daysRemaining = ChronoUnit.DAYS.between(LocalDate.now(), expirationDate);
                     return List.of(safe(itemName(lot)), safe(String.valueOf(lot.getInventoryItem().getItemType())),
@@ -215,9 +214,9 @@ public class InventoryReportServiceImpl implements InventoryReportService {
                 }).collect(Collectors.toCollection(ArrayList::new));
 
         sortRows(rows, groupByType ? 1 : null, groupByLocation ? 9 : null, 5);
-        return new ReportTable("Most Expired Items Report",
-                List.of("Item Name", "Item Type", "Lot Number", "Current Quantity", "Units", "Effective Expiry",
-                        "Days Remaining", "QC Status", "Lot Status", "Storage Location"),
+        return new ReportTable(
+                "Most Expired Items Report", List.of("Item Name", "Item Type", "Lot Number", "Current Quantity",
+                        "Units", "Effective Expiry", "Days Remaining", "QC Status", "Lot Status", "Storage Location"),
                 rows);
     }
 

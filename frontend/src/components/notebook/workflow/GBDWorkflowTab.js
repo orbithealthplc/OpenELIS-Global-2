@@ -34,17 +34,25 @@ import "./NotebookWorkflow.css";
  * Gel Electrophoresis → Library Preparation → Bioanalyzer QC → Sequencing → Bioinformatics Analysis →
  * Storage & Environmental Monitoring
  */
+// Placeholder ids MUST use the "default-" prefix so page components skip
+// sample-loading API calls (guarded by startsWith("default-")) until the real
+// numeric notebook page ids load. A non-numeric, non-"default-" id causes the
+// backend samples endpoint (@PathVariable Integer pageId) to return HTTP 400.
 const GBD_WORKFLOW_PAGES = [
-  { id: "gbd-1", order: 1, title: "Sample Intake & Registration" },
-  { id: "gbd-2", order: 2, title: "DNA/RNA Extraction" },
-  { id: "gbd-3", order: 3, title: "Quality & Quantity Assessment" },
-  { id: "gbd-4", order: 4, title: "PCR Amplification" },
-  { id: "gbd-5", order: 5, title: "Gel Electrophoresis" },
-  { id: "gbd-6", order: 6, title: "Library Preparation" },
-  { id: "gbd-7", order: 7, title: "Bioanalyzer QC" },
-  { id: "gbd-8", order: 8, title: "Sequencing" },
-  { id: "gbd-9", order: 9, title: "Bioinformatics Analysis & Data Submission" },
-  { id: "gbd-10", order: 10, title: "Storage & Environmental Monitoring" },
+  { id: "default-1", order: 1, title: "Sample Intake & Registration" },
+  { id: "default-2", order: 2, title: "DNA/RNA Extraction" },
+  { id: "default-3", order: 3, title: "Quality & Quantity Assessment" },
+  { id: "default-4", order: 4, title: "PCR Amplification" },
+  { id: "default-5", order: 5, title: "Gel Electrophoresis" },
+  { id: "default-6", order: 6, title: "Library Preparation" },
+  { id: "default-7", order: 7, title: "Bioanalyzer QC" },
+  { id: "default-8", order: 8, title: "Sequencing" },
+  {
+    id: "default-9",
+    order: 9,
+    title: "Bioinformatics Analysis & Data Submission",
+  },
+  { id: "default-10", order: 10, title: "Storage & Environmental Monitoring" },
 ];
 
 /**
@@ -88,12 +96,19 @@ function GBDWorkflowTab({ notebookId, entryId: propEntryId }) {
     if (explicit === "genomics" || explicit === "gbd") {
       return explicit;
     }
-    const title = String(notebook?.title || entry?.notebook?.title || "").toLowerCase();
+    const title = String(
+      notebook?.title || entry?.notebook?.title || "",
+    ).toLowerCase();
     if (title.includes("genomics") || title.includes("bioinformatics")) {
       return "genomics";
     }
     return "gbd";
-  }, [entry?.notebook?.title, entry?.notebook?.workflowType, notebook?.title, notebook?.workflowType]);
+  }, [
+    entry?.notebook?.title,
+    entry?.notebook?.workflowType,
+    notebook?.title,
+    notebook?.workflowType,
+  ]);
 
   // Use shared hook for page access control
   // isCreating: true when creating a new entry (bypasses page-level role restrictions)

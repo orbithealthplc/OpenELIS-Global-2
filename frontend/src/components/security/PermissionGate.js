@@ -63,8 +63,14 @@ const PermissionGate = ({
   hideCompletely = false,
   fallback = null,
 }) => {
-  const { hasRole, hasAnyRole, hasAllRoles, hasLabUnitRole, isGlobalAdmin, userSessionDetails } =
-    usePermissions();
+  const {
+    hasRole,
+    hasAnyRole,
+    hasAllRoles,
+    hasLabUnitRole,
+    isGlobalAdmin,
+    userSessionDetails,
+  } = usePermissions();
 
   /**
    * Check if user has required global roles

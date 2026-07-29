@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Filters user-management lab unit lists to the AHRI research-lab allowlist only
- * ({@link AHRITestSectionCatalog} / research-lab-linkages.csv).
+ * Filters user-management lab unit lists to the AHRI research-lab allowlist
+ * only ({@link AHRITestSectionCatalog} / research-lab-linkages.csv).
  */
 @Service
 public class AHRIUserManagementCatalogService {
@@ -72,8 +72,8 @@ public class AHRIUserManagementCatalogService {
     }
 
     /**
-     * Lab units for {@code Lab Unit Roles} assignment: only active test sections whose
-     * name is in the AHRI allowlist. Never returns the full active list.
+     * Lab units for {@code Lab Unit Roles} assignment: only active test sections
+     * whose name is in the AHRI allowlist. Never returns the full active list.
      */
     @Transactional(readOnly = true)
     public List<IdValuePair> filterLabUnitTestSections(List<IdValuePair> activeTestSections) {
@@ -85,8 +85,8 @@ public class AHRIUserManagementCatalogService {
                 .filter(section -> !GenericValidator.isBlankOrNull(section.getId()))
                 .filter(section -> isAllowlistedTestSection(section.getId())
                         || isAllowlistedDisplayName(section.getValue()))
-                .sorted(Comparator
-                        .comparing((IdValuePair section) -> String.valueOf(section.getValue()), String.CASE_INSENSITIVE_ORDER))
+                .sorted(Comparator.comparing((IdValuePair section) -> String.valueOf(section.getValue()),
+                        String.CASE_INSENSITIVE_ORDER))
                 .collect(Collectors.toList());
 
         if (filtered.isEmpty()) {

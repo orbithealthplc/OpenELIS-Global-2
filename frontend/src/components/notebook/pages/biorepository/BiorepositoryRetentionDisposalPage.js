@@ -158,7 +158,8 @@ function BiorepositoryRetentionDisposalPage({
       setSearchError(
         intl.formatMessage({
           id: "biorepository.disposal.search.emptyBarcode",
-          defaultMessage: "Please enter a sample ID, accession, or barcode to search.",
+          defaultMessage:
+            "Please enter a sample ID, accession, or barcode to search.",
         }),
       );
       return;

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -14,17 +15,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.openelisglobal.common.constants.Constants;
-import org.openelisglobal.common.services.DisplayListService;
-import org.openelisglobal.common.util.IdValuePair;
 import org.openelisglobal.analysis.service.AnalysisService;
 import org.openelisglobal.analysis.valueholder.Analysis;
+import org.openelisglobal.common.constants.Constants;
 import org.openelisglobal.common.log.LogEvent;
+import org.openelisglobal.common.services.DisplayListService;
 import org.openelisglobal.common.services.IStatusService;
 import org.openelisglobal.common.services.StatusService.AnalysisStatus;
 import org.openelisglobal.common.services.StatusService.ExternalOrderStatus;
 import org.openelisglobal.common.services.StatusService.SampleStatus;
 import org.openelisglobal.common.util.DateUtil;
+import org.openelisglobal.common.util.IdValuePair;
 import org.openelisglobal.dataexchange.order.valueholder.ElectronicOrder;
 import org.openelisglobal.dataexchange.order.valueholder.ElectronicOrderType;
 import org.openelisglobal.dataexchange.service.order.ElectronicOrderService;
@@ -43,6 +44,7 @@ import org.openelisglobal.result.service.ResultService;
 import org.openelisglobal.result.valueholder.Result;
 import org.openelisglobal.resultlimit.service.ResultLimitService;
 import org.openelisglobal.resultlimits.valueholder.ResultLimit;
+import org.openelisglobal.role.service.RoleService;
 import org.openelisglobal.sample.service.SampleService;
 import org.openelisglobal.sample.valueholder.OrderPriority;
 import org.openelisglobal.sample.valueholder.Sample;
@@ -51,14 +53,13 @@ import org.openelisglobal.samplehuman.valueholder.SampleHuman;
 import org.openelisglobal.sampleitem.service.SampleItemService;
 import org.openelisglobal.sampleitem.valueholder.SampleItem;
 import org.openelisglobal.spring.util.SpringContext;
-import org.openelisglobal.role.service.RoleService;
-import org.openelisglobal.userrole.service.UserRoleService;
 import org.openelisglobal.systemuser.service.UserService;
 import org.openelisglobal.test.service.TestService;
 import org.openelisglobal.test.service.TestServiceImpl;
 import org.openelisglobal.test.valueholder.Test;
 import org.openelisglobal.typeofsample.service.TypeOfSampleService;
 import org.openelisglobal.typeofsample.valueholder.TypeOfSample;
+import org.openelisglobal.userrole.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -525,8 +526,8 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
 
     @Override
     @Transactional
-    public Map<String, Object> linkSamplesToPatient(List<Integer> sampleItemIds, String patientId, Integer notebookPageId,
-            String sysUserId) {
+    public Map<String, Object> linkSamplesToPatient(List<Integer> sampleItemIds, String patientId,
+            Integer notebookPageId, String sysUserId) {
 
         Map<String, Object> result = new HashMap<>();
 
@@ -586,9 +587,8 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
 
                 linkedCount++;
             } catch (Exception e) {
-                LogEvent.logError(this.getClass().getSimpleName(), "linkSamplesToPatient",
-                        "Error linking sample item " + sampleItemId + " to patient " + patientId + ": "
-                                + e.getMessage());
+                LogEvent.logError(this.getClass().getSimpleName(), "linkSamplesToPatient", "Error linking sample item "
+                        + sampleItemId + " to patient " + patientId + ": " + e.getMessage());
                 errors.add("Error linking sample item " + sampleItemId + ": " + e.getMessage());
             }
         }
@@ -831,14 +831,11 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
 
         List<MedLabTestRequirements> requirements = medLabTestRequirementsService.getActiveRequirements();
         if (requirements != null && !requirements.isEmpty()) {
-            Set<String> configuredTestIds = requirements.stream()
-                    .map(req -> String.valueOf(req.getTestId()))
+            Set<String> configuredTestIds = requirements.stream().map(req -> String.valueOf(req.getTestId()))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             List<IdValuePair> configuredTests = DisplayListService.getInstance()
-                    .getList(DisplayListService.ListType.ORDERABLE_TESTS)
-                    .stream()
-                    .filter(test -> configuredTestIds.contains(test.getId()))
-                    .collect(Collectors.toList());
+                    .getList(DisplayListService.ListType.ORDERABLE_TESTS).stream()
+                    .filter(test -> configuredTestIds.contains(test.getId())).collect(Collectors.toList());
             if (!configuredTests.isEmpty()) {
                 return configuredTests;
             }
@@ -852,8 +849,7 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             return List.of();
         }
 
-        List<Integer> sectionIds = testSections.stream()
-                .map(section -> Integer.valueOf(section.getId()))
+        List<Integer> sectionIds = testSections.stream().map(section -> Integer.valueOf(section.getId()))
                 .collect(Collectors.toList());
         List<Test> tests = testService.getTestsByTestSectionIds(sectionIds);
         if (tests == null || tests.isEmpty()) {
@@ -887,9 +883,8 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             }
         }
 
-        throw new RuntimeException(
-                "Unable to reserve a unique lab number for prefix '" + normalizedPrefix + "' after "
-                        + MAX_LAB_NUMBER_RESERVATION_ATTEMPTS + " attempts");
+        throw new RuntimeException("Unable to reserve a unique lab number for prefix '" + normalizedPrefix + "' after "
+                + MAX_LAB_NUMBER_RESERVATION_ATTEMPTS + " attempts");
     }
 
     private boolean labNumberExists(String labNo) {
@@ -1243,6 +1238,16 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
     public Map<String, Object> recordSampleCollection(String labNo, String sampleTypeId, String containerType,
             String collectionTime, String collectionDate, String collectorId, String volume, String notes,
             Integer notebookPageId, String sysUserId) {
+        List<String> sampleTypeIds = StringUtils.isBlank(sampleTypeId) ? List.of() : List.of(sampleTypeId);
+        return recordSampleCollection(labNo, sampleTypeIds, containerType, collectionTime, collectionDate, collectorId,
+                volume, notes, notebookPageId, sysUserId);
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> recordSampleCollection(String labNo, List<String> sampleTypeIds, String containerType,
+            String collectionTime, String collectionDate, String collectorId, String volume, String notes,
+            Integer notebookPageId, String sysUserId) {
 
         Map<String, Object> result = new HashMap<>();
 
@@ -1308,7 +1313,7 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             if (existingSample != null) {
                 LogEvent.logInfo(this.getClass().getSimpleName(), "recordSampleCollection",
                         "Sample already exists for labNo: " + labNo + ", updating collection info");
-                Map<String, Object> existingResult = updateExistingSampleCollection(existingSample, sampleTypeId,
+                Map<String, Object> existingResult = updateExistingSampleCollection(existingSample, sampleTypeIds,
                         containerType, collectionTime, collectionDate, collectorId, volume, sysUserId);
                 if (Boolean.TRUE.equals(existingResult.get("success"))) {
                     String existingPrimarySampleItemId = getPrimarySampleItemId(existingSample);
@@ -1323,18 +1328,23 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
                 return result;
             }
 
-            TypeOfSample requestedSampleType = null;
-            if (StringUtils.isNotBlank(sampleTypeId)) {
-                requestedSampleType = typeOfSampleService.get(sampleTypeId);
+            List<TypeOfSample> requestedSampleTypes = new ArrayList<>();
+            for (String requestedSampleTypeId : new LinkedHashSet<>(
+                    sampleTypeIds == null ? List.of() : sampleTypeIds)) {
+                if (StringUtils.isBlank(requestedSampleTypeId)) {
+                    continue;
+                }
+                TypeOfSample requestedSampleType = typeOfSampleService.get(requestedSampleTypeId);
                 if (requestedSampleType == null) {
                     result.put("success", false);
-                    result.put("error", "Invalid sample type: " + sampleTypeId);
+                    result.put("error", "Invalid sample type: " + requestedSampleTypeId);
                     return result;
                 }
+                requestedSampleTypes.add(requestedSampleType);
             }
 
             List<Test> resolvedTests = new ArrayList<>();
-            boolean hasResolvableSampleType = requestedSampleType != null;
+            boolean hasResolvableSampleType = !requestedSampleTypes.isEmpty();
             for (String testId : testIds) {
                 Test test = testService.get(testId);
                 if (test == null) {
@@ -1425,63 +1435,66 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             int testCount = 0;
             String primarySampleItemId = null;
             for (Test test : resolvedTests) {
+                List<TypeOfSample> itemSampleTypes = requestedSampleTypes.isEmpty()
+                        ? Collections.singletonList(getDefaultSampleTypeForTest(test))
+                        : requestedSampleTypes;
 
-                // Get sample type - use provided or default for test
-                TypeOfSample itemSampleType = requestedSampleType != null ? requestedSampleType
-                        : getDefaultSampleTypeForTest(test);
-                if (itemSampleType == null) {
-                    LogEvent.logWarn(this.getClass().getSimpleName(), "recordSampleCollection",
-                            "No sample type for test: " + test.getId());
-                    continue;
-                }
+                for (TypeOfSample itemSampleType : itemSampleTypes) {
+                    if (itemSampleType == null) {
+                        LogEvent.logWarn(this.getClass().getSimpleName(), "recordSampleCollection",
+                                "No sample type for test: " + test.getId());
+                        continue;
+                    }
 
-                // Create SampleItem
-                SampleItem sampleItem = new SampleItem();
-                sampleItem.setSample(sample);
-                sampleItem.setTypeOfSample(itemSampleType);
-                sampleItem.setSortOrder(String.valueOf(testCount + 1));
-                sampleItem.setStatusId(statusService.getStatusID(SampleStatus.Entered));
-                sampleItem.setSysUserId(sysUserId);
+                    // A selected specimen type is a distinct physical sample item. The ordered
+                    // test is attached once to each selected specimen type.
+                    SampleItem sampleItem = new SampleItem();
+                    sampleItem.setSample(sample);
+                    sampleItem.setTypeOfSample(itemSampleType);
+                    sampleItem.setSortOrder(String.valueOf(testCount + 1));
+                    sampleItem.setStatusId(statusService.getStatusID(SampleStatus.Entered));
+                    sampleItem.setSysUserId(sysUserId);
 
-                // Store collection info
-                StringBuilder collectionInfo = new StringBuilder();
-                if (StringUtils.isNotBlank(collectorId)) {
-                    collectionInfo.append("collector:").append(collectorId);
-                }
-                if (StringUtils.isNotBlank(containerType)) {
-                    if (collectionInfo.length() > 0)
-                        collectionInfo.append(";");
-                    collectionInfo.append("container:").append(containerType);
-                }
-                if (StringUtils.isNotBlank(volume)) {
-                    if (collectionInfo.length() > 0)
-                        collectionInfo.append(";");
-                    collectionInfo.append("volume:").append(volume);
-                }
-                if (collectionInfo.length() > 0) {
-                    sampleItem.setCollector(collectionInfo.toString());
-                }
+                    // Store collection info
+                    StringBuilder collectionInfo = new StringBuilder();
+                    if (StringUtils.isNotBlank(collectorId)) {
+                        collectionInfo.append("collector:").append(collectorId);
+                    }
+                    if (StringUtils.isNotBlank(containerType)) {
+                        if (collectionInfo.length() > 0)
+                            collectionInfo.append(";");
+                        collectionInfo.append("container:").append(containerType);
+                    }
+                    if (StringUtils.isNotBlank(volume)) {
+                        if (collectionInfo.length() > 0)
+                            collectionInfo.append(";");
+                        collectionInfo.append("volume:").append(volume);
+                    }
+                    if (collectionInfo.length() > 0) {
+                        sampleItem.setCollector(collectionInfo.toString());
+                    }
 
-                sampleItemService.insert(sampleItem);
-                if (primarySampleItemId == null) {
-                    primarySampleItemId = sampleItem.getId();
+                    sampleItemService.insert(sampleItem);
+                    if (primarySampleItemId == null) {
+                        primarySampleItemId = sampleItem.getId();
+                    }
+                    LogEvent.logInfo(this.getClass().getSimpleName(), "recordSampleCollection",
+                            "SampleItem created: id=" + sampleItem.getId());
+
+                    // Create Analysis
+                    Analysis analysis = new Analysis();
+                    analysis.setSampleItem(sampleItem);
+                    analysis.setTest(test);
+                    analysis.setAnalysisType("MANUAL");
+                    analysis.setStatusId(statusService.getStatusID(SampleStatus.Entered));
+                    analysis.setSysUserId(sysUserId);
+                    analysis.setEnteredDate(DateUtil.getNowAsTimestamp());
+                    analysisService.insert(analysis);
+                    LogEvent.logInfo(this.getClass().getSimpleName(), "recordSampleCollection",
+                            "Analysis created: id=" + analysis.getId());
+
+                    testCount++;
                 }
-                LogEvent.logInfo(this.getClass().getSimpleName(), "recordSampleCollection",
-                        "SampleItem created: id=" + sampleItem.getId());
-
-                // Create Analysis
-                Analysis analysis = new Analysis();
-                analysis.setSampleItem(sampleItem);
-                analysis.setTest(test);
-                analysis.setAnalysisType("MANUAL");
-                analysis.setStatusId(statusService.getStatusID(SampleStatus.Entered));
-                analysis.setSysUserId(sysUserId);
-                analysis.setEnteredDate(DateUtil.getNowAsTimestamp());
-                analysisService.insert(analysis);
-                LogEvent.logInfo(this.getClass().getSimpleName(), "recordSampleCollection",
-                        "Analysis created: id=" + analysis.getId());
-
-                testCount++;
             }
 
             // Update NotebookPageSample entry for this labNo to COMPLETED on the
@@ -1518,10 +1531,32 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
     /**
      * Helper method to update collection details on an existing sample.
      */
-    private Map<String, Object> updateExistingSampleCollection(Sample sample, String sampleTypeId, String containerType,
-            String collectionTime, String collectionDate, String collectorId, String volume, String sysUserId) {
+    private Map<String, Object> updateExistingSampleCollection(Sample sample, List<String> sampleTypeIds,
+            String containerType, String collectionTime, String collectionDate, String collectorId, String volume,
+            String sysUserId) {
 
         Map<String, Object> result = new HashMap<>();
+
+        // Validate before changing persisted collection data. An idempotent retry
+        // must not silently discard one of the selected specimen types.
+        List<SampleItem> sampleItems = sampleItemService.getSampleItemsBySampleId(sample.getId());
+        List<TypeOfSample> selectedTypes = new ArrayList<>();
+        for (String sampleTypeId : new LinkedHashSet<>(sampleTypeIds == null ? List.of() : sampleTypeIds)) {
+            if (StringUtils.isNotBlank(sampleTypeId)) {
+                TypeOfSample typeOfSample = typeOfSampleService.get(sampleTypeId);
+                if (typeOfSample == null) {
+                    result.put("success", false);
+                    result.put("error", "Invalid sample type: " + sampleTypeId);
+                    return result;
+                }
+                selectedTypes.add(typeOfSample);
+            }
+        }
+        if (!selectedTypes.isEmpty() && (sampleItems == null || selectedTypes.size() > sampleItems.size())) {
+            result.put("success", false);
+            result.put("error", "The existing order has fewer sample items than the selected sample types");
+            return result;
+        }
 
         // Update collection date/time
         if (StringUtils.isNotBlank(collectionDate)) {
@@ -1539,16 +1574,11 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
         sampleService.update(sample);
 
         // Update sample items
-        List<SampleItem> sampleItems = sampleItemService.getSampleItemsBySampleId(sample.getId());
         if (sampleItems != null && !sampleItems.isEmpty()) {
-            TypeOfSample typeOfSample = null;
-            if (StringUtils.isNotBlank(sampleTypeId)) {
-                typeOfSample = typeOfSampleService.get(sampleTypeId);
-            }
-
-            for (SampleItem sampleItem : sampleItems) {
-                if (typeOfSample != null) {
-                    sampleItem.setTypeOfSample(typeOfSample);
+            for (int index = 0; index < sampleItems.size(); index++) {
+                SampleItem sampleItem = sampleItems.get(index);
+                if (!selectedTypes.isEmpty()) {
+                    sampleItem.setTypeOfSample(selectedTypes.get(index % selectedTypes.size()));
                 }
 
                 StringBuilder collectionInfo = new StringBuilder();
@@ -1739,8 +1769,7 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             for (NoteBookPage page : pages) {
                 String pageKey = page.getPageId() != null ? page.getPageId().trim() : "";
                 String title = page.getTitle() != null ? page.getTitle().toLowerCase() : "";
-                if ("sample-collection".equals(pageKey)
-                        || (pageKey.isEmpty() && title.contains("sample collection"))) {
+                if ("sample-collection".equals(pageKey) || (pageKey.isEmpty() && title.contains("sample collection"))) {
                     collectionPageId = page.getId();
                     LogEvent.logInfo(this.getClass().getSimpleName(), "getSamplesForQC",
                             "Found sample-collection page with id: " + collectionPageId);
@@ -1936,8 +1965,7 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             for (NoteBookPage page : pages) {
                 String pageKey = page.getPageId() != null ? page.getPageId().trim() : "";
                 String title = page.getTitle() != null ? page.getTitle().toLowerCase() : "";
-                if ("sample-collection".equals(pageKey)
-                        || (pageKey.isEmpty() && title.contains("sample collection"))) {
+                if ("sample-collection".equals(pageKey) || (pageKey.isEmpty() && title.contains("sample collection"))) {
                     collectionPageId = page.getId();
                     LogEvent.logInfo(this.getClass().getSimpleName(), "getSamplesForTransport",
                             "Found collection page with id: " + collectionPageId);
@@ -2189,11 +2217,13 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
             Integer routingPageId = null;
 
             for (NoteBookPage page : pages) {
-                // Check for both standard and MedLab-specific page IDs
-                String pageId = page.getPageId();
-                if ("quality-check".equals(pageId) || "medlab-quality-check".equals(pageId)) {
+                // Legacy CTD instances may have a blank page_id because older clone paths
+                // copied the title/order but not the stable identifier. Keep title/order
+                // fallback so verified samples never disappear from Sample Routing.
+                if (isMedLabWorkflowPage(page, 3, "Sample Receipt & Quality Assessment", "quality-check",
+                        "medlab-quality-check")) {
                     qcPageId = page.getId();
-                } else if ("sample-routing".equals(pageId) || "medlab-sample-routing".equals(pageId)) {
+                } else if (isMedLabWorkflowPage(page, 4, "Sample Routing", "sample-routing", "medlab-sample-routing")) {
                     routingPageId = page.getId();
                 }
             }
@@ -2298,6 +2328,21 @@ public class MedLabPatientOrderServiceImpl implements MedLabPatientOrderService 
         }
 
         return samples;
+    }
+
+    static boolean isMedLabWorkflowPage(NoteBookPage page, int expectedOrder, String expectedTitle,
+            String... acceptedPageIds) {
+        if (page == null) {
+            return false;
+        }
+        String pageId = StringUtils.trimToEmpty(page.getPageId());
+        for (String acceptedPageId : acceptedPageIds) {
+            if (acceptedPageId.equalsIgnoreCase(pageId)) {
+                return true;
+            }
+        }
+        return Integer.valueOf(expectedOrder).equals(page.getOrder())
+                && expectedTitle.equalsIgnoreCase(StringUtils.trimToEmpty(page.getTitle()));
     }
 
     @Override

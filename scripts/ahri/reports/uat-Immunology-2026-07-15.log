@@ -1,0 +1,17 @@
+cases=6
+browser launched
+== Immunology / imm_collector ==
+  PASS nav=True order=None restr=9/9 titles=10
+== Immunology / imm_tech ==
+  PASS nav=True order=None restr=2/2 titles=10
+== Immunology / imm_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=0/0 titles=10
+== Immunology / imm_jr_researcher ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=5/5 titles=10
+== Immunology / imm_sr_researcher ==
+  PASS nav=True order=None restr=4/4 titles=10
+== Immunology / imm_biomedical ==
+  PASS nav=True order=None restr=10/10 titles=10
+DONE 6/6 PASS

@@ -96,13 +96,7 @@ export function coordinatesReferToSameCell(a, b, hint, columns) {
   return normalizedA === normalizedB;
 }
 
-export function findLayoutEntryForCell(
-  layout,
-  rowIdx,
-  colIdx,
-  columns,
-  hint,
-) {
+export function findLayoutEntryForCell(layout, rowIdx, colIdx, columns, hint) {
   if (!layout) {
     return undefined;
   }

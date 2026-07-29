@@ -1,13 +1,15 @@
 # AHRI Go-Live Runbook
 
-| Environment | Host | App dir |
-|-------------|------|---------|
-| **Test** | `192.168.176.127` | `/opt/OpenELIS-Docker` |
-| **Production** | `192.168.25.25` | `/opt/OpenELIS-Docker` |
+| Environment    | Host              | App dir                |
+| -------------- | ----------------- | ---------------------- |
+| **Test**       | `192.168.176.127` | `/opt/OpenELIS-Docker` |
+| **Production** | `192.168.25.25`   | `/opt/OpenELIS-Docker` |
 
-Deploy to **test first**, smoke-test, then production (`clinlims` database, `openelisglobal-database` container).
+Deploy to **test first**, smoke-test, then production (`clinlims` database,
+`openelisglobal-database` container).
 
-Reference data: `AHRI-20260525T055818Z-3-001.zip` (especially `AHRI/Biorepository/sampledata.xlsx`).
+Reference data: `AHRI-20260525T055818Z-3-001.zip` (especially
+`AHRI/Biorepository/sampledata.xlsx`).
 
 ## Execution order
 
@@ -41,7 +43,8 @@ export GHCR_READ_TOKEN=ghp_...
 sudo -E bash deploy-release-on-server.sh v2026.06.18.05
 ```
 
-Copy `scripts/deploy-release-on-server.sh` to the host first if it is not already there.
+Copy `scripts/deploy-release-on-server.sh` to the host first if it is not
+already there.
 
 If Liquibase lock sticks after restart:
 
@@ -51,7 +54,8 @@ SET locked = false, lockgranted = NULL, lockedby = NULL
 WHERE id = 1;
 ```
 
-Smoke test: Biorepository → Storage Assignment → assign 3 samples → verify list + grid + re-open box.
+Smoke test: Biorepository → Storage Assignment → assign 3 samples → verify
+list + grid + re-open box.
 
 ---
 
@@ -126,15 +130,15 @@ KEEP_BACT_ENTRY_ID=12345 ./scripts/ahri/go-live-cleanup-execute.sh
 
 ### Post-cleanup checklist
 
-| Check | Expected |
-|-------|----------|
-| Login + version | Release tag visible |
-| Received Samples | ~7K rows, sorted by S.No |
-| Storage Assignment | List + grid in sync |
-| Box wells | Barcode text, not blue dot |
-| Bacteriology entry | Newest entry intact |
-| Other notebook entries | Templates + 1 bacteriology instance |
-| `databasechangeloglock` | `locked = false` |
+| Check                   | Expected                            |
+| ----------------------- | ----------------------------------- |
+| Login + version         | Release tag visible                 |
+| Received Samples        | ~7K rows, sorted by S.No            |
+| Storage Assignment      | List + grid in sync                 |
+| Box wells               | Barcode text, not blue dot          |
+| Bacteriology entry      | Newest entry intact                 |
+| Other notebook entries  | Templates + 1 bacteriology instance |
+| `databasechangeloglock` | `locked = false`                    |
 
 ### Rollback
 

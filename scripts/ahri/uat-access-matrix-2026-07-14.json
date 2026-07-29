@@ -1,0 +1,2385 @@
+[
+  {
+    "dept": "Bacteriology",
+    "user": "bac_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 2,
+    "expectedRestricted": 7,
+    "accessiblePreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification"
+    ],
+    "restrictedPreview": [
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control",
+      "6:Assay/Test Execution"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Bacteriology",
+    "user": "bac_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 7,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment"
+    ],
+    "restrictedPreview": [
+      "8:Sample Retrieval, Archival & Disposal",
+      "9:Reporting & Data Export"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Bacteriology",
+    "user": "bac_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 9,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Bacteriology",
+    "user": "bac_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 2,
+    "expectedRestricted": 7,
+    "accessiblePreview": [
+      "3:Isolate Creation",
+      "6:Assay/Test Execution"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Bacteriology",
+    "user": "bac_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 3,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "3:Isolate Creation",
+      "6:Assay/Test Execution",
+      "9:Reporting & Data Export"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Bacteriology",
+    "user": "bac_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": true,
+    "expectedAccessible": 0,
+    "expectedRestricted": 9,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Laboratory Reception & Verification",
+      "3:Isolate Creation",
+      "4:Temporary Storage Assignment",
+      "5:Processing & Quality Control"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 12,
+    "accessiblePreview": [
+      "1:Sample Creation and Metadata Capture"
+    ],
+    "restrictedPreview": [
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup"
+    ],
+    "restrictedPreview": [
+      "10:Individual Patient Report Preview and Print",
+      "12:Reporting and Performance Monitoring",
+      "13:Disposal and Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 13,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_pathologist",
+    "persona": "Pathologist",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 13,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_cyto",
+    "persona": "Cytopathologist",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 13,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 7,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing",
+      "6:Block Creation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "10:Individual Patient Report Preview and Print",
+      "11:Storage and Inventory Management"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Pathology",
+    "user": "path_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 13,
+    "pageOrderOk": null,
+    "expectedAccessible": 9,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing",
+      "6:Block Creation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Creation and Metadata Capture",
+      "2:Sample Quality Control",
+      "11:Storage and Inventory Management",
+      "13:Disposal and Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Metadata Capture",
+      "2:Sample Quality Control",
+      "3:Gross Examination",
+      "4:Cassette Setup",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 2,
+    "expectedRestricted": 9,
+    "accessiblePreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification"
+    ],
+    "restrictedPreview": [
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import",
+      "6:Processing & Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_technician",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 8,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation"
+    ],
+    "restrictedPreview": [
+      "9:Sample Archiving",
+      "10:Data Analysis & Export",
+      "11:Reporting & REDCap Integration"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 11,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 4,
+    "expectedRestricted": 7,
+    "accessiblePreview": [
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import",
+      "7:Test Assignment & Machine Scheduling",
+      "8:Test Execution & Raw Data Capture"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "6:Processing & Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_senior",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 5,
+    "accessiblePreview": [
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import",
+      "7:Test Assignment & Machine Scheduling",
+      "8:Test Execution & Raw Data Capture"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "6:Processing & Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "MNTD",
+    "user": "mntd_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 11,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 11,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake / Sample Creation",
+      "2:Laboratory Reception & Verification",
+      "3:Temporary Storage Assignment",
+      "4:Sample Processing Preparation",
+      "5:Aliquoting / Bulk Sample Import"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 9,
+    "accessiblePreview": [
+      "1:Sample Reception"
+    ],
+    "restrictedPreview": [
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples",
+      "5:Prep"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 8,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples"
+    ],
+    "restrictedPreview": [
+      "9:Archive",
+      "10:Reporting & REDCap"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 5,
+    "accessiblePreview": [
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples",
+      "5:Prep"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "7:Storage",
+      "8:Results",
+      "9:Archive"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples",
+      "5:Prep"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "7:Storage",
+      "8:Results",
+      "9:Archive"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Immunology",
+    "user": "imm_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 10,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Assays",
+      "4:Child Samples"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Initial Processing",
+      "3:Additional Assays",
+      "4:Child Sample Creation",
+      "5:Plate Setup"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration"
+    ],
+    "restrictedPreview": [
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Retention & Disposal",
+      "5:Sample Request & Retrieval"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "5:Sample Request & Retrieval"
+    ],
+    "restrictedPreview": [
+      "4:Retention & Disposal",
+      "7:Reporting & Audit"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 7,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Retention & Disposal"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 7,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Retention & Disposal"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "7:Reporting & Audit"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Retention & Disposal"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "Biorepository",
+    "user": "bio_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 7,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Retention & Disposal"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake & Registration",
+      "2:Storage Assignment",
+      "3:Ongoing Storage and Monitoring",
+      "4:Sample Request & Retrieval",
+      "5:QC Inspection"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 7,
+    "accessiblePreview": [
+      "1:Sample Accession & Registration"
+    ],
+    "restrictedPreview": [
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Test Execution"
+    ],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring"
+    ],
+    "restrictedPreview": [
+      "7:Disposal & Archiving",
+      "8:Reporting"
+    ],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 8,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 3,
+    "expectedRestricted": 5,
+    "accessiblePreview": [
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Test Execution"
+    ],
+    "restrictedPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "6:Isolate Storage",
+      "7:Disposal & Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 4,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Test Execution",
+      "8:Reporting"
+    ],
+    "restrictedPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "6:Isolate Storage",
+      "7:Disposal & Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "TB",
+    "user": "tb_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 8,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Accession & Registration",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Initial Sample Processing",
+      "4:Incubation & Monitoring",
+      "5:Assay/Test Execution"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "1:Sample Creation & Full Metadata Capture"
+    ],
+    "restrictedPreview": [
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution"
+    ],
+    "restrictedPreview": [
+      "6:Reporting & Performance Monitoring",
+      "7:Disposal & Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 7,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 2,
+    "expectedRestricted": 5,
+    "accessiblePreview": [
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution"
+    ],
+    "restrictedPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "5:Storage & Inventory Management",
+      "6:Reporting & Performance Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 3,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "6:Reporting & Performance Monitoring"
+    ],
+    "restrictedPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "5:Storage & Inventory Management",
+      "7:Disposal & Archiving"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Pharma",
+    "user": "pharm_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 7,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 7,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution"
+    ],
+    "pagesPreview": [
+      "1:Sample Creation & Full Metadata Capture",
+      "2:Raw Sample Quality Check (QC)",
+      "3:Sample Processing & Aliquoting",
+      "4:Assay & Test Execution",
+      "5:Storage & Inventory Management"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 7,
+    "accessiblePreview": [
+      "1:Sample Intake, Registration & Authentication"
+    ],
+    "restrictedPreview": [
+      "2:Sample Storage & Herbarium Placement",
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration",
+      "5:Analytical Pathway"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 7,
+    "expectedRestricted": 1,
+    "accessiblePreview": [
+      "1:Sample Intake, Registration & Authentication",
+      "2:Sample Storage & Herbarium Placement",
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration"
+    ],
+    "restrictedPreview": [
+      "8:Storage, Reporting & Archival"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 8,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake, Registration & Authentication",
+      "2:Sample Storage & Herbarium Placement",
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration",
+      "5:Analytical Pathway",
+      "6:Product Development & Testing"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake, Registration & Authentication",
+      "2:Sample Storage & Herbarium Placement",
+      "8:Storage, Reporting & Archival"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration",
+      "5:Analytical Pathway",
+      "6:Product Development & Testing"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake, Registration & Authentication",
+      "2:Sample Storage & Herbarium Placement"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Traditional",
+    "user": "trad_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 8,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 8,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake, Registration & Authentication",
+      "2:Sample Storage & Herbarium Placement",
+      "3:Sample Preparation for Analysis",
+      "4:Extraction, Filtration & Concentration"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake, Reception & Registration",
+      "2:Authentication",
+      "3:Storage & Herbarium Placement",
+      "4:Sample Preparation for Analysis",
+      "5:Extraction, Filtration & Concentration"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration"
+    ],
+    "restrictedPreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 4,
+    "expectedRestricted": 1,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "restrictedPreview": [
+      "4:Reporting & Release"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 2,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "4:Reporting & Release",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 3,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioanalytical",
+    "user": "banal_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 5,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Analytical Test Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration"
+    ],
+    "restrictedPreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 4,
+    "expectedRestricted": 1,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "restrictedPreview": [
+      "4:Reporting & Release"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 2,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "4:Reporting & Release",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 3,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "5:Post-Test Sample & Data Handling"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Bioequivalence",
+    "user": "beq_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 5,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 5,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Reception & Registration",
+      "2:Test Assignment & Preparation",
+      "3:Conduct Analysis / Test",
+      "4:Reporting & Release"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception",
+      "2:Test Assignment",
+      "3:Analytical Execution",
+      "4:Reporting & Release",
+      "5:Post-Test Storage & Archiving"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 2,
+    "expectedRestricted": 8,
+    "accessiblePreview": [
+      "1:Patient Registration",
+      "2:Sample Collection"
+    ],
+    "restrictedPreview": [
+      "3:Transport & Packaging",
+      "4:Sample Receipt & Quality Assessment",
+      "5:Sample Routing",
+      "6:Sample Processing"
+    ],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 8,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Patient Registration",
+      "2:Sample Collection",
+      "3:Transport & Packaging",
+      "4:Sample Receipt & Quality Assessment"
+    ],
+    "restrictedPreview": [
+      "9:Validation, Reporting & Performance Monitoring",
+      "10:Disposal, Archiving & Accreditation"
+    ],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Patient Registration",
+      "2:Sample Collection",
+      "3:Transport & Packaging",
+      "4:Sample Receipt & Quality Assessment"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 4,
+    "expectedRestricted": 6,
+    "accessiblePreview": [
+      "3:Transport & Packaging",
+      "5:Sample Routing",
+      "6:Sample Processing",
+      "7:Testing & Analyzer"
+    ],
+    "restrictedPreview": [
+      "1:Patient Registration",
+      "2:Sample Collection",
+      "4:Sample Receipt & Quality Assessment",
+      "8:Result Entry"
+    ],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 5,
+    "expectedRestricted": 5,
+    "accessiblePreview": [
+      "3:Transport & Packaging",
+      "5:Sample Routing",
+      "6:Sample Processing",
+      "7:Testing & Analyzer"
+    ],
+    "restrictedPreview": [
+      "1:Patient Registration",
+      "2:Sample Collection",
+      "4:Sample Receipt & Quality Assessment",
+      "8:Result Entry"
+    ],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Medlab/CTD",
+    "user": "medlab_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 9,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 10,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Patient Registration",
+      "2:Sample Collection",
+      "3:Transport & Packaging",
+      "4:Sample Receipt & Quality Assessment"
+    ],
+    "pagesPreview": [
+      "1:Patient & Lab Order",
+      "2:Sample Collection",
+      "3:Sample Receipt & Quality Assessment",
+      "4:Sample Routing",
+      "5:Sample Processing"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 9,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration"
+    ],
+    "restrictedPreview": [
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "2:DNA/RNA Extraction",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis",
+      "6:Library Preparation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "3:Quality & Quantity Assessment",
+      "7:Bioanalyzer QC",
+      "10:Storage & Environmental Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "2:DNA/RNA Extraction",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis",
+      "6:Library Preparation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "3:Quality & Quantity Assessment",
+      "7:Bioanalyzer QC",
+      "10:Storage & Environmental Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Genomics",
+    "user": "gen_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 10,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 9,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration"
+    ],
+    "restrictedPreview": [
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 10,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "2:DNA/RNA Extraction",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis",
+      "6:Library Preparation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "3:Quality & Quantity Assessment",
+      "7:Bioanalyzer QC",
+      "10:Storage & Environmental Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 6,
+    "expectedRestricted": 4,
+    "accessiblePreview": [
+      "2:DNA/RNA Extraction",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis",
+      "6:Library Preparation"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "3:Quality & Quantity Assessment",
+      "7:Bioanalyzer QC",
+      "10:Storage & Environmental Monitoring"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Virology",
+    "user": "vir_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 10,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 10,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification"
+    ],
+    "pagesPreview": [
+      "1:Sample Reception & Registration",
+      "2:DNA/RNA Extraction",
+      "3:Quality & Quantity Assessment",
+      "4:PCR Amplification",
+      "5:Gel Electrophoresis"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_collector",
+    "persona": "Sample Collector",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 1,
+    "expectedRestricted": 13,
+    "accessiblePreview": [
+      "1:Sample Intake and Registration"
+    ],
+    "restrictedPreview": [
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_tech",
+    "persona": "Laboratory Technician",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 12,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control"
+    ],
+    "restrictedPreview": [
+      "13:Seed Virus Production",
+      "14:Preclinical & Clinical Trials"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_manager",
+    "persona": "Lab Manager",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 14,
+    "expectedRestricted": 0,
+    "accessiblePreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control"
+    ],
+    "restrictedPreview": [],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_jr_researcher",
+    "persona": "Junior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 11,
+    "expectedRestricted": 3,
+    "accessiblePreview": [
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "5:Virus Culture",
+      "6:Dark Room Imaging"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake and Registration",
+      "4:Quality Control",
+      "14:Preclinical & Clinical Trials"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_sr_researcher",
+    "persona": "Senior Researcher",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 12,
+    "expectedRestricted": 2,
+    "accessiblePreview": [
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "5:Virus Culture",
+      "6:Dark Room Imaging"
+    ],
+    "restrictedPreview": [
+      "1:Sample Intake and Registration",
+      "4:Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  },
+  {
+    "dept": "Viral Vaccine",
+    "user": "vv_biomedical",
+    "persona": "Biomedical Staff",
+    "login": "PASS",
+    "labUnit": "PASS",
+    "notebookView": "PASS",
+    "pageCount": 14,
+    "pageOrderOk": null,
+    "expectedAccessible": 0,
+    "expectedRestricted": 14,
+    "accessiblePreview": [],
+    "restrictedPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control"
+    ],
+    "pagesPreview": [
+      "1:Sample Intake and Registration",
+      "2:Media Preparation",
+      "3:Cell Culture",
+      "4:Quality Control",
+      "5:Virus Culture"
+    ]
+  }
+]

@@ -1,0 +1,16 @@
+cases=6
+browser launched
+== MNTD / mntd_collector ==
+  PASS nav=True order=None restr=9/9 titles=11
+== MNTD / mntd_technician ==
+  PASS nav=True order=None restr=3/3 titles=11
+== MNTD / mntd_manager ==
+  no .page-navigation — hard reload + Workflow tab
+  PASS nav=True order=None restr=0/0 titles=11
+== MNTD / mntd_researcher ==
+  PASS nav=True order=None restr=7/7 titles=11
+== MNTD / mntd_senior ==
+  PASS nav=True order=None restr=5/5 titles=11
+== MNTD / mntd_biomedical ==
+  PASS nav=True order=None restr=11/11 titles=11
+DONE 6/6 PASS

@@ -1,0 +1,176 @@
+- generic [ref=f3e3]:
+    - banner [ref=f3e4]:
+        - button "Close menu" [active] [ref=f3e172] [cursor=pointer]
+        - link [ref=f3e8] [cursor=pointer]:
+            - /url: /
+            - img "AHRI LIMS" [ref=f3e11]
+            - generic [ref=f3e12]:
+                - heading "AHRI LIMS" [level=5] [ref=f3e13]
+                - paragraph [ref=f3e14]: "Version: 3.2.1.2"
+        - generic [ref=f3e15]:
+            - generic [ref=f3e16]:
+                - button "Search" [ref=f3e17] [cursor=pointer]
+                - tooltip
+            - generic [ref=f3e20]:
+                - button "Notifications" [ref=f3e21] [cursor=pointer]
+                - tooltip
+            - generic [ref=f3e25]:
+                - button "User" [ref=f3e26] [cursor=pointer]
+                - tooltip
+            - generic [ref=f3e30]:
+                - button "Help" [ref=f3e31] [cursor=pointer]
+                - tooltip
+            - generic "Help Panel":
+                - list:
+                    - listitem:
+                        - button "User Manual" [ref=f3e36] [cursor=pointer]
+                    - listitem:
+                        - button "Video Tutorials" [ref=f3e40] [cursor=pointer]
+                    - listitem:
+                        - button "Release Notes" [ref=f3e44] [cursor=pointer]
+        - generic "Header Panel":
+            - list:
+                - listitem: Open ELIS
+                - listitem: Logout
+                - listitem:
+                    - generic [ref=f3e53]:
+                        - generic [ref=f3e54]: Select Locale
+                        - combobox "Select Locale" [ref=f3e56] [cursor=pointer]:
+                            - option "English" [selected]
+                            - option "English (UK)"
+                            - option "English (Sri Lanka)"
+                            - option "English (US)"
+                            - option "Español"
+                            - option "Français"
+                            - option "Indonesia"
+                            - option "Indonesia (ID)"
+                            - option "Malagasy"
+                            - option "Română"
+                            - option "සිංහල"
+                            - option "සිංහල (Sri Lanka)"
+                            - option "தமிழ்"
+                            - option "தமிழ் (Sri Lanka)"
+                            - option "Swahili"
+                            - option "Amharic"
+                - listitem:
+                    - generic [ref=f3e57]: "Version:: 3.2.1.2"
+        - navigation "Side navigation" [ref=f3e175]:
+            - list [ref=f3e176]:
+                - listitem [ref=f3e178]:
+                    - link "Home" [ref=f3e179] [cursor=pointer]:
+                        - /url: /Dashboard
+                - listitem [ref=f3e184]:
+                    - button "Storage" [ref=f3e185] [cursor=pointer]
+                    - button "Storage Management" [ref=f3e190] [cursor=pointer]
+                    - button "Cold Storage Monitoring" [ref=f3e192] [cursor=pointer]
+                - listitem [ref=f3e196]:
+                    - button "Non-Conform" [ref=f3e197] [cursor=pointer]
+                    - button "Report Non-Conforming Event" [ref=f3e202] [cursor=pointer]
+                    - button "View New Non-Conforming Events" [ref=f3e204] [cursor=pointer]
+                    - button "Corrective actions" [ref=f3e206] [cursor=pointer]
+                - listitem [ref=f3e210]:
+                    - button "Workplan" [ref=f3e211] [cursor=pointer]
+                    - button "By Test Type" [ref=f3e216] [cursor=pointer]
+                    - button "By Panel" [ref=f3e218] [cursor=pointer]
+                    - button "By Unit" [ref=f3e220] [cursor=pointer]
+                    - button "By Priority" [ref=f3e222] [cursor=pointer]
+                - listitem [ref=f3e226]:
+                    - button "Results" [ref=f3e227] [cursor=pointer]
+                    - button "By Unit" [ref=f3e232] [cursor=pointer]
+                    - button "By Order" [ref=f3e234] [cursor=pointer]
+                    - button "Referred Out" [ref=f3e236] [cursor=pointer]
+                    - button "By Range of Order numbers" [ref=f3e238] [cursor=pointer]
+                    - button "By Test, Date or Status" [ref=f3e240] [cursor=pointer]
+                    - button "Order Programs" [ref=f3e242] [cursor=pointer]
+                - listitem [ref=f3e246]:
+                    - button "Validation" [ref=f3e247] [cursor=pointer]
+                    - button "Routine" [ref=f3e252] [cursor=pointer]
+                    - button "Study" [ref=f3e254] [cursor=pointer]
+                    - button "By Order" [ref=f3e259] [cursor=pointer]
+                    - button "By Range of Order Numbers" [ref=f3e261] [cursor=pointer]
+                    - button "By Date" [ref=f3e263] [cursor=pointer]
+                - listitem [ref=f3e267]:
+                    - button "Reports" [ref=f3e268] [cursor=pointer]
+                    - button "Routine" [ref=f3e273] [cursor=pointer]
+                    - button [ref=f3e275] [cursor=pointer]
+                    - button "Study" [ref=f3e279] [cursor=pointer]
+                    - button [ref=f3e281] [cursor=pointer]
+                    - button "WHONET Report" [ref=f3e285] [cursor=pointer]
+                - listitem [ref=f3e289]:
+                    - button "Inventory" [ref=f3e290] [cursor=pointer]
+                    - button "Inventory Management" [ref=f3e295] [cursor=pointer]
+                    - button "Equipment Usage" [ref=f3e297] [cursor=pointer]
+                - listitem [ref=f3e300]:
+                    - link "Admin" [ref=f3e301] [cursor=pointer]:
+                        - /url: /MasterListsPage
+                - listitem [ref=f3e305]:
+                    - link "Aliquot" [ref=f3e306] [cursor=pointer]:
+                        - /url: /Aliquot
+                - listitem [ref=f3e310]:
+                    - link "NoteBook" [ref=f3e311] [cursor=pointer]:
+                        - /url: /NotebookDashboard
+                - listitem [ref=f3e316]:
+                    - button "Help" [ref=f3e317] [cursor=pointer]
+                    - button "User Manual" [ref=f3e322] [cursor=pointer]
+    - main [ref=f3e59]:
+        - navigation "Breadcrumb" [ref=f3e62]:
+            - list [ref=f3e63]:
+                - listitem [ref=f3e64]:
+                    - link "Home" [ref=f3e65] [cursor=pointer]:
+                        - /url: /
+                    - text: /
+        - generic [ref=f3e67]:
+            - generic [ref=f3e68] [cursor=pointer]:
+                - heading "In Progress" [level=3] [ref=f3e69]
+                - paragraph [ref=f3e70]: Awaiting Result Entry
+                - paragraph [ref=f3e71]: "0"
+            - generic [ref=f3e76] [cursor=pointer]:
+                - heading "Ready For Validation" [level=3] [ref=f3e77]
+                - paragraph [ref=f3e78]: Awaiting Review
+                - paragraph [ref=f3e79]: "0"
+            - generic [ref=f3e84] [cursor=pointer]:
+                - heading "Orders Completed Today" [level=3] [ref=f3e85]
+                - paragraph [ref=f3e86]: Total Orders Completed Today
+                - paragraph [ref=f3e87]: "0"
+            - generic [ref=f3e92] [cursor=pointer]:
+                - heading "Partially Completed Today" [level=3] [ref=f3e93]
+                - paragraph [ref=f3e94]: Total Orders Completed Today
+                - paragraph [ref=f3e95]: "0"
+            - generic [ref=f3e100] [cursor=pointer]:
+                - heading "Orders Entered By Users" [level=3] [ref=f3e101]
+                - paragraph [ref=f3e102]: Entered by users Today
+                - paragraph [ref=f3e103]: "0"
+            - generic [ref=f3e108] [cursor=pointer]:
+                - heading "Orders Rejected" [level=3] [ref=f3e109]
+                - paragraph [ref=f3e110]: Rejected By Lab Today
+                - paragraph [ref=f3e111]: "0"
+            - generic [ref=f3e116] [cursor=pointer]:
+                - heading "UnPrinted Results" [level=3] [ref=f3e117]
+                - paragraph [ref=f3e118]: UnPrinted Results Today
+                - paragraph [ref=f3e119]: "0"
+            - generic [ref=f3e124] [cursor=pointer]:
+                - heading "Electronic Orders" [level=3] [ref=f3e125]
+                - paragraph [ref=f3e126]: Electronic Orders
+                - paragraph [ref=f3e127]: "17"
+            - generic [ref=f3e132] [cursor=pointer]:
+                - heading "Average Turn Around time" [level=3] [ref=f3e133]
+                - paragraph [ref=f3e134]: Reception to Validation
+                - paragraph [ref=f3e135]: "0"
+            - generic [ref=f3e140] [cursor=pointer]:
+                - heading "Delayed Turn Around" [level=3] [ref=f3e141]
+                - paragraph [ref=f3e142]: More Than 96 hours
+                - paragraph [ref=f3e143]: "0"
+            - generic [ref=f3e148] [cursor=pointer]:
+                - heading "Low Stock Items" [level=3] [ref=f3e149]
+                - paragraph [ref=f3e150]: Items below minimum stock level
+                - paragraph [ref=f3e151]: "13"
+            - generic [ref=f3e156] [cursor=pointer]:
+                - heading "Expiring Soon" [level=3] [ref=f3e157]
+                - paragraph [ref=f3e158]: Lots expiring within alert threshold
+                - paragraph [ref=f3e159]: "2"
+            - generic [ref=f3e164] [cursor=pointer]:
+                - heading "Expired Lots" [level=3] [ref=f3e165]
+                - paragraph [ref=f3e166]: Lots past expiration date
+                - paragraph [ref=f3e167]: "136"
+    - contentinfo:
+        - paragraph

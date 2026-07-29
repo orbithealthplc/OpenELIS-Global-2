@@ -278,7 +278,9 @@ function VirologyMediaPreparationPage({
       })),
       equipmentId: selectedEquipment?.id,
       equipmentName:
-        selectedEquipment?.label || selectedEquipment?.text || selectedEquipment?.name,
+        selectedEquipment?.label ||
+        selectedEquipment?.text ||
+        selectedEquipment?.name,
       equipmentSerialNumber: selectedEquipment?.serialNumber,
       batchNumber,
       preparationNotes,

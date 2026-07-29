@@ -510,7 +510,8 @@ public class SampleRetrievalRequest extends BaseObject<Integer> {
     }
 
     /**
-     * Top-level request lines (reference or direct), excluding fulfillment children.
+     * Top-level request lines (reference or direct), excluding fulfillment
+     * children.
      */
     public int getRequestLineCount() {
         return (int) items.stream().filter(item -> !item.isFulfillmentLine()).count();
@@ -564,16 +565,14 @@ public class SampleRetrievalRequest extends BaseObject<Integer> {
         long unfinishedDirectItems = items.stream().filter(SampleRetrievalItem::isDirectItem)
                 .filter(item -> !isTerminalWorkflowStatus(item.getStatus())).count();
         if (unfinishedDirectItems > 0) {
-            return "Cannot complete request: " + unfinishedDirectItems
-                    + " sample(s) are not released or returned yet.";
+            return "Cannot complete request: " + unfinishedDirectItems + " sample(s) are not released or returned yet.";
         }
 
         return null;
     }
 
     private boolean isTerminalWorkflowStatus(SampleRetrievalItem.ItemStatus status) {
-        return status == SampleRetrievalItem.ItemStatus.IN_ANALYSIS
-                || status == SampleRetrievalItem.ItemStatus.RETURNED
+        return status == SampleRetrievalItem.ItemStatus.IN_ANALYSIS || status == SampleRetrievalItem.ItemStatus.RETURNED
                 || status == SampleRetrievalItem.ItemStatus.CONSUMED
                 || status == SampleRetrievalItem.ItemStatus.PARTIALLY_USED;
     }

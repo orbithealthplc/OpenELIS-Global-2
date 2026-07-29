@@ -888,6 +888,7 @@
   "notebook.label.projectFiles": "Fichiers du projet",
   "notebook.label.entryFiles": "Fichiers d’entrée",
   "notebook.label.technician": "Nom du technicien",
+  "notebook.label.technician.search": "Rechercher un technicien...",
   "notebook.error.notAssigned": "Vous n’êtes pas affecté à ce projet",
   "notebook.validation.title.required": "Titre obligatoire",
   "notebook.validation.type.required": "Le type d'expérience est requis.",
@@ -2549,5 +2550,18 @@
   "biorepository.retrieval.print.exportAll": "Exporter toutes les transactions (sans filtre de date)",
   "pathology.cassettes.childTracking.tissuePieces": "Fragments de tissu",
   "pathology.cassettes.tissuePieces.section": "Fragments de tissu par cassette",
-  "pathology.cassettes.tissuePieces.label": "Fragments de tissu"
+  "pathology.cassettes.tissuePieces.label": "Fragments de tissu",
+  "biorepository.shipment.button.continueToRegistration": "Continuer vers l'enregistrement des échantillons",
+  "biorepository.shipment.button.continueToDocumentation": "Continuer vers la documentation",
+  "biorepository.shipment.list.search": "Rechercher des envois",
+  "biorepository.shipment.list.search.placeholder": "Réf. livraison, expéditeur ou organisation",
+  "biorepository.shipment.list.error.title": "Échec du chargement des envois",
+  "biorepository.shipment.list.error.message": "Impossible de charger les envois. Vérifiez votre connexion et réessayez.",
+  "biorepository.shipment.list.error.invalidResponse": "Réponse inattendue lors du chargement des envois.",
+  "biorepository.shipment.list.empty.search": "Aucun envoi ne correspond à votre recherche.",
+  "biorepository.intake.registration.shipmentRequired": "Envoi requis",
+  "biorepository.intake.registration.shipmentRequired.message": "Sélectionnez un envoi existant dans Réception des envois, puis continuez.",
+  "biorepository.intake.registration.activeShipment": "Enregistrement des échantillons pour l'envoi {ref}",
+  "biorepository.intake.registration.activeShipment.hint": "Importez un manifeste ou acceptez des échantillons pour cet envoi.",
+  "label.button.retry": "Réessayer"
 }

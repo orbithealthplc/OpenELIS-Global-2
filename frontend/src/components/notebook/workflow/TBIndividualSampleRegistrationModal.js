@@ -199,7 +199,9 @@ function TBIndividualSampleRegistrationModal({
       })}
       onRequestSubmit={handleSubmit}
       onSecondarySubmit={handleClose}
-      primaryButtonDisabled={isSubmitting || specimenTypesLoading || specimenTypes.length === 0}
+      primaryButtonDisabled={
+        isSubmitting || specimenTypesLoading || specimenTypes.length === 0
+      }
       size="lg"
     >
       <div className="tb-individual-registration-form">
@@ -226,7 +228,10 @@ function TBIndividualSampleRegistrationModal({
         )}
 
         {specimenTypesLoading && (
-          <Loading withOverlay={false} description="Loading specimen types..." />
+          <Loading
+            withOverlay={false}
+            description="Loading specimen types..."
+          />
         )}
 
         {/* B. Specimen Information (Required) */}

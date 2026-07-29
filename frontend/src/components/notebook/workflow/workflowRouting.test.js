@@ -29,7 +29,11 @@ describe("workflowRouting", () => {
     expect(
       resolveWorkflowTabComponent({ workflowType: "viral_vaccine" }),
     ).toBeTruthy();
-    expect(resolveWorkflowTabComponent({ workflowType: "virology" })).toBeTruthy();
-    expect(resolveWorkflowTabComponent({ workflowType: "genomics" })).toBeTruthy();
+    expect(
+      resolveWorkflowTabComponent({ workflowType: "virology" }),
+    ).toBeTruthy();
+    expect(
+      resolveWorkflowTabComponent({ workflowType: "genomics" }),
+    ).toBeTruthy();
   });
 });

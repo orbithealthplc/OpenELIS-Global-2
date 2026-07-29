@@ -55,8 +55,10 @@ function sortByAllowlist(roles, allowlist) {
     allowlist.map((name, index) => [normalizeRoleName(name), index]),
   );
   return [...roles].sort((a, b) => {
-    const ai = order.get(normalizeRoleName(a.roleName)) ?? Number.MAX_SAFE_INTEGER;
-    const bi = order.get(normalizeRoleName(b.roleName)) ?? Number.MAX_SAFE_INTEGER;
+    const ai =
+      order.get(normalizeRoleName(a.roleName)) ?? Number.MAX_SAFE_INTEGER;
+    const bi =
+      order.get(normalizeRoleName(b.roleName)) ?? Number.MAX_SAFE_INTEGER;
     if (ai !== bi) {
       return ai - bi;
     }

@@ -48,7 +48,6 @@ import org.openelisglobal.systemuser.validator.UnifiedSystemUserFormValidator;
 import org.openelisglobal.systemuser.valueholder.SystemUser;
 import org.openelisglobal.systemuser.valueholder.UnifiedSystemUser;
 import org.openelisglobal.test.service.TestSectionService;
-import org.openelisglobal.test.valueholder.TestSection;
 import org.openelisglobal.userrole.service.UserRoleService;
 import org.openelisglobal.userrole.valueholder.LabUnitRoleMap;
 import org.openelisglobal.userrole.valueholder.UserLabUnitRoles;
@@ -150,8 +149,8 @@ public class UnifiedSystemUserController extends BaseController {
         setupRoles(form, request, doFiltering);
 
         // load testSections for drop down
-        List<IdValuePair> testSections = ahriUserManagementCatalogService.filterLabUnitTestSections(
-                DisplayListService.getInstance().getList(ListType.TEST_SECTION_ACTIVE));
+        List<IdValuePair> testSections = ahriUserManagementCatalogService
+                .filterLabUnitTestSections(DisplayListService.getInstance().getList(ListType.TEST_SECTION_ACTIVE));
         form.setTestSections(testSections);
         form.setSystemUsers(getDisplaySystemUsersJsonArray());
         addFlashMsgsToRequest(request);
@@ -182,8 +181,7 @@ public class UnifiedSystemUserController extends BaseController {
             projectRoles = displayRoles.stream().filter(role -> role.getParentRole() != null)
                     .filter(role -> role.getParentRole().equals(projectRoleGroupId)).collect(Collectors.toList());
         } else {
-            projectRoles = displayRoles.stream()
-                    .filter(role -> AHRIRoleCatalog.isProjectRoleName(role.getRoleName()))
+            projectRoles = displayRoles.stream().filter(role -> AHRIRoleCatalog.isProjectRoleName(role.getRoleName()))
                     .collect(Collectors.toList());
         }
 
@@ -459,8 +457,8 @@ public class UnifiedSystemUserController extends BaseController {
 
         Set<String> projectRoleNames = ProjectRole.roleNames();
         return getAllRoles().stream()
-            .filter(role -> projectRoleNames.contains(AHRIRoleCatalog.normalizeRoleName(role.getName())))
-            .map(Role::getId).collect(Collectors.toList());
+                .filter(role -> projectRoleNames.contains(AHRIRoleCatalog.normalizeRoleName(role.getName())))
+                .map(Role::getId).collect(Collectors.toList());
     }
 
     @RequestMapping(value = "/UnifiedSystemUser", method = RequestMethod.POST)

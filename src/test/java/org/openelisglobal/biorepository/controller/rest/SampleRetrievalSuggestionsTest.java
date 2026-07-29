@@ -6,7 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,11 +103,8 @@ public class SampleRetrievalSuggestionsTest {
         usd.setSytemUserId(1);
         session.setAttribute(IActionConstants.USER_SESSION_DATA, usd);
 
-        mockMvc.perform(post("/rest/biorepository/retrieval/items/suggestions")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"itemIds\":[101]}"))
-                .andExpect(status().isOk())
+        mockMvc.perform(post("/rest/biorepository/retrieval/items/suggestions").session(session)
+                .contentType(MediaType.APPLICATION_JSON).content("{\"itemIds\":[101]}")).andExpect(status().isOk())
                 .andExpect(jsonPath("$['101'].suggestionStatus").value("EXACT_MATCH"))
                 .andExpect(jsonPath("$['101'].topCandidate.accessionNumber").value("ACC-1"))
                 .andExpect(jsonPath("$['101'].summary.sampleIdentity").value("ACC-1"))

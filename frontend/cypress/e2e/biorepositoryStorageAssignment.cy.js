@@ -24,7 +24,9 @@ describe("Biorepository storage assignment persistence", () => {
     }).then((instancesResponse) => {
       const instances = instancesResponse.body || [];
       if (!Array.isArray(instances) || instances.length === 0) {
-        cy.log("No biorepository notebook instances available for assignment test");
+        cy.log(
+          "No biorepository notebook instances available for assignment test",
+        );
         return;
       }
 
@@ -53,7 +55,8 @@ describe("Biorepository storage assignment persistence", () => {
           url: `/rest/notebook/page/${storagePage.id}/samples`,
           failOnStatusCode: false,
         }).then((samplesResponse) => {
-          const samples = samplesResponse.body?.samples || samplesResponse.body || [];
+          const samples =
+            samplesResponse.body?.samples || samplesResponse.body || [];
           const pendingSample = samples.find(
             (sample) =>
               sample.pageStatus === "PENDING" ||
@@ -88,7 +91,8 @@ describe("Biorepository storage assignment persistence", () => {
                 data: {
                   locationId: device.id,
                   locationType: "device",
-                  storagePath: device.name || device.label || "Biorepository device",
+                  storagePath:
+                    device.name || device.label || "Biorepository device",
                   notes: "Cypress storage assignment trust test",
                 },
               },

@@ -4,8 +4,8 @@ import java.util.List;
 import org.openelisglobal.biorepository.controller.rest.dto.BioSampleLifecycleEventDTO;
 
 /**
- * Aggregates a chronological lifecycle trail for one {@link BioSample} from existing
- * storage, transfer, and retrieval persistence.
+ * Aggregates a chronological lifecycle trail for one {@link BioSample} from
+ * existing storage, transfer, and retrieval persistence.
  */
 public interface BioSampleLifecycleService {
 

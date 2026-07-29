@@ -841,8 +841,7 @@ function PathologyReportingPage({
                     rootIds.has(id) ||
                     rootIds.has(root) ||
                     sampleIds.some(
-                      (sid) =>
-                        id === String(sid) || id.startsWith(`${sid}_`),
+                      (sid) => id === String(sid) || id.startsWith(`${sid}_`),
                     )
                   );
                 });

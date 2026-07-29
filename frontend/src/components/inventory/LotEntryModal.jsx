@@ -417,8 +417,7 @@ const LotEntryModal = ({ open, onClose, onSave, lot = null }) => {
                   prev.currentQuantity === 1 && prev.unitSize === "1 each"
                     ? 0
                     : prev.currentQuantity,
-                unitSize:
-                  prev.unitSize === "1 each" ? "" : prev.unitSize,
+                unitSize: prev.unitSize === "1 each" ? "" : prev.unitSize,
               }));
               setError(null);
             }

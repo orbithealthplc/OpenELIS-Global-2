@@ -31,4 +31,3 @@ export const isPermanentEquipment = (itemOrType) => {
 export const isStockManaged = (itemOrType) => !isPermanentEquipment(itemOrType);
 
 export const isLotReceivable = (itemOrType) => isStockManaged(itemOrType);
-

@@ -57,7 +57,9 @@ function inferLegacyWorkflowType(notebook) {
     .map((value) => String(value));
 
   for (const candidate of candidates) {
-    const hint = LEGACY_WORKFLOW_HINTS.find(({ match }) => match.test(candidate));
+    const hint = LEGACY_WORKFLOW_HINTS.find(({ match }) =>
+      match.test(candidate),
+    );
     if (hint) {
       return hint.workflowType;
     }

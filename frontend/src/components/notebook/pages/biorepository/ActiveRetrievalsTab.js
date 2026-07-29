@@ -41,7 +41,9 @@ import {
   postToOpenElisServerJsonResponse,
 } from "../../../utils/Utils";
 import BiorepositoryLifecycleModal from "./BiorepositoryLifecycleModal";
-import AttachSamplePanel, { buildFiltersFromReferenceItem } from "./AttachSamplePanel";
+import AttachSamplePanel, {
+  buildFiltersFromReferenceItem,
+} from "./AttachSamplePanel";
 import FulfillmentReviewBlock from "./FulfillmentReviewBlock";
 import { formatQuantityWithUnit } from "./biorepositoryQuantityHelpers";
 import { formatBrf02SamplePath } from "./biorepositorySamplePathHelpers";
@@ -238,7 +240,9 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
                 ]);
                 return;
               }
-              const query = buildFulfillmentSearchQuery(filters, { status: "STORED" });
+              const query = buildFulfillmentSearchQuery(filters, {
+                status: "STORED",
+              });
               getFromOpenElisServer(
                 `/rest/biorepository/sample/search?${query}&context=fulfillment`,
                 (data) => {
@@ -305,7 +309,10 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
         merged,
         { usedFallback = false, errorMessage = null, onComplete = null } = {},
       ) => {
-        const normalizedMap = buildSyntheticSuggestionMap(unresolvedItems, merged);
+        const normalizedMap = buildSyntheticSuggestionMap(
+          unresolvedItems,
+          merged,
+        );
         setSuggestionsByItemId(normalizedMap);
         setSuggestionsLoading(false);
         setSuggestionsLoadState(
@@ -333,11 +340,17 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
               : null;
           if (!postSucceeded && process.env.NODE_ENV !== "production") {
             // eslint-disable-next-line no-console
-            console.warn("Bulk fulfillment suggestions POST failed or returned invalid payload:", data);
+            console.warn(
+              "Bulk fulfillment suggestions POST failed or returned invalid payload:",
+              data,
+            );
           }
           const postMap = postSucceeded ? mapApiSuggestionResponse(data) : {};
 
-          if (postSucceeded && Object.keys(postMap).length >= unresolvedItems.length) {
+          if (
+            postSucceeded &&
+            Object.keys(postMap).length >= unresolvedItems.length
+          ) {
             finishLoad(postMap, { onComplete });
             return;
           }
@@ -345,7 +358,8 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
           try {
             const fallbackMap = await loadSuggestionsViaGet(unresolvedItems);
             const merged = mergeSuggestionMaps(postMap, fallbackMap);
-            const usedFallback = !postSucceeded || Object.keys(postMap).length === 0;
+            const usedFallback =
+              !postSucceeded || Object.keys(postMap).length === 0;
             const errorMessage = usedFallback
               ? apiErrorDetail
                 ? intl.formatMessage(
@@ -385,19 +399,22 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
     [buildSyntheticSuggestionMap, intl, loadSuggestionsViaGet],
   );
 
-  const refreshSelectedRequest = useCallback((requestId) => {
-    if (!requestId) return;
-    getFromOpenElisServer(
-      `/rest/biorepository/retrieval/requests/${requestId}`,
-      (data) => {
-        if (data && !data.error) {
-          setSelectedRequest(data);
-          setSuggestionsLoading(true);
-          loadSuggestionReview(data);
-        }
-      },
-    );
-  }, [loadSuggestionReview]);
+  const refreshSelectedRequest = useCallback(
+    (requestId) => {
+      if (!requestId) return;
+      getFromOpenElisServer(
+        `/rest/biorepository/retrieval/requests/${requestId}`,
+        (data) => {
+          if (data && !data.error) {
+            setSelectedRequest(data);
+            setSuggestionsLoading(true);
+            loadSuggestionReview(data);
+          }
+        },
+      );
+    },
+    [loadSuggestionReview],
+  );
 
   const afterItemAction = useCallback(
     (requestId) => {
@@ -504,7 +521,10 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
   );
 
   const handleQuickAttachConfirm = useCallback(() => {
-    if (!quickAttachTarget?.referenceItem?.id || !quickAttachTarget?.bioSample?.id) {
+    if (
+      !quickAttachTarget?.referenceItem?.id ||
+      !quickAttachTarget?.bioSample?.id
+    ) {
       return;
     }
     const { referenceItem, bioSample } = quickAttachTarget;
@@ -561,7 +581,9 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
         temperatureAtRetrieval: temperatureAtRetrieval
           ? parseFloat(temperatureAtRetrieval)
           : null,
-        quantityReleased: quantityReleased ? parseFloat(quantityReleased) : null,
+        quantityReleased: quantityReleased
+          ? parseFloat(quantityReleased)
+          : null,
       }),
       (data) => {
         setActionLoading(false);
@@ -721,7 +743,9 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
     (item, suggestion, top) => {
       const summary = getSuggestionSummary(suggestion);
       if (top) {
-        return summary?.sampleIdentity || formatTopCandidateIdentity(top) || "—";
+        return (
+          summary?.sampleIdentity || formatTopCandidateIdentity(top) || "—"
+        );
       }
       if (isRowSuggestionPending(item)) {
         return intl.formatMessage({
@@ -888,27 +912,30 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
   );
 
   // Load full request details with items
-  const loadRequestDetails = useCallback((requestId) => {
-    setWorkOrderLoading(true);
-    setAttachTargetItem(null);
-    setQuickAttachTarget(null);
-    setHighlightedItemId(null);
-    setAttachSuccessMessage(null);
-    getFromOpenElisServer(
-      `/rest/biorepository/retrieval/requests/${requestId}`,
-      (data) => {
-        setWorkOrderLoading(false);
-        if (data && !data.error) {
-          setSelectedRequest(data);
-          setWorkOrderModalOpen(true);
-          loadSuggestionReview(data);
-        } else {
-          setSuggestionsLoading(false);
-          setError(data?.error || "Failed to load request details");
-        }
-      },
-    );
-  }, [loadSuggestionReview]);
+  const loadRequestDetails = useCallback(
+    (requestId) => {
+      setWorkOrderLoading(true);
+      setAttachTargetItem(null);
+      setQuickAttachTarget(null);
+      setHighlightedItemId(null);
+      setAttachSuccessMessage(null);
+      getFromOpenElisServer(
+        `/rest/biorepository/retrieval/requests/${requestId}`,
+        (data) => {
+          setWorkOrderLoading(false);
+          if (data && !data.error) {
+            setSelectedRequest(data);
+            setWorkOrderModalOpen(true);
+            loadSuggestionReview(data);
+          } else {
+            setSuggestionsLoading(false);
+            setError(data?.error || "Failed to load request details");
+          }
+        },
+      );
+    },
+    [loadSuggestionReview],
+  );
 
   const completeRequestAfterRelease = useCallback(
     (requestId) =>
@@ -921,7 +948,9 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
               return;
             }
 
-            const blockReason = getRequestCompletionBlockReason(data.items || []);
+            const blockReason = getRequestCompletionBlockReason(
+              data.items || [],
+            );
             if (blockReason) {
               resolve({ error: blockReason });
               return;
@@ -1249,7 +1278,12 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
                             <TableCell key={cell.id}>
                               {cell.info.header === "status" ? (
                                 <Tag
-                                  type={rawData ? getRequestDisplayStatus(rawData, intl).tagType : "gray"}
+                                  type={
+                                    rawData
+                                      ? getRequestDisplayStatus(rawData, intl)
+                                          .tagType
+                                      : "gray"
+                                  }
                                   size="sm"
                                 >
                                   {cell.value}
@@ -1535,190 +1569,207 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {selectedRequest.items.flatMap((item) => {
-                        const rows = [
-                          { item, isFulfillment: false, referenceItem: null },
-                        ];
-                        (item.fulfillments || []).forEach((fulfillment) => {
-                          rows.push({
-                            item: fulfillment,
-                            isFulfillment: true,
-                            referenceItem: item,
+                      {selectedRequest.items
+                        .flatMap((item) => {
+                          const rows = [
+                            { item, isFulfillment: false, referenceItem: null },
+                          ];
+                          (item.fulfillments || []).forEach((fulfillment) => {
+                            rows.push({
+                              item: fulfillment,
+                              isFulfillment: true,
+                              referenceItem: item,
+                            });
                           });
-                        });
-                        return rows;
-                      }).map(({ item, isFulfillment, referenceItem }, idx) => {
-                        const unresolved = !isFulfillment && isUnresolvedReferenceItem(item);
-                        const suggestion = unresolved ? getSuggestionReview(item) : null;
-                        const top = getTopCandidate(suggestion);
-                        const summary = getSuggestionSummary(suggestion);
-                        const rowHighlighted =
-                          String(highlightedItemId) === String(item.id) ||
-                          quickAttachTarget?.referenceItem?.id === item.id ||
-                          attachTargetItem?.id === item.id;
+                          return rows;
+                        })
+                        .map(({ item, isFulfillment, referenceItem }, idx) => {
+                          const unresolved =
+                            !isFulfillment && isUnresolvedReferenceItem(item);
+                          const suggestion = unresolved
+                            ? getSuggestionReview(item)
+                            : null;
+                          const top = getTopCandidate(suggestion);
+                          const summary = getSuggestionSummary(suggestion);
+                          const rowHighlighted =
+                            String(highlightedItemId) === String(item.id) ||
+                            quickAttachTarget?.referenceItem?.id === item.id ||
+                            attachTargetItem?.id === item.id;
 
-                        return (
-                        <TableRow
-                          key={`${item.id}-${idx}`}
-                          style={
-                            rowHighlighted
-                              ? { backgroundColor: "#edf5ff" }
-                              : undefined
-                          }
-                        >
-                          <TableCell>
-                            {isFulfillment ? (
-                              <span
-                                style={{
-                                  paddingLeft: "1rem",
-                                  color: "#525252",
-                                  fontStyle: "italic",
-                                }}
-                              >
-                                <FormattedMessage
-                                  id="biorepository.retrieval.workOrder.fulfillsRowAbove"
-                                  defaultMessage="(fulfills row above)"
-                                />
-                              </span>
-                            ) : (
-                              formatRequestedReferenceSummary(item)
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {!isFulfillment && item.quantityRequested != null
-                              ? formatQuantityWithUnit(
-                                  item.quantityRequested,
-                                  item.unitOfMeasure,
-                                )
-                              : "—"}
-                          </TableCell>
-                          <TableCell>
-                            {isFulfillment
-                              ? item.externalId ||
-                                item.accessionNumber ||
-                                item.barcode ||
-                                item.sampleNumber ||
-                                item.bioSampleExternalId ||
-                                "—"
-                              : item.fulfillments?.length > 0
-                                ? item.fulfillments
-                                    .map(
-                                      (f) =>
-                                        f.externalId ||
-                                        f.accessionNumber ||
-                                        f.barcode ||
-                                        f.sampleNumber ||
-                                        f.bioSampleExternalId,
-                                    )
-                                    .filter(Boolean)
-                                    .join(", ") || "—"
-                                : unresolved
-                                  ? renderSuggestionIdentityCell(item, suggestion, top)
-                                  : "—"}
-                          </TableCell>
-                          <TableCell>
-                            {isFulfillment
-                              ? formatQuantityWithUnit(
-                                  item.quantityReleased ?? item.quantityRequested,
-                                  item.unitOfMeasure,
-                                )
-                              : top
-                                ? formatQuantityWithUnit(
-                                    summary?.availableQuantity ??
-                                      top.remainingQuantity ??
-                                      top.quantity,
-                                    summary?.availableUnitOfMeasure ||
-                                      top.unitOfMeasure,
-                                  )
-                                : unresolved && isRowSuggestionPending(item)
-                                  ? intl.formatMessage({
-                                      id: "biorepository.retrieval.workbench.searching",
-                                      defaultMessage: "Searching…",
-                                    })
-                                  : unresolved &&
-                                      suggestion?.status === SUGGESTION_STATUS.NO_CANDIDATE
-                                    ? "—"
-                                    : unresolved &&
-                                        suggestion?.status === SUGGESTION_STATUS.NO_CRITERIA
-                                      ? "—"
-                                      : "—"}
-                          </TableCell>
-                          <TableCell>
-                            {isFulfillment
-                              ? formatBrf02SamplePath(item) ||
-                                item.sourceStoragePath ||
-                                item.storageLocation ||
-                                "—"
-                              : top
-                                ? summary?.samplePath ||
-                                  formatBrf02SamplePath(top) ||
-                                  formatSamplePath(top) ||
-                                  "—"
-                                : unresolved && isRowSuggestionPending(item)
-                                  ? intl.formatMessage({
-                                      id: "biorepository.retrieval.workbench.searching",
-                                      defaultMessage: "Searching…",
-                                    })
-                                  : "—"}
-                          </TableCell>
-                          <TableCell>
-                            {unresolved ? (
-                              <div>
-                                {renderSuggestionTag(item)}
-                                {(summary?.matchReason || top?.matchReason) && (
-                                  <div
+                          return (
+                            <TableRow
+                              key={`${item.id}-${idx}`}
+                              style={
+                                rowHighlighted
+                                  ? { backgroundColor: "#edf5ff" }
+                                  : undefined
+                              }
+                            >
+                              <TableCell>
+                                {isFulfillment ? (
+                                  <span
                                     style={{
-                                      marginTop: "0.25rem",
-                                      fontSize: "0.75rem",
+                                      paddingLeft: "1rem",
                                       color: "#525252",
+                                      fontStyle: "italic",
                                     }}
                                   >
                                     <FormattedMessage
-                                      id={`biorepository.retrieval.attach.matchReason.${summary?.matchReason || top.matchReason}`}
-                                      defaultMessage={summary?.matchReason || top.matchReason}
+                                      id="biorepository.retrieval.workOrder.fulfillsRowAbove"
+                                      defaultMessage="(fulfills row above)"
                                     />
-                                  </div>
+                                  </span>
+                                ) : (
+                                  formatRequestedReferenceSummary(item)
                                 )}
-                                {suggestion?.noExactMatch && (
-                                  <div
-                                    style={{
-                                      marginTop: "0.25rem",
-                                      fontSize: "0.75rem",
-                                      color: "#8a3ffc",
-                                    }}
-                                  >
-                                    <FormattedMessage
-                                      id="biorepository.retrieval.workbench.suggestionState.noExactMatch"
-                                      defaultMessage="No exact match"
-                                    />
+                              </TableCell>
+                              <TableCell>
+                                {!isFulfillment &&
+                                item.quantityRequested != null
+                                  ? formatQuantityWithUnit(
+                                      item.quantityRequested,
+                                      item.unitOfMeasure,
+                                    )
+                                  : "—"}
+                              </TableCell>
+                              <TableCell>
+                                {isFulfillment
+                                  ? item.externalId ||
+                                    item.accessionNumber ||
+                                    item.barcode ||
+                                    item.sampleNumber ||
+                                    item.bioSampleExternalId ||
+                                    "—"
+                                  : item.fulfillments?.length > 0
+                                    ? item.fulfillments
+                                        .map(
+                                          (f) =>
+                                            f.externalId ||
+                                            f.accessionNumber ||
+                                            f.barcode ||
+                                            f.sampleNumber ||
+                                            f.bioSampleExternalId,
+                                        )
+                                        .filter(Boolean)
+                                        .join(", ") || "—"
+                                    : unresolved
+                                      ? renderSuggestionIdentityCell(
+                                          item,
+                                          suggestion,
+                                          top,
+                                        )
+                                      : "—"}
+                              </TableCell>
+                              <TableCell>
+                                {isFulfillment
+                                  ? formatQuantityWithUnit(
+                                      item.quantityReleased ??
+                                        item.quantityRequested,
+                                      item.unitOfMeasure,
+                                    )
+                                  : top
+                                    ? formatQuantityWithUnit(
+                                        summary?.availableQuantity ??
+                                          top.remainingQuantity ??
+                                          top.quantity,
+                                        summary?.availableUnitOfMeasure ||
+                                          top.unitOfMeasure,
+                                      )
+                                    : unresolved && isRowSuggestionPending(item)
+                                      ? intl.formatMessage({
+                                          id: "biorepository.retrieval.workbench.searching",
+                                          defaultMessage: "Searching…",
+                                        })
+                                      : unresolved &&
+                                          suggestion?.status ===
+                                            SUGGESTION_STATUS.NO_CANDIDATE
+                                        ? "—"
+                                        : unresolved &&
+                                            suggestion?.status ===
+                                              SUGGESTION_STATUS.NO_CRITERIA
+                                          ? "—"
+                                          : "—"}
+                              </TableCell>
+                              <TableCell>
+                                {isFulfillment
+                                  ? formatBrf02SamplePath(item) ||
+                                    item.sourceStoragePath ||
+                                    item.storageLocation ||
+                                    "—"
+                                  : top
+                                    ? summary?.samplePath ||
+                                      formatBrf02SamplePath(top) ||
+                                      formatSamplePath(top) ||
+                                      "—"
+                                    : unresolved && isRowSuggestionPending(item)
+                                      ? intl.formatMessage({
+                                          id: "biorepository.retrieval.workbench.searching",
+                                          defaultMessage: "Searching…",
+                                        })
+                                      : "—"}
+                              </TableCell>
+                              <TableCell>
+                                {unresolved ? (
+                                  <div>
+                                    {renderSuggestionTag(item)}
+                                    {(summary?.matchReason ||
+                                      top?.matchReason) && (
+                                      <div
+                                        style={{
+                                          marginTop: "0.25rem",
+                                          fontSize: "0.75rem",
+                                          color: "#525252",
+                                        }}
+                                      >
+                                        <FormattedMessage
+                                          id={`biorepository.retrieval.attach.matchReason.${summary?.matchReason || top.matchReason}`}
+                                          defaultMessage={
+                                            summary?.matchReason ||
+                                            top.matchReason
+                                          }
+                                        />
+                                      </div>
+                                    )}
+                                    {suggestion?.noExactMatch && (
+                                      <div
+                                        style={{
+                                          marginTop: "0.25rem",
+                                          fontSize: "0.75rem",
+                                          color: "#8a3ffc",
+                                        }}
+                                      >
+                                        <FormattedMessage
+                                          id="biorepository.retrieval.workbench.suggestionState.noExactMatch"
+                                          defaultMessage="No exact match"
+                                        />
+                                      </div>
+                                    )}
+                                    {hasTypeMismatch(suggestion) && (
+                                      <div
+                                        style={{
+                                          marginTop: "0.25rem",
+                                          fontSize: "0.75rem",
+                                          color: "#a56eff",
+                                        }}
+                                      >
+                                        <FormattedMessage
+                                          id="biorepository.retrieval.workbench.typeMismatch.short"
+                                          defaultMessage="Type mismatch"
+                                        />
+                                      </div>
+                                    )}
                                   </div>
+                                ) : (
+                                  "—"
                                 )}
-                                {hasTypeMismatch(suggestion) && (
-                                  <div
-                                    style={{
-                                      marginTop: "0.25rem",
-                                      fontSize: "0.75rem",
-                                      color: "#a56eff",
-                                    }}
-                                  >
-                                    <FormattedMessage
-                                      id="biorepository.retrieval.workbench.typeMismatch.short"
-                                      defaultMessage="Type mismatch"
-                                    />
-                                  </div>
-                                )}
-                              </div>
-                            ) : (
-                              "—"
-                            )}
-                          </TableCell>
-                          <TableCell>{getItemStatusTag(item)}</TableCell>
-                          <TableCell>
-                            {renderItemActions(item, referenceItem)}
-                          </TableCell>
-                        </TableRow>
-                        );
-                      })}
+                              </TableCell>
+                              <TableCell>{getItemStatusTag(item)}</TableCell>
+                              <TableCell>
+                                {renderItemActions(item, referenceItem)}
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
                     </TableBody>
                   </Table>
                 ) : (
@@ -1740,7 +1791,9 @@ function ActiveRetrievalsTab({ onActionComplete, refreshToken }) {
               {attachTargetItem && (
                 <AttachSamplePanel
                   referenceItem={attachTargetItem}
-                  initialResults={getSuggestionReview(attachTargetItem)?.results || []}
+                  initialResults={
+                    getSuggestionReview(attachTargetItem)?.results || []
+                  }
                   suggestionSummary={getSuggestionReview(attachTargetItem)}
                   onAttachSuccess={handleAttachSuccess}
                   onCancel={() => setAttachTargetItem(null)}

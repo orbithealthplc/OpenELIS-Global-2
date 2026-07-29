@@ -25,31 +25,22 @@ public class RbacPermissionServiceImpl implements RbacPermissionService {
     private static final Map<RbacAction, Set<String>> ACTION_ROLES = new EnumMap<>(RbacAction.class);
 
     static {
-        put(RbacAction.REGISTER_SAMPLES,
-                Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
+        put(RbacAction.REGISTER_SAMPLES, Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
                 Constants.ROLE_LAB_MANAGER);
-        put(RbacAction.PROCESS_SAMPLES,
-                Constants.ROLE_LABORATORY_TECHNICIAN, Constants.ROLE_JUNIOR_RESEARCHER,
+        put(RbacAction.PROCESS_SAMPLES, Constants.ROLE_LABORATORY_TECHNICIAN, Constants.ROLE_JUNIOR_RESEARCHER,
                 Constants.ROLE_SENIOR_RESEARCHER);
-        put(RbacAction.UPDATE_SAMPLES,
-                Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
+        put(RbacAction.UPDATE_SAMPLES, Constants.ROLE_SAMPLE_COLLECTOR, Constants.ROLE_LABORATORY_TECHNICIAN,
                 Constants.ROLE_JUNIOR_RESEARCHER, Constants.ROLE_SENIOR_RESEARCHER, Constants.ROLE_LAB_MANAGER);
-        put(RbacAction.VALIDATE_RESULTS,
-                Constants.ROLE_LABORATORY_TECHNICIAN, Constants.ROLE_SENIOR_RESEARCHER, Constants.ROLE_LAB_MANAGER);
-        put(RbacAction.REVIEW_RESULTS,
-                Constants.ROLE_JUNIOR_RESEARCHER, Constants.ROLE_SENIOR_RESEARCHER, Constants.ROLE_LAB_MANAGER);
-        put(RbacAction.GENERATE_REPORTS,
-                Constants.ROLE_LAB_MANAGER, Constants.ROLE_SENIOR_RESEARCHER);
-        put(RbacAction.MANAGE_QA,
+        put(RbacAction.VALIDATE_RESULTS, Constants.ROLE_LABORATORY_TECHNICIAN, Constants.ROLE_SENIOR_RESEARCHER,
                 Constants.ROLE_LAB_MANAGER);
-        put(RbacAction.APPROVE_NOTEBOOK_ENTRY,
-                Constants.ROLE_LAB_MANAGER, Constants.ROLE_SENIOR_RESEARCHER);
-        put(RbacAction.VIEW_AUDIT_TRAIL,
-                Constants.ROLE_AUDIT_TRAIL, Constants.ROLE_IT_SUPPORT_STAFF);
-        put(RbacAction.SYSTEM_ADMIN,
-                Constants.ROLE_SYSTEM_ADMIN);
-        put(RbacAction.MANAGE_EQUIPMENT,
-                Constants.ROLE_BIOMEDICAL_STAFF, Constants.ROLE_LAB_MANAGER);
+        put(RbacAction.REVIEW_RESULTS, Constants.ROLE_JUNIOR_RESEARCHER, Constants.ROLE_SENIOR_RESEARCHER,
+                Constants.ROLE_LAB_MANAGER);
+        put(RbacAction.GENERATE_REPORTS, Constants.ROLE_LAB_MANAGER, Constants.ROLE_SENIOR_RESEARCHER);
+        put(RbacAction.MANAGE_QA, Constants.ROLE_LAB_MANAGER);
+        put(RbacAction.APPROVE_NOTEBOOK_ENTRY, Constants.ROLE_LAB_MANAGER, Constants.ROLE_SENIOR_RESEARCHER);
+        put(RbacAction.VIEW_AUDIT_TRAIL, Constants.ROLE_AUDIT_TRAIL, Constants.ROLE_IT_SUPPORT_STAFF);
+        put(RbacAction.SYSTEM_ADMIN, Constants.ROLE_SYSTEM_ADMIN);
+        put(RbacAction.MANAGE_EQUIPMENT, Constants.ROLE_BIOMEDICAL_STAFF, Constants.ROLE_LAB_MANAGER);
     }
 
     @Autowired

@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.hibernate.Hibernate;
 import org.openelisglobal.biorepository.controller.rest.dto.RetrievalItemSuggestionDTO;
 import org.openelisglobal.biorepository.controller.rest.dto.RetrievalItemSuggestionsRequestDTO;
 import org.openelisglobal.biorepository.service.RetrievalFulfillmentSuggestionService;
@@ -19,7 +20,6 @@ import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.Desti
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.PriorityLevel;
 import org.openelisglobal.biorepository.valueholder.SampleRetrievalRequest.RequestStatus;
 import org.openelisglobal.common.rest.BaseRestController;
-import org.hibernate.Hibernate;
 import org.openelisglobal.notebook.service.NotebookEntryService;
 import org.openelisglobal.notebook.valueholder.NoteBook;
 import org.openelisglobal.notebook.valueholder.NotebookEntry;
@@ -89,9 +89,9 @@ public class SampleRetrievalRestController extends BaseRestController {
 
             SampleRetrievalRequest retrieval;
             if (request.getItems() != null && !request.getItems().isEmpty()) {
-                retrieval = retrievalService.createRequest(request.getRequestPurpose(), mapRetrievalItems(request.getItems()),
-                        request.getProjectId(), request.getEthicsApprovalRef(), destType,
-                        request.getDestinationDetails(), priority, request.getRequiredByDate(), sysUserId);
+                retrieval = retrievalService.createRequest(request.getRequestPurpose(),
+                        mapRetrievalItems(request.getItems()), request.getProjectId(), request.getEthicsApprovalRef(),
+                        destType, request.getDestinationDetails(), priority, request.getRequiredByDate(), sysUserId);
             } else {
                 retrieval = retrievalService.createRequest(request.getRequestPurpose(),
                         mapBioSampleIdsToItems(request.getBioSampleIds()), request.getProjectId(),
@@ -443,20 +443,21 @@ public class SampleRetrievalRestController extends BaseRestController {
         }
 
         try {
-            Map<String, RetrievalItemSuggestionDTO> suggestions =
-                    fulfillmentSuggestionService.getSuggestions(request, httpRequest);
+            Map<String, RetrievalItemSuggestionDTO> suggestions = fulfillmentSuggestionService.getSuggestions(request,
+                    httpRequest);
             return ResponseEntity.ok(suggestions);
         } catch (Exception e) {
-            org.slf4j.LoggerFactory.getLogger(SampleRetrievalRestController.class)
-                    .error("Failed to load fulfillment suggestions for itemIds={}",
-                            request != null ? request.getItemIds() : null, e);
+            org.slf4j.LoggerFactory.getLogger(SampleRetrievalRestController.class).error(
+                    "Failed to load fulfillment suggestions for itemIds={}",
+                    request != null ? request.getItemIds() : null, e);
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "Failed to load suggestions: " + e.getMessage()));
         }
     }
 
     /**
-     * Attach a stored BioSample to a reference-only request line during fulfillment.
+     * Attach a stored BioSample to a reference-only request line during
+     * fulfillment.
      */
     @PostMapping(value = "/items/{itemId}/attach", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
@@ -863,8 +864,7 @@ public class SampleRetrievalRestController extends BaseRestController {
             if (referenceId == null) {
                 continue;
             }
-            fulfillmentsByReference.computeIfAbsent(referenceId, key -> new ArrayList<>())
-                    .add(mapRetrievalItem(item));
+            fulfillmentsByReference.computeIfAbsent(referenceId, key -> new ArrayList<>()).add(mapRetrievalItem(item));
         }
 
         for (SampleRetrievalItem item : request.getItems()) {

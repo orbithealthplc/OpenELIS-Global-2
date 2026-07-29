@@ -197,21 +197,22 @@ public class BiorepositoryQCInspectionServiceIntegrationTest extends BaseWebCont
                 testUser.getId().toString());
     }
 
-        @Test
-        public void testCreateInspection_NonStoredSample_ThrowsIllegalArgumentException() {
-                // Arrange
-                BioSample bioSample = createTestBioSample("QC-NON-STORED-" + System.currentTimeMillis(),
-                                WorkflowStatus.DISPOSED);
+    @Test
+    public void testCreateInspection_NonStoredSample_ThrowsIllegalArgumentException() {
+        // Arrange
+        BioSample bioSample = createTestBioSample("QC-NON-STORED-" + System.currentTimeMillis(),
+                WorkflowStatus.DISPOSED);
 
-                // Act + Assert
-                try {
-                        qcInspectionService.createInspection(bioSample.getId(), "Inspector", new Timestamp(System.currentTimeMillis()),
-                                        true, true, true, true, true, null, null, "Should fail", testUser.getId().toString());
-                        fail("Expected IllegalArgumentException for non-STORED bio sample");
-                } catch (IllegalArgumentException e) {
-                        assertTrue("Error should mention STORED restriction", e.getMessage().contains("STORED"));
-                }
+        // Act + Assert
+        try {
+            qcInspectionService.createInspection(bioSample.getId(), "Inspector",
+                    new Timestamp(System.currentTimeMillis()), true, true, true, true, true, null, null, "Should fail",
+                    testUser.getId().toString());
+            fail("Expected IllegalArgumentException for non-STORED bio sample");
+        } catch (IllegalArgumentException e) {
+            assertTrue("Error should mention STORED restriction", e.getMessage().contains("STORED"));
         }
+    }
 
     // ========== BULK CREATE INSPECTIONS TESTS ==========
 
@@ -584,8 +585,9 @@ public class BiorepositoryQCInspectionServiceIntegrationTest extends BaseWebCont
                 new Timestamp(System.currentTimeMillis()), false, true, true, true, true, "SAMPLE_MISSING",
                 "Sample not found", "Missing during QC", testUser.getId().toString());
 
-        qcInspectionService.applyCorrectionWorkflow(inspection, "MARK_MISSING", initialLocation.id, initialLocation.type, "B2",
-                "invalid request", "invalid request", "invalid request", testUser.getId().toString());
+        qcInspectionService.applyCorrectionWorkflow(inspection, "MARK_MISSING", initialLocation.id,
+                initialLocation.type, "B2", "invalid request", "invalid request", "invalid request",
+                testUser.getId().toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -599,8 +601,9 @@ public class BiorepositoryQCInspectionServiceIntegrationTest extends BaseWebCont
                 new Timestamp(System.currentTimeMillis()), true, true, true, true, false, "MISPLACED_SAMPLE_FOUND",
                 "Position mismatch", "Detected wrong coordinate", testUser.getId().toString());
 
-        qcInspectionService.applyCorrectionWorkflow(inspection, "REASSIGN_POSITION", initialLocation.id, initialLocation.type,
-                null, "invalid request", "invalid request", "invalid request", testUser.getId().toString());
+        qcInspectionService.applyCorrectionWorkflow(inspection, "REASSIGN_POSITION", initialLocation.id,
+                initialLocation.type, null, "invalid request", "invalid request", "invalid request",
+                testUser.getId().toString());
     }
 
     // ========== HELPER METHODS ==========
@@ -651,10 +654,10 @@ public class BiorepositoryQCInspectionServiceIntegrationTest extends BaseWebCont
      * Create a test BioSample with STORED workflow status.
      */
     private BioSample createTestBioSample(String externalId) {
-                return createTestBioSample(externalId, WorkflowStatus.STORED);
-        }
+        return createTestBioSample(externalId, WorkflowStatus.STORED);
+    }
 
-        private BioSample createTestBioSample(String externalId, WorkflowStatus workflowStatus) {
+    private BioSample createTestBioSample(String externalId, WorkflowStatus workflowStatus) {
         // Create Sample
         Sample sample = new Sample();
         // Use shorter accession number to fit VARCHAR(20) constraint
@@ -681,7 +684,7 @@ public class BiorepositoryQCInspectionServiceIntegrationTest extends BaseWebCont
         BioSample bioSample = new BioSample();
         bioSample.setSampleItem(sampleItem);
         bioSample.setBiosafetyLevel(BiosafetyLevel.BSL_1);
-                bioSample.setWorkflowStatus(workflowStatus);
+        bioSample.setWorkflowStatus(workflowStatus);
         bioSample.setPreservationMedium("EDTA");
         bioSample.setSysUserId(testUser.getId().toString());
 

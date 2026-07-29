@@ -6,12 +6,13 @@
     <dictionary id="8800" />
 
     <localization id="8801" description="sampleType name"
-        english="Whole Blood" french="Sang total" lastupdated="2026-01-01 12:00:00" />
+        english="Whole Blood" french="Sang total"
+        lastupdated="2026-01-01 12:00:00" />
 
-    <type_of_sample id="8801" description="Whole Blood" domain="H"
-        lastupdated="2026-01-01 12:00:00" local_abbrev="Whole Blood"
-        is_active="true" sort_order="1" name_localization_id="8801"
-        display_key="sample.type.WholeBlood" />
+    <type_of_sample id="8801" description="Whole Blood"
+        domain="H" lastupdated="2026-01-01 12:00:00"
+        local_abbrev="Whole Blood" is_active="true" sort_order="1"
+        name_localization_id="8801" display_key="sample.type.WholeBlood" />
 
     <!-- MNTD template notebook with intake page -->
     <notebook id="8801" title="MNTD Laboratory" type="8800"
@@ -20,28 +21,31 @@
         workflow_type="mntd" technician_id="1" creator_id="1"
         date_created="2026-01-01 10:00:00" last_updated="2026-01-01 10:00:00" />
 
-    <notebook_page id="88011" notebook_id="8801" page_order="1"
-        title="Sample Intake / Sample Creation" page_id="intake"
-        instructions="Register incoming MNTD samples" content="Page 1" />
+    <notebook_page id="88011" notebook_id="8801"
+        page_order="1" title="Sample Intake / Sample Creation"
+        page_id="intake" instructions="Register incoming MNTD samples"
+        content="Page 1" />
 
     <!-- Child instance inherits pages from template (no local pages) -->
-    <notebook id="8802" title="MNTD Laboratory Instance" type="8800"
-        protocol="MNTD Protocol" content="MNTD instance content"
+    <notebook id="8802" title="MNTD Laboratory Instance"
+        type="8800" protocol="MNTD Protocol" content="MNTD instance content"
         objective="MNTD workflow" status="DRAFT" is_template="false"
-        workflow_type="mntd" parent_notebook_id="8801"
-        technician_id="1" creator_id="1"
-        date_created="2026-01-02 10:00:00" last_updated="2026-01-02 10:00:00" />
+        workflow_type="mntd" parent_notebook_id="8801" technician_id="1"
+        creator_id="1" date_created="2026-01-02 10:00:00"
+        last_updated="2026-01-02 10:00:00" />
 
     <!-- Instance with its own copied pages -->
-    <notebook id="8803" title="MNTD Laboratory Instance With Pages" type="8800"
+    <notebook id="8803"
+        title="MNTD Laboratory Instance With Pages" type="8800"
         protocol="MNTD Protocol" content="MNTD instance content"
         objective="MNTD workflow" status="DRAFT" is_template="false"
         workflow_type="mntd" technician_id="1" creator_id="1"
         date_created="2026-01-03 10:00:00" last_updated="2026-01-03 10:00:00" />
 
-    <notebook_page id="88031" notebook_id="8803" page_order="1"
-        title="Sample Intake / Sample Creation" page_id="intake"
-        instructions="Register incoming MNTD samples" content="Page 1" />
+    <notebook_page id="88031" notebook_id="8803"
+        page_order="1" title="Sample Intake / Sample Creation"
+        page_id="intake" instructions="Register incoming MNTD samples"
+        content="Page 1" />
 
     <notebook_entry id="8801" notebook_id="8802"
         title="MNTD Entry Child Instance" status="DRAFT" creator_id="1"

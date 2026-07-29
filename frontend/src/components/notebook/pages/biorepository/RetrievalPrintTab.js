@@ -104,7 +104,8 @@ function RetrievalPrintTab({ refreshToken }) {
           })}
           subtitle={intl.formatMessage({
             id: "biorepository.retrieval.print.successDetail",
-            defaultMessage: "Retrieval transaction report saved to your downloads folder.",
+            defaultMessage:
+              "Retrieval transaction report saved to your downloads folder.",
           })}
           lowContrast
           onCloseButtonClick={() => setSuccess(false)}

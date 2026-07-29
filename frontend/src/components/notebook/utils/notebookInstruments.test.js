@@ -20,9 +20,9 @@ describe("notebookInstruments", () => {
   });
 
   it("uses empty linkedInstruments when user cleared selections", () => {
-    expect(resolveNotebookInstruments([], [{ id: "2", value: "Centrifuge" }])).toEqual(
-      [],
-    );
+    expect(
+      resolveNotebookInstruments([], [{ id: "2", value: "Centrifuge" }]),
+    ).toEqual([]);
   });
 
   it("maps IdValuePair analyzers to dropdown options", () => {

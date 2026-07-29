@@ -306,12 +306,14 @@ function BiorepositoryLifecycleModal({
             </strong>
             {retrievalSummary.requestNumber && (
               <div style={{ fontSize: "0.875rem" }}>
-                <strong>Request number:</strong> {retrievalSummary.requestNumber}
+                <strong>Request number:</strong>{" "}
+                {retrievalSummary.requestNumber}
               </div>
             )}
             {retrievalSummary.requestorName && (
               <div style={{ fontSize: "0.875rem" }}>
-                <strong>Requestor name:</strong> {retrievalSummary.requestorName}
+                <strong>Requestor name:</strong>{" "}
+                {retrievalSummary.requestorName}
               </div>
             )}
             {retrievalSummary.requesterLabUnit && (
@@ -565,7 +567,10 @@ BiorepositoryLifecycleModal.propTypes = {
   }),
   retrievalContext: PropTypes.shape({
     requestedReference: PropTypes.string,
-    requestedQuantity: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    requestedQuantity: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
+    ]),
     requestedUnit: PropTypes.string,
     fulfilledSample: PropTypes.string,
     storagePath: PropTypes.string,

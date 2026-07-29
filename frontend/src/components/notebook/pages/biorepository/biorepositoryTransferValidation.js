@@ -117,10 +117,7 @@ export function extractBiorepositoryTransferError(response, fallbackMessage) {
   if (!message) {
     return fallbackMessage;
   }
-  if (
-    typeof message === "string" &&
-    message.includes("Unrecognized field")
-  ) {
+  if (typeof message === "string" && message.includes("Unrecognized field")) {
     return "Server is out of date and rejected transfer metadata. Rebuild and redeploy the backend, then try again.";
   }
   return message;

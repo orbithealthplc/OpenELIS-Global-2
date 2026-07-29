@@ -5,7 +5,8 @@ import java.time.LocalDate;
 
 /**
  * Per-sample metadata supplied when creating a biorepository retrieval request.
- * bioSampleId is optional for reference-only request lines from external departments.
+ * bioSampleId is optional for reference-only request lines from external
+ * departments.
  */
 public class RetrievalItemCreate {
 

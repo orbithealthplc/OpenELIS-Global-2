@@ -1,0 +1,122 @@
+[    2342ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[    2740ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://localhost:3000/login:0
+[    7522ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[   14625ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   15127ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[   15255ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739469
+[   15255ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739471
+[   19855ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[   21083ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[   21691ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[   21771ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739469
+[   21773ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739471
+[   22288ms] [LOG] System roles API response: [Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object] @ https://localhost:3000/static/js/bundle.js:346306
+[   22289ms] [LOG] Mapped available roles: [Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object, Object] @ https://localhost:3000/static/js/bundle.js:346316
+[   22951ms] [LOG] Matching departments - pending: [195] organizations: [168, 188, 189, 196, 195, 186, 59, 191, 190, 192, 187, 194, 193, 76] matched: [Object] @ https://localhost:3000/static/js/bundle.js:346336
+[   26412ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[  155566ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  156141ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  156272ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739469
+[  156273ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739471
+[  156376ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  156376ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  156952ms] [LOG] Loading data {data: Object} @ https://localhost:3000/static/js/bundle.js:349253
+[  160922ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[  174366ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notebook/my-stage-access:0
+[  588521ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  589594ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  589745ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739471
+[  589745ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739473
+[  590322ms] [LOG] Loading data {data: Object} @ https://localhost:3000/static/js/bundle.js:349253
+[  594229ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[  612389ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  612732ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  612808ms] [INFO] Authenticated @ https://localhost:3000/static/js/bundle.js:739481
+[  612809ms] [INFO] Access Allowed @ https://localhost:3000/static/js/bundle.js:739483
+[  612891ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  612891ms] [LOG] reports @ https://localhost:3000/static/js/bundle.js:336024
+[  613066ms] [LOG] Loading data {data: Object} @ https://localhost:3000/static/js/bundle.js:349253
+[  617588ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814
+[  791208ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  792736ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notifications:0
+[  792892ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  792897ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  792898ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  792899ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/open-configuration-properties:0
+[  792922ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  792923ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  792951ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  792958ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  792961ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  792976ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  792981ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  792997ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  792998ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793019ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793021ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793052ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793052ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793083ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793084ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793105ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793106ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793129ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793129ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793140ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793141ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793155ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  793157ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  793461ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ https://localhost:3000/static/js/bundle.js:180160
+[  794174ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://localhost:3000/login:0
+[  794200ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  794209ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  794214ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notifications:0
+[  794353ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/open-configuration-properties:0
+[  794386ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794386ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794390ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/notification/pnconfig:0
+[  794392ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  794407ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  794408ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794408ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794426ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  794436ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794436ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794444ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794445ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794458ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794465ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794499ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794500ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794521ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794521ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794543ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794543ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794566ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794566ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794578ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/session:0
+[  794578ms] [ERROR] Error: Did not receive a successful response from the backend while retrieving user session details
+    at getUserSessionDetails (https://localhost:3000/static/js/bundle.js:232035:17) @ https://localhost:3000/static/js/bundle.js:232037
+[  794659ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  794660ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/open-configuration-properties:0
+[  794670ms] [ERROR] Failed to load resource: the server responded with a status of 504 (Gateway Timeout) @ https://localhost:3000/OpenELIS-Global/rest/properties:0
+[  798762ms] [WARNING] single-spa minified message #1: See https://single-spa.js.org/error/?code=1 @ https://localhost:3000/static/js/bundle.js:191814

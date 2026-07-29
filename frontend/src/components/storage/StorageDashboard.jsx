@@ -3175,14 +3175,14 @@ const StorageDashboard = () => {
         sampleAccessionNumber: sampleAccessionNumber, // Parent Sample accession for context
         type: sampleItem.type || sampleItem.sampleType || "",
         status: isDisposedSample(sampleItem) ? (
-            <Tag type="red">
-              <FormattedMessage id="storage.status.disposed" />
-            </Tag>
-          ) : (
-            <Tag type="green">
-              <FormattedMessage id="label.active" />
-            </Tag>
-          ),
+          <Tag type="red">
+            <FormattedMessage id="storage.status.disposed" />
+          </Tag>
+        ) : (
+          <Tag type="green">
+            <FormattedMessage id="label.active" />
+          </Tag>
+        ),
         department:
           sampleItem.departmentName ||
           sampleItem.departmentTestSectionName ||
@@ -3469,7 +3469,9 @@ const StorageDashboard = () => {
                               items={[
                                 {
                                   id: "",
-                                  label: intl.formatMessage({ id: "label.all" }),
+                                  label: intl.formatMessage({
+                                    id: "label.all",
+                                  }),
                                 },
                                 ...assignableDepartments,
                               ]}
@@ -3485,8 +3487,9 @@ const StorageDashboard = () => {
                                         )?.label ||
                                         rooms.find(
                                           (r) =>
-                                            String(r.departmentTestSectionId) ===
-                                            String(filterDepartment),
+                                            String(
+                                              r.departmentTestSectionId,
+                                            ) === String(filterDepartment),
                                         )?.departmentName ||
                                         filterDepartment,
                                     }
@@ -3517,7 +3520,9 @@ const StorageDashboard = () => {
                               items={[
                                 {
                                   id: "",
-                                  label: intl.formatMessage({ id: "label.all" }),
+                                  label: intl.formatMessage({
+                                    id: "label.all",
+                                  }),
                                 },
                                 ...rooms
                                   .filter(
@@ -3537,8 +3542,7 @@ const StorageDashboard = () => {
                                       id: filterRoom,
                                       label:
                                         rooms.find((r) => r.id === filterRoom)
-                                          ?.name ||
-                                        storageLabels.filterRoom,
+                                          ?.name || storageLabels.filterRoom,
                                     }
                                   : {
                                       id: "",
@@ -3565,14 +3569,18 @@ const StorageDashboard = () => {
                               items={[
                                 {
                                   id: "",
-                                  label: intl.formatMessage({ id: "label.all" }),
+                                  label: intl.formatMessage({
+                                    id: "label.all",
+                                  }),
                                 },
                                 ...devices
                                   .filter((d) => {
-                                    const deviceRoomId = d.roomId || d.parentRoomId;
+                                    const deviceRoomId =
+                                      d.roomId || d.parentRoomId;
                                     if (
                                       filterRoom &&
-                                      String(deviceRoomId) !== String(filterRoom)
+                                      String(deviceRoomId) !==
+                                        String(filterRoom)
                                     ) {
                                       return false;
                                     }
@@ -3599,8 +3607,9 @@ const StorageDashboard = () => {
                                   ? {
                                       id: filterDevice,
                                       label:
-                                        devices.find((d) => d.id === filterDevice)
-                                          ?.name ||
+                                        devices.find(
+                                          (d) => d.id === filterDevice,
+                                        )?.name ||
                                         intl.formatMessage({
                                           id: "storage.filter.device",
                                         }),
@@ -3645,8 +3654,7 @@ const StorageDashboard = () => {
                                       id: filterRoom,
                                       label:
                                         rooms.find((r) => r.id === filterRoom)
-                                          ?.name ||
-                                        storageLabels.filterRoom,
+                                          ?.name || storageLabels.filterRoom,
                                     }
                                   : {
                                       id: "",
@@ -4136,8 +4144,7 @@ const StorageDashboard = () => {
                                       id: filterRoom,
                                       label:
                                         rooms.find((r) => r.id === filterRoom)
-                                          ?.name ||
-                                        storageLabels.filterRoom,
+                                          ?.name || storageLabels.filterRoom,
                                     }
                                   : {
                                       id: "",
@@ -4401,8 +4408,7 @@ const StorageDashboard = () => {
                                       id: filterRoom,
                                       label:
                                         rooms.find((r) => r.id === filterRoom)
-                                          ?.name ||
-                                        storageLabels.filterRoom,
+                                          ?.name || storageLabels.filterRoom,
                                     }
                                   : {
                                       id: "",
@@ -4717,8 +4723,7 @@ const StorageDashboard = () => {
                                       id: filterRoom,
                                       label:
                                         rooms.find((r) => r.id === filterRoom)
-                                          ?.name ||
-                                        storageLabels.filterRoom,
+                                          ?.name || storageLabels.filterRoom,
                                     }
                                   : {
                                       id: "",

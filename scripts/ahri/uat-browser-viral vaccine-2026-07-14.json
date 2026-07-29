@@ -1,0 +1,62 @@
+[
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_collector",
+    "persona": "Sample Collector",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/6?mode=edit&tab=workflow&entryId=115\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_tech",
+    "persona": "Laboratory Technician",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/6?mode=edit&tab=workflow&entryId=115\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_manager",
+    "persona": "Lab Manager",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/6?mode=edit&tab=workflow&entryId=115\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_jr_researcher",
+    "persona": "Junior Researcher",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/6?mode=edit&tab=workflow&entryId=115\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_sr_researcher",
+    "persona": "Senior Researcher",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/6?mode=edit&tab=workflow&entryId=115\", waiting until \"domcontentloaded\"\n"
+  },
+  {
+    "dept": "Viral Vaccine",
+    "workflow": "viral_vaccine",
+    "user": "vv_biomedical",
+    "persona": "Biomedical Staff",
+    "notebookId": 6,
+    "entryId": 115,
+    "result": "FAIL",
+    "error": "Page.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator(\"#loginName\")\n"
+  }
+]

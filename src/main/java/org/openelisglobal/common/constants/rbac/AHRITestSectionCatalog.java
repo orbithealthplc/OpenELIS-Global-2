@@ -6,8 +6,8 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * AHRI research-lab allowlist for user-management lab unit assignment.
- * Matches {@code volume/configuration/backend/notebook-departments/research-lab-linkages.csv}.
+ * AHRI research-lab allowlist for user-management lab unit assignment. Matches
+ * {@code volume/configuration/backend/notebook-departments/research-lab-linkages.csv}.
  */
 public final class AHRITestSectionCatalog {
 

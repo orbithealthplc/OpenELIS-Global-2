@@ -111,7 +111,8 @@ public interface SampleRetrievalService extends BaseObjectService<SampleRetrieva
             BigDecimal temperatureAtRetrieval, BigDecimal quantityReleased, String sysUserId);
 
     /**
-     * Attach a stored BioSample to a reference-only retrieval line during fulfillment.
+     * Attach a stored BioSample to a reference-only retrieval line during
+     * fulfillment.
      */
     SampleRetrievalItem attachSampleToReferenceItem(Integer referenceItemId, Integer bioSampleId,
             BigDecimal quantityRequested, String sysUserId);

@@ -11,7 +11,10 @@ import {
 } from "../constants/ahriSrsPersonas";
 
 /** Roles allowed to create or edit storage locations (rooms, devices, shelves, racks). */
-export const storageMutationRoles = [...storagePersonas, ...Permissions.MANAGE_EQUIPMENT];
+export const storageMutationRoles = [
+  ...storagePersonas,
+  ...Permissions.MANAGE_EQUIPMENT,
+];
 
 /** Roles allowed to save inventory items (reagents or equipment). */
 export const inventorySaveRoles = [
@@ -26,10 +29,16 @@ export const inventoryItemMutationRoles = [...inventorySaveRoles];
 export const equipmentMutationRoles = [...equipmentPersonas];
 
 /** Roles allowed to run inventory QC workflows on lots. */
-export const inventoryQcRoles = [...resultValidationPersonas, ...Permissions.MANAGE_QA];
+export const inventoryQcRoles = [
+  ...resultValidationPersonas,
+  ...Permissions.MANAGE_QA,
+];
 
 /** Roles allowed to generate inventory reports. */
-export const inventoryReportRoles = [...reportingPersonas, ...Permissions.GENERATE_REPORTS];
+export const inventoryReportRoles = [
+  ...reportingPersonas,
+  ...Permissions.GENERATE_REPORTS,
+];
 
 /** Roles allowed to register new samples (biorepository intake). */
 export const sampleRegistrationRoles = [...sampleRegistrationPersonas];

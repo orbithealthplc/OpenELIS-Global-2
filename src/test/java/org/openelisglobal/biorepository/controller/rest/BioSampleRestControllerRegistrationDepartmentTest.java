@@ -76,10 +76,8 @@ public class BioSampleRestControllerRegistrationDepartmentTest {
         when(departmentIsolationService.hasUnrestrictedDepartmentAccess(any())).thenReturn(false);
         when(departmentIsolationService.getRestrictedUserTestSectionIds(any())).thenReturn(java.util.Set.of());
 
-        mockMvc.perform(post("/rest/biorepository/sample/register")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/rest/biorepository/sample/register").session(session)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -94,10 +92,8 @@ public class BioSampleRestControllerRegistrationDepartmentTest {
         when(departmentIsolationService.resolveDepartmentForScopedCreate(any(), any())).thenReturn(178);
         when(departmentIsolationService.canAccessDepartmentScopedLocation(eq(178), any())).thenReturn(false);
 
-        mockMvc.perform(post("/rest/biorepository/sample/register")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/rest/biorepository/sample/register").session(session)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -113,10 +109,8 @@ public class BioSampleRestControllerRegistrationDepartmentTest {
         when(departmentIsolationService.canAccessDepartmentScopedLocation(eq(178), any())).thenReturn(true);
         when(rbacPermissionService.hasPermission(any(), eq(RbacAction.REGISTER_SAMPLES))).thenReturn(false);
 
-        mockMvc.perform(post("/rest/biorepository/sample/register")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/rest/biorepository/sample/register").session(session)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isForbidden());
     }
 
@@ -133,10 +127,8 @@ public class BioSampleRestControllerRegistrationDepartmentTest {
         when(departmentIsolationService.canAccessDepartmentScopedLocation(eq(178), any())).thenReturn(true);
         when(departmentIsolationService.isInventoryProjectConsistent(178, "Other Dept Project")).thenReturn(false);
 
-        mockMvc.perform(post("/rest/biorepository/sample/register")
-                .session(session)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+        mockMvc.perform(post("/rest/biorepository/sample/register").session(session)
+                .contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 

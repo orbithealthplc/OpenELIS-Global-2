@@ -1,0 +1,79 @@
+{
+  "TB": {
+    "notebookId": 235,
+    "lab": "180",
+    "entryId": 119,
+    "raw": {
+      "notebookId": 235,
+      "id": 119,
+      "title": "TB UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Pharma": {
+    "notebookId": 236,
+    "lab": "178",
+    "entryId": 120,
+    "raw": {
+      "notebookId": 236,
+      "id": 120,
+      "title": "Pharma UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Traditional": {
+    "notebookId": 237,
+    "lab": "173",
+    "entryId": 121,
+    "raw": {
+      "notebookId": 237,
+      "id": 121,
+      "title": "Traditional UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Bioanalytical": {
+    "notebookId": 238,
+    "lab": "174",
+    "entryId": 122,
+    "raw": {
+      "notebookId": 238,
+      "id": 122,
+      "title": "Bioanalytical UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Bioequivalence": {
+    "notebookId": 239,
+    "lab": "175",
+    "entryId": 123,
+    "raw": {
+      "notebookId": 239,
+      "id": 123,
+      "title": "Bioequivalence UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Virology": {
+    "notebookId": 240,
+    "lab": "203",
+    "entryId": 124,
+    "raw": {
+      "notebookId": 240,
+      "id": 124,
+      "title": "Virology UAT Entry #1",
+      "status": "DRAFT"
+    }
+  },
+  "Viral Vaccine": {
+    "notebookId": 241,
+    "lab": "179",
+    "entryId": 125,
+    "raw": {
+      "notebookId": 241,
+      "id": 125,
+      "title": "Viral Vaccine UAT Entry #1",
+      "status": "DRAFT"
+    }
+  }
+}

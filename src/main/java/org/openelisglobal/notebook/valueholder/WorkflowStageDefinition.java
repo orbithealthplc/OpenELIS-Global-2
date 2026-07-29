@@ -28,7 +28,8 @@ public class WorkflowStageDefinition {
                 : (stageId != null ? stageId.trim() : "stage-" + stageOrder);
         this.stageTitle = stageTitle;
         this.allowedPersonas = allowedPersonas == null ? List.of() : List.copyOf(allowedPersonas);
-        this.allowedActions = allowedActions == null || allowedActions.isEmpty() ? NotebookStageAction.DEFAULT_STAGE_ACTIONS
+        this.allowedActions = allowedActions == null || allowedActions.isEmpty()
+                ? NotebookStageAction.DEFAULT_STAGE_ACTIONS
                 : Collections.unmodifiableSet(allowedActions);
     }
 

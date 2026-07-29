@@ -688,7 +688,6 @@ function SampleIntakeForm({
             </Switch>
           </ContentSwitcher>
         </Column>
-
       </Grid>
 
       {mode === 0 ? (

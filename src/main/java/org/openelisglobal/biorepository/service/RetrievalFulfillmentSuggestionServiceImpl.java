@@ -28,20 +28,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfillmentSuggestionService {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(RetrievalFulfillmentSuggestionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(RetrievalFulfillmentSuggestionServiceImpl.class);
 
     private static final int CANDIDATE_CAP = 10;
 
-    @Autowired private SampleRetrievalService retrievalService;
+    @Autowired
+    private SampleRetrievalService retrievalService;
 
-    @Autowired private BioSampleFulfillmentSearchService fulfillmentSearchService;
+    @Autowired
+    private BioSampleFulfillmentSearchService fulfillmentSearchService;
 
-    @Autowired private TypeOfSampleService typeOfSampleService;
+    @Autowired
+    private TypeOfSampleService typeOfSampleService;
 
     @Override
-    public Map<String, RetrievalItemSuggestionDTO> getSuggestions(
-            RetrievalItemSuggestionsRequestDTO request, HttpServletRequest httpRequest) {
+    public Map<String, RetrievalItemSuggestionDTO> getSuggestions(RetrievalItemSuggestionsRequestDTO request,
+            HttpServletRequest httpRequest) {
         Map<String, RetrievalItemSuggestionDTO> response = new LinkedHashMap<>();
         if (request == null || request.getItemIds() == null || request.getItemIds().isEmpty()) {
             return response;
@@ -89,18 +91,14 @@ public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfi
         return dto;
     }
 
-    private RetrievalItemSuggestionDTO buildSuggestionForItem(
-            SampleRetrievalItem item,
-            RetrievalItemIdentityLookupDTO override,
-            HttpServletRequest httpRequest) {
+    private RetrievalItemSuggestionDTO buildSuggestionForItem(SampleRetrievalItem item,
+            RetrievalItemIdentityLookupDTO override, HttpServletRequest httpRequest) {
         RetrievalItemSuggestionDTO dto = new RetrievalItemSuggestionDTO();
         dto.setRetrievalItemId(item.getId());
 
-        String accession =
-            firstNonBlank(
-                override != null ? override.getAccessionNumber() : null, item.getRequestedAccessionNumber());
-        String barcode =
-            firstNonBlank(override != null ? override.getBarcode() : null, item.getRequestedBarcode());
+        String accession = firstNonBlank(override != null ? override.getAccessionNumber() : null,
+                item.getRequestedAccessionNumber());
+        String barcode = firstNonBlank(override != null ? override.getBarcode() : null, item.getRequestedBarcode());
         String sampleType = trimToNull(item.getRequestedSampleType());
         String originLab = trimToNull(item.getRequestedOriginLab());
         String projectId = trimToNull(item.getRequestedProjectId());
@@ -149,10 +147,8 @@ public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfi
             return dto;
         }
 
-        List<BioSampleListDTO> exactMatches =
-            candidates.stream()
-                .filter(c -> Boolean.TRUE.equals(c.getExactIdentityMatch()))
-                .collect(Collectors.toList());
+        List<BioSampleListDTO> exactMatches = candidates.stream()
+                .filter(c -> Boolean.TRUE.equals(c.getExactIdentityMatch())).collect(Collectors.toList());
 
         if (!exactMatches.isEmpty()) {
             BioSampleListDTO topExact = exactMatches.get(0);
@@ -178,14 +174,10 @@ public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfi
         if (topCandidate == null) {
             return summary;
         }
-        summary.setSampleIdentity(firstNonBlank(
-                topCandidate.getAccessionNumber(),
-                topCandidate.getBarcode(),
+        summary.setSampleIdentity(firstNonBlank(topCandidate.getAccessionNumber(), topCandidate.getBarcode(),
                 topCandidate.getProjectId()));
-        summary.setAvailableQuantity(
-                topCandidate.getRemainingQuantity() != null
-                        ? topCandidate.getRemainingQuantity()
-                        : topCandidate.getQuantity());
+        summary.setAvailableQuantity(topCandidate.getRemainingQuantity() != null ? topCandidate.getRemainingQuantity()
+                : topCandidate.getQuantity());
         summary.setAvailableUnitOfMeasure(topCandidate.getUnitOfMeasure());
         summary.setSamplePath(firstNonBlank(topCandidate.getSamplePath(), topCandidate.getHierarchicalPath()));
         summary.setMatchReason(topCandidate.getMatchReason());
@@ -195,13 +187,9 @@ public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfi
         return summary;
     }
 
-    private boolean hasSearchCriteria(
-            String accession, String barcode, String sampleType, String originLab, String projectId) {
-        return accession != null
-            || barcode != null
-            || sampleType != null
-            || originLab != null
-            || projectId != null;
+    private boolean hasSearchCriteria(String accession, String barcode, String sampleType, String originLab,
+            String projectId) {
+        return accession != null || barcode != null || sampleType != null || originLab != null || projectId != null;
     }
 
     private String firstNonBlank(String... values) {
@@ -243,13 +231,11 @@ public class RetrievalFulfillmentSuggestionServiceImpl implements RetrievalFulfi
             if (type.getId() == null) {
                 continue;
             }
-            String description =
-                type.getDescription() != null ? type.getDescription().toLowerCase(Locale.ROOT) : "";
-            String localizedName =
-                type.getLocalizedName() != null ? type.getLocalizedName().toLowerCase(Locale.ROOT) : "";
-            if (description.contains(normalizedQuery)
-                || localizedName.contains(normalizedQuery)
-                || trimmed.equalsIgnoreCase(type.getId())) {
+            String description = type.getDescription() != null ? type.getDescription().toLowerCase(Locale.ROOT) : "";
+            String localizedName = type.getLocalizedName() != null ? type.getLocalizedName().toLowerCase(Locale.ROOT)
+                    : "";
+            if (description.contains(normalizedQuery) || localizedName.contains(normalizedQuery)
+                    || trimmed.equalsIgnoreCase(type.getId())) {
                 matchingIds.add(type.getId());
             }
         }

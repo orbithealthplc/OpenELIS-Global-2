@@ -3452,7 +3452,9 @@ ACC-2024-002,BLK-002-A,"Negative for malignancy",,Benign fibrocystic changes,tru
 
                       <Column lg={16} md={8} sm={4}>
                         <div style={{ marginTop: "1rem" }}>
-                          <p style={{ marginBottom: "0.5rem", fontWeight: 600 }}>
+                          <p
+                            style={{ marginBottom: "0.5rem", fontWeight: 600 }}
+                          >
                             <FormattedMessage
                               id="pathology.results.synopticPdfImport"
                               defaultMessage="Import Synoptic Report (PDF)"

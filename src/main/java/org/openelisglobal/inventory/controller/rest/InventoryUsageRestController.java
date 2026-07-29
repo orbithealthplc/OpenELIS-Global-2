@@ -51,8 +51,8 @@ public class InventoryUsageRestController extends BaseRestController {
     public ResponseEntity<List<InventoryUsage>> getByTestResultId(@PathVariable String testResultId,
             HttpServletRequest request) {
         try {
-            List<InventoryUsage> usageList = filterAccessible(usageService.getByTestResultId(Long.valueOf(testResultId)),
-                    request);
+            List<InventoryUsage> usageList = filterAccessible(
+                    usageService.getByTestResultId(Long.valueOf(testResultId)), request);
             return ResponseEntity.ok(usageList);
         } catch (Exception e) {
             LogEvent.logError(e);
@@ -104,7 +104,6 @@ public class InventoryUsageRestController extends BaseRestController {
     }
 
     private boolean canAccessUsage(InventoryUsage usage, HttpServletRequest request) {
-        return usage != null
-                && departmentIsolationService.canAccessInventoryItem(usage.getInventoryItem(), request);
+        return usage != null && departmentIsolationService.canAccessInventoryItem(usage.getInventoryItem(), request);
     }
 }

@@ -24,9 +24,7 @@ export function getDepartmentLabUnitKeys(userSessionDetails) {
   );
 }
 
-const LAB_UNIT_ALIAS_GROUPS = [
-  ["ctd", "ctd department", "medical laboratory"],
-];
+const LAB_UNIT_ALIAS_GROUPS = [["ctd", "ctd department", "medical laboratory"]];
 
 function normalizeLabUnitName(name) {
   if (!name) {

@@ -43,31 +43,28 @@ public class BiorepositoryQCInspectionDAOImpl extends BaseDAOImpl<BiorepositoryQ
         return results.isEmpty() ? null : results.get(0);
     }
 
-        @Override
-        public Map<Integer, BiorepositoryQCInspection> getMostRecentByBioSampleIds(List<Integer> bioSampleIds) {
-                if (bioSampleIds == null || bioSampleIds.isEmpty()) {
-                        return Map.of();
-                }
-
-                Session session = entityManager.unwrap(Session.class);
-                String hql = "SELECT qc FROM BiorepositoryQCInspection qc "
-                                + "JOIN FETCH qc.bioSample bs "
-                                + "WHERE bs.id IN :bioSampleIds "
-                                + "ORDER BY bs.id ASC, qc.inspectionDate DESC, qc.id DESC";
-
-                List<BiorepositoryQCInspection> inspections = session.createQuery(hql, BiorepositoryQCInspection.class)
-                                .setParameter("bioSampleIds", bioSampleIds)
-                                .getResultList();
-
-                Map<Integer, BiorepositoryQCInspection> mostRecentBySampleId = new HashMap<>();
-                for (BiorepositoryQCInspection inspection : inspections) {
-                        Integer sampleId = inspection.getBioSample() != null ? inspection.getBioSample().getId() : null;
-                        if (sampleId != null && !mostRecentBySampleId.containsKey(sampleId)) {
-                                mostRecentBySampleId.put(sampleId, inspection);
-                        }
-                }
-                return mostRecentBySampleId;
+    @Override
+    public Map<Integer, BiorepositoryQCInspection> getMostRecentByBioSampleIds(List<Integer> bioSampleIds) {
+        if (bioSampleIds == null || bioSampleIds.isEmpty()) {
+            return Map.of();
         }
+
+        Session session = entityManager.unwrap(Session.class);
+        String hql = "SELECT qc FROM BiorepositoryQCInspection qc " + "JOIN FETCH qc.bioSample bs "
+                + "WHERE bs.id IN :bioSampleIds " + "ORDER BY bs.id ASC, qc.inspectionDate DESC, qc.id DESC";
+
+        List<BiorepositoryQCInspection> inspections = session.createQuery(hql, BiorepositoryQCInspection.class)
+                .setParameter("bioSampleIds", bioSampleIds).getResultList();
+
+        Map<Integer, BiorepositoryQCInspection> mostRecentBySampleId = new HashMap<>();
+        for (BiorepositoryQCInspection inspection : inspections) {
+            Integer sampleId = inspection.getBioSample() != null ? inspection.getBioSample().getId() : null;
+            if (sampleId != null && !mostRecentBySampleId.containsKey(sampleId)) {
+                mostRecentBySampleId.put(sampleId, inspection);
+            }
+        }
+        return mostRecentBySampleId;
+    }
 
     @Override
     public List<BiorepositoryQCInspection> getByQCResult(QCResult qcResult) {

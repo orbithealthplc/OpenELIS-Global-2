@@ -12,16 +12,16 @@ public interface MedLabPatientOrderService {
     /**
      * Creates a new patient order for the MedLab workflow.
      *
-     * @param patientId       the patient ID
-     * @param labNo           the lab accession number
-     * @param requestDate     the order request date
-     * @param receivedDate    the sample received date
-     * @param priority        the order priority
-     * @param testIds         list of test IDs to include
-     * @param notebookEntryId notebook entry ID (optional)
-     * @param notebookPageId  notebook page ID (optional)
+     * @param patientId              the patient ID
+     * @param labNo                  the lab accession number
+     * @param requestDate            the order request date
+     * @param receivedDate           the sample received date
+     * @param priority               the order priority
+     * @param testIds                list of test IDs to include
+     * @param notebookEntryId        notebook entry ID (optional)
+     * @param notebookPageId         notebook page ID (optional)
      * @param sampleCollectionPageId sample collection page ID (optional)
-     * @param sysUserId       the system user ID
+     * @param sysUserId              the system user ID
      * @return the created order information
      */
     Map<String, Object> createPatientOrder(String patientId, String labNo, String requestDate, String receivedDate,
@@ -29,8 +29,8 @@ public interface MedLabPatientOrderService {
             Integer sampleCollectionPageId, String sysUserId);
 
     default Map<String, Object> createPatientOrder(String patientId, String labNo, String requestDate,
-            String receivedDate, String priority, List<String> testIds, Integer notebookEntryId,
-            Integer notebookPageId, String sysUserId) {
+            String receivedDate, String priority, List<String> testIds, Integer notebookEntryId, Integer notebookPageId,
+            String sysUserId) {
         return createPatientOrder(patientId, labNo, requestDate, receivedDate, priority, testIds, notebookEntryId,
                 notebookPageId, null, sysUserId);
     }
@@ -39,15 +39,16 @@ public interface MedLabPatientOrderService {
      * Creates bulk patient orders for multiple patients at once. Uses
      * AccessionService for unique lab number generation with the specified prefix.
      *
-     * @param patients        list of patient data maps with patientId, firstName,
-     *                        lastName
-     * @param labNumberPrefix the prefix for lab numbers (e.g., "MEDLAB-2026-")
-     * @param testIds         list of test IDs to include in each order
-     * @param priority        the order priority
-     * @param notebookEntryId notebook entry ID (optional)
-     * @param notebookPageId  notebook page ID (optional)
+     * @param patients               list of patient data maps with patientId,
+     *                               firstName, lastName
+     * @param labNumberPrefix        the prefix for lab numbers (e.g.,
+     *                               "MEDLAB-2026-")
+     * @param testIds                list of test IDs to include in each order
+     * @param priority               the order priority
+     * @param notebookEntryId        notebook entry ID (optional)
+     * @param notebookPageId         notebook page ID (optional)
      * @param sampleCollectionPageId sample collection page ID (optional)
-     * @param sysUserId       the system user ID
+     * @param sysUserId              the system user ID
      * @return result with created orders information
      */
     Map<String, Object> createBulkPatientOrders(List<Map<String, Object>> patients, String labNumberPrefix,
@@ -64,10 +65,10 @@ public interface MedLabPatientOrderService {
      * Links existing imported samples to a patient/participant so downstream pages
      * can resolve the relationship outside notebook-page metadata.
      *
-     * @param sampleItemIds   sample item IDs to link
-     * @param patientId       patient/participant ID
-     * @param notebookPageId  notebook page ID (optional)
-     * @param sysUserId       the system user ID
+     * @param sampleItemIds  sample item IDs to link
+     * @param patientId      patient/participant ID
+     * @param notebookPageId notebook page ID (optional)
+     * @param sysUserId      the system user ID
      * @return linking result
      */
     Map<String, Object> linkSamplesToPatient(List<Integer> sampleItemIds, String patientId, Integer notebookPageId,
@@ -101,7 +102,8 @@ public interface MedLabPatientOrderService {
 
     /**
      * Returns tests available for MedLab Page 1 order entry for the current user.
-     * Uses lab-unit scope (any assigned role), then falls back to orderable catalog tests.
+     * Uses lab-unit scope (any assigned role), then falls back to orderable catalog
+     * tests.
      */
     List<Map<String, Object>> getOrderableTestsForMedLab(String systemUserId);
 
@@ -122,8 +124,8 @@ public interface MedLabPatientOrderService {
     List<Map<String, Object>> getAllRegisteredPatientsForPage(Integer pageId);
 
     /**
-     * Gets patients registered on a notebook page (session list) who do not yet have
-     * a pending order on that page.
+     * Gets patients registered on a notebook page (session list) who do not yet
+     * have a pending order on that page.
      *
      * @param pageId the notebook page ID (Patient &amp; Lab Order page)
      * @return list of registered patient snapshots awaiting an order
@@ -191,6 +193,14 @@ public interface MedLabPatientOrderService {
      * @return result of the operation
      */
     Map<String, Object> recordSampleCollection(String labNo, String sampleTypeId, String containerType,
+            String collectionTime, String collectionDate, String collectorId, String volume, String notes,
+            Integer notebookPageId, String sysUserId);
+
+    /**
+     * Records collection of one or more specimen types under the same lab order.
+     * Each selected type is preserved as a distinct sample item.
+     */
+    Map<String, Object> recordSampleCollection(String labNo, List<String> sampleTypeIds, String containerType,
             String collectionTime, String collectionDate, String collectorId, String volume, String notes,
             Integer notebookPageId, String sysUserId);
 

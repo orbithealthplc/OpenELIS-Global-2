@@ -352,17 +352,14 @@ public class NoteBookRestController extends BaseRestController {
                 return ResponseEntity.status(403).body(Map.of("error", "Admin access required to edit templates"));
             }
         } else {
-            // Entry updates require entry-level permission on parent template.
+            // Entry/instance updates: template allowedRoles OR any SRS workflow stage
+            // persona.
             NoteBook parent = noteBookService.getParentTemplate(noteBookId);
             if (parent != null) {
                 boolean canViewParent = notebookSecurityService.canViewTemplate(parent.getId(), sysUserId,
                         loginLabUnit);
-                boolean canEditByRole = notebookSecurityService.canCreateEntry(parent.getId(), sysUserId, loginLabUnit);
-                boolean isCreator = notebook.getCreator() != null
-                        && String.valueOf(notebook.getCreator().getId()).equals(sysUserId);
-                boolean isTechnician = notebook.getTechnician() != null
-                        && String.valueOf(notebook.getTechnician().getId()).equals(sysUserId);
-                canEdit = canViewParent && (canEditByRole || isCreator || isTechnician);
+                canEdit = canViewParent
+                        && notebookSecurityService.canEditNotebookInstance(notebook, sysUserId, loginLabUnit);
             } else {
                 // Standalone notebook edits are restricted to admins.
                 canEdit = notebookSecurityService.canEditTemplate(sysUserId);

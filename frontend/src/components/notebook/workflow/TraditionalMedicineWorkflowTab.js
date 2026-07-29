@@ -477,37 +477,37 @@ function TraditionalMedicineWorkflowTab({ notebookId, entryId: propEntryId }) {
             {effectivePages.length > 0 &&
               effectivePages[activePage] &&
               effectivePages[activePage].hasAccess && (
-              <div className="page-panel">
-                <div className="page-header">
-                  <h3>{effectivePages[activePage].title}</h3>
-                  <div className="page-progress">
-                    {(() => {
-                      const progress = getProgressForPage(
-                        effectivePages[activePage].id,
-                      );
-                      return (
-                        <span>
-                          {progress.completed}/{progress.total}{" "}
-                          <FormattedMessage id="notebook.workflow.samplesCompleted" />
-                        </span>
-                      );
-                    })()}
-                  </div>
-                </div>
-
-                <div className="page-content">
-                  {effectivePages[activePage].instructions && (
-                    <div className="page-instructions">
-                      {effectivePages[activePage].instructions}
+                <div className="page-panel">
+                  <div className="page-header">
+                    <h3>{effectivePages[activePage].title}</h3>
+                    <div className="page-progress">
+                      {(() => {
+                        const progress = getProgressForPage(
+                          effectivePages[activePage].id,
+                        );
+                        return (
+                          <span>
+                            {progress.completed}/{progress.total}{" "}
+                            <FormattedMessage id="notebook.workflow.samplesCompleted" />
+                          </span>
+                        );
+                      })()}
                     </div>
-                  )}
+                  </div>
 
-                  <div key={`page-content-${effectivePages[activePage].id}`}>
-                    {renderPageContent(effectivePages[activePage])}
+                  <div className="page-content">
+                    {effectivePages[activePage].instructions && (
+                      <div className="page-instructions">
+                        {effectivePages[activePage].instructions}
+                      </div>
+                    )}
+
+                    <div key={`page-content-${effectivePages[activePage].id}`}>
+                      {renderPageContent(effectivePages[activePage])}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
             {effectivePages.length > 0 &&
               effectivePages[activePage] &&
               !effectivePages[activePage].hasAccess && (

@@ -24,7 +24,10 @@ import "../pathology/PathologyDashboard.css";
 import PageBreadCrumb from "../common/PageBreadCrumb";
 import { usePermissions } from "../../hooks/usePermissions";
 import { Permissions } from "../../constants/roles";
-import { canEditNotebookEntry } from "./utils/noteBookEntryEditPermissions";
+import {
+  canEditNotebookEntry,
+  canOpenNotebookEntry,
+} from "./utils/noteBookEntryEditPermissions";
 import CustomDatePicker from "../common/CustomDatePicker";
 import {
   Document,
@@ -56,13 +59,13 @@ function NoteBookDashBoard() {
 
   const intl = useIntl();
 
-  const canEditDashboardEntry = (entry) => {
+  const dashboardEntryAccessArgs = (entry) => {
     const entryRoles = entry?.allowedRoles
       ? Array.isArray(entry.allowedRoles)
         ? entry.allowedRoles
         : Array.from(entry.allowedRoles)
       : [];
-    return canEditNotebookEntry({
+    return {
       hasRoleForCurrentLabUnit,
       hasPersonaForActiveDepartment,
       templateAllowedRoles: entryRoles,
@@ -70,8 +73,19 @@ function NoteBookDashBoard() {
       creatorId: entry?.creatorId,
       technicianId: entry?.technicianId,
       workflowType: entry?.workflowType,
-    });
+    };
   };
+
+  /** Save / mutate — Biomedical Staff excluded (equipment persona). */
+  const canEditDashboardEntry = (entry) =>
+    canEditNotebookEntry(dashboardEntryAccessArgs(entry));
+
+  /**
+   * Open notebook (edit URL with Restricted stages, or view). Biomedical Staff
+   * may open; Save stays gated by canEditDashboardEntry inside the form.
+   */
+  const canOpenDashboardEntry = (entry) =>
+    canOpenNotebookEntry(dashboardEntryAccessArgs(entry));
 
   const [statuses, setStatuses] = useState([]);
   const [noteBookEntries, setNoteBookEntries] = useState([]);
@@ -670,7 +684,6 @@ function NoteBookDashBoard() {
                             <Button
                               kind="secondary"
                               size="sm"
-                              disabled={!canEditDashboardEntry(entry)}
                               onClick={() => openNoteBookInstanceView(entry)}
                             >
                               <View size={13} />
@@ -682,15 +695,21 @@ function NoteBookDashBoard() {
                               <Button
                                 kind="primary"
                                 size="sm"
-                                disabled={!canEditDashboardEntry(entry)}
+                                disabled={!canOpenDashboardEntry(entry)}
                                 title={
-                                  !canEditDashboardEntry(entry)
+                                  !canOpenDashboardEntry(entry)
                                     ? intl.formatMessage({
                                         id: "notebook.permission.entry.edit.required",
                                         defaultMessage:
                                           "You need permission to create or edit notebook entries",
                                       })
-                                    : undefined
+                                    : !canEditDashboardEntry(entry)
+                                      ? intl.formatMessage({
+                                          id: "notebook.permission.entry.open.restricted",
+                                          defaultMessage:
+                                            "You can open this notebook; stages are Restricted and Save is disabled",
+                                        })
+                                      : undefined
                                 }
                                 onClick={() => openNoteBookInstanceEdit(entry)}
                               >

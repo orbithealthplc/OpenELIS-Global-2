@@ -25,18 +25,18 @@ import org.openelisglobal.notebook.service.NotebookBulkOperationService;
 import org.openelisglobal.notebook.service.NotebookPageSampleService;
 import org.openelisglobal.notebook.service.PathologyUserAttestationUtil;
 import org.openelisglobal.notebook.service.ResultCompilationService;
-import org.openelisglobal.systemuser.service.SystemUserService;
 import org.openelisglobal.notebook.service.ResultCompilationService.ExportOptions;
 import org.openelisglobal.notebook.service.ResultCompilationService.ValidationSummary;
 import org.openelisglobal.notebook.valueholder.NoteBook;
 import org.openelisglobal.notebook.valueholder.NoteBookPage;
-import org.openelisglobal.notebook.valueholder.NotebookStageAction;
 import org.openelisglobal.notebook.valueholder.NotebookPageSample;
 import org.openelisglobal.notebook.valueholder.NotebookPageSample.Status;
+import org.openelisglobal.notebook.valueholder.NotebookStageAction;
 import org.openelisglobal.notebook.valueholder.ValidationStatus;
 import org.openelisglobal.storage.dao.StorageBoxDAO;
 import org.openelisglobal.storage.service.SampleStorageService;
 import org.openelisglobal.storage.valueholder.StorageBox;
+import org.openelisglobal.systemuser.service.SystemUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -129,8 +129,7 @@ public class NotebookBulkOperationController extends BaseRestController {
 
         assertPageEdit(httpRequest, pageId);
 
-        PathologyUserAttestationUtil.applyPathologistFieldsIfVerifying(request.getData(), systemUserService,
-                sysUserId);
+        PathologyUserAttestationUtil.applyPathologistFieldsIfVerifying(request.getData(), systemUserService, sysUserId);
 
         int updatedCount = bulkOperationService.bulkApplyValues(pageId, request.getSampleIds(), request.getData(),
                 sysUserId);
@@ -181,8 +180,7 @@ public class NotebookBulkOperationController extends BaseRestController {
 
         assertPageEdit(httpRequest, pageId);
 
-        PathologyUserAttestationUtil.applyPathologistFieldsIfVerifying(request.getData(), systemUserService,
-                sysUserId);
+        PathologyUserAttestationUtil.applyPathologistFieldsIfVerifying(request.getData(), systemUserService, sysUserId);
 
         int updatedCount = bulkOperationService.bulkApplyValuesString(pageId, request.getSampleIds(), request.getData(),
                 sysUserId);
@@ -586,9 +584,8 @@ public class NotebookBulkOperationController extends BaseRestController {
     @GetMapping(value = "/notebook/{notebookId}/export/excel", produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     public void exportToExcel(@PathVariable("notebookId") Integer notebookId,
             @RequestParam(defaultValue = "true") boolean includeInvalid,
-            @RequestParam(defaultValue = "true") boolean includeInconclusive,
-            HttpServletRequest httpRequest, jakarta.servlet.http.HttpServletResponse response)
-            throws java.io.IOException {
+            @RequestParam(defaultValue = "true") boolean includeInconclusive, HttpServletRequest httpRequest,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
 
         try {
             assertNotebookReadAccess(httpRequest, notebookId);
@@ -644,9 +641,8 @@ public class NotebookBulkOperationController extends BaseRestController {
     @GetMapping(value = "/notebook/{notebookId}/export/csv", produces = "text/csv")
     public void exportToCsv(@PathVariable("notebookId") Integer notebookId,
             @RequestParam(defaultValue = "true") boolean includeInvalid,
-            @RequestParam(defaultValue = "true") boolean includeInconclusive,
-            HttpServletRequest httpRequest, jakarta.servlet.http.HttpServletResponse response)
-            throws java.io.IOException {
+            @RequestParam(defaultValue = "true") boolean includeInconclusive, HttpServletRequest httpRequest,
+            jakarta.servlet.http.HttpServletResponse response) throws java.io.IOException {
 
         try {
             assertNotebookReadAccess(httpRequest, notebookId);

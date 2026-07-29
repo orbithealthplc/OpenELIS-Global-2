@@ -1,0 +1,54 @@
+- generic [active]:
+  - generic:
+    - generic:
+      - banner [ref=f2e1]:
+        - link [ref=f2e2] [cursor=pointer]:
+          - /url: /
+          - img "AHRI LIMS" [ref=f2e5]
+          - generic [ref=f2e6]:
+            - heading "AHRI LIMS" [level=5] [ref=f2e7]
+            - paragraph [ref=f2e8]: "Version:"
+        - generic [ref=f2e9]:
+          - generic [ref=f2e10]:
+            - button "Lang" [ref=f2e11] [cursor=pointer]
+            - tooltip
+          - generic [ref=f2e14]:
+            - button "Help" [ref=f2e15] [cursor=pointer]
+            - tooltip
+          - generic "Help Panel":
+            - list:
+              - listitem:
+                - button "User Manual" [ref=f2e20] [cursor=pointer]
+              - listitem:
+                - button "Video Tutorials" [ref=f2e24] [cursor=pointer]
+              - listitem:
+                - button "Release Notes" [ref=f2e28] [cursor=pointer]
+        - generic "Header Panel":
+          - list:
+            - listitem:
+              - generic [ref=f2e33]:
+                - generic [ref=f2e34]: Select Locale
+                - combobox "Select Locale" [ref=f2e36] [cursor=pointer]:
+                  - option "English" [selected]
+                  - option "English (UK)"
+                  - option "English (Sri Lanka)"
+                  - option "English (US)"
+                  - option "Español"
+                  - option "Français"
+                  - option "Indonesia"
+                  - option "Indonesia (ID)"
+                  - option "Malagasy"
+                  - option "Română"
+                  - option "සිංහල"
+                  - option "සිංහල (Sri Lanka)"
+                  - option "தமிழ்"
+                  - option "தமிழ் (Sri Lanka)"
+                  - option "Swahili"
+                  - option "Amharic"
+            - listitem:
+              - generic [ref=f2e37]: "Version::"
+      - generic:
+        - main:
+          - img "loading" [ref=f2e40]
+      - contentinfo:
+        - paragraph

@@ -139,7 +139,13 @@ function IncomingRequestsTab({ onActionComplete, onAccepted }) {
         }
       },
     );
-  }, [selectedRequest, acceptNotes, loadRequests, onActionComplete, onAccepted]);
+  }, [
+    selectedRequest,
+    acceptNotes,
+    loadRequests,
+    onActionComplete,
+    onAccepted,
+  ]);
 
   const handleReject = useCallback(() => {
     if (!selectedRequest || !rejectionReason.trim()) return;

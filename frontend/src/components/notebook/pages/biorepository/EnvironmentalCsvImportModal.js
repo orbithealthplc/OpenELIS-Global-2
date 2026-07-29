@@ -199,35 +199,40 @@ function EnvironmentalCsvImportModal({
       ? { deviceCode: scopeCode || null, rows }
       : { roomCode: scopeCode || null, rows };
 
-    postToOpenElisServerJsonResponse(endpoint, JSON.stringify(payload), (response) => {
-      setImporting(false);
+    postToOpenElisServerJsonResponse(
+      endpoint,
+      JSON.stringify(payload),
+      (response) => {
+        setImporting(false);
 
-      if (response && (response.importedCount > 0 || response.success)) {
-        if (onImportSuccess) {
-          onImportSuccess(response);
+        if (response && (response.importedCount > 0 || response.success)) {
+          if (onImportSuccess) {
+            onImportSuccess(response);
+          }
+          handleClose();
+          return;
         }
-        handleClose();
-        return;
-      }
 
-      const responseErrors = response?.errors || [];
-      if (responseErrors.length > 0) {
+        const responseErrors = response?.errors || [];
+        if (responseErrors.length > 0) {
+          setError(
+            responseErrors
+              .map((item) => `Row ${item.row}: ${item.message}`)
+              .join("; "),
+          );
+          return;
+        }
+
         setError(
-          responseErrors
-            .map((item) => `Row ${item.row}: ${item.message}`)
-            .join("; "),
+          response?.error ||
+            intl.formatMessage({
+              id: "biorepository.environmental.import.failed",
+              defaultMessage:
+                "Import failed. Please review the file and try again.",
+            }),
         );
-        return;
-      }
-
-      setError(
-        response?.error ||
-          intl.formatMessage({
-            id: "biorepository.environmental.import.failed",
-            defaultMessage: "Import failed. Please review the file and try again.",
-          }),
-      );
-    });
+      },
+    );
   };
 
   return (
@@ -352,7 +357,13 @@ function EnvironmentalCsvImportModal({
             />
           </h5>
           <DataTable rows={previewRows} headers={previewHeaders} size="sm">
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            {({
+              rows,
+              headers,
+              getTableProps,
+              getHeaderProps,
+              getRowProps,
+            }) => (
               <TableContainer>
                 <Table {...getTableProps()}>
                   <TableHead>

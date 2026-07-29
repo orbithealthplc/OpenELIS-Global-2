@@ -50,20 +50,15 @@ public class BiorepositoryQCInspection extends BaseObject<Integer> {
      */
     public enum DiscrepancyType {
         // Document-aligned core discrepancy classes
-        SAMPLE_MISSING("Sample missing"),
-        WRONG_SAMPLE_IN_POSITION("Wrong sample in position"),
+        SAMPLE_MISSING("Sample missing"), WRONG_SAMPLE_IN_POSITION("Wrong sample in position"),
         MISPLACED_SAMPLE_FOUND("Misplaced sample (found elsewhere)"),
-        EMPTY_POSITION_REGISTERED("Empty position but registered as occupied"),
-        LABELING_ERROR("Labeling error"),
+        EMPTY_POSITION_REGISTERED("Empty position but registered as occupied"), LABELING_ERROR("Labeling error"),
         BOX_RACK_MISPLACEMENT("Box/rack misplacement"),
         CONTAINER_VOLUME_APPEARANCE("Container/volume/appearance issue"),
         // Legacy values retained for backward compatibility with existing records
-        MISSING_SAMPLE("Missing Sample"),
-        DAMAGED_LABEL("Damaged/Illegible Label"),
-        MISPLACED_ITEM("Misplaced Item (wrong position)"),
-        CONTAINER_DAMAGE("Container Damage"),
-        VOLUME_DISCREPANCY("Volume Discrepancy"),
-        OTHER("Other");
+        MISSING_SAMPLE("Missing Sample"), DAMAGED_LABEL("Damaged/Illegible Label"),
+        MISPLACED_ITEM("Misplaced Item (wrong position)"), CONTAINER_DAMAGE("Container Damage"),
+        VOLUME_DISCREPANCY("Volume Discrepancy"), OTHER("Other");
 
         private final String displayValue;
 

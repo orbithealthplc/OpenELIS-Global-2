@@ -1,0 +1,113 @@
+[
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_collector",
+    "persona": "Sample Collector",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "FAIL",
+    "error": "login failed for trad_collector: HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7dd0c2506000>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=45)'))"
+  },
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_tech",
+    "persona": "Laboratory Technician",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "FAIL",
+    "error": "login failed for trad_tech: HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7dd0c2542480>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=45)'))"
+  },
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_manager",
+    "persona": "Lab Manager",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "FAIL",
+    "error": "login failed for trad_manager: HTTPSConnectionPool(host='lims.ahri.gov.et', port=443): Max retries exceeded with url: /api/OpenELIS-Global/ValidateLogin?apiCall=true (Caused by ConnectTimeoutError(<HTTPSConnection(host='lims.ahri.gov.et', port=443) at 0x7dd0c2541ca0>, 'Connection to lims.ahri.gov.et timed out. (connect timeout=45)'))"
+  },
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_jr_researcher",
+    "persona": "Junior Researcher",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Intake, Registration & Authentication",
+      "2.Sample Storage & Herbarium Placement",
+      "3.Sample Preparation for Analysis",
+      "4.Sample Preparation for Analysis",
+      "5.Extraction, Filtration & Concentration",
+      "6.Product Development & Testing",
+      "7.Product Development & Testing",
+      "8.Formulation of Medical Product"
+    ],
+    "restrictedCount": 2,
+    "expectedRestrictedCount": 3,
+    "expectedRestricted": [
+      "Sample Intake, Registration & Authentication",
+      "Sample Storage & Herbarium Placement",
+      "Storage, Reporting & Archival"
+    ],
+    "stageCount": 8,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/237?mode=edit&tab=workflow&entryId=121",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Traditional_trad_jr_researcher.png",
+    "navText": "Workflow Pages\n1.Sample Intake, Registration & Authentication\nRestricted\n2.Sample Storage & Herbarium Placement\nRestricted\n3.Sample Preparation for Analysis\n0%\n4.Sample Preparation for Analysis\n0%\n5.Extraction, Filtration & Concentration\n0%\n6.Product Development & Testing\n0%\n7.Product Development & Testing\n0%\n8.Formulation of Medical Product\n0%\n0 of 8 pages completed"
+  },
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_sr_researcher",
+    "persona": "Senior Researcher",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "FAIL",
+    "error": "Page.goto: Timeout 120000ms exceeded.\nCall log:\n  - navigating to \"https://lims.ahri.gov.et/NoteBookInstanceEditForm/237?mode=edit&tab=workflow&entryId=121\", waiting until \"commit\"\n"
+  },
+  {
+    "dept": "Traditional",
+    "workflow": "traditional_medicine",
+    "user": "trad_biomedical",
+    "persona": "Biomedical Staff",
+    "notebookId": 237,
+    "entryId": 121,
+    "result": "PASS",
+    "hasNav": true,
+    "order_ok": null,
+    "access_ok": true,
+    "titles": [
+      "1.Sample Intake, Registration & Authentication",
+      "2.Sample Storage & Herbarium Placement",
+      "3.Sample Preparation for Analysis",
+      "4.Sample Preparation for Analysis",
+      "5.Extraction, Filtration & Concentration",
+      "6.Product Development & Testing",
+      "7.Product Development & Testing",
+      "8.Formulation of Medical Product"
+    ],
+    "restrictedCount": 8,
+    "expectedRestrictedCount": 8,
+    "expectedRestricted": [
+      "Sample Intake, Registration & Authentication",
+      "Sample Storage & Herbarium Placement",
+      "Sample Preparation for Analysis",
+      "Extraction, Filtration & Concentration",
+      "Analytical Pathway",
+      "Product Development & Testing",
+      "Formulation of Medical Product",
+      "Storage, Reporting & Archival"
+    ],
+    "stageCount": 8,
+    "url": "https://lims.ahri.gov.et/NoteBookInstanceEditForm/237?mode=edit&tab=workflow&entryId=121",
+    "screenshot": "/home/dawit/Ahri/OpenELIS-Global-2/output/playwright/ahri-uat/Traditional_trad_biomedical.png",
+    "navText": "Workflow Pages\n1.Sample Intake, Registration & Authentication\nRestricted\n2.Sample Storage & Herbarium Placement\nRestricted\n3.Sample Preparation for Analysis\nRestricted\n4.Sample Preparation for Analysis\nRestricted\n5.Extraction, Filtration & Concentration\nRestricted\n6.Product Development & Testing\nRestricted\n7.Product Development & Testing\nRestricted\n8.Formulation of Medical Product\nRestricted\n0 of 8 pages completed"
+  }
+]

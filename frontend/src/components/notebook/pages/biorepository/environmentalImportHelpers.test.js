@@ -6,7 +6,9 @@ import {
 } from "./environmentalImportHelpers";
 
 describe("environmentalImportHelpers", () => {
-  const devices = [{ id: 1, name: "FREEZER-01", code: "FREEZER-01", deviceType: "Freezer-80" }];
+  const devices = [
+    { id: 1, name: "FREEZER-01", code: "FREEZER-01", deviceType: "Freezer-80" },
+  ];
   const rooms = [{ id: 10, name: "BR-ROOM-A", code: "BR-ROOM-A" }];
 
   test("buildDeviceTemplateCsv includes required headers", () => {

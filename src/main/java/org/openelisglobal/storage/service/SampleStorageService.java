@@ -63,8 +63,8 @@ public interface SampleStorageService {
             String positionCoordinate, String reason, String notes, String sysUserId);
 
     /**
-     * Mark a sample item as missing by clearing its current assignment location while
-     * retaining the assignment row for audit/traceability.
+     * Mark a sample item as missing by clearing its current assignment location
+     * while retaining the assignment row for audit/traceability.
      *
      * @param sampleItemId SampleItem ID
      * @param reason       Required reason for missing state
@@ -74,8 +74,8 @@ public interface SampleStorageService {
     java.util.Map<String, Object> markSampleItemMissing(String sampleItemId, String reason, String notes);
 
     /**
-     * Remove a stored sample from its physical location when checked out for retrieval
-     * (clears assignment location; records movement audit).
+     * Remove a stored sample from its physical location when checked out for
+     * retrieval (clears assignment location; records movement audit).
      */
     java.util.Map<String, Object> clearStorageAssignmentForCheckout(String sampleItemId, String notes,
             String sysUserId);
@@ -98,8 +98,8 @@ public interface SampleStorageService {
     java.util.Map<String, Object> getSampleItemLocation(String sampleItemId);
 
     /**
-     * Resolve a SampleItem by accession number, external id, or internal id (same rules
-     * as storage assignment).
+     * Resolve a SampleItem by accession number, external id, or internal id (same
+     * rules as storage assignment).
      *
      * @param identifier accession, external id, or sample item id
      * @return resolved SampleItem or null when not found
@@ -107,22 +107,22 @@ public interface SampleStorageService {
     org.openelisglobal.sampleitem.valueholder.SampleItem resolveSampleItemByIdentifier(String identifier);
 
     /**
-     * Find an assigned stored SampleItem using the same substring rules as the storage
-     * dashboard search (accession, external id, sample item id, location path).
+     * Find an assigned stored SampleItem using the same substring rules as the
+     * storage dashboard search (accession, external id, sample item id, location
+     * path).
      *
      * @param identifier partial or full accession / external id / id
      * @return first matching assigned SampleItem, or null
      */
-    org.openelisglobal.sampleitem.valueholder.SampleItem findAssignedSampleItemByPartialIdentifier(
-            String identifier);
+    org.openelisglobal.sampleitem.valueholder.SampleItem findAssignedSampleItemByPartialIdentifier(String identifier);
 
     /**
      * Get storage locations for multiple SampleItems in a single call.
-         *
-         * @param sampleItemIds sample item IDs
-         * @return map keyed by SampleItem ID with location details
-         */
-        java.util.Map<String, java.util.Map<String, Object>> getSampleItemLocations(java.util.List<String> sampleItemIds);
+     *
+     * @param sampleItemIds sample item IDs
+     * @return map keyed by SampleItem ID with location details
+     */
+    java.util.Map<String, java.util.Map<String, Object>> getSampleItemLocations(java.util.List<String> sampleItemIds);
 
     /**
      * Get paginated sample storage assignments for dashboard display (OGC-150).

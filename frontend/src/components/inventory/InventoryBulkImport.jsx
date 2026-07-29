@@ -94,7 +94,10 @@ const InventoryBulkImport = () => {
         }));
         setAssignableDepartments(departments);
         const loginId = userSessionDetails?.loginLabUnitId;
-        if (loginId && departments.some((d) => String(d.id) === String(loginId))) {
+        if (
+          loginId &&
+          departments.some((d) => String(d.id) === String(loginId))
+        ) {
           setDepartmentId(String(loginId));
         } else if (departments.length === 1) {
           setDepartmentId(String(departments[0].id));
@@ -194,7 +197,11 @@ const InventoryBulkImport = () => {
       return;
     }
 
-    if (mode === MODE_CATALOG && assignableDepartments.length > 0 && !departmentId) {
+    if (
+      mode === MODE_CATALOG &&
+      assignableDepartments.length > 0 &&
+      !departmentId
+    ) {
       setError("Please select a department before validating");
       return;
     }
@@ -222,7 +229,11 @@ const InventoryBulkImport = () => {
 
       const data = await response.json();
       if (!response.ok) {
-        setError(data?.error || data?.message || `Validation failed (${response.status})`);
+        setError(
+          data?.error ||
+            data?.message ||
+            `Validation failed (${response.status})`,
+        );
         return;
       }
 
@@ -235,7 +246,9 @@ const InventoryBulkImport = () => {
       try {
         await runLocalValidation();
       } catch (localErr) {
-        setError(localErr?.message || err?.message || "Failed to validate file");
+        setError(
+          localErr?.message || err?.message || "Failed to validate file",
+        );
       }
     } finally {
       setValidating(false);
@@ -260,7 +273,9 @@ const InventoryBulkImport = () => {
     try {
       if (usingLocalImport) {
         const rows =
-          parsedRows.length > 0 ? parsedRows : (await parseImportFile(file)).rows;
+          parsedRows.length > 0
+            ? parsedRows
+            : (await parseImportFile(file)).rows;
         const data =
           mode === MODE_CATALOG
             ? await importCatalogLocal(rows, departmentId)
@@ -285,7 +300,9 @@ const InventoryBulkImport = () => {
 
       if (isImportApiUnavailable(response)) {
         const rows =
-          parsedRows.length > 0 ? parsedRows : (await parseImportFile(file)).rows;
+          parsedRows.length > 0
+            ? parsedRows
+            : (await parseImportFile(file)).rows;
         const data =
           mode === MODE_CATALOG
             ? await importCatalogLocal(rows, departmentId)
@@ -301,7 +318,9 @@ const InventoryBulkImport = () => {
 
       const data = await response.json();
       if (!response.ok) {
-        setError(data?.error || data?.message || `Import failed (${response.status})`);
+        setError(
+          data?.error || data?.message || `Import failed (${response.status})`,
+        );
         return;
       }
 
@@ -493,7 +512,10 @@ const InventoryBulkImport = () => {
             kind="primary"
             onClick={handleImport}
             disabled={
-              !file || !validationResult?.valid || importing || catalogNeedsDepartment
+              !file ||
+              !validationResult?.valid ||
+              importing ||
+              catalogNeedsDepartment
             }
             style={{ marginLeft: "1rem" }}
           >

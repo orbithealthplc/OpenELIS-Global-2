@@ -44,8 +44,7 @@ public class BiorepositoryDashboardSampleAgingUnitTest {
         BioSample fromCollectionDate = buildStoredSample(
                 Timestamp.valueOf(LocalDate.now().minusDays(365).atStartOfDay()),
                 Timestamp.valueOf(LocalDate.now().minusDays(20).atStartOfDay()));
-        BioSample fromReceivedDate = buildStoredSample(
-                null,
+        BioSample fromReceivedDate = buildStoredSample(null,
                 Timestamp.valueOf(LocalDate.now().minusDays(730).atStartOfDay()));
 
         when(bioSampleService.getAll()).thenReturn(List.of(fromCollectionDate, fromReceivedDate));

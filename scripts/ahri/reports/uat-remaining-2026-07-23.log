@@ -1,0 +1,36 @@
+[PASS] stage-override-enforce / API DEFAULT mode
+[FAIL] stage-override-enforce / UI DEFAULT Restricted>0 — restr=0 nav=False
+[PASS] stage-override-enforce / API ALL mode
+[FAIL] stage-override-enforce / UI ALL Restricted=0 — restr=0 titles=0
+[PASS] stage-override-enforce / API ALLOWLIST pageKeys
+[FAIL] stage-override-enforce / UI ALLOWLIST mostly Restricted — restr=0
+[PASS] stage-override-enforce / cleanup DEFAULT
+[FAIL] admin-stage-ui / User edit shows Notebook stage access — AHRI LIMS Version:  3.2.1.2    Français    English   Login     	Notice: Access to this service is for authorized personnel only. If you do not have the expressed authorization of t
+[FAIL] admin-stage-ui / UI Save All stages persists — editor missing — skipped save
+[FAIL] admin-stage-ui / API POST UnifiedSystemUser with stageAccess — HTTP 500 "Check server logs"
+[PASS] stage-complete-api / collector COMPLETE reception — HTTP 200 expect [200, 400]
+[PASS] stage-complete-api / collector COMPLETE reporting deny — HTTP 403 expect [403]
+[PASS] stage-complete-api / manager COMPLETE reporting — HTTP 200 expect [200, 400]
+[PASS] stage-complete-api / jr COMPLETE reception deny — HTTP 403 expect [403]
+[FAIL] stage-complete-api / global_admin COMPLETE deny — HTTP 200 expect [403, 401]
+[PASS] stage-complete-api / system_admin COMPLETE deny — HTTP 403 expect [403, 401]
+[PASS] stage-complete-api / admin_staff COMPLETE deny — HTTP 403 expect [403, 401]
+[PASS] stage-complete-api / eqa_user COMPLETE deny — HTTP 403 expect [403, 401]
+[PASS] stage-complete-api / biomedical COMPLETE deny — HTTP 403 expect [403]
+[PASS] biomedical-menus / API inventory/items — HTTP 200
+[PASS] biomedical-menus / API storage/rooms — HTTP 200
+[FAIL] biomedical-menus / view-mode notebook open — redirected to login
+[FAIL] biomedical-menus / UI /inventory — url=https://lims.ahri.gov.et/login head=AHRI LIMS  Version:   3.2.1.2  User Manual Video Tutorials Release Notes Select 
+[FAIL] biomedical-menus / UI /equipment-usage — url=https://lims.ahri.gov.et/login head=AHRI LIMS  Version:   3.2.1.2  User Manual Video Tutorials Release Notes Select 
+[FAIL] biomedical-menus / UI /StorageDashboard — url=https://lims.ahri.gov.et/OpenELIS-Global/LoginPage head=AHRI LIMS Version:  3.2.1.2    Français    English   Login     	Notice: Access t
+[PASS] global-roles / global_admin /admin — url=https://lims.ahri.gov.et/admin
+[FAIL] global-roles / system_admin /admin — url=https://lims.ahri.gov.et/admin
+[FAIL] global-roles / admin_staff /landing — url=https://lims.ahri.gov.et/landing
+[PASS] global-roles / eqa_user /landing — url=https://lims.ahri.gov.et/landing
+[FAIL] stage-edit-ui / manager full stage access — restr=0
+[PASS] stage-edit-ui / manager sees Save/Complete controls — buttons=0
+[FAIL] stage-edit-ui / collector blocked on reporting stage — Locator.click: Timeout 4000ms exceeded.
+Call log:
+  - waiting for get_by_text(re.compile(r"Reporting", re.IGNORECASE)).first
+
+REPORT /home/dawit/Ahri/OpenELIS-Global-2/scripts/ahri/uat-remaining-pass-fail-2026-07-23.md 17/32

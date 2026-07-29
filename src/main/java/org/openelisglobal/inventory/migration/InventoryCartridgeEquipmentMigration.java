@@ -1,8 +1,8 @@
 package org.openelisglobal.inventory.migration;
 
 /**
- * Documents and tests the Liquibase heuristic that reclassifies mis-typed CARTRIDGE
- * catalog rows holding equipment metadata to EQUIPMENT.
+ * Documents and tests the Liquibase heuristic that reclassifies mis-typed
+ * CARTRIDGE catalog rows holding equipment metadata to EQUIPMENT.
  */
 public final class InventoryCartridgeEquipmentMigration {
 
@@ -10,8 +10,8 @@ public final class InventoryCartridgeEquipmentMigration {
     }
 
     /**
-     * Rows still matching this query after migration 045/047 should be reviewed manually
-     * (likely true analyzer cartridges, not instruments).
+     * Rows still matching this query after migration 045/047 should be reviewed
+     * manually (likely true analyzer cartridges, not instruments).
      */
     public static final String AUDIT_REMAINING_CARTRIDGE_WITH_EQUIPMENT_METADATA_SQL = """
             SELECT id, name, category, model_number, serial_number, equipment_condition, ahri_tag
@@ -35,10 +35,11 @@ public final class InventoryCartridgeEquipmentMigration {
     }
 
     /**
-     * Additional predicate for changeset inventory-migrate-cartridge-to-equipment-dates (047).
+     * Additional predicate for changeset
+     * inventory-migrate-cartridge-to-equipment-dates (047).
      */
-    public static boolean shouldMigrateCartridgeToEquipmentByMaintenanceDates(
-            java.util.Date installationDate, java.util.Date lastMaintenanceDate, java.util.Date nextMaintenanceDate) {
+    public static boolean shouldMigrateCartridgeToEquipmentByMaintenanceDates(java.util.Date installationDate,
+            java.util.Date lastMaintenanceDate, java.util.Date nextMaintenanceDate) {
         return installationDate != null || lastMaintenanceDate != null || nextMaintenanceDate != null;
     }
 

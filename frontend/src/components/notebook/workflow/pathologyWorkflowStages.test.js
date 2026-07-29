@@ -17,9 +17,12 @@ const PATHOLOGY_WORKFLOW_STAGE_MAP = {
 const ALL_SUBTYPES = Object.keys(PATHOLOGY_WORKFLOW_STAGE_MAP);
 
 describe("pathology workflow subtypes", () => {
-  it.each(ALL_SUBTYPES)("normalizes %s to canonical pathology RBAC key", (subtype) => {
-    expect(normalizeWorkflowType(subtype)).toBe("pathology");
-  });
+  it.each(ALL_SUBTYPES)(
+    "normalizes %s to canonical pathology RBAC key",
+    (subtype) => {
+      expect(normalizeWorkflowType(subtype)).toBe("pathology");
+    },
+  );
 
   it("histopathology shows full 13-stage subset", () => {
     expect(PATHOLOGY_WORKFLOW_STAGE_MAP.histopathology_biopsy_tissue.size).toBe(
@@ -31,7 +34,8 @@ describe("pathology workflow subtypes", () => {
   });
 
   it("peripheral smear skips tissue processing stages 3-6", () => {
-    const stages = PATHOLOGY_WORKFLOW_STAGE_MAP.peripheral_smear_bone_marrow_morphology;
+    const stages =
+      PATHOLOGY_WORKFLOW_STAGE_MAP.peripheral_smear_bone_marrow_morphology;
     expect(stages.has(3)).toBe(false);
     expect(stages.has(7)).toBe(true);
   });

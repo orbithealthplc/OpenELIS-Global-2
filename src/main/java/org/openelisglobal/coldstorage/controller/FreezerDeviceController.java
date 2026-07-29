@@ -1,9 +1,9 @@
 package org.openelisglobal.coldstorage.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.OffsetDateTime;
@@ -69,8 +69,7 @@ public class FreezerDeviceController extends BaseRestController {
             @RequestParam(name = "roomId", required = false) Long roomFilter,
             @RequestParam(name = "status", required = false) FreezerReading.Status statusFilter,
             HttpServletRequest request) {
-        return freezerService.getActiveFreezers().stream()
-                .filter(freezer -> canAccessFreezer(freezer, request))
+        return freezerService.getActiveFreezers().stream().filter(freezer -> canAccessFreezer(freezer, request))
                 .filter(freezer -> roomFilter == null || (freezer.getStorageRoom() != null
                         && roomFilter.equals(freezer.getStorageRoom().getId().longValue())))
                 .map(this::toStatusResponse)
@@ -90,9 +89,9 @@ public class FreezerDeviceController extends BaseRestController {
     }
 
     @GetMapping("/{name}/latest")
-    public ResponseEntity<SensorReadingResponse> getLatestByName(@PathVariable String name, HttpServletRequest request) {
-        return freezerService.findByName(name)
-                .filter(freezer -> canAccessFreezer(freezer, request))
+    public ResponseEntity<SensorReadingResponse> getLatestByName(@PathVariable String name,
+            HttpServletRequest request) {
+        return freezerService.findByName(name).filter(freezer -> canAccessFreezer(freezer, request))
                 .flatMap(freezer -> freezerReadingService.getLatestReading(freezer.getId()))
                 .map(SensorReadingResponse::from).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
@@ -100,8 +99,7 @@ public class FreezerDeviceController extends BaseRestController {
     @GetMapping("/{name}/recent")
     public ResponseEntity<List<SensorReadingResponse>> getRecentByName(@PathVariable String name,
             @RequestParam(defaultValue = "10") @Min(1) @Max(250) int limit, HttpServletRequest request) {
-        return freezerService.findByName(name)
-                .filter(freezer -> canAccessFreezer(freezer, request))
+        return freezerService.findByName(name).filter(freezer -> canAccessFreezer(freezer, request))
                 .map(freezer -> ResponseEntity.ok(freezerReadingService.getRecentReadings(freezer.getId(), limit)
                         .stream().map(SensorReadingResponse::from).collect(Collectors.toList())))
                 .orElse(ResponseEntity.notFound().build());
@@ -133,8 +131,8 @@ public class FreezerDeviceController extends BaseRestController {
     @GetMapping("/storage-devices")
     public List<StorageDeviceResponse> listStorageDevices(HttpServletRequest request) {
         return storageLocationService.getAllDevices().stream().filter(StorageDevice::getActive)
-                .filter(device -> canAccessRoom(device.getParentRoom(), request))
-                .map(StorageDeviceResponse::from).collect(Collectors.toList());
+                .filter(device -> canAccessRoom(device.getParentRoom(), request)).map(StorageDeviceResponse::from)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/users")
@@ -146,8 +144,7 @@ public class FreezerDeviceController extends BaseRestController {
 
     @PostMapping("/devices")
     public ResponseEntity<Freezer> createDevice(@RequestBody @Valid Freezer freezer,
-            @RequestParam(name = "roomId", required = true) Long roomId,
-            HttpServletRequest request) {
+            @RequestParam(name = "roomId", required = true) Long roomId, HttpServletRequest request) {
         StorageRoom room = storageLocationService.getRoom(roomId.intValue());
         if (!canAccessRoom(room, request)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -158,8 +155,7 @@ public class FreezerDeviceController extends BaseRestController {
 
     @PutMapping("/devices/{id}")
     public ResponseEntity<Freezer> updateDevice(@PathVariable Long id, @RequestBody @Valid Freezer freezer,
-            @RequestParam(name = "roomId", required = true) Long roomId,
-            HttpServletRequest request) {
+            @RequestParam(name = "roomId", required = true) Long roomId, HttpServletRequest request) {
         Freezer existing = freezerService.requireFreezer(id);
         StorageRoom targetRoom = storageLocationService.getRoom(roomId.intValue());
         if (!canAccessFreezer(existing, request) || !canAccessRoom(targetRoom, request)) {

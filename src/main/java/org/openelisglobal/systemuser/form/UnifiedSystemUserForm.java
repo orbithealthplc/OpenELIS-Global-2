@@ -321,4 +321,20 @@ public class UnifiedSystemUserForm extends BaseForm {
     public void setSelectedTestSectionLabUnits(Map<String, Set<String>> selectedTestSectionLabUnits) {
         this.selectedTestSectionLabUnits = selectedTestSectionLabUnits;
     }
+
+    /**
+     * Per lab-unit notebook stage access override (DEFAULT / ALL / ALLOWLIST + page
+     * keys). Key = test section / lab unit id.
+     */
+    private Map<String, org.openelisglobal.notebook.form.LabUnitStageAccessForm> selectedLabUnitStageAccess = new HashMap<>();
+
+    public Map<String, org.openelisglobal.notebook.form.LabUnitStageAccessForm> getSelectedLabUnitStageAccess() {
+        return selectedLabUnitStageAccess;
+    }
+
+    public void setSelectedLabUnitStageAccess(
+            Map<String, org.openelisglobal.notebook.form.LabUnitStageAccessForm> selectedLabUnitStageAccess) {
+        this.selectedLabUnitStageAccess = selectedLabUnitStageAccess == null ? new HashMap<>()
+                : selectedLabUnitStageAccess;
+    }
 }

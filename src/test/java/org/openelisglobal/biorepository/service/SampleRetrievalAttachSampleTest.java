@@ -81,8 +81,8 @@ public class SampleRetrievalAttachSampleTest {
         when(bioSampleService.get(99)).thenReturn(bioSample);
         when(baseObjectDAO.hasActiveRetrievalForBioSample(99)).thenReturn(false);
 
-        SampleRetrievalItem fulfillment = retrievalService.attachSampleToReferenceItem(
-                20, 99, BigDecimal.valueOf(2), "user-1");
+        SampleRetrievalItem fulfillment = retrievalService.attachSampleToReferenceItem(20, 99, BigDecimal.valueOf(2),
+                "user-1");
 
         assertNotNull(fulfillment);
         assertEquals(SampleRetrievalItem.ItemStatus.PENDING, fulfillment.getStatus());

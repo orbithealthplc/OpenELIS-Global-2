@@ -3,8 +3,8 @@ package org.openelisglobal.biorepository.controller.rest.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
- * Single lifecycle event for a biorepository sample (storage, transfer, retrieval
- * flow). Populated from persisted domain data only.
+ * Single lifecycle event for a biorepository sample (storage, transfer,
+ * retrieval flow). Populated from persisted domain data only.
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BioSampleLifecycleEventDTO {

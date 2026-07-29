@@ -12,12 +12,18 @@ describe("registry pageKey + action", () => {
 
   it("permits VIEW for biorepository intake", () => {
     expect(
-      isActionPermitted("biorepository", { pageId: "intake", order: 1 }, "VIEW"),
+      isActionPermitted(
+        "biorepository",
+        { pageId: "intake", order: 1 },
+        "VIEW",
+      ),
     ).toBe(true);
   });
 
   it("fail-closed for unknown workflow", () => {
-    expect(resolvePageAllowedRoles("unknown", { pageId: "x", order: 1 }, "VIEW")).toEqual([]);
+    expect(
+      resolvePageAllowedRoles("unknown", { pageId: "x", order: 1 }, "VIEW"),
+    ).toEqual([]);
   });
 
   it("denies EDIT when action not in registry stage", () => {

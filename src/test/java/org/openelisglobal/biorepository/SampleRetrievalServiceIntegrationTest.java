@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -103,7 +102,8 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         Integer bioSampleId = bioSample.getId();
 
         // Step 1: Create request (DRAFT)
-        SampleRetrievalRequest request = retrievalService.createRequest("Research analysis", itemsFor(bioSampleId), null, null, DestinationType.ANALYSIS_RETURN, "Lab 101", PriorityLevel.NORMAL,
+        SampleRetrievalRequest request = retrievalService.createRequest("Research analysis", itemsFor(bioSampleId),
+                null, null, DestinationType.ANALYSIS_RETURN, "Lab 101", PriorityLevel.NORMAL,
                 LocalDate.now().plusDays(7), requester.getId().toString());
 
         assertEquals(RequestStatus.DRAFT, request.getStatus());
@@ -123,7 +123,8 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
 
         // Step 4: Retrieve item
         Integer itemId = request.getItems().get(0).getId();
-        SampleRetrievalItem item = retrievalService.retrieveItem(itemId, "Good", "No issues", null, null, approver.getId().toString());
+        SampleRetrievalItem item = retrievalService.retrieveItem(itemId, "Good", "No issues", null, null,
+                approver.getId().toString());
         assertEquals(ItemStatus.RETRIEVED, item.getStatus());
 
         // Verify BioSample status changed to IN_USE
@@ -147,8 +148,8 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         List<ChainOfCustodyLog> logs = custodyService
                 .getBySampleItemId(Integer.valueOf(bioSample.getSampleItem().getId()));
         assertTrue("Should have custody log entries", logs.size() >= 2);
-        assertTrue("Expected RETURN_RECEIVED event",
-                logs.stream().anyMatch(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_RECEIVED));
+        assertTrue("Expected RETURN_RECEIVED event", logs.stream()
+                .anyMatch(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_RECEIVED));
         assertFalse("RETURN_STORED should not be emitted before physical storage",
                 logs.stream().anyMatch(log -> log.getCustodyAction() == ChainOfCustodyLog.CustodyAction.RETURN_STORED));
     }
@@ -183,8 +184,8 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         BioSample bioSample = createStoredBioSample("DUP-" + System.currentTimeMillis());
 
         // First request
-        SampleRetrievalRequest first = retrievalService.createRequest("First", itemsFor(bioSample.getId()), null,
-                null, DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null, requester.getId().toString());
+        SampleRetrievalRequest first = retrievalService.createRequest("First", itemsFor(bioSample.getId()), null, null,
+                DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null, requester.getId().toString());
         retrievalService.submitForApproval(first.getId(), requester.getId().toString());
 
         // Second request should fail
@@ -264,9 +265,8 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
     @Test
     public void testCancelRequest() {
         BioSample bioSample = createStoredBioSample("CANC-" + System.currentTimeMillis());
-        SampleRetrievalRequest request = retrievalService.createRequest("Cancel me", itemsFor(bioSample.getId()),
-                null, null, DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null,
-                requester.getId().toString());
+        SampleRetrievalRequest request = retrievalService.createRequest("Cancel me", itemsFor(bioSample.getId()), null,
+                null, DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null, requester.getId().toString());
 
         request = retrievalService.cancelRequest(request.getId(), requester.getId().toString());
 
@@ -361,9 +361,9 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         BioSample bs1 = createStoredBioSample("BULK1-" + System.currentTimeMillis());
         BioSample bs2 = createStoredBioSample("BULK2-" + System.currentTimeMillis());
 
-        SampleRetrievalRequest request = retrievalService.createRequest("Bulk test",
-                itemsFor(bs1.getId(), bs2.getId()), null, null, DestinationType.ANALYSIS_RETURN, null,
-                PriorityLevel.NORMAL, null, requester.getId().toString());
+        SampleRetrievalRequest request = retrievalService.createRequest("Bulk test", itemsFor(bs1.getId(), bs2.getId()),
+                null, null, DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null,
+                requester.getId().toString());
         request = retrievalService.submitForApproval(request.getId(), requester.getId().toString());
         request = retrievalService.approveRequest(request.getId(), "Approved", approver.getId().toString());
 
@@ -379,7 +379,6 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         assertEquals(RequestStatus.COMPLETED, updated.getStatus());
         assertEquals(2, updated.getTotalItemCount());
     }
-
 
     @Test(expected = IllegalArgumentException.class)
     public void testCreateRequest_QuantityExceedsAvailable_Fails() {
@@ -415,7 +414,6 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
         SampleItem updated = sampleItemService.get(sampleItem.getId());
         assertEquals(new java.math.BigDecimal("7.0"), updated.getEffectiveRemainingQuantity());
     }
-
 
     private List<RetrievalItemCreate> itemsFor(Integer... bioSampleIds) {
         List<RetrievalItemCreate> items = new java.util.ArrayList<>();
@@ -471,9 +469,9 @@ public class SampleRetrievalServiceIntegrationTest extends BaseWebContextSensiti
     }
 
     private SampleRetrievalRequest createAndSubmitRequest(BioSample bioSample) {
-        SampleRetrievalRequest request = retrievalService.createRequest("Test purpose",
-                itemsFor(bioSample.getId()), null, null, DestinationType.ANALYSIS_RETURN, null,
-                PriorityLevel.NORMAL, null, requester.getId().toString());
+        SampleRetrievalRequest request = retrievalService.createRequest("Test purpose", itemsFor(bioSample.getId()),
+                null, null, DestinationType.ANALYSIS_RETURN, null, PriorityLevel.NORMAL, null,
+                requester.getId().toString());
         return retrievalService.submitForApproval(request.getId(), requester.getId().toString());
     }
 

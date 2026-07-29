@@ -38,9 +38,7 @@ import {
   MNTDReportingREDCapPage,
 } from "../pages/mntd";
 import "./NotebookWorkflow.css";
-import {
-  resolveNotebookInstruments,
-} from "../utils/notebookInstruments";
+import { resolveNotebookInstruments } from "../utils/notebookInstruments";
 
 /**
  * Default workflow pages for MNTD workflow.
@@ -79,7 +77,11 @@ const DEFAULT_MNTD_WORKFLOW_PAGES = [
  * @param {number} props.entryId - The notebook entry ID (direct entry access)
  * @param {Array} props.linkedInstruments - Live linked equipment from instance form
  */
-function MNTDWorkflowTab({ notebookId, entryId: propEntryId, linkedInstruments }) {
+function MNTDWorkflowTab({
+  notebookId,
+  entryId: propEntryId,
+  linkedInstruments,
+}) {
   const componentMounted = useRef(false);
   const intl = useIntl();
   const { userSessionDetails, isGlobalAdmin } = usePermissions();

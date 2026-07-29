@@ -3,9 +3,9 @@ package org.openelisglobal.biorepository.service;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doThrow;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
@@ -97,9 +97,7 @@ public class RetrievalFulfillmentSuggestionServiceTest {
         failingItem.setId(404);
         failingItem.setRequestedSampleType("blood");
         when(retrievalService.getRetrievalItem(404)).thenReturn(failingItem);
-        doThrow(new RuntimeException("search exploded"))
-                .when(fulfillmentSearchService)
-                .search(any(), any());
+        doThrow(new RuntimeException("search exploded")).when(fulfillmentSearchService).search(any(), any());
 
         SampleRetrievalItem okItem = new SampleRetrievalItem();
         okItem.setId(505);

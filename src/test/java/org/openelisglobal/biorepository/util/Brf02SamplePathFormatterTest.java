@@ -26,8 +26,7 @@ public class Brf02SamplePathFormatterTest {
     @Test
     public void formatFromHierarchicalPath_parsesRoomToBoxHierarchy() {
         assertEquals("Zn Room-A / FRZ Freezer-1 / SH S2 / RK R15 / Box BX078 / Pos B3",
-                Brf02SamplePathFormatter.formatFromHierarchicalPath(
-                        "Room-A > Freezer-1 > S2 > R15 > BX078", "B3"));
+                Brf02SamplePathFormatter.formatFromHierarchicalPath("Room-A > Freezer-1 > S2 > R15 > BX078", "B3"));
     }
 
     @Test

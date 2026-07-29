@@ -20,14 +20,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class InventoryLotServiceImpl extends AuditableBaseObjectServiceImpl<InventoryLot, Long>
         implements InventoryLotService {
 
-    public static final String EQUIPMENT_LOT_RECEIVE_MESSAGE =
-            "Equipment is managed from the equipment catalog/asset workflow, not inventory lot receiving.";
+    public static final String EQUIPMENT_LOT_RECEIVE_MESSAGE = "Equipment is managed from the equipment catalog/asset workflow, not inventory lot receiving.";
 
-    public static final String EQUIPMENT_SERIAL_REQUIRED_MESSAGE =
-            "Serial / asset ID is required for equipment registration.";
+    public static final String EQUIPMENT_SERIAL_REQUIRED_MESSAGE = "Serial / asset ID is required for equipment registration.";
 
-    public static final String EQUIPMENT_QUANTITY_MESSAGE =
-            "Equipment assets must be registered with quantity 1.";
+    public static final String EQUIPMENT_QUANTITY_MESSAGE = "Equipment assets must be registered with quantity 1.";
 
     @Autowired
     private InventoryLotDAO inventoryLotDAO;

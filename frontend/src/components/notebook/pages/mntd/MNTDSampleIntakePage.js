@@ -321,7 +321,11 @@ function MNTDSampleIntakePage({
 
         {selectedSampleIds.length > 0 && (
           <PermissionGate
-            roles={stageEditRoles.length > 0 ? stageEditRoles : Permissions.REGISTER_SAMPLES}
+            roles={
+              stageEditRoles.length > 0
+                ? stageEditRoles
+                : Permissions.REGISTER_SAMPLES
+            }
             requireActiveDepartment
             departmentDeniedTooltip="Select your active MNTD department in the header first"
             disabledTooltip="You do not have permission to mark samples as registered"

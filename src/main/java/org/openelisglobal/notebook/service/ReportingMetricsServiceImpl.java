@@ -39,7 +39,7 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
     private org.openelisglobal.sample.dao.SampleDAO sampleDAO;
 
     @Override
-        public ThroughputMetrics calculateThroughputMetrics(LocalDate startDate, LocalDate endDate) {
+    public ThroughputMetrics calculateThroughputMetrics(LocalDate startDate, LocalDate endDate) {
         java.sql.Timestamp start = java.sql.Timestamp.valueOf(startDate.atStartOfDay());
         java.sql.Timestamp end = java.sql.Timestamp.valueOf(endDate.plusDays(1).atStartOfDay());
 
@@ -47,13 +47,17 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
         Number reported = 0;
         Number analyzed = 0;
         try {
-            received = (Number) entityManager.createQuery("SELECT COUNT(s) FROM Sample s WHERE s.receivedTimestamp >= :start AND s.receivedTimestamp < :end")
+            received = (Number) entityManager.createQuery(
+                    "SELECT COUNT(s) FROM Sample s WHERE s.receivedTimestamp >= :start AND s.receivedTimestamp < :end")
                     .setParameter("start", start).setParameter("end", end).getSingleResult();
-            reported = (Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'COMPLETED' ")
+            reported = (Number) entityManager
+                    .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'COMPLETED' ")
                     .getSingleResult();
-            analyzed = (Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status IN ('IN_PROGRESS', 'COMPLETED')")
+            analyzed = (Number) entityManager.createQuery(
+                    "SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status IN ('IN_PROGRESS', 'COMPLETED')")
                     .getSingleResult();
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         int samplesReceived = received != null ? received.intValue() : 0;
         int samplesAnalyzed = analyzed != null ? analyzed.intValue() : 0;
@@ -66,20 +70,28 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
         int analyticalQueueLength = 0;
         int backlogSamples = 0;
         try {
-            analyticalQueueLength = ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'IN_PROGRESS'").getSingleResult()).intValue();
-            backlogSamples = ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'").getSingleResult()).intValue();
-        } catch (Exception e) {}
+            analyticalQueueLength = ((Number) entityManager
+                    .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'IN_PROGRESS'")
+                    .getSingleResult()).intValue();
+            backlogSamples = ((Number) entityManager
+                    .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'")
+                    .getSingleResult()).intValue();
+        } catch (Exception e) {
+        }
 
-        return new ThroughputMetrics(samplesReceived, samplesAnalyzed, samplesReported, averageTATDays, tatByTestType, analyticalQueueLength, backlogSamples);
+        return new ThroughputMetrics(samplesReceived, samplesAnalyzed, samplesReported, averageTATDays, tatByTestType,
+                analyticalQueueLength, backlogSamples);
     }
 
     @Override
-        public QualityMetrics calculateQualityMetrics(LocalDate startDate, LocalDate endDate) {
+    public QualityMetrics calculateQualityMetrics(LocalDate startDate, LocalDate endDate) {
         double qcPassRate = 100.0;
         try {
-            List<NotebookPageSample> all = notebookPageSampleService.getByNotebookId(1); // just checking any notebook doesn't easily get all 
+            List<NotebookPageSample> all = notebookPageSampleService.getByNotebookId(1); // just checking any notebook
+                                                                                         // doesn't easily get all
             // We can just rely on basic query
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
 
         Map<String, InstrumentQuality> instrumentMetrics = new HashMap<>();
         instrumentMetrics.put("Active Instruments", new InstrumentQuality("ALL", 100.0, 0, 100.0, LocalDate.now()));
@@ -88,18 +100,20 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
     }
 
     @Override
-        public List<StudyProgressMetrics> getStudyProgressMetrics(String studyId) {
+    public List<StudyProgressMetrics> getStudyProgressMetrics(String studyId) {
         List<StudyProgressMetrics> studyProgress = new ArrayList<>();
         int count = 0;
         try {
             count = ((Number) entityManager.createQuery("SELECT COUNT(s) FROM Sample s").getSingleResult()).intValue();
-        } catch (Exception e) {}
-        studyProgress.add(new StudyProgressMetrics("ALL-STUDIES", "Active Lab Work", count + 10, count, count > 0 ? 100.0 : 0, "N/A", LocalDate.now().toString()));
+        } catch (Exception e) {
+        }
+        studyProgress.add(new StudyProgressMetrics("ALL-STUDIES", "Active Lab Work", count + 10, count,
+                count > 0 ? 100.0 : 0, "N/A", LocalDate.now().toString()));
         return studyProgress;
     }
 
     @Override
-        public List<InstrumentUtilization> getInstrumentUtilization(int numberOfDays) {
+    public List<InstrumentUtilization> getInstrumentUtilization(int numberOfDays) {
         List<InstrumentUtilization> utilization = new ArrayList<>();
         utilization.add(new InstrumentUtilization("GENERIC-01", "Lab Analyzer", 100.0, 5, 20, LocalDate.now()));
         return utilization;
@@ -120,51 +134,69 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
     }
 
     @Override
-        public double getAverageTATByTestType(String testType, LocalDate startDate, LocalDate endDate) {
+    public double getAverageTATByTestType(String testType, LocalDate startDate, LocalDate endDate) {
         return 2.5;
     }
 
     @Override
-        public Map<String, Double> getAnalyticalSuccessRateByTestType(LocalDate startDate, LocalDate endDate) {
+    public Map<String, Double> getAnalyticalSuccessRateByTestType(LocalDate startDate, LocalDate endDate) {
         Map<String, Double> successRates = new HashMap<>();
         successRates.put("Overall", 100.0);
         return successRates;
     }
 
     @Override
-        public Map<String, Integer> getSampleQueueStatus() {
+    public Map<String, Integer> getSampleQueueStatus() {
         Map<String, Integer> queueStatus = new HashMap<>();
         try {
-            queueStatus.put("pending", ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'").getSingleResult()).intValue());
-            queueStatus.put("in_progress", ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'IN_PROGRESS'").getSingleResult()).intValue());
-            queueStatus.put("completed", ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'COMPLETED'").getSingleResult()).intValue());
-        } catch (Exception e) {}
+            queueStatus
+                    .put("pending",
+                            ((Number) entityManager.createQuery(
+                                    "SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'")
+                                    .getSingleResult()).intValue());
+            queueStatus
+                    .put("in_progress",
+                            ((Number) entityManager.createQuery(
+                                    "SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'IN_PROGRESS'")
+                                    .getSingleResult()).intValue());
+            queueStatus.put("completed",
+                    ((Number) entityManager
+                            .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'COMPLETED'")
+                            .getSingleResult()).intValue());
+        } catch (Exception e) {
+        }
         return queueStatus;
     }
 
     @Override
-        public int getAnalyticalBacklogCount() {
+    public int getAnalyticalBacklogCount() {
         try {
-            return ((Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'").getSingleResult()).intValue();
-        } catch (Exception e) { return 0; }
+            return ((Number) entityManager
+                    .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'NOT_STARTED'")
+                    .getSingleResult()).intValue();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     @Override
-        public Map<String, Object> getExternalReportingSummary(String reportType, LocalDate startDate, LocalDate endDate) {
+    public Map<String, Object> getExternalReportingSummary(String reportType, LocalDate startDate, LocalDate endDate) {
         Map<String, Object> summary = new HashMap<>();
         summary.put("reportType", reportType);
         summary.put("startDate", startDate);
         summary.put("endDate", endDate);
         summary.put("generatedDate", LocalDate.now());
         try {
-            summary.put("totalSamples", ((Number) entityManager.createQuery("SELECT COUNT(s) FROM Sample s").getSingleResult()).intValue());
-        } catch (Exception e) {}
+            summary.put("totalSamples",
+                    ((Number) entityManager.createQuery("SELECT COUNT(s) FROM Sample s").getSingleResult()).intValue());
+        } catch (Exception e) {
+        }
         summary.put("status", "ACTIVE");
         return summary;
     }
 
     @Override
-        public List<Map<String, Object>> getPerformanceTrends(int numberOfMonths) {
+    public List<Map<String, Object>> getPerformanceTrends(int numberOfMonths) {
         List<Map<String, Object>> trends = new ArrayList<>();
         LocalDate endDate = LocalDate.now();
         for (int m = 0; m < numberOfMonths; m++) {
@@ -179,14 +211,17 @@ public class ReportingMetricsServiceImpl implements ReportingMetricsService {
     }
 
     @Override
-        public List<String> getDashboardAlerts() {
+    public List<String> getDashboardAlerts() {
         List<String> alerts = new ArrayList<>();
         try {
-            Number issues = (Number) entityManager.createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'ERROR'").getSingleResult();
+            Number issues = (Number) entityManager
+                    .createQuery("SELECT COUNT(nps) FROM NotebookPageSample nps WHERE nps.status = 'ERROR'")
+                    .getSingleResult();
             if (issues != null && issues.intValue() > 0) {
                 alerts.add("SYSTEM ALERT: " + issues.intValue() + " samples in error state!");
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         return alerts;
     }
 

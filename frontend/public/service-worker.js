@@ -1,5 +1,5 @@
 // Define a cache name for versioning your cache
-const CACHE_NAME = "my-cache-v1";
+const CACHE_NAME = "ahri-lims-v20260721-ctd-multisample";
 
 // Cache assets during the install phase
 self.addEventListener("install", (event) => {

@@ -23,8 +23,7 @@ const STORAGE_LOCATION_KEYS = [
   "storageBox",
 ];
 
-const readField = (sample, key) =>
-  sample?.data?.[key] ?? sample?.[key] ?? null;
+const readField = (sample, key) => sample?.data?.[key] ?? sample?.[key] ?? null;
 
 export const hasStorageLocation = (sample) =>
   STORAGE_LOCATION_KEYS.some((key) => {
@@ -237,7 +236,9 @@ export const advanceSamplesToStorageBatched = async (
     );
 
     if (!addResponse?.success) {
-      errors.push(addResponse?.error || `Failed to add batch at offset ${index}`);
+      errors.push(
+        addResponse?.error || `Failed to add batch at offset ${index}`,
+      );
       continue;
     }
 

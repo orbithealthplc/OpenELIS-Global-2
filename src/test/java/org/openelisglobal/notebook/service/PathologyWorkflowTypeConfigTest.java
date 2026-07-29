@@ -12,14 +12,12 @@ public class PathologyWorkflowTypeConfigTest {
     public void canonicalStageOrder_mapsLegacyPathologyTitlesToCanonicalStages() {
         assertEquals(Integer.valueOf(1),
                 PathologyWorkflowTypeConfig.canonicalStageOrder("Sample Creation & Metadata Capture", 1));
-        assertEquals(Integer.valueOf(9),
-                PathologyWorkflowTypeConfig.canonicalStageOrder("Microscopy & Diagnosis", 8));
+        assertEquals(Integer.valueOf(9), PathologyWorkflowTypeConfig.canonicalStageOrder("Microscopy & Diagnosis", 8));
         assertEquals(Integer.valueOf(11),
                 PathologyWorkflowTypeConfig.canonicalStageOrder("Storage & Inventory Management", 9));
         assertEquals(Integer.valueOf(12),
                 PathologyWorkflowTypeConfig.canonicalStageOrder("Reporting & Performance Monitoring", 10));
-        assertEquals(Integer.valueOf(13),
-                PathologyWorkflowTypeConfig.canonicalStageOrder("Disposal & Archiving", 11));
+        assertEquals(Integer.valueOf(13), PathologyWorkflowTypeConfig.canonicalStageOrder("Disposal & Archiving", 11));
     }
 
     @Test

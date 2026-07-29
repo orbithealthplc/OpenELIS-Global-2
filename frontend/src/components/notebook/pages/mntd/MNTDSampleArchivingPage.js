@@ -498,7 +498,9 @@ function MNTDSampleArchivingPage({
     let storagePath = "";
     if (archiveType === "RETENTION") {
       if (useExistingLocation && selectedSamples.length > 0) {
-        storagePath = getExistingStorageLocation(selectedSamples[0]).storagePath;
+        storagePath = getExistingStorageLocation(
+          selectedSamples[0],
+        ).storagePath;
       } else if (storageSelection.box) {
         const parts = [];
         if (storageSelection.room) parts.push(storageSelection.room.name);
@@ -632,12 +634,14 @@ function MNTDSampleArchivingPage({
                   reassign: true,
                   data: {
                     storageRoom:
-                      storageSelection.room?.label || storageSelection.room?.name,
+                      storageSelection.room?.label ||
+                      storageSelection.room?.name,
                     storageFreezer:
                       storageSelection.device?.label ||
                       storageSelection.device?.name,
                     storageRack:
-                      storageSelection.rack?.label || storageSelection.rack?.name,
+                      storageSelection.rack?.label ||
+                      storageSelection.rack?.name,
                     storageBox:
                       storageSelection.box?.label || storageSelection.box?.name,
                     storagePath: assignStoragePath,
@@ -871,10 +875,7 @@ function MNTDSampleArchivingPage({
     if (sample.archiveType === "RETENTION") {
       const storageLocation = coerceDisplayValue(sample.storageLocation, "");
       const storageWell = coerceDisplayValue(sample.storageWell, "");
-      const retentionEndDate = coerceDisplayValue(
-        sample.retentionEndDate,
-        "",
-      );
+      const retentionEndDate = coerceDisplayValue(sample.retentionEndDate, "");
 
       return (
         <div style={{ fontSize: "12px" }}>
@@ -1413,10 +1414,7 @@ function MNTDSampleArchivingPage({
                   })}
                   value="EXISTING"
                   disabled={
-                    !allSelectedHaveExistingStorage(
-                      samples,
-                      selectedSampleIds,
-                    )
+                    !allSelectedHaveExistingStorage(samples, selectedSampleIds)
                   }
                 />
                 <RadioButton
@@ -1447,82 +1445,82 @@ function MNTDSampleArchivingPage({
 
               {retentionLocationMode === "NEW" && (
                 <>
-              {/* Storage Location Selection */}
-              <h6 style={{ marginBottom: "0.5rem", marginTop: "1rem" }}>
-                <FormattedMessage
-                  id="notebook.mntd.archiving.selectStorage"
-                  defaultMessage="Select Storage Location"
-                />
-              </h6>
+                  {/* Storage Location Selection */}
+                  <h6 style={{ marginBottom: "0.5rem", marginTop: "1rem" }}>
+                    <FormattedMessage
+                      id="notebook.mntd.archiving.selectStorage"
+                      defaultMessage="Select Storage Location"
+                    />
+                  </h6>
 
-              <StorageHierarchySelector
-                onSelectionChange={handleStorageSelectionChange}
-                entryId={entryId}
-                notebookId={notebookId}
-                selectedBox={storageSelection.box}
-                storageType="archival"
-              />
-
-              {/* Box Layout Viewer */}
-              {storageSelection.box?.id && (
-                <div style={{ marginTop: "1rem" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    <h6>
-                      <FormattedMessage
-                        id="notebook.mntd.archiving.assignWells"
-                        defaultMessage="Click wells to assign samples ({assigned}/{total})"
-                        values={{
-                          assigned: Object.keys(wellAssignments).length,
-                          total: selectedSampleIds.length,
-                        }}
-                      />
-                    </h6>
-                    <Button
-                      kind="tertiary"
-                      size="sm"
-                      renderIcon={Automatic}
-                      onClick={handleAutoPopulate}
-                      disabled={selectedSampleIds.length === 0}
-                    >
-                      <FormattedMessage
-                        id="notebook.mntd.storage.autoPopulate"
-                        defaultMessage="Auto-Populate"
-                      />
-                    </Button>
-                  </div>
-                  <BoxLayoutViewer
-                    boxId={storageSelection.box.id}
-                    layout={getCombinedLayout()}
-                    rows={storageSelection.box.rows || 8}
-                    columns={storageSelection.box.columns || 12}
-                    onWellClick={handleWellClick}
+                  <StorageHierarchySelector
+                    onSelectionChange={handleStorageSelectionChange}
+                    entryId={entryId}
+                    notebookId={notebookId}
+                    selectedBox={storageSelection.box}
+                    storageType="archival"
                   />
-                </div>
-              )}
 
-              <TextArea
-                id="storage-notes"
-                labelText={intl.formatMessage({
-                  id: "notebook.mntd.archiving.storageNotes",
-                  defaultMessage: "Storage Notes",
-                })}
-                value={retentionData.storageNotes}
-                onChange={(e) =>
-                  setRetentionData((prev) => ({
-                    ...prev,
-                    storageNotes: e.target.value,
-                  }))
-                }
-                rows={2}
-                style={{ marginTop: "1rem" }}
-              />
+                  {/* Box Layout Viewer */}
+                  {storageSelection.box?.id && (
+                    <div style={{ marginTop: "1rem" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
+                          marginBottom: "0.5rem",
+                        }}
+                      >
+                        <h6>
+                          <FormattedMessage
+                            id="notebook.mntd.archiving.assignWells"
+                            defaultMessage="Click wells to assign samples ({assigned}/{total})"
+                            values={{
+                              assigned: Object.keys(wellAssignments).length,
+                              total: selectedSampleIds.length,
+                            }}
+                          />
+                        </h6>
+                        <Button
+                          kind="tertiary"
+                          size="sm"
+                          renderIcon={Automatic}
+                          onClick={handleAutoPopulate}
+                          disabled={selectedSampleIds.length === 0}
+                        >
+                          <FormattedMessage
+                            id="notebook.mntd.storage.autoPopulate"
+                            defaultMessage="Auto-Populate"
+                          />
+                        </Button>
+                      </div>
+                      <BoxLayoutViewer
+                        boxId={storageSelection.box.id}
+                        layout={getCombinedLayout()}
+                        rows={storageSelection.box.rows || 8}
+                        columns={storageSelection.box.columns || 12}
+                        onWellClick={handleWellClick}
+                      />
+                    </div>
+                  )}
+
+                  <TextArea
+                    id="storage-notes"
+                    labelText={intl.formatMessage({
+                      id: "notebook.mntd.archiving.storageNotes",
+                      defaultMessage: "Storage Notes",
+                    })}
+                    value={retentionData.storageNotes}
+                    onChange={(e) =>
+                      setRetentionData((prev) => ({
+                        ...prev,
+                        storageNotes: e.target.value,
+                      }))
+                    }
+                    rows={2}
+                    style={{ marginTop: "1rem" }}
+                  />
                 </>
               )}
             </div>

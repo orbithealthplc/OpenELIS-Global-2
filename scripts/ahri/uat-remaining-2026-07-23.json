@@ -1,0 +1,207 @@
+[
+  {
+    "area": "stage-override-enforce",
+    "case": "API DEFAULT mode",
+    "result": "PASS",
+    "details": {
+      "mode": "DEFAULT",
+      "labUnitId": "168",
+      "pageKeys": []
+    }
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "UI DEFAULT Restricted>0",
+    "result": "FAIL",
+    "notes": "restr=0 nav=False"
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "API ALL mode",
+    "result": "PASS",
+    "details": {
+      "mode": "ALL",
+      "labUnitId": "168",
+      "pageKeys": []
+    }
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "UI ALL Restricted=0",
+    "result": "FAIL",
+    "notes": "restr=0 titles=0"
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "API ALLOWLIST pageKeys",
+    "result": "PASS",
+    "details": {
+      "mode": "ALLOWLIST",
+      "labUnitId": "168",
+      "pageKeys": [
+        "reception"
+      ]
+    }
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "UI ALLOWLIST mostly Restricted",
+    "result": "FAIL",
+    "notes": "restr=0"
+  },
+  {
+    "area": "stage-override-enforce",
+    "case": "cleanup DEFAULT",
+    "result": "PASS"
+  },
+  {
+    "area": "admin-stage-ui",
+    "case": "User edit shows Notebook stage access",
+    "result": "FAIL",
+    "notes": "AHRI LIMS Version:\u00a0 3.2.1.2\u00a0\u00a0\u00a0 Fran\u00e7ais\u00a0\u00a0\u00a0\u00a0English   Login    \u00a0\tNotice: Access to this service is for authorized personnel only. If you do not have the expressed authorization of t"
+  },
+  {
+    "area": "admin-stage-ui",
+    "case": "UI Save All stages persists",
+    "result": "FAIL",
+    "notes": "editor missing \u2014 skipped save"
+  },
+  {
+    "area": "admin-stage-ui",
+    "case": "API POST UnifiedSystemUser with stageAccess",
+    "result": "FAIL",
+    "notes": "HTTP 500 \"Check server logs\""
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "collector COMPLETE reception",
+    "result": "PASS",
+    "notes": "HTTP 200 expect [200, 400]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "collector COMPLETE reporting deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "manager COMPLETE reporting",
+    "result": "PASS",
+    "notes": "HTTP 200 expect [200, 400]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "jr COMPLETE reception deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "global_admin COMPLETE deny",
+    "result": "FAIL",
+    "notes": "HTTP 200 expect [403, 401]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "system_admin COMPLETE deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403, 401]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "admin_staff COMPLETE deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403, 401]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "eqa_user COMPLETE deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403, 401]"
+  },
+  {
+    "area": "stage-complete-api",
+    "case": "biomedical COMPLETE deny",
+    "result": "PASS",
+    "notes": "HTTP 403 expect [403]"
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "API inventory/items",
+    "result": "PASS",
+    "notes": "HTTP 200"
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "API storage/rooms",
+    "result": "PASS",
+    "notes": "HTTP 200"
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "view-mode notebook open",
+    "result": "FAIL",
+    "notes": "redirected to login"
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "UI /inventory",
+    "result": "FAIL",
+    "notes": "url=https://lims.ahri.gov.et/login head=AHRI LIMS  Version: \u00a0 3.2.1.2  User Manual Video Tutorials Release Notes Select "
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "UI /equipment-usage",
+    "result": "FAIL",
+    "notes": "url=https://lims.ahri.gov.et/login head=AHRI LIMS  Version: \u00a0 3.2.1.2  User Manual Video Tutorials Release Notes Select "
+  },
+  {
+    "area": "biomedical-menus",
+    "case": "UI /StorageDashboard",
+    "result": "FAIL",
+    "notes": "url=https://lims.ahri.gov.et/OpenELIS-Global/LoginPage head=AHRI LIMS Version:\u00a0 3.2.1.2\u00a0\u00a0\u00a0 Fran\u00e7ais\u00a0\u00a0\u00a0\u00a0English   Login    \u00a0\tNotice: Access t"
+  },
+  {
+    "area": "global-roles",
+    "case": "global_admin /admin",
+    "result": "PASS",
+    "notes": "url=https://lims.ahri.gov.et/admin"
+  },
+  {
+    "area": "global-roles",
+    "case": "system_admin /admin",
+    "result": "FAIL",
+    "notes": "url=https://lims.ahri.gov.et/admin"
+  },
+  {
+    "area": "global-roles",
+    "case": "admin_staff /landing",
+    "result": "FAIL",
+    "notes": "url=https://lims.ahri.gov.et/landing"
+  },
+  {
+    "area": "global-roles",
+    "case": "eqa_user /landing",
+    "result": "PASS",
+    "notes": "url=https://lims.ahri.gov.et/landing"
+  },
+  {
+    "area": "stage-edit-ui",
+    "case": "manager full stage access",
+    "result": "FAIL",
+    "notes": "restr=0"
+  },
+  {
+    "area": "stage-edit-ui",
+    "case": "manager sees Save/Complete controls",
+    "result": "PASS",
+    "notes": "buttons=0"
+  },
+  {
+    "area": "stage-edit-ui",
+    "case": "collector blocked on reporting stage",
+    "result": "FAIL",
+    "notes": "Locator.click: Timeout 4000ms exceeded.\nCall log:\n  - waiting for get_by_text(re.compile(r\"Reporting\", re.IGNORECASE)).first\n"
+  }
+]

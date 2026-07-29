@@ -59,7 +59,8 @@ public interface SampleItemDAO extends BaseDAO<SampleItem, String> {
     public List<SampleItem> getSampleItemsByExternalID(String externalId) throws LIMSRuntimeException;
 
     /**
-     * Return external IDs from the given collection that already exist in sample_item.
+     * Return external IDs from the given collection that already exist in
+     * sample_item.
      */
     public Set<String> findExistingExternalIds(Collection<String> externalIds) throws LIMSRuntimeException;
 
