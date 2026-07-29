@@ -170,6 +170,11 @@ public class NoteBook extends BaseObject<Integer> {
     @Column(name = "test_id")
     private Set<Integer> allowedTestIds = new HashSet<>();
 
+    @ElementCollection
+    @CollectionTable(name = "notebook_participants", joinColumns = @JoinColumn(name = "notebook_id"))
+    @Column(name = "system_user_id")
+    private Set<Integer> participantIds = new HashSet<>();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_notebook_id")
     private NoteBook parentNotebook;
@@ -425,6 +430,17 @@ public class NoteBook extends BaseObject<Integer> {
 
     public void setAllowedTestIds(Set<Integer> allowedTestIds) {
         this.allowedTestIds = allowedTestIds;
+    }
+
+    public Set<Integer> getParticipantIds() {
+        if (participantIds == null) {
+            participantIds = new HashSet<>();
+        }
+        return participantIds;
+    }
+
+    public void setParticipantIds(Set<Integer> participantIds) {
+        this.participantIds = participantIds;
     }
 
     public NoteBook getParentNotebook() {

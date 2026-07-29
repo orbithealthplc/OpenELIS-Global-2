@@ -284,6 +284,9 @@ const NoteBookEntryForm = () => {
     noteBookForm.content = noteBookData.content;
     noteBookForm.status = noteBookData.status;
     noteBookForm.technicianId = noteBookData.technicianId;
+    noteBookForm.participantIds = (noteBookData.participantIds || []).map(
+      Number,
+    );
     noteBookForm.sampleIds = noteBookData.samples
       ? noteBookData.samples.map((entry) => Number(entry.id))
       : [];
@@ -2310,6 +2313,49 @@ const NoteBookEntryForm = () => {
                     ...noteBookData,
                     technicianId: selectedItem?.id ?? null,
                     technicianName: selectedItem?.label ?? "",
+                  });
+                }}
+              />
+            </Column>
+          </Grid>
+        </Column>
+        <Column lg={16} md={8} sm={4}>
+          <Grid fullWidth={true} className="gridBoundary">
+            <Column lg={16} md={8} sm={4}>
+              <FilterableMultiSelect
+                id="participants"
+                key={`participants-${(noteBookData.participantIds || []).join(",")}-${technicianUsers.length}`}
+                titleText={intl.formatMessage({
+                  id: "notebook.label.participants",
+                  defaultMessage: "Participants",
+                })}
+                placeholder={intl.formatMessage({
+                  id: "notebook.label.participants.search",
+                  defaultMessage: "Search participants...",
+                })}
+                helperText={intl.formatMessage({
+                  id: "notebook.label.participants.helper",
+                  defaultMessage:
+                    "Select people who participate in this project (in addition to the technician).",
+                })}
+                items={technicianUsers.map((u) => ({
+                  id: u.id,
+                  label: u.value || u.name || u.displayName || String(u.id),
+                }))}
+                itemToString={(item) => (item ? item.label : "")}
+                initialSelectedItems={(noteBookData.participantIds || [])
+                  .map((pid) =>
+                    technicianUsers.find((u) => String(u.id) === String(pid)),
+                  )
+                  .filter(Boolean)
+                  .map((u) => ({
+                    id: u.id,
+                    label: u.value || u.name || u.displayName || String(u.id),
+                  }))}
+                onChange={({ selectedItems }) => {
+                  setNoteBookData({
+                    ...noteBookData,
+                    participantIds: selectedItems.map((i) => i.id),
                   });
                 }}
               />
